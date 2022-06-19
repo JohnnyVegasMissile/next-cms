@@ -66,6 +66,14 @@ const validate = (values: PageType) => {
         errors.title = 'Required'
     }
 
+    const splittedSlug = values.slug.split('/')
+    for (const slug of splittedSlug) {
+        if (!slug) {
+            errors.slug = 'Forbiden slug'
+            break
+        }
+    }
+
     if (!values.slug) {
         errors.slug = 'Required'
     }
@@ -128,30 +136,29 @@ const Admin = () => {
 
     const lastSlugIndex = get(values, 'slug', '').split('/').length - 1
 
+    const onHandleChange = (name: string, value: any) => {
+        handleChange({ target: { name, value } })
+    }
+
     const addSlug = () => {
         let newValue = [...get(values, 'slug', '').split('/')]
         newValue.splice(lastSlugIndex, 0, '')
 
-        handleChange({
-            target: {
-                name: 'slug',
-                value: newValue.join('/'),
-            },
-        })
+        onHandleChange('slug', newValue.join('/'))
     }
 
     const removeSlug = () => {
         let newValue = [...get(values, 'slug', '').split('/')]
         newValue.splice(lastSlugIndex - 1, 1)
 
-        handleChange({ target: { name: 'slug', value: newValue.join('/') } })
+        onHandleChange('slug', newValue.join('/'))
     }
 
     const editSlug = (index: number, value: string) => {
         let newValue = [...get(values, 'slug', '').split('/')]
         newValue[index] = value
 
-        handleChange({ target: { name: 'slug', value: newValue.join('/') } })
+        onHandleChange('slug', newValue.join('/'))
     }
 
     // const addSection = () => {
@@ -190,10 +197,6 @@ const Admin = () => {
     //     handleChange({ target: { name: 'metadatas', value: newValue } })
     // }
 
-    const onHandleChange = (name: string, value: any) => {
-        handleChange({ target: { name, value } })
-    }
-
     if (loading || pid === undefined) {
         return <div>Loading...</div>
     }
@@ -214,10 +217,14 @@ const Admin = () => {
                             onHandleChange('title', e.target.value)
 
                             if (pid === 'create') {
-                                // onHandleChange(
-                                //     `slug.${lastSlugIndex}`,
-                                //     kebabcase(e.target.value)
-                                // )
+                                let newValue = [
+                                    ...get(values, 'slug', '').split('/'),
+                                ]
+                                newValue[lastSlugIndex] = kebabcase(
+                                    e.target.value
+                                )
+
+                                onHandleChange('slug', newValue.join('/'))
                             }
                         }}
                     />
@@ -315,6 +322,9 @@ const Admin = () => {
                                         value={slug}
                                         onChange={(e) =>
                                             editSlug(idx, e.target.value)
+                                        }
+                                        status={
+                                            errors.slug ? 'error' : undefined
                                         }
                                     />
                                     {lastSlugIndex !== idx && '/'}

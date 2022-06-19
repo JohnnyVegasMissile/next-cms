@@ -1,8 +1,25 @@
 import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import 'antd/dist/antd.css'
+// import type { AppProps } from 'next/app'
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+import { AuthGuard } from '../components/AuthGuard'
+import { ProvideAuth } from '../hooks/useAuth'
+
+// function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: any) {
+    return (
+        <ProvideAuth>
+            {/* if requireAuth property is present - protect the page */}
+            {Component.requireAuth ? (
+                <AuthGuard>
+                    <Component {...pageProps} />
+                </AuthGuard>
+            ) : (
+                // public page
+                <Component {...pageProps} />
+            )}
+        </ProvideAuth>
+    )
 }
 
 export default MyApp

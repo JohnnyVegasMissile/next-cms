@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Page {
+  id          Int               @id @default(autoincrement())
+  title       String
+  slug        String            @unique
+  // header      Section     @relation(fields: [headerId])
+  sections    Section[]
+  metadatas   Metadata[]
+  // footer      Section
+  published   Boolean
+  homepage    Boolean           @default(false)
+  updatedAt   DateTime          @updatedAt
+}
+
+model Metadata {
+  id              Int           @id @default(autoincrement())
+  name            String
+  content         String
+  pageId          Int
+  page            Page          @relation(fields: [pageId], references: [id])
+}
+
+model Section {
+  id              Int           @id @default(autoincrement())
+  block           String
+  pageId          Int
+  page            Page          @relation(fields: [pageId], references: [id])
+  // elementId    Int?
+  element         Element[]
+  position        Int
+  content         String?
+  updatedAt       DateTime      @updatedAt
+}
+
+model Element {
+  id              Int           @id @default(autoincrement())
+  type            String        // HEADER SECTION FOOTER
+  sectionId       Int?
+  section         Section?      @relation(fields: [sectionId], references: [id])
+  fields          Field[]
+  content         String?
+  updatedAt       DateTime      @updatedAt
+}
+
+model Field {
+  id              Int           @id @default(autoincrement())
+  type            String      // TEXT, TEXTAREA, SELECT, CHECKBOX, RADIO, IMAGE, FILE, DATE, DATETIME, TIME, HIDDEN, PASSWORD
+  label           String
+  name            String
+  elementId       Int?
+  element         Element?      @relation(fields: [elementId], references: [id])
+  required        Boolean       @default(false)
+  value           String?
+}
+
+model User {
+  id              Int           @id @default(autoincrement())
+  name            String
+  email           String
+  password        String
+  updatedAt       DateTime      @updatedAt
+}

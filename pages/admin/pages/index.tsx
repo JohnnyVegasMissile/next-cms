@@ -64,8 +64,8 @@ const columns = [
         render: (e: Page) => (
             <Link href={`/${e}`}>
                 <a>
-                    {e.homepage ? (
-                        <Tag color="cyan">Homepage</Tag>
+                    {e.type !== 'page' ? (
+                        <Tag color="cyan">{e.type}</Tag>
                     ) : (
                         <Breadcrumb>
                             {e.slug.split('/').map((s: string, idx: number) => (
@@ -106,7 +106,7 @@ const columns = [
                 </Button>
                 <Button
                     danger
-                    disabled={e.homepage}
+                    disabled={e.type !== 'page'}
                     onClick={() => {
                         fetch(`/api/pages/${e.id}`, {
                             method: 'DELETE',

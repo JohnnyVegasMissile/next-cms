@@ -13,13 +13,13 @@ datasource db {
 model Page {
   id          Int               @id @default(autoincrement())
   title       String
+  type        String            @default("page")
   slug        String            @unique
   // header      Section     @relation(fields: [headerId])
   sections    Section[]
   metadatas   Metadata[]
   // footer      Section
-  published   Boolean
-  homepage    Boolean           @default(false)
+  published   Boolean           @default(true)
   updatedAt   DateTime          @updatedAt
 }
 
@@ -33,11 +33,9 @@ model Metadata {
 
 model Section {
   id              Int           @id @default(autoincrement())
-  block           String
   pageId          Int
   page            Page          @relation(fields: [pageId], references: [id])
-  // elementId    Int?
-  element         Element[]
+  block           Block[]
   position        Int
   content         String?
   updatedAt       DateTime      @updatedAt
@@ -45,12 +43,19 @@ model Section {
 
 model Element {
   id              Int           @id @default(autoincrement())
-  type            String        // HEADER SECTION FOOTER
-  sectionId       Int?
-  section         Section?      @relation(fields: [sectionId], references: [id])
-  fields          Field[]
+  block           Block[]
   content         String?
   updatedAt       DateTime      @updatedAt
+}
+
+model Block {
+    id              Int           @id @default(autoincrement())
+    model           String
+    fields          Field[]
+    sectionId       Int?
+    section         Section?      @relation(fields: [sectionId], references: [id])
+    elementId       Int?
+    element         Element?      @relation(fields: [elementId], references: [id])
 }
 
 model Field {
@@ -58,8 +63,8 @@ model Field {
   type            String      // TEXT, TEXTAREA, SELECT, CHECKBOX, RADIO, IMAGE, FILE, DATE, DATETIME, TIME, HIDDEN, PASSWORD
   label           String
   name            String
-  elementId       Int?
-  element         Element?      @relation(fields: [elementId], references: [id])
+  blockId         Int?
+  block           Block?        @relation(fields: [blockId], references: [id])
   required        Boolean       @default(false)
   value           String?
 }

@@ -45,13 +45,14 @@ const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin']
 interface PageType {
     title: string
     slug: string
+    type?: 'home' | 'page' | 'error'
     // sections?: SectionType[];
     // metadatas?: MetadataType[];
     published: boolean
     homepage?: boolean
 }
 
-const initialValues: PageType = {
+const initialValues: PageType | Page = {
     title: '',
     slug: '',
     // sections: [],
@@ -59,7 +60,7 @@ const initialValues: PageType = {
     published: true,
 }
 
-const validate = (values: PageType) => {
+const validate = (values: PageType | Page) => {
     let errors: any = {}
 
     if (!values.title) {
@@ -90,34 +91,34 @@ const Admin = () => {
     const router = useRouter()
     const { pid } = router.query
 
-    const { values, errors, handleChange, handleSubmit, setValues } = useFormik(
-        {
-            initialValues,
-            validate,
-            onSubmit: async (values) => {
-                setLoading(true)
-                if (pid === 'create') {
-                    await fetch('/api/pages', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(values),
-                    })
-                } else {
-                    await fetch(`/api/pages/${pid}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(values),
-                    })
-                }
-                router.push('/admin/pages')
-                setLoading(false)
-            },
-        }
-    )
+    const { values, errors, handleChange, handleSubmit, setValues } = useFormik<
+        PageType | Page
+    >({
+        initialValues,
+        validate,
+        onSubmit: async (values) => {
+            setLoading(true)
+            if (pid === 'create') {
+                await fetch('/api/pages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(values),
+                })
+            } else {
+                await fetch(`/api/pages/${pid}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(values),
+                })
+            }
+            router.push('/admin/pages')
+            setLoading(false)
+        },
+    })
 
     useEffect(() => {
         const getPageInfos = async () => {
@@ -237,7 +238,7 @@ const Admin = () => {
                         onChange={(e) =>
                             onHandleChange('published', e.target.value)
                         }
-                        disabled={pid !== 'create' && values.homepage}
+                        disabled={pid !== 'create' && values.type !== 'page'}
                     >
                         <Radio value={true}>Published</Radio>
                         <Radio value={false}>Unpublished</Radio>

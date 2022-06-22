@@ -22,7 +22,9 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         data: req.body,
     })
 
-    return res.status(200).json(page)
+    res.status(200).json(page)
+
+    return res.unstable_revalidate(`/${page.slug}`)
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

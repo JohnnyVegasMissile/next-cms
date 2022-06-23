@@ -1,4 +1,5 @@
 import INSTANCE from './api'
+import type { File } from '@prisma/client'
 
 export const uploadFile = (file: any): Promise<File> =>
     new Promise(async (resolve, reject) => {
@@ -7,7 +8,7 @@ export const uploadFile = (file: any): Promise<File> =>
 
         INSTANCE({
             method: 'POST',
-            url: `/api/images/upload`,
+            url: `/api/images`,
             headers: { 'Content-Type': 'application/json' },
             data,
         })
@@ -15,7 +16,7 @@ export const uploadFile = (file: any): Promise<File> =>
             .catch(reject)
     })
 
-export const getFiles = (): Promise<string[]> =>
+export const getFiles = (): Promise<File[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
@@ -25,14 +26,21 @@ export const getFiles = (): Promise<string[]> =>
             .catch(reject)
     })
 
-export const deleteFiles = (filename: string): Promise<void> =>
+export const deleteFiles = (id: number): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
-            url: `/api/images`,
-            data: {
-                filename,
-            },
+            url: `/api/images/${id}`,
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const initPages = (): Promise<void> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
+            url: `/api/init`,
         })
             .then(resolve)
             .catch(reject)

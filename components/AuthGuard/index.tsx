@@ -2,7 +2,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-export function AuthGuard({ children }: { children: React.ReactNode }) {
+function AuthGuard({ children }: { children: React.ReactNode }) {
     const { user, initializing /*, setRedirect*/ } = useAuth()
     const router = useRouter()
 
@@ -31,3 +31,5 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     /* otherwise don't return anything, will do a redirect from useEffect */
     return null
 }
+
+export default AuthGuard

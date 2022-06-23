@@ -2,7 +2,7 @@ import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 import { PrismaClient, Prisma } from '@prisma/client'
 import type { Page } from '@prisma/client'
-import Link from 'next/link'
+// import Link from 'next/link'
 import get from 'lodash.get'
 
 const prisma = new PrismaClient()
@@ -39,7 +39,7 @@ export async function getStaticProps(context: GetStaticPathsContext) {
         props: {
             ...page,
             updatedAt: Math.floor(
-                (page?.updatedAt.getMilliseconds() || 1) / 1000
+                (page?.updatedAt?.getMilliseconds() || 1) / 1000
             ),
         },
         revalidate: 60,

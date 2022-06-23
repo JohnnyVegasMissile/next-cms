@@ -2,7 +2,8 @@
 const nextConfig = {
     reactStrictMode: true,
     env: {
-        UPLOADS_DIR: './public/uploads/images',
+        UPLOADS_IMAGES_DIR: '/uploads/images',
+        SITE_URL: 'http://localhost:3000',
     },
 }
 

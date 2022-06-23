@@ -1,7 +1,6 @@
 import { Button, Space } from 'antd'
 import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
-import UploadButton from '../../components/UploadButton'
 import { getFiles } from '../../network/admin'
 
 const Admin = () => {
@@ -25,15 +24,14 @@ const Admin = () => {
             </Button>
 
             <Button type="primary">
-                <Link href="/admin/uploads">
-                    <a>Uploads</a>
+                <Link href="/admin/images">
+                    <a>Images</a>
                 </Link>
             </Button>
             <Button danger onClick={signOut}>
                 Sign Out
             </Button>
 
-            <UploadButton />
             <Button onClick={getFiles}>getFiles</Button>
         </Space>
     )

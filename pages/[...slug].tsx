@@ -1,9 +1,9 @@
 import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
-import Router, { useRouter } from 'next/router'
-import { PrismaClient, Prisma } from '@prisma/client'
+// import Router, { useRouter } from 'next/router'
+import { PrismaClient } from '@prisma/client'
 import type { Page } from '@prisma/client'
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 
 const prisma = new PrismaClient()
 
@@ -49,7 +49,7 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
         props: {
             ...page,
             updatedAt: Math.floor(
-                (page?.updatedAt.getMilliseconds() || 1) / 1000
+                (page?.updatedAt?.getMilliseconds() || 1) / 1000
             ),
         },
         revalidate: 60,

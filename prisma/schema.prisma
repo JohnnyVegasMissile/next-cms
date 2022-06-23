@@ -42,6 +42,15 @@ model Section {
   updatedAt       DateTime      @updatedAt
 }
 
+model File {
+  id              Int           @id @default(autoincrement())
+  uri             String        @unique
+  mimeType        String
+  name            String
+  size            Int
+  uploadTime      DateTime      @default(now())
+}
+
 model Element {
   id              Int           @id @default(autoincrement())
   position        Int?

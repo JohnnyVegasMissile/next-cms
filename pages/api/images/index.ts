@@ -1,25 +1,65 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { promises as fs } from 'fs'
+// import { promises as fs } from 'fs'
+import { IncomingForm } from 'formidable'
+import mv from 'mv'
+import get from 'lodash.get'
+import mime from 'mime-types'
+import { PrismaClient, Prisma } from '@prisma/client'
+import type { File } from '@prisma/client'
+
+import { makeId } from '../../../utils'
+
+const prisma = new PrismaClient()
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const dirName = './public/uploads/images'
+    const files: File[] = await prisma.file.findMany()
 
-    const filenames = await fs.readdir(dirName)
-
-    return res.status(200).json(filenames)
+    return res.status(200).json(files)
 }
 
-const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-    const dirName = './public/uploads/images'
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+}
 
-    if (req.body.filename)
-        return res.status(500).json({ error: 'filename missing' })
+const POST = async (req: NextApiRequest, res: NextApiResponse) => {
+    const form = new IncomingForm()
 
-    await fs.unlink(`${dirName}/${req.body.filename}`)
+    await form.parse(req, (err, fields, files) => {
+        if (err) return res.status(500).json({ error: 'err' })
 
-    return res
-        .status(200)
-        .json({ message: `File ${req.body.filename} remove succesfully` })
+        const file: File | undefined | any = Array.isArray(files.file)
+            ? get(files, 'file.0', undefined)
+            : files.file
+
+        if (!file) return res.status(400).json({ error: 'No file' })
+
+        var oldPath = file.filepath
+        var newFileName = `FILE-${makeId(10)}-${makeId(10)}.${mime.extension(
+            file.mimetype
+        )}`
+
+        var newPath = `./public${process.env.UPLOADS_IMAGES_DIR}/${newFileName}`
+
+        mv(oldPath, newPath, function (err) {
+            if (err) return res.status(500).json({ error: err })
+        })
+
+        const fileInfos: Prisma.FileCreateInput = {
+            uri: newFileName,
+            mimeType: file.mimetype,
+            name: file.originalFilename,
+            size: file.size,
+        }
+
+        prisma.file
+            .create({ data: fileInfos })
+            .then((e) => {
+                res.status(200).json(e)
+            })
+            .catch((err) => res.status(500).json({ error: err }))
+    })
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -32,8 +72,8 @@ const upload = async (req: NextApiRequest, res: NextApiResponse) => {
             return await GET(req, res)
         }
 
-        case 'DELETE': {
-            return await DELETE(req, res)
+        case 'POST': {
+            return await POST(req, res)
         }
 
         default: {

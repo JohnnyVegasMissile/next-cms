@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
+// import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+// const prisma = new PrismaClient()
 
 const elements = async (req: NextApiRequest, res: NextApiResponse) => {
-    const pages = await prisma.page.findMany()
+    // const pages = await prisma.page.findMany()
 
     switch (req.method) {
         case 'GET':

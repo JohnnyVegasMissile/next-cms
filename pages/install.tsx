@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react'
-import { Divider, Steps } from 'antd'
+// import { Divider, Steps } from 'antd'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import Head from 'next/head'
-import Image from 'next/image'
+// import Image from 'next/image'
+import { initPages } from '../network/admin'
 
 const Install: NextPage = () => {
-    useEffect(() => {}, [])
+    const [initialazing, setInitialazing] = useState<boolean>(true)
+    useEffect(() => {
+        initPages()
+            .then(() => setInitialazing(false))
+            .catch(() => setInitialazing(false))
+    }, [])
 
     return (
         <div>
@@ -22,9 +28,16 @@ const Install: NextPage = () => {
             <header></header>
 
             <main>
-                <Link href="/">
-                    <a>Back home</a>
-                </Link>
+                {initialazing ? (
+                    'Initialazing...'
+                ) : (
+                    <>
+                        Installed
+                        <Link href="/">
+                            <a>Back home</a>
+                        </Link>
+                    </>
+                )}
             </main>
 
             <footer></footer>

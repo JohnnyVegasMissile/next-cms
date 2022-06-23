@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button, Space, Typography } from 'antd'
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons'
+import type { File } from '@prisma/client'
 
 import { uploadFile } from '../../network/admin'
 
@@ -26,9 +27,15 @@ import { uploadFile } from '../../network/admin'
 
 // interface File
 
-const UploadButton = () => {
+interface Props {
+    value?: File
+    onDeleteValue?(): void
+    onFileRecieved(file: File): void
+}
+
+const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
     const [loading, setLoading] = useState(false)
-    const [value, setValue] = useState<File | null>(null)
+    // const [value, setValue] = useState<File | null>(null)
 
     const handleFiles = async (event: any) => {
         setLoading(true)
@@ -38,10 +45,11 @@ const UploadButton = () => {
         //     return
         // }
 
-        const res = await uploadFile(file)
+        const res: File = await uploadFile(file)
 
         setLoading(false)
-        setValue(res)
+
+        if (res) onFileRecieved(res)
     }
 
     return (
@@ -83,7 +91,7 @@ const UploadButton = () => {
                 <>
                     <Typography.Text underline>{value?.name}</Typography.Text>
                     <Button
-                        onClick={() => setValue(null)}
+                        onClick={onDeleteValue}
                         shape="circle"
                         icon={<CloseOutlined />}
                     />

@@ -44,6 +44,7 @@ model Section {
 
 model Element {
   id              Int           @id @default(autoincrement())
+  position        Int?
   // block           Block[]
   // pageId          Int?
   // page            Page?          @relation(fields: [pageId], references: [id])
@@ -63,7 +64,7 @@ model Element {
 
 model Field {
   id              Int           @id @default(autoincrement())
-  type            String      // TEXT, TEXTAREA, SELECT, CHECKBOX, RADIO, IMAGE, FILE, DATE, DATETIME, TIME, HIDDEN, PASSWORD
+  type            String        // TEXT, TEXTAREA, SELECT, CHECKBOX, RADIO, IMAGE, FILE, DATE, DATETIME, TIME, HIDDEN, PASSWORD
   label           String
   name            String
   // blockId         Int?

@@ -1,36 +1,14 @@
 import { useState } from 'react'
 import { Button, Space, Typography } from 'antd'
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons'
-import type { File } from '@prisma/client'
+import type { Media } from '@prisma/client'
 
-import { uploadFile } from '../../network/admin'
-
-// export const uploadFile = (file) =>
-//     new Promise((resolve, reject) => {
-//         const token = localStorage.getItem('token')
-
-//         const data = new FormData()
-//         data.append('file', file)
-
-//         INSTANCE({
-//             method: 'post',
-//             url: `/files/page-image`,
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 Authorization: `Bearer ${token}`,
-//             },
-//             data,
-//         })
-//             .then(resolve)
-//             .catch(reject)
-//     })
-
-// interface File
+import { uploadImage } from '../../network/images'
 
 interface Props {
-    value?: File
+    value?: Media
     onDeleteValue?(): void
-    onFileRecieved(file: File): void
+    onFileRecieved(file: Media): void
 }
 
 const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
@@ -45,7 +23,7 @@ const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
         //     return
         // }
 
-        const res: File = await uploadFile(file)
+        const res: Media = await uploadImage(file)
 
         setLoading(false)
 

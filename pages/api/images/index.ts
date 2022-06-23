@@ -5,14 +5,14 @@ import mv from 'mv'
 import get from 'lodash.get'
 import mime from 'mime-types'
 import { PrismaClient, Prisma } from '@prisma/client'
-import type { File } from '@prisma/client'
+import type { Media } from '@prisma/client'
 
 import { makeId } from '../../../utils'
 
 const prisma = new PrismaClient()
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const files: File[] = await prisma.file.findMany()
+    const files: Media[] = await prisma.media.findMany()
 
     return res.status(200).json(files)
 }
@@ -29,7 +29,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     await form.parse(req, (err, fields, files) => {
         if (err) return res.status(500).json({ error: 'err' })
 
-        const file: File | undefined | any = Array.isArray(files.file)
+        const file: Media | undefined | any = Array.isArray(files.file)
             ? get(files, 'file.0', undefined)
             : files.file
 
@@ -46,14 +46,14 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             if (err) return res.status(500).json({ error: err })
         })
 
-        const fileInfos: Prisma.FileCreateInput = {
+        const fileInfos: Prisma.MediaCreateInput = {
             uri: newFileName,
             mimeType: file.mimetype,
             name: file.originalFilename,
             size: file.size,
         }
 
-        prisma.file
+        prisma.media
             .create({ data: fileInfos })
             .then((e) => {
                 res.status(200).json(e)

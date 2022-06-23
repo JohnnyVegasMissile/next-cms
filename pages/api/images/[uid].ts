@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
-import type { File } from '@prisma/client'
+import type { Media } from '@prisma/client'
 import { promises as fs } from 'fs'
 
 const prisma = new PrismaClient()
@@ -9,17 +9,17 @@ const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = parseInt(
         Array.isArray(req.query.uid) ? req.query.uid[0] : req.query.uid
     )
-    const page: File = await prisma.file.delete({
+    const image: Media = await prisma.media.delete({
         where: { id },
     })
 
-    if (!page) return res.status(500).json({ error: 'File does not exist' })
+    if (!image) return res.status(500).json({ error: 'File does not exist' })
 
-    await fs.unlink(`./public${process.env.UPLOADS_IMAGES_DIR}/${page.uri}`)
+    await fs.unlink(`./public${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`)
 
     return res
         .status(200)
-        .json({ message: `File ${page.name} remove succesfully` })
+        .json({ message: `File ${image.name} remove succesfully` })
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {

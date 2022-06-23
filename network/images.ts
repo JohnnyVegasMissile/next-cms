@@ -1,7 +1,7 @@
 import INSTANCE from './api'
-import type { File } from '@prisma/client'
+import type { Media } from '@prisma/client'
 
-export const uploadFile = (file: any): Promise<File> =>
+export const uploadImage = (file: any): Promise<Media> =>
     new Promise(async (resolve, reject) => {
         const data = new FormData()
         data.append('file', file)
@@ -16,7 +16,7 @@ export const uploadFile = (file: any): Promise<File> =>
             .catch(reject)
     })
 
-export const getFiles = (): Promise<File[]> =>
+export const getImages = (): Promise<Media[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
@@ -26,7 +26,7 @@ export const getFiles = (): Promise<File[]> =>
             .catch(reject)
     })
 
-export const deleteFiles = (id: number): Promise<void> =>
+export const deleteImage = (id: number): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
@@ -36,34 +36,12 @@ export const deleteFiles = (id: number): Promise<void> =>
             .catch(reject)
     })
 
-export const initPages = (): Promise<void> =>
+export const editImage = (id: number, alt: string): Promise<Media> =>
     new Promise((resolve, reject) => {
         INSTANCE({
-            method: 'GET',
-            url: `/api/init`,
+            method: 'DELETE',
+            url: `/api/images/${id}`,
         })
             .then(resolve)
             .catch(reject)
     })
-
-// await fetch('/api/pages', {
-//     method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify(values),
-// })
-
-// await fetch(`/api/pages/${pid}`, {
-//     method: 'PUT',
-//     headers: {
-//         'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify(values),
-// })
-
-// const res = await fetch('/api/pages')
-
-// fetch(`/api/pages/${e.id}`, {
-//     method: 'DELETE',
-// })

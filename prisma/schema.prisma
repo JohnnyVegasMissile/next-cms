@@ -42,12 +42,13 @@ model Section {
   updatedAt       DateTime      @updatedAt
 }
 
-model File {
+model Media {
   id              Int           @id @default(autoincrement())
   uri             String        @unique
   mimeType        String
   name            String
   size            Int
+  alt             String?
   uploadTime      DateTime      @default(now())
 }
 

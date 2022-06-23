@@ -4,19 +4,19 @@ import { CloseOutlined } from '@ant-design/icons'
 import { Space, Button, Image, Row, Col, Typography } from 'antd'
 // import Link from 'next/link'
 // import moment from 'moment'
-import type { File } from '@prisma/client'
+import type { Media } from '@prisma/client'
 
 import UploadButton from '../../components/UploadButton'
-import { getFiles, deleteFiles } from '../../network/admin'
+import { getImages, deleteImage } from '../../network/images'
 
 const AdminPages = () => {
-    const [files, setFiles] = useState<File[]>([])
+    const [files, setFiles] = useState<Media[]>([])
     const [loading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         setLoading(true)
-        getFiles()
-            .then((res: File[]) => {
+        getImages()
+            .then((res: Media[]) => {
                 setFiles(res)
                 setLoading(false)
             })
@@ -27,14 +27,14 @@ const AdminPages = () => {
         return <div>Loading...</div>
     }
 
-    const addFile = (file: File) => {
+    const addFile = (file: Media) => {
         setFiles([...files, file])
     }
 
     const deleteFile = (id: number) => {
-        deleteFiles(id)
+        deleteImage(id)
 
-        const index = files.findIndex((file) => file.id === id)
+        const index = files.findIndex((file: Media) => file.id === id)
 
         if (index === -1) return
 

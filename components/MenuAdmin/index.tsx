@@ -1,4 +1,4 @@
-import { Menu, Button } from 'antd'
+import { Menu } from 'antd'
 import {
     MailOutlined,
     AppstoreOutlined,

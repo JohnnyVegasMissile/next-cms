@@ -13,3 +13,13 @@ INSTANCE.interceptors.response.use(async (response: any) => {
 })
 
 export default INSTANCE
+
+export const initPages = (): Promise<void> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
+            url: `/api/init`,
+        })
+            .then(resolve)
+            .catch(reject)
+    })

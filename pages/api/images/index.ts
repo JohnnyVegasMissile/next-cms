@@ -10,9 +10,19 @@ import type { Media } from '@prisma/client'
 import { makeId } from '../../../utils'
 
 const prisma = new PrismaClient()
-
+const mimeTypesImages = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    // 'image/svg+xml',
+    // 'image/bmp',
+    // 'image/tiff',
+]
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const files: Media[] = await prisma.media.findMany()
+    const files: Media[] = await prisma.media.findMany({
+        where: { OR: mimeTypesImages.map((mimeType) => ({ mimeType })) },
+    })
 
     return res.status(200).json(files)
 }

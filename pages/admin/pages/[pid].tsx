@@ -10,6 +10,7 @@ import {
     Divider,
     Radio,
     Typography,
+    Select,
 } from 'antd'
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import get from 'lodash.get'
@@ -180,23 +181,23 @@ const Admin = () => {
     //     handleChange({ target: { name: 'sections', value: newValue } })
     // }
 
-    // const addMetadata = () => {
-    //     handleChange({
-    //         target: {
-    //             name: 'metadatas',
-    //             value: get(values, 'metadatas', []).concat([
-    //                 { name: '', content: '' },
-    //             ]),
-    //         },
-    //     })
-    // }
+    const addMetadata = () => {
+        handleChange({
+            target: {
+                name: 'metadatas',
+                value: get(values, 'metadatas', []).concat([
+                    { name: '', content: '' },
+                ]),
+            },
+        })
+    }
 
-    // const removeMetadata = (index) => {
-    //     let newValue = [...get(values, 'metadatas', [])]
-    //     newValue.splice(index, 1)
+    const removeMetadata = (index: number) => {
+        let newValue = [...get(values, 'metadatas', [])]
+        newValue.splice(index, 1)
 
-    //     handleChange({ target: { name: 'metadatas', value: newValue } })
-    // }
+        handleChange({ target: { name: 'metadatas', value: newValue } })
+    }
 
     if (loading || pid === undefined) {
         return <div>Loading...</div>
@@ -247,42 +248,66 @@ const Admin = () => {
                     <Divider />
 
                     <Title level={5}>Meta Datas</Title>
-                    {/* <Space direction="vertical">
-                        {get(values, 'metadatas', []).map((metadata, index) => (
-                            <Space key={index}>
-                                <Input
-                                    value={metadata.name}
-                                    onChange={(e) =>
-                                        onHandleChange(
-                                            `metadatas.${index}.name`,
-                                            e.target.value
-                                        )
-                                    }
-                                />
-                                <Input
-                                    value={metadata.content}
-                                    onChange={(e) =>
-                                        onHandleChange(
-                                            `metadatas.${index}.content`,
-                                            e.target.value
-                                        )
-                                    }
-                                />
-                                <Button
-                                    onClick={() => removeMetadata(index)}
-                                    type="primary"
-                                    shape="circle"
-                                    icon={<MinusOutlined />}
-                                />
-                            </Space>
-                        ))}
+                    <Space direction="vertical">
+                        {get(values, 'metadatas', []).map(
+                            (metadata: any, index: number) => (
+                                <Space key={index}>
+                                    <Select
+                                        style={{ width: 175 }}
+                                        value={metadata.name}
+                                        onChange={(e) =>
+                                            onHandleChange(
+                                                `metadatas.${index}.name`,
+                                                e
+                                            )
+                                        }
+                                    >
+                                        <Select.Option value="application-name">
+                                            Application name
+                                        </Select.Option>
+                                        <Select.Option value="author">
+                                            Author
+                                        </Select.Option>
+                                        <Select.Option value="description">
+                                            Description
+                                        </Select.Option>
+                                        <Select.Option value="generator">
+                                            Generator
+                                        </Select.Option>
+                                        <Select.Option value="keywords">
+                                            Keywords
+                                        </Select.Option>
+                                        <Select.Option value="viewport">
+                                            Viewport
+                                        </Select.Option>
+                                    </Select>
+                                    <Input
+                                        value={metadata.content}
+                                        onChange={(e) =>
+                                            onHandleChange(
+                                                `metadatas.${index}.content`,
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                    {/* http-equiv content-security-policy
+                                    content-type default-style refresh */}
+                                    <Button
+                                        onClick={() => removeMetadata(index)}
+                                        type="primary"
+                                        shape="circle"
+                                        icon={<MinusOutlined />}
+                                    />
+                                </Space>
+                            )
+                        )}
                         <Button
                             onClick={addMetadata}
                             type="primary"
                             shape="circle"
                             icon={<PlusOutlined />}
                         />
-                    </Space> */}
+                    </Space>
 
                     <Divider />
 

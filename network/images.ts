@@ -39,8 +39,9 @@ export const deleteImage = (id: number): Promise<void> =>
 export const editImage = (id: number, alt: string): Promise<Media> =>
     new Promise((resolve, reject) => {
         INSTANCE({
-            method: 'DELETE',
+            method: 'PUT',
             url: `/api/images/${id}`,
+            data: { alt },
         })
             .then(resolve)
             .catch(reject)

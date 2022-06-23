@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 // import type { Page } from '@prisma/client'
-import { CloseOutlined } from '@ant-design/icons'
-import { Space, Button, Image, Row, Col, Typography } from 'antd'
+import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
+import { Space, Button, Image, Row, Col, Input, Card } from 'antd'
 // import Link from 'next/link'
 // import moment from 'moment'
 import type { Media } from '@prisma/client'
 
 import UploadButton from '../../components/UploadButton'
-import { getImages, deleteImage } from '../../network/images'
+import { getImages, deleteImage, editImage } from '../../network/images'
 
 const AdminPages = () => {
     const [files, setFiles] = useState<Media[]>([])
@@ -47,28 +47,58 @@ const AdminPages = () => {
             <Row gutter={[8, 16]} style={{ width: '100%', padding: 15 }}>
                 {files?.map((img, idx) => (
                     <Col key={idx} className="gutter-row" span={6}>
-                        <Space direction="vertical">
-                            <Image
-                                width={200}
-                                height={200}
-                                src={`${process.env.UPLOADS_IMAGES_DIR}/${img.uri}`}
-                                alt=""
-                            />
-                            <Space>
-                                <Typography.Text underline>
-                                    {img.name}
-                                </Typography.Text>
-                                <Button
-                                    onClick={() => deleteFile(img.id)}
-                                    shape="circle"
-                                    icon={<CloseOutlined />}
-                                />
-                            </Space>
-                        </Space>
+                        <ImageCard
+                            img={img}
+                            onDelete={deleteFile}
+                            onEdit={editImage}
+                        />
                     </Col>
                 ))}
             </Row>
         </>
+    )
+}
+
+interface ImageCardProps {
+    img: Media
+    onDelete(id: number): void
+    onEdit(id: number, alt: string): void
+}
+
+const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
+    const [alt, setAlt] = useState<string>(img.alt || '')
+
+    return (
+        <Card
+            title={img.name}
+            extra={
+                <Button
+                    onClick={() => onDelete(img.id)}
+                    shape="circle"
+                    type="dashed"
+                    icon={<CloseOutlined />}
+                />
+            }
+        >
+            <Space direction="vertical">
+                <Image
+                    width={200}
+                    height={200}
+                    src={`${process.env.UPLOADS_IMAGES_DIR}/${img.uri}`}
+                    alt=""
+                />
+                <Space>
+                    <Input.Search
+                        value={alt}
+                        onChange={(e) => setAlt(e.target.value)}
+                        addonBefore="Alt :"
+                        // placeholder="Alt"
+                        onSearch={(e) => onEdit(img.id, e)}
+                        enterButton={<CheckOutlined />}
+                    />
+                </Space>
+            </Space>
+        </Card>
     )
 }
 

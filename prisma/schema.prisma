@@ -15,10 +15,11 @@ model Page {
   title       String
   type        String            @default("page")
   slug        String            @unique
-  // header      Section     @relation(fields: [headerId])
+  // header      Element?
   sections    Section[]
+  // elements    Element[]
   metadatas   Metadata[]
-  // footer      Section
+  // footer      Element?
   published   Boolean           @default(true)
   updatedAt   DateTime          @updatedAt
 }
@@ -35,7 +36,7 @@ model Section {
   id              Int           @id @default(autoincrement())
   pageId          Int
   page            Page          @relation(fields: [pageId], references: [id])
-  block           Block[]
+  // block           Block[]
   position        Int
   content         String?
   updatedAt       DateTime      @updatedAt
@@ -43,28 +44,30 @@ model Section {
 
 model Element {
   id              Int           @id @default(autoincrement())
-  block           Block[]
+  // block           Block[]
+  // pageId          Int?
+  // page            Page?          @relation(fields: [pageId], references: [id])
   content         String?
   updatedAt       DateTime      @updatedAt
 }
 
-model Block {
-    id              Int           @id @default(autoincrement())
-    model           String
-    fields          Field[]
-    sectionId       Int?
-    section         Section?      @relation(fields: [sectionId], references: [id])
-    elementId       Int?
-    element         Element?      @relation(fields: [elementId], references: [id])
-}
+// model Block {
+//   id              Int           @id @default(autoincrement())
+//   model           String
+//   fields          Field[]
+//   sectionId       Int?
+//   section         Section?      @relation(fields: [sectionId], references: [id])
+//   elementId       Int?
+//   element         Element?      @relation(fields: [elementId], references: [id])
+// }
 
 model Field {
   id              Int           @id @default(autoincrement())
   type            String      // TEXT, TEXTAREA, SELECT, CHECKBOX, RADIO, IMAGE, FILE, DATE, DATETIME, TIME, HIDDEN, PASSWORD
   label           String
   name            String
-  blockId         Int?
-  block           Block?        @relation(fields: [blockId], references: [id])
+  // blockId         Int?
+  // block           Block?        @relation(fields: [blockId], references: [id])
   required        Boolean       @default(false)
   value           String?
 }

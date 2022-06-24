@@ -1,11 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import type { Login, Session, User } from '@prisma/client'
+import type { Login, /* Session,*/ User } from '@prisma/client'
 
 import { isEmail, initSession } from '../../../utils'
 
 const prisma = new PrismaClient()
+
+interface FullUser extends User {
+    login: Login
+}
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
@@ -25,7 +29,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 
         console.log(3, hash)
 
-        const user: User = await prisma.user.create({
+        const user = await prisma.user.create({
             data: {
                 name,
                 login: {
@@ -35,17 +39,17 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
                     },
                 },
             },
-            // include: { login: true },
+            include: { login: true },
         })
 
         // const login = prisma.login.findUnique({ where: { userId: user.id } })
 
-        console.log('user', user)
-        // if (!user?.login.id) {
-        //     throw new Error('Email already exist.')
-        // }
+        console.log('user', user.login)
+        if (!user.login) {
+            throw new Error('Email already exist.')
+        }
 
-        // const session = await initSession(user.login.id)
+        const session = await initSession(user.login.id)
 
         // const login = prisma.login.create({
         //     data: {
@@ -80,9 +84,9 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(201).json({
             title: 'Login Successful',
             detail: 'Successfully validated login credentials',
-            // token: session.token,
-            // expiresAt: session.expiresAt,
-            // type: login.type,
+            token: session.token,
+            expiresAt: session.expiresAt,
+            type: user.login.type,
             user,
         })
     } catch (err) {

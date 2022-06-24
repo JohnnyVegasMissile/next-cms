@@ -39,3 +39,5 @@ yarn-error.log*
 /prisma/migrations
 /public/uploads/files/*
 /public/uploads/images/*
+/public/sitemap*
+/public/robot.txt

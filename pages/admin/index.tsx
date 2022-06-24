@@ -11,7 +11,7 @@ const Admin = () => {
         >
             <Button
                 onClick={() => {
-                    signUp('a@mail.com', '123456')
+                    signUp('all@mail.com', '123456')
                 }}
             >
                 Sign up

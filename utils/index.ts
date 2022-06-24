@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js'
 import { PrismaClient } from '@prisma/client'
 import type { Login, Session, User } from '@prisma/client'
+import crypto from 'crypto'
 
 const prisma = new PrismaClient()
 
@@ -29,7 +30,7 @@ export const initSession = async (loginId: number) => {
     const expiresAt = new Date()
     expiresAt.setMonth(expiresAt.getMonth() + 2)
 
-    const token: string = await generateToken(
+    const token: string = generateToken(
         `${loginId}.${expiresAt.getMilliseconds()}`
     )
     const session = await prisma.session.create({
@@ -43,8 +44,5 @@ export const initSession = async (loginId: number) => {
     return session
 }
 
-export const generateToken = (message: string): Promise<string> => {
-    return new Promise((resolve, reject) =>
-        CryptoJS.SHA3(message, { outputLength: 512 }).toString()
-    )
-}
+export const generateToken = (message: string) =>
+    CryptoJS.SHA3(message, { outputLength: 512 }).toString()

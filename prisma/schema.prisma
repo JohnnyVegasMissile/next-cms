@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Page {
+  id          Int               @id @default(autoincrement())
+  title       String
+  type        String            @default("page")
+  slug        String            @unique
+  // header      Element?
+  sections    Section[]
+  // elements    Element[]
+  metadatas   Metadata[]
+  articles    Article[]
+  // footer      Element?
+  published   Boolean           @default(true)
+  updatedAt   DateTime          @updatedAt
+}
+
+model Metadata {
+  id              Int           @id @default(autoincrement())
+  name            String
+  content         String
+  pageId          Int?
+  page            Page?          @relation(fields: [pageId], references: [id])
+  // nodeId          Int?
+  // node            Node?          @relation(fields: [nodeId], references: [id])
+}
+
+model Section {
+  id              Int           @id @default(autoincrement())
+  pageId          Int?
+  page            Page?          @relation(fields: [pageId], references: [id])
+  // nodeId          Int?
+  // node            Node?          @relation(fields: [nodeId], references: [id])
+  position        Int
+  content         String?
+  updatedAt       DateTime      @updatedAt
+}
+
+model Media {
+  id              Int           @id @default(autoincrement())
+  uri             String        @unique
+  mimeType        String
+  name            String
+  size            Int
+  alt             String?
+  uploadTime      DateTime      @default(now())
+}
+
+model Element {
+  id              Int           @id @default(autoincrement())
+  position        Int?
+  // block           Block[]
+  // pageId          Int?
+  // page            Page?          @relation(fields: [pageId], references: [id])
+  content         String?
+  updatedAt       DateTime      @updatedAt
+}
+
+// model Block {
+//   id              Int           @id @default(autoincrement())
+//   model           String
+//   fields          Field[]
+//   sectionId       Int?
+//   section         Section?      @relation(fields: [sectionId], references: [id])
+//   elementId       Int?
+//   element         Element?      @relation(fields: [elementId], references: [id])
+// }
+
+model Field {
+  id              Int           @id @default(autoincrement())
+  type            String        // TEXT, TEXTAREA, SELECT, CHECKBOX, RADIO, IMAGE, FILE, DATE, DATETIME, TIME, HIDDEN, PASSWORD
+  label           String
+  name            String
+  // blockId         Int?
+  // block           Block?        @relation(fields: [blockId], references: [id])
+  required        Boolean       @default(false)
+  value           String?
+}
+
+model User {
+  id              Int           @id @default(autoincrement())
+  name            String?
+  login           Login?
+  updatedAt       DateTime      @updatedAt
+}
+
+model Login {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id])
+  sessions        Session[]
+  type            String        @default("user") // user admin super-admin
+  email           String        @unique
+  password        String
+  updatedAt       DateTime      @updatedAt
+}
+
+// model Node {
+//   id              Int               @id @default(autoincrement())
+//   title           String
+//   slug            String            @unique
+//   // header      Element?
+//   sections        Section[]
+//   // elements    Element[]
+//   metadatas       Metadata[]
+//   articles        Article[]
+//   // footer      Element?
+//   published       Boolean           @default(true)
+//   updatedAt       DateTime          @updatedAt
+// }
+
+model Article {
+  id            Int               @id @default(autoincrement())
+  title         String
+  slug          String            @unique
+  // header      Element?
+  // content     String
+  // elements    Element[]
+  // metadatas   Metadata[]
+  // footer      Element?
+  pageId        Int?
+  Page          Page?             @relation(fields: [pageId], references: [id])
+  published     Boolean           @default(true)
+  updatedAt     DateTime          @updatedAt
+}
+
+model Session {
+  id              Int           @id @default(autoincrement())
+  token           String        @unique
+  loginId         Int
+  login           Login         @relation(fields: [loginId], references: [id])
+  expiresAt       DateTime
+  updatedAt       DateTime      @updatedAt
+}

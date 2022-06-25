@@ -36,6 +36,7 @@ yarn-error.log*
 
 # db
 *.db
+*.db-journal
 /prisma/migrations
 /public/uploads/files/*
 /public/uploads/images/*

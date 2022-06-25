@@ -1,7 +1,7 @@
 /** @type {import('next-sitemap').IConfig} */
 
 const config = {
-    siteUrl: process.env.SITE_URL || 'https://localhost.com',
+    siteUrl: process.env.SITE_URL || 'http://localhost:3000',
     changefreq: 'daily',
     generateRobotsTxt: true,
     sitemapSize: 5000,

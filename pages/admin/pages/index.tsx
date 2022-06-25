@@ -3,27 +3,18 @@ import type { Page } from '@prisma/client'
 import { Space, Button, Table, Breadcrumb, Badge, Tag } from 'antd'
 import Link from 'next/link'
 import moment from 'moment'
+import { useQuery, UseQueryResult } from 'react-query'
+import { getPages } from '../../../network/pages'
+import get from 'lodash.get'
 
 const AdminPages = () => {
-    const [pages, setPages] = useState<Page[]>([])
-    const [loading, setLoading] = useState<boolean>(false)
-
-    useEffect(() => {
-        const getPages = async () => {
-            setLoading(true)
-            const res = await fetch('/api/pages')
-
-            const pages: Page[] = await res.json()
-            setPages(pages)
-            setLoading(false)
+    const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
+        ['pages'],
+        () => getPages(),
+        {
+            refetchOnWindowFocus: false,
         }
-
-        getPages()
-    }, [])
-
-    if (loading) {
-        return <div>Loading...</div>
-    }
+    )
 
     return (
         <Space
@@ -38,12 +29,12 @@ const AdminPages = () => {
             </Button>
             <Table
                 bordered={false}
-                loading={loading}
-                dataSource={pages}
+                loading={pages.isLoading}
+                dataSource={get(pages, 'data', [])}
                 columns={columns}
                 pagination={{
                     hideOnSinglePage: true,
-                    pageSize: pages?.length,
+                    pageSize: get(pages, 'data', []).length,
                 }}
             />
         </Space>

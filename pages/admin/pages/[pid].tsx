@@ -136,6 +136,7 @@ const Admin = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pid])
 
+    const isPage = values.type === 'page'
     const lastSlugIndex = get(values, 'slug', '').split('/').length - 1
 
     const onHandleChange = (name: string, value: any) => {
@@ -205,7 +206,6 @@ const Admin = () => {
 
     return (
         <form onSubmit={handleSubmit}>
-            {}
             <Space
                 direction="vertical"
                 size="large"
@@ -253,7 +253,7 @@ const Admin = () => {
                             (metadata: any, index: number) => (
                                 <Space key={index}>
                                     <Select
-                                        style={{ width: 175 }}
+                                        style={{ width: 200 }}
                                         value={metadata.name}
                                         onChange={(e) =>
                                             onHandleChange(
@@ -315,48 +315,58 @@ const Admin = () => {
 
                     <Divider />
 
-                    <Title level={5}>Page URL</Title>
-                    <Space>
-                        {get(values, 'slug', '')
-                            .split('/')
-                            .map((slug: string, idx: number) => (
-                                <Fragment key={idx}>
-                                    {idx === lastSlugIndex && (
-                                        <>
-                                            <Button
-                                                onClick={removeSlug}
-                                                type="primary"
-                                                shape="circle"
-                                                disabled={
-                                                    get(
-                                                        values,
-                                                        'slug',
-                                                        ''
-                                                    ).split('/').length < 2
+                    {isPage && (
+                        <>
+                            <Title level={5}>Page URL</Title>
+                            <Space>
+                                {get(values, 'slug', '')
+                                    .split('/')
+                                    .map((slug: string, idx: number) => (
+                                        <Fragment key={idx}>
+                                            {idx === lastSlugIndex && (
+                                                <>
+                                                    <Button
+                                                        onClick={removeSlug}
+                                                        type="primary"
+                                                        shape="circle"
+                                                        disabled={
+                                                            get(
+                                                                values,
+                                                                'slug',
+                                                                ''
+                                                            ).split('/')
+                                                                .length < 2
+                                                        }
+                                                        icon={<MinusOutlined />}
+                                                    />
+                                                    <Button
+                                                        onClick={addSlug}
+                                                        type="primary"
+                                                        shape="circle"
+                                                        icon={<PlusOutlined />}
+                                                    />
+                                                </>
+                                            )}
+                                            <Input
+                                                value={slug}
+                                                onChange={(e) =>
+                                                    editSlug(
+                                                        idx,
+                                                        e.target.value
+                                                    )
                                                 }
-                                                icon={<MinusOutlined />}
+                                                status={
+                                                    errors.slug
+                                                        ? 'error'
+                                                        : undefined
+                                                }
                                             />
-                                            <Button
-                                                onClick={addSlug}
-                                                type="primary"
-                                                shape="circle"
-                                                icon={<PlusOutlined />}
-                                            />
-                                        </>
-                                    )}
-                                    <Input
-                                        value={slug}
-                                        onChange={(e) =>
-                                            editSlug(idx, e.target.value)
-                                        }
-                                        status={
-                                            errors.slug ? 'error' : undefined
-                                        }
-                                    />
-                                    {lastSlugIndex !== idx && '/'}
-                                </Fragment>
-                            ))}
-                    </Space>
+                                            {lastSlugIndex !== idx && '/'}
+                                        </Fragment>
+                                    ))}
+                            </Space>
+                        </>
+                    )}
                     <Divider />
 
                     <Title level={5}>Page content</Title>

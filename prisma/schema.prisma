@@ -28,15 +28,18 @@ model Metadata {
   id              Int           @id @default(autoincrement())
   name            String
   content         String
-  pageId          Int
-  page            Page          @relation(fields: [pageId], references: [id])
+  pageId          Int?
+  page            Page?          @relation(fields: [pageId], references: [id])
+  nodeId          Int?
+  node            Node?          @relation(fields: [nodeId], references: [id])
 }
 
 model Section {
   id              Int           @id @default(autoincrement())
-  pageId          Int
-  page            Page          @relation(fields: [pageId], references: [id])
-  // block           Block[]
+  pageId          Int?
+  page            Page?          @relation(fields: [pageId], references: [id])
+  nodeId          Int?
+  node            Node?          @relation(fields: [nodeId], references: [id])
   position        Int
   content         String?
   updatedAt       DateTime      @updatedAt
@@ -89,4 +92,33 @@ model User {
   email           String
   password        String
   updatedAt       DateTime      @updatedAt
+}
+
+model Node {
+  id              Int               @id @default(autoincrement())
+  title           String
+  slug            String            @unique
+  // header      Element?
+  sections        Section[]
+  // elements    Element[]
+  metadatas       Metadata[]
+  articles        Article[]
+  // footer      Element?
+  published       Boolean           @default(true)
+  updatedAt       DateTime          @updatedAt
+}
+
+model Article {
+  id            Int               @id @default(autoincrement())
+  title         String
+  slug          String            @unique
+  // header      Element?
+  // content     String
+  // elements    Element[]
+  // metadatas   Metadata[]
+  // footer      Element?
+  nodeId        Int?
+  node          Node?             @relation(fields: [nodeId], references: [id])
+  published     Boolean           @default(true)
+  updatedAt     DateTime          @updatedAt
 }

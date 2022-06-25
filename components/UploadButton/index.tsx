@@ -33,6 +33,7 @@ const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
     return (
         <Space>
             <Button
+                type="primary"
                 icon={<UploadOutlined />}
                 style={{ position: 'relative' }}
                 loading={loading}

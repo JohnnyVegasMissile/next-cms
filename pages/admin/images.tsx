@@ -1,61 +1,62 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 // import type { Page } from '@prisma/client'
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
-import { Space, Button, Image, Row, Col, Input, Card } from 'antd'
+import { Space, Button, Image, Row, Col, Input, Card, Tooltip } from 'antd'
 // import Link from 'next/link'
 // import moment from 'moment'
 import type { Media } from '@prisma/client'
+import { useQuery, UseQueryResult, useQueryClient } from 'react-query'
+import get from 'lodash.get'
 
 import UploadButton from '../../components/UploadButton'
 import { getImages, deleteImage, editImage } from '../../network/images'
 
-const AdminPages = () => {
-    const [files, setFiles] = useState<Media[]>([])
-    const [loading, setLoading] = useState<boolean>(false)
-
-    useEffect(() => {
-        setLoading(true)
-        getImages()
-            .then((res: Media[]) => {
-                setFiles(res)
-                setLoading(false)
-            })
-            .catch((e) => setLoading(false))
-    }, [])
-
-    if (loading) {
-        return <div>Loading...</div>
-    }
+const AdminImages = () => {
+    const queryClient = useQueryClient()
+    const files: UseQueryResult<Media[], Error> = useQuery<Media[], Error>(
+        ['images'],
+        () => getImages(),
+        {
+            refetchOnWindowFocus: false,
+        }
+    )
 
     const addFile = (file: Media) => {
-        setFiles([...files, file])
+        queryClient.setQueryData('images', (oldData: any) => {
+            // type error
+            return [file, ...oldData]
+        })
     }
 
-    const deleteFile = (id: number) => {
+    const deleteFile = async (id: number) => {
         deleteImage(id)
 
-        const index = files.findIndex((file: Media) => file.id === id)
+        await queryClient.setQueryData('images', (oldData: any) => {
+            // type error
+            const index = oldData.findIndex((file: Media) => file.id === id)
 
-        if (index === -1) return
+            if (index === -1) return oldData
 
-        setFiles([...files.slice(0, index), ...files.slice(index + 1)])
+            return [...oldData.slice(0, index), ...oldData.slice(index + 1)]
+        })
     }
 
     return (
-        <>
-            <UploadButton onFileRecieved={addFile} />
-            <Row gutter={[8, 16]} style={{ width: '100%', padding: 15 }}>
-                {files?.map((img, idx) => (
-                    <Col key={idx} className="gutter-row" span={6}>
-                        <ImageCard
-                            img={img}
-                            onDelete={deleteFile}
-                            onEdit={editImage}
-                        />
-                    </Col>
-                ))}
-            </Row>
-        </>
+        <Row gutter={[8, 16]} style={{ width: '100%', padding: 15 }}>
+            <Col span={24}>
+                <UploadButton onFileRecieved={addFile} />
+            </Col>
+            {files.isLoading && <div>Loading...</div>}
+            {get(files, 'data', []).map((img, idx) => (
+                <Col key={idx} className="gutter-row" span={6}>
+                    <ImageCard
+                        img={img}
+                        onDelete={deleteFile}
+                        onEdit={editImage}
+                    />
+                </Col>
+            ))}
+        </Row>
     )
 }
 
@@ -70,7 +71,11 @@ const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
 
     return (
         <Card
-            title={img.name}
+            title={
+                <Tooltip title={img.name}>
+                    <span>{img.name}</span>
+                </Tooltip>
+            }
             extra={
                 <Button
                     onClick={() => onDelete(img.id)}
@@ -80,7 +85,10 @@ const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
                 />
             }
         >
-            <Space direction="vertical">
+            <Space
+                direction="vertical"
+                style={{ width: '100%', alignItems: 'center' }}
+            >
                 <Image
                     width={200}
                     height={200}
@@ -102,6 +110,6 @@ const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
     )
 }
 
-AdminPages.requireAuth = true
+AdminImages.requireAuth = true
 
-export default AdminPages
+export default AdminImages

@@ -6,9 +6,8 @@ import { promises as fs } from 'fs'
 const prisma = new PrismaClient()
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(
-        Array.isArray(req.query.uid) ? req.query.uid[0] : req.query.uid
-    )
+    const id = parseInt(req.query.uid as string)
+
     const image: Media = await prisma.media.delete({
         where: { id },
     })
@@ -23,9 +22,8 @@ const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(
-        Array.isArray(req.query.uid) ? req.query.uid[0] : req.query.uid
-    )
+    const id = parseInt(req.query.uid as string)
+
     const image: Media = await prisma.media.update({
         where: { id },
         data: req.body,

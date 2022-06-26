@@ -15,3 +15,7 @@ a {
 * {
     box-sizing: border-box;
 }
+
+.ant-menu-title-content > a {
+    color: rgba(0, 0, 0, 0.85);
+}

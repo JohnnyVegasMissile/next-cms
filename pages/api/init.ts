@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
-import type { Page } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+import type { Page, User, Login } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -10,15 +11,13 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     })
 
     if (!homes.length) {
-        const page: Page = await prisma.page.create({
+        await prisma.page.create({
             data: {
                 type: 'home',
                 title: 'Home',
                 slug: '/',
             },
         })
-
-        return res.status(200).json(page)
     }
 
     const errors: Page[] = await prisma.page.findMany({
@@ -26,16 +25,37 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     })
 
     if (!errors.length) {
-        const page: Page = await prisma.page.create({
+        await prisma.page.create({
             data: {
                 type: 'error',
                 title: 'Not Found',
                 slug: '/not-found',
             },
         })
-
-        return res.status(200).json(page)
     }
+
+    const admins: Login[] = await prisma.login.findMany({
+        where: { type: 'super-admin' },
+    })
+
+    if (!admins.length) {
+        const hash = await bcrypt.hash('root', 10)
+
+        await prisma.user.create({
+            data: {
+                name: 'root',
+                login: {
+                    create: {
+                        type: 'super-admin',
+                        email: 'root',
+                        password: hash,
+                    },
+                },
+            },
+        })
+    }
+
+    return res.status(200).json({ message: 'all set up' })
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {

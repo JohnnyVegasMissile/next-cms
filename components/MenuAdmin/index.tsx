@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { Menu } from 'antd'
 import {
     MailOutlined,
@@ -10,11 +11,19 @@ import {
     OrderedListOutlined,
     PicCenterOutlined,
     PictureOutlined,
+    UserOutlined,
+    PlusCircleOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+
+const CustomLink = (link: string, label: string) => (
+    <Link href={link}>
+        <a>{label}</a>
+    </Link>
+)
 
 function MenuAdmin() {
     const { isAuth, signOut } = useAuth()
@@ -22,70 +31,75 @@ function MenuAdmin() {
 
     if (!isAuth) return null
 
-    return (
-        <Menu mode="horizontal" defaultSelectedKeys={[router.pathname]}>
-            <Menu.Item key="home" icon={<HomeOutlined />}>
-                <Link href="/">
-                    <a>Home</a>
-                </Link>
-            </Menu.Item>
-            <Menu.Item key="/admin" icon={<MailOutlined />}>
-                <Link href="/admin">
-                    <a>Admin</a>
-                </Link>
-            </Menu.Item>
-            <Menu.SubMenu
-                key="/admin/pages"
-                title="Pages"
-                icon={<FileImageOutlined />}
-            >
-                <Menu.Item key="/admin/create" icon={<FileAddOutlined />}>
-                    <Link href="/admin/pages/create">
-                        <a>Create a page</a>
-                    </Link>
-                </Menu.Item>
-                <Menu.Item key="/admin/pages/" icon={<OrderedListOutlined />}>
-                    <Link href="/admin/pages">
-                        <a>All pages</a>
-                    </Link>
-                </Menu.Item>
-            </Menu.SubMenu>
-            <Menu.SubMenu
-                key="ElementsMenu"
-                title="Elements"
-                icon={<PicCenterOutlined />}
-            >
-                <Menu.Item key="allPages" icon={<PicCenterOutlined />}>
-                    <Link href="/admin/elements">
-                        <a>All Elements</a>
-                    </Link>
-                </Menu.Item>
-            </Menu.SubMenu>
-            <Menu.Item key="/admin/images" icon={<PictureOutlined />}>
-                <Link href="/admin/images">
-                    <a>All Images</a>
-                </Link>
-            </Menu.Item>
-            <Menu.SubMenu
-                key="SettingsMenu"
-                title="Settings"
-                icon={<SettingOutlined />}
-            >
-                <Menu.Item key="/install" icon={<AppstoreOutlined />}>
-                    <Link href="/install">
-                        <a>Install</a>
-                    </Link>
-                </Menu.Item>
-                <Menu.Item
-                    key="install"
-                    icon={<LogoutOutlined />}
-                    onClick={signOut}
-                >
-                    Disconnect
-                </Menu.Item>
-            </Menu.SubMenu>
-        </Menu>
-    )
+    const items = [
+        {
+            key: '/',
+            label: CustomLink('/', 'Home'),
+            icon: <HomeOutlined />,
+            children: [
+                {
+                    label: CustomLink('/admin', 'Settings'),
+                    key: '/admin',
+                    icon: <SettingOutlined />,
+                },
+                {
+                    // label: 'Disconnect',
+                    label: <span onClick={signOut}>Disconnect</span>,
+                    key: 'disconnect',
+                    icon: <LogoutOutlined />,
+                },
+            ],
+        },
+        {
+            label: CustomLink('/admin/pages', 'Pages'),
+            key: '/admin/pages',
+            icon: <FileImageOutlined />,
+            children: [
+                {
+                    label: CustomLink(
+                        '/admin/elements/create',
+                        'Create a page'
+                    ),
+                    key: '/admin/elements/create',
+                    icon: <PlusCircleOutlined />,
+                },
+            ],
+        },
+        {
+            label: CustomLink('/admin/elements', 'Elements'),
+            key: '/admin/elements',
+            icon: <PicCenterOutlined />,
+            children: [
+                {
+                    label: CustomLink(
+                        '/admin/elements/create',
+                        'Create an elements'
+                    ),
+                    key: '/admin/elements/create',
+                    icon: <PlusCircleOutlined />,
+                },
+            ],
+        },
+        {
+            label: CustomLink('/admin/users', 'Users'),
+            key: '/admin/users',
+            icon: <UserOutlined />,
+            children: [
+                {
+                    label: CustomLink('/admin/users/create', 'Create a users'),
+                    key: '/admin/users/create',
+                    icon: <PlusCircleOutlined />,
+                },
+            ],
+        },
+        {
+            label: CustomLink('/admin/images', 'Images'),
+            key: '/admin/images',
+            icon: <PictureOutlined />,
+        },
+    ]
+
+    return <Menu mode="horizontal" items={items} />
 }
 
 export default MenuAdmin

@@ -32,7 +32,10 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             })
         }
 
-        const login = await prisma.login.findUnique({ where: { email } })
+        const login = await prisma.login.findUnique({
+            where: { email },
+            include: { user: true },
+        })
         if (!login) {
             throw new Error('No login found')
         }
@@ -44,17 +47,17 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const session = await initSession(login.id)
 
-        const user = await prisma.login.findUnique({
-            where: { id: login.userId },
-        })
+        // const user = await prisma.login.findUnique({
+        //     where: { id: login.userId },
+        // })
 
         return res.status(201).json({
             title: 'Login Successful',
             detail: 'Successfully validated login credentials',
             token: session.token,
             expiresAt: session.expiresAt,
-            type: login.type,
-            user,
+            // type: login.type,
+            user: { ...login.user, type: login.type },
         })
     } catch (err) {
         res.status(401).json({ errors: err })

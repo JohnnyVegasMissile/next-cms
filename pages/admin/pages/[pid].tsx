@@ -17,10 +17,12 @@ import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
 // import { Prisma } from '@prisma/client'
 import type { Page } from '@prisma/client'
+import { editPage, postPage } from '../../../network/pages'
+import type { FullPageEdit } from '../../../types'
 
 const { Title } = Typography
 
-const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin']
+const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found']
 
 // interface ElementType {
 //         type: string;
@@ -43,25 +45,19 @@ const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin']
 //     content: string;
 // }
 
-interface PageType {
-    title: string
-    slug: string
-    type?: 'home' | 'page' | 'error'
-    // sections?: SectionType[];
-    // metadatas?: MetadataType[];
-    published: boolean
-    homepage?: boolean
-}
+// interface FullPageEdit extends FullPage {
+//     id?: number
+// }
 
-const initialValues: PageType | Page = {
+const initialValues: FullPageEdit = {
     title: '',
     slug: '',
-    // sections: [],
-    // metadatas: [],
+    sections: [],
+    metadatas: [],
     published: true,
 }
 
-const validate = (values: PageType | Page) => {
+const validate = (values: FullPageEdit) => {
     let errors: any = {}
 
     if (!values.title) {
@@ -92,51 +88,46 @@ const Admin = () => {
     const router = useRouter()
     const { pid } = router.query
 
-    const { values, errors, handleChange, handleSubmit, setValues } = useFormik<
-        PageType | Page
-    >({
-        initialValues,
-        validate,
-        onSubmit: async (values) => {
-            setLoading(true)
-            if (pid === 'create') {
-                await fetch('/api/pages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(values),
-                })
-            } else {
-                await fetch(`/api/pages/${pid}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(values),
-                })
-            }
-            router.push('/admin/pages')
-            setLoading(false)
-        },
-    })
+    const { values, errors, handleChange, handleSubmit, setValues } =
+        useFormik<FullPageEdit>({
+            initialValues,
+            validate,
+            onSubmit: async (values) => {
+                setLoading(true)
+                if (pid === 'create') {
+                    await postPage(values)
+                } else {
+                    const id = pid as string
+
+                    await editPage(id, values)
+                }
+                router.push('/admin/pages')
+                setLoading(false)
+            },
+        })
+
+    const isLockedPage = values.type === 'error' || values.type === 'home'
 
     useEffect(() => {
         const getPageInfos = async () => {
-            if (pid !== 'create' && pid !== undefined) {
+            if (pid === undefined) {
+                return
+            }
+            if (pid !== 'create') {
                 const data = await fetch(`/api/pages/${pid}`)
 
                 if (!data.ok) router.push('/admin/pages')
 
-                const page: Page = await data.json()
+                const page = await data.json()
                 setValues(page)
+            } else {
+                setValues(initialValues)
             }
         }
         getPageInfos()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pid])
 
-    const isPage = values.type === 'page'
     const lastSlugIndex = get(values, 'slug', '').split('/').length - 1
 
     const onHandleChange = (name: string, value: any) => {
@@ -186,9 +177,10 @@ const Admin = () => {
         handleChange({
             target: {
                 name: 'metadatas',
-                value: get(values, 'metadatas', []).concat([
+                value: [
+                    ...get(values, 'metadatas', []),
                     { name: '', content: '' },
-                ]),
+                ],
             },
         })
     }
@@ -233,13 +225,35 @@ const Admin = () => {
 
                     <Divider />
 
+                    <Select
+                        value={values.type}
+                        style={{ width: 200 }}
+                        disabled={isLockedPage}
+                        onChange={(e) => onHandleChange('type', e)}
+                    >
+                        <Select.Option value="page">Page</Select.Option>
+                        <Select.Option value="article">Article</Select.Option>
+                        {isLockedPage && (
+                            <>
+                                <Select.Option value="error" disabled>
+                                    Not found
+                                </Select.Option>
+                                <Select.Option value="home" disabled>
+                                    Homepage
+                                </Select.Option>
+                            </>
+                        )}
+                    </Select>
+
+                    <Divider />
+
                     <Title level={5}>Status</Title>
                     <Radio.Group
                         value={values.published}
                         onChange={(e) =>
                             onHandleChange('published', e.target.value)
                         }
-                        disabled={pid !== 'create' && values.type !== 'page'}
+                        disabled={pid !== 'create' && isLockedPage}
                     >
                         <Radio value={true}>Published</Radio>
                         <Radio value={false}>Unpublished</Radio>
@@ -315,7 +329,7 @@ const Admin = () => {
 
                     <Divider />
 
-                    {isPage && (
+                    {!isLockedPage && (
                         <>
                             <Title level={5}>Page URL</Title>
                             <Space>

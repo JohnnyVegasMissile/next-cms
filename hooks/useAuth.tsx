@@ -1,13 +1,11 @@
 import { useState, useEffect, useContext, createContext } from 'react'
 import { useRouter } from 'next/router'
-
-interface User {
-    name: string
-}
+import type { ContextUser } from '../types'
+import { useQueryClient } from 'react-query'
 
 interface UseProvideAuthProps {
     isAuth: boolean
-    user: User | null
+    user: ContextUser | null
     loading: boolean
     initializing: boolean
     signIn: () => void
@@ -31,8 +29,8 @@ export const useProvideAuth = (): UseProvideAuthProps => {
     const router = useRouter()
     const [initializing, setInitializing] = useState<boolean>(true)
     const [loading, setLoading] = useState<boolean>(false)
-    const [user, setUser] = useState<User | null>(null)
-    // const queryClient = useQueryClient()
+    const [user, setUser] = useState<ContextUser | null>(null)
+    const queryClient = useQueryClient()
 
     useEffect(() => {
         const user = localStorage.getItem('user')
@@ -42,18 +40,17 @@ export const useProvideAuth = (): UseProvideAuthProps => {
     }, [])
 
     const signIn = () => {
-        const user = { name: 'alex' }
+        const user = { name: 'alex', type: 'admin', email: '' }
         setLoading(true)
         setUser(user)
         localStorage.setItem('user', JSON.stringify(user))
-        router.push('/admin')
+        // router.push('/')
         setLoading(false)
     }
 
     const signOut = () => {
         setUser(null)
-        // queryClient.invalidateQueries()
-
+        queryClient.invalidateQueries()
         localStorage.clear()
     }
 

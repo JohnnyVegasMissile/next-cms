@@ -1,12 +1,13 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
-import type { Page } from '@prisma/client'
+import type { User, Login } from '@prisma/client'
+import { FullUser } from '../types'
 
-export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
+export const postUser = (data: Prisma.UserCreateInput): Promise<FullUser> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
-            url: `/api/pages`,
+            url: `/api/users`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -16,14 +17,11 @@ export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
             .catch(reject)
     })
 
-export const editPage = (
-    id: string,
-    data: Prisma.PageCreateInput
-): Promise<Page> =>
+export const editUser = (id: number | string, data: any): Promise<FullUser> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
-            url: `/api/pages/${id}`,
+            url: `/api/users/${id}`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -33,21 +31,31 @@ export const editPage = (
             .catch(reject)
     })
 
-export const getPages = (): Promise<Page[]> =>
+export const getUsers = (): Promise<FullUser[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/pages`,
+            url: `/api/users`,
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const deletePage = (id: string): Promise<void> =>
+export const getUser = (id: number | string): Promise<FullUser> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
+            url: `/api/users/${id}`,
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const deleteUser = (id: number | string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
-            url: `/api/pages/${id}`,
+            url: `/api/users/${id}`,
         })
             .then(resolve)
             .catch(reject)

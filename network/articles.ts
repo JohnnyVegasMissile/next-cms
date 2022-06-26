@@ -1,12 +1,14 @@
 import INSTANCE from './api'
-import { Prisma } from '@prisma/client'
+import { Article, Prisma } from '@prisma/client'
 import type { Page } from '@prisma/client'
 
-export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
+export const postArticle = (
+    data: Prisma.ArticleCreateInput
+): Promise<Article> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
-            url: `/api/pages`,
+            url: `/api/articles`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -16,14 +18,14 @@ export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
             .catch(reject)
     })
 
-export const editPage = (
+export const editArticle = (
     id: string,
-    data: Prisma.PageCreateInput
-): Promise<Page> =>
+    data: Prisma.ArticleCreateInput
+): Promise<Article> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
-            url: `/api/pages/${id}`,
+            url: `/api/articles/${id}`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -33,21 +35,21 @@ export const editPage = (
             .catch(reject)
     })
 
-export const getPages = (): Promise<Page[]> =>
+export const getArticles = (): Promise<Article[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/pages`,
+            url: `/api/articles`,
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const deletePage = (id: string): Promise<void> =>
+export const deleteArticle = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
-            url: `/api/pages/${id}`,
+            url: `/api/articles/${id}`,
         })
             .then(resolve)
             .catch(reject)

@@ -96,7 +96,7 @@ model User {
 
 model Login {
   id              Int           @id @default(autoincrement())
-  userId          Int
+  userId          Int           @unique
   user            User          @relation(fields: [userId], references: [id])
   sessions        Session[]
   type            String        @default("user") // user admin super-admin

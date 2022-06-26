@@ -58,16 +58,22 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
 }
 
 export async function getStaticPaths() {
-    const pages: Page[] = await prisma.page.findMany({
+    const pages = await prisma.page.findMany({
         where: {
             published: true,
             type: 'page',
+            OR: [{ type: 'page' }, { type: 'article' }],
         },
+        include: { articles: true },
     })
 
-    const paths = pages.map((page) => ({
-        params: { slug: page.slug.split('/') },
-    }))
+    const paths = pages.map((page) => {
+        // const articlePaths = page.articles.map((article) => ({ params: { slug: article.slug.split('/') } }))
+
+        return {
+            params: { slug: page.slug.split('/') },
+        }
+    })
 
     return {
         paths,

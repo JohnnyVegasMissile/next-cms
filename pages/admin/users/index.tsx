@@ -1,29 +1,30 @@
 import { useState, useEffect } from 'react'
-import type { Page } from '@prisma/client'
-import { Space, Button, Table, Breadcrumb, Badge, Tag } from 'antd'
+import type { User, Login } from '@prisma/client'
+import {
+    Space,
+    Button,
+    Table,
+    Breadcrumb,
+    Badge,
+    Tag,
+    Typography,
+    Popconfirm,
+} from 'antd'
 import Link from 'next/link'
 import moment from 'moment'
+import { useQuery, UseQueryResult } from 'react-query'
+import { getUsers } from '../../../network/users'
+import type { FullUser } from '../../../types'
+import get from 'lodash.get'
 
 const AdminUsers = () => {
-    const [pages, setPages] = useState<Page[]>([])
-    const [loading, setLoading] = useState<boolean>(false)
-
-    useEffect(() => {
-        const getPages = async () => {
-            setLoading(true)
-            const res = await fetch('/api/pages')
-
-            const pages: Page[] = await res.json()
-            setPages(pages)
-            setLoading(false)
+    const users: UseQueryResult<User[], Error> = useQuery<User[], Error>(
+        ['users'],
+        () => getUsers(),
+        {
+            refetchOnWindowFocus: false,
         }
-
-        getPages()
-    }, [])
-
-    if (loading) {
-        return <div>Loading...</div>
-    }
+    )
 
     return (
         <Space
@@ -32,18 +33,18 @@ const AdminUsers = () => {
             style={{ width: '100%', padding: 15 }}
         >
             <Button type="primary">
-                <Link href="/admin/pages/create">
+                <Link href="/admin/users/create">
                     <a>Create</a>
                 </Link>
             </Button>
             <Table
                 bordered={false}
-                loading={loading}
-                dataSource={pages}
+                loading={users.isLoading}
+                dataSource={get(users, 'data', [])}
                 columns={columns}
                 pagination={{
                     hideOnSinglePage: true,
-                    pageSize: pages?.length,
+                    pageSize: get(users, 'data', []).length,
                 }}
             />
         </Space>
@@ -56,65 +57,57 @@ const columns = [
         dataIndex: 'id',
     },
     {
-        title: 'Title',
-        dataIndex: 'title',
-    },
-    {
-        title: 'Title',
-        render: (e: Page) => (
-            <Link href={`/${e}`}>
-                <a>
-                    {e.type !== 'page' ? (
-                        <Tag color="cyan">{e.type}</Tag>
-                    ) : (
-                        <Breadcrumb>
-                            {e.slug.split('/').map((s: string, idx: number) => (
-                                <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
-                            ))}
-                        </Breadcrumb>
-                    )}
-                </a>
-            </Link>
-        ),
-    },
-    {
-        title: 'Published',
-        dataIndex: 'published',
-        render: (e: boolean) => {
+        title: 'Type',
+        dataIndex: 'login',
+        render: (e: Login) => {
+            const types = {
+                admin: { label: 'Admin', color: 'red' },
+                'super-admin': { label: 'Admin', color: 'magenta' },
+                user: { label: 'User', color: 'blue' },
+            }
+
             return (
-                <Badge
-                    status={e ? 'success' : 'error'}
-                    text={e ? 'Published' : 'Unpublished'}
-                />
+                <Tag color={get(types, e?.type, types.user).color}>
+                    {get(types, e?.type, types.user).label}
+                </Tag>
             )
         },
     },
-
     {
-        title: 'Last updated',
-        dataIndex: 'updatedAt',
-        render: (e: Date) => moment(e).fromNow(),
+        title: 'Name',
+        dataIndex: 'name',
+    },
+    {
+        title: 'Email',
+        dataIndex: 'login',
+        render: (e: Login) => e?.email,
     },
     {
         width: 1,
-        render: (e: Page) => (
+        render: (e: FullUser) => (
             <Space>
                 <Button type="primary">
-                    <Link href={`/admin/pages/${e.id}`}>
+                    <Link href={`/admin/users/${e.id}`}>
                         <a>Edit</a>
                     </Link>
                 </Button>
-                <Button
-                    danger
-                    disabled={e.type !== 'page'}
-                    onClick={() => {
-                        fetch(`/api/pages/${e.id}`, {
+
+                <Popconfirm
+                    placement="topRight"
+                    title={'ho la la'}
+                    disabled={e?.login?.type === 'super-admin'}
+                    onConfirm={() => {
+                        fetch(`/api/users/${e.id}`, {
                             method: 'DELETE',
                         })
                     }}
+                    okText="Yes"
+                    cancelText="No"
                 >
-                    Delete
-                </Button>
+                    <Button danger disabled={e?.login?.type === 'super-admin'}>
+                        Delete
+                    </Button>
+                </Popconfirm>
             </Space>
         ),
     },

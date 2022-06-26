@@ -13,7 +13,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
                 // remember the page that user tried to access
                 // setRedirect(router.route)
                 // redirect
-                router.push('/admin/signin')
+                router.push('/signin')
             }
         }
     }, [/* setRedirect,*/ initializing, router, user])

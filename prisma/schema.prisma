@@ -145,7 +145,7 @@ model Article {
 
 model Setting {
   id            Int               @id @default(autoincrement())
-  name          String
+  name          String            @unique
   value         String
   updatedAt     DateTime          @updatedAt
 }

@@ -34,6 +34,10 @@ export async function getStaticProps(context: GetStaticPathsContext) {
 
     const page: Page = get(allHomepages, '0', {})
 
+    const revalidate = await prisma.setting.findUnique({
+        where: { name: 'revalidate' },
+    })
+
     return {
         props: {
             ...page,
@@ -41,7 +45,7 @@ export async function getStaticProps(context: GetStaticPathsContext) {
                 (page?.updatedAt?.getMilliseconds() || 1) / 1000
             ),
         },
-        revalidate: 60,
+        revalidate: revalidate ? parseInt(revalidate.value) : 60,
     }
 }
 

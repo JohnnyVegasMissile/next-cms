@@ -16,6 +16,21 @@ export const uploadImage = (file: any): Promise<Media> =>
             .catch(reject)
     })
 
+export const uploadFavicon = (file: any): Promise<Media> =>
+    new Promise(async (resolve, reject) => {
+        const data = new FormData()
+        data.append('file', file)
+
+        INSTANCE({
+            method: 'POST',
+            url: `/api/images/favicon`,
+            headers: { 'Content-Type': 'application/json' },
+            data,
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
 export const getImages = (): Promise<Media[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({

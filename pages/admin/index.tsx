@@ -1,13 +1,53 @@
-import { Space, Avatar } from 'antd'
+import UploadButton from '../../components/UploadButton'
+import { Space, Avatar, InputNumber } from 'antd'
+import { useQuery, UseQueryResult } from 'react-query'
+import { Setting } from '@prisma/client'
+import { useEffect, useState } from 'react'
+import { getSettings, editSetting } from '../../network/settings'
+import get from 'lodash.get'
+import useDebounce from '../../hooks/useDebounce'
 
 const Admin = () => {
+    const [settings, setSettings] = useState<any>()
+    const setting: UseQueryResult<Setting[], Error> = useQuery<
+        Setting[],
+        Error
+    >(['setting'], () => getSettings(), {
+        refetchOnWindowFocus: false,
+        onSuccess: (data: Setting[]) => {
+            const newSettings: any = {}
+            for (const sett of data) {
+                newSettings[sett.name] = sett.value
+            }
+            setSettings(newSettings)
+        },
+    })
+
+    const debouncedValue = useDebounce<string>(settings?.revalidate, 1500)
+
+    useEffect(() => {
+        const update = async () =>
+            editSetting('revalidate', settings?.revalidate.toString())
+
+        if (settings?.revalidate) update()
+    }, [debouncedValue])
+
     return (
         <Space
             direction="vertical"
             size="large"
             style={{ width: '100%', padding: 15 }}
         >
-            <Avatar src="/favicon.ico" shape="square" size="large" />
+            <Space>
+                <Avatar src="/favicon.ico" shape="square" size="large" />
+                <UploadButton.Favicon />
+            </Space>
+            <InputNumber
+                value={get(settings, 'revalidate', undefined)}
+                onChange={(e) =>
+                    setSettings((prev: any) => ({ ...prev, revalidate: e }))
+                }
+            />
         </Space>
     )
 }

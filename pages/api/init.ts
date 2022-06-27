@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import bcrypt from 'bcryptjs'
-import type { Page, Login } from '@prisma/client'
+import type { Page, Login, Setting } from '@prisma/client'
 
 import { prisma } from '../../utils/prisma'
 
@@ -50,6 +50,19 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
                         password: hash,
                     },
                 },
+            },
+        })
+    }
+
+    const revalidate = await prisma.setting.findUnique({
+        where: { name: 'revalidate' },
+    })
+
+    if (!revalidate) {
+        await prisma.setting.create({
+            data: {
+                name: 'revalidate',
+                value: '60',
             },
         })
     }

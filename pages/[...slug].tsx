@@ -89,9 +89,13 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
         }
     }
 
+    const revalidate = await prisma.setting.findUnique({
+        where: { name: 'revalidate' },
+    })
+
     return {
         props,
-        revalidate: 60,
+        revalidate: revalidate ? parseInt(revalidate.value) : 60,
         notFound: !props,
     }
 }

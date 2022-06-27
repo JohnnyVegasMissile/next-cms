@@ -1,11 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import type { Login, /* Session,*/ User } from '@prisma/client'
+// import type { Login, /* Session,*/ User } from '@prisma/client'
 
 import { isEmail, initSession } from '../../../utils'
-
-const prisma = new PrismaClient()
+import { prisma } from '../../../utils/prisma'
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     try {

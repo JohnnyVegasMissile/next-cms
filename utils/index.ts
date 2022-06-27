@@ -1,9 +1,7 @@
 import CryptoJS from 'crypto-js'
-import { PrismaClient } from '@prisma/client'
 // import type { Login, Session, User } from '@prisma/client'
 // import crypto from 'crypto'
-
-const prisma = new PrismaClient()
+import { prisma } from '../utils/prisma'
 
 export function makeId(length: number) {
     var result = ''

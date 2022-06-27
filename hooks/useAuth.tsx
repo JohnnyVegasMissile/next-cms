@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, createContext } from 'react'
-import { useRouter } from 'next/router'
+// import { useRouter } from 'next/router'
 import type { ContextUser } from '../types'
 import { useQueryClient } from 'react-query'
 
@@ -26,7 +26,7 @@ export const useAuth = () => {
 }
 
 export const useProvideAuth = (): UseProvideAuthProps => {
-    const router = useRouter()
+    // const router = useRouter()
     const [initializing, setInitializing] = useState<boolean>(true)
     const [loading, setLoading] = useState<boolean>(false)
     const [user, setUser] = useState<ContextUser | null>(null)

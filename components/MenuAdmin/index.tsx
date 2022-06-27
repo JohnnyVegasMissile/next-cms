@@ -1,23 +1,19 @@
-import { Fragment } from 'react'
 import { Menu } from 'antd'
 import {
-    MailOutlined,
-    AppstoreOutlined,
     SettingOutlined,
     HomeOutlined,
     LogoutOutlined,
-    FileAddOutlined,
     FileImageOutlined,
-    OrderedListOutlined,
     PicCenterOutlined,
     PictureOutlined,
     UserOutlined,
     PlusCircleOutlined,
+    FileTextOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+// import { useRouter } from 'next/router'
 
 const CustomLink = (link: string, label: string) => (
     <Link href={link}>
@@ -27,7 +23,7 @@ const CustomLink = (link: string, label: string) => (
 
 function MenuAdmin() {
     const { isAuth, signOut } = useAuth()
-    const router = useRouter()
+    // const router = useRouter()
 
     if (!isAuth) return null
 
@@ -56,11 +52,23 @@ function MenuAdmin() {
             icon: <FileImageOutlined />,
             children: [
                 {
+                    label: CustomLink('/admin/pages/create', 'Create a page'),
+                    key: '/admin/pages/create',
+                    icon: <PlusCircleOutlined />,
+                },
+            ],
+        },
+        {
+            label: CustomLink('/admin/articles', 'Articles'),
+            key: '/admin/articles',
+            icon: <FileTextOutlined />,
+            children: [
+                {
                     label: CustomLink(
-                        '/admin/elements/create',
-                        'Create a page'
+                        '/admin/articles/create',
+                        'Create an article'
                     ),
-                    key: '/admin/elements/create',
+                    key: '/admin/articles/create',
                     icon: <PlusCircleOutlined />,
                 },
             ],

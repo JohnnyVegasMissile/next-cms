@@ -1,32 +1,20 @@
-import type { Page } from '@prisma/client'
-import {
-    Space,
-    Button,
-    Table,
-    Breadcrumb,
-    Badge,
-    Tag,
-    Typography,
-    Popconfirm,
-    Modal,
-} from 'antd'
-import { ExclamationCircleOutlined } from '@ant-design/icons'
+import type { Article, Page } from '@prisma/client'
+import { Space, Button, Table, Breadcrumb, Badge, Popconfirm } from 'antd'
 import Link from 'next/link'
 import moment from 'moment'
 import { useQuery, UseQueryResult } from 'react-query'
-import { getPages } from '../../../network/pages'
+
+import { getArticles } from '../../../network/articles'
 import get from 'lodash.get'
+import { FullArticle } from 'types'
 
-const { confirm } = Modal
-
-const AdminPages = () => {
-    const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
-        ['pages'],
-        () => getPages(),
-        {
-            refetchOnWindowFocus: false,
-        }
-    )
+const AdminArticles = () => {
+    const articles: UseQueryResult<Article[], Error> = useQuery<
+        Article[],
+        Error
+    >(['articles'], () => getArticles(), {
+        refetchOnWindowFocus: false,
+    })
 
     return (
         <Space
@@ -35,40 +23,40 @@ const AdminPages = () => {
             style={{ width: '100%', padding: 15 }}
         >
             <Button type="primary">
-                <Link href="/admin/pages/create">
+                <Link href="/admin/articles/create">
                     <a>Create</a>
                 </Link>
             </Button>
             <Table
                 bordered={false}
-                loading={pages.isLoading}
-                dataSource={get(pages, 'data', [])}
+                loading={articles.isLoading}
+                dataSource={get(articles, 'data', [])}
                 columns={columns}
                 pagination={{
                     hideOnSinglePage: true,
-                    pageSize: get(pages, 'data', []).length,
+                    pageSize: get(articles, 'data', []).length,
                 }}
             />
         </Space>
     )
 }
 
-const showDeleteConfirm = () => {
-    confirm({
-        title: 'Are you sure delete this task?',
-        icon: <ExclamationCircleOutlined />,
-        content: 'Some descriptions',
-        okText: 'Yes',
-        okType: 'danger',
-        cancelText: 'No',
-        onOk() {
-            console.log('OK')
-        },
-        onCancel() {
-            console.log('Cancel')
-        },
-    })
-}
+// const showDeleteConfirm = () => {
+//     confirm({
+//         title: 'Are you sure delete this task?',
+//         icon: <ExclamationCircleOutlined />,
+//         content: 'Some descriptions',
+//         okText: 'Yes',
+//         okType: 'danger',
+//         cancelText: 'No',
+//         onOk() {
+//             console.log('OK')
+//         },
+//         onCancel() {
+//             console.log('Cancel')
+//         },
+//     })
+// }
 
 const columns = [
     {
@@ -80,76 +68,44 @@ const columns = [
         dataIndex: 'title',
     },
     {
-        title: 'Type',
-        dataIndex: 'type',
-        render: (e: 'home' | 'error' | 'page' | 'article') => {
-            const types = {
-                home: { label: 'Homepage', color: '#108ee9' },
-                error: { label: 'Not Found', color: '#f50' },
-                page: { label: 'Page', color: '#2db7f5' },
-                article: { label: 'Article', color: '#87d068' },
-            }
-
-            return <Tag color={types[e].color}>{types[e].label}</Tag>
-        },
-    },
-    {
         title: 'URL',
-        render: (e: Page) => {
-            if (e.type === 'error') return null
-
-            if (e.type === 'home') {
-                return (
-                    <Link href="/">
-                        <a>
-                            <Typography.Text>/</Typography.Text>
-                        </a>
-                    </Link>
-                )
-            }
-
+        render: (e: FullArticle) => {
             return (
-                <Link href={`/${e.slug}`}>
+                <Link href={`/${e.page.slug}/${e.slug}`}>
                     <a>
                         <Breadcrumb>
-                            {e.slug.split('/').map((s: string, idx: number) => (
-                                <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
-                            ))}
+                            {e.page.slug
+                                .split('/')
+                                .map((s: string, idx: number) => (
+                                    <Breadcrumb.Item key={idx}>
+                                        {s}
+                                    </Breadcrumb.Item>
+                                ))}
+                            <Breadcrumb.Item>{e.slug}</Breadcrumb.Item>
                         </Breadcrumb>
                     </a>
                 </Link>
             )
         },
-
-        // (
-        //     <Link href={`/${e}`}>
-        //         <a>
-        //             {e.type !== 'page' ? (
-        //                 <Tag color="cyan">{e.type}</Tag>
-        //             ) : (
-        //                 <Breadcrumb>
-        //                     {e.slug.split('/').map((s: string, idx: number) => (
-        //                         <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
-        //                     ))}
-        //                 </Breadcrumb>
-        //             )}
-        //         </a>
-        //     </Link>
-        // ),
+    },
+    {
+        title: 'Article',
+        dataIndex: 'page',
+        render: (e: Page) => e.title,
     },
     {
         title: 'Published',
-        dataIndex: 'published',
-        render: (e: boolean) => {
+        render: (e: FullArticle) => {
+            const isPublished = e.published && e.page.published
+
             return (
                 <Badge
-                    status={e ? 'success' : 'error'}
-                    text={e ? 'Published' : 'Unpublished'}
+                    status={isPublished ? 'success' : 'error'}
+                    text={isPublished ? 'Published' : 'Unpublished'}
                 />
             )
         },
     },
-
     {
         title: 'Last updated',
         dataIndex: 'updatedAt',
@@ -157,44 +113,32 @@ const columns = [
     },
     {
         width: 1,
-        render: (e: Page) => (
+        render: (e: Article) => (
             <Space>
                 <Button type="primary">
-                    <Link href={`/admin/pages/${e.id}`}>
+                    <Link href={`/admin/articles/${e.id}`}>
                         <a>Edit</a>
                     </Link>
                 </Button>
 
-                {e.type === 'article' ? (
-                    <Button onClick={showDeleteConfirm} danger>
-                        Delete
-                    </Button>
-                ) : (
-                    <Popconfirm
-                        placement="topRight"
-                        title={'ho la la'}
-                        disabled={e.type === 'error' || e.type === 'home'}
-                        onConfirm={() => {
-                            fetch(`/api/pages/${e.id}`, {
-                                method: 'DELETE',
-                            })
-                        }}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button
-                            danger
-                            disabled={e.type === 'error' || e.type === 'home'}
-                        >
-                            Delete
-                        </Button>
-                    </Popconfirm>
-                )}
+                <Popconfirm
+                    placement="topRight"
+                    title={'ho la la'}
+                    onConfirm={() => {
+                        fetch(`/api/articles/${e.id}`, {
+                            method: 'DELETE',
+                        })
+                    }}
+                    okText="Yes"
+                    cancelText="No"
+                >
+                    <Button danger>Delete</Button>
+                </Popconfirm>
             </Space>
         ),
     },
 ]
 
-AdminPages.requireAuth = true
+AdminArticles.requireAuth = true
 
-export default AdminPages
+export default AdminArticles

@@ -1,6 +1,7 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
 import type { Page } from '@prisma/client'
+import { PageTypes } from '../types'
 
 export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
     new Promise(async (resolve, reject) => {
@@ -33,11 +34,15 @@ export const editPage = (
             .catch(reject)
     })
 
-export const getPages = (): Promise<Page[]> =>
+export const getPages = (type?: PageTypes): Promise<Page[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
             url: `/api/pages`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            params: { type },
         })
             .then(resolve)
             .catch(reject)

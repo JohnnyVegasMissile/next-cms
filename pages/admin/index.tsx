@@ -1,6 +1,4 @@
-import { Space, Button } from 'antd'
-
-import { signUp, signIn } from '../../network/auth'
+import { Space, Avatar } from 'antd'
 
 const Admin = () => {
     return (
@@ -9,20 +7,7 @@ const Admin = () => {
             size="large"
             style={{ width: '100%', padding: 15 }}
         >
-            <Button
-                onClick={() => {
-                    signUp('all@mail.com', '123456')
-                }}
-            >
-                Sign up
-            </Button>
-            <Button
-                onClick={() => {
-                    signIn('alex@mail.com', '123456')
-                }}
-            >
-                Sign In
-            </Button>
+            <Avatar src="/favicon.ico" shape="square" size="large" />
         </Space>
     )
 }

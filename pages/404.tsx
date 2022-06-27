@@ -1,11 +1,10 @@
 import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
-import { PrismaClient, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import type { Page } from '@prisma/client'
 // import Link from 'next/link'
 import get from 'lodash.get'
-
-const prisma = new PrismaClient()
+import { prisma } from '../utils/prisma'
 
 const NotFound = ({ title }: Prisma.PageCreateInput) => {
     return (

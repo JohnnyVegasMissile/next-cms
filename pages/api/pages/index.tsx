@@ -1,29 +1,39 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
 import type { Page, Metadata, Section } from '@prisma/client'
 import get from 'lodash.get'
+import { PageTypes, FullPageEdit } from '../../../types'
 
-const prisma = new PrismaClient()
+import { prisma } from '../../../utils/prisma'
 
-interface FullPage extends Page {
-    metadatas?: Metadata[]
-    sections?: Section[]
-}
+// interface FullPage extends Page {
+//     metadatas?: Metadata[]
+//     sections?: Section[]
+// }
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const pages: Page[] = await prisma.page.findMany()
+    const type = req.query.type as PageTypes
+    const search = !!type ? { where: { type } } : undefined
+
+    const pages: Page[] = await prisma.page.findMany(search)
 
     return res.status(200).json(pages)
 }
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
-    const newPageContent: FullPage = req.body
+    const newPageContent: FullPageEdit = req.body
 
+    const sections: Section[] = get(req, 'body.sections', [])
     const metadatas: Metadata[] = get(req, 'body.metadatas', [])
+    delete newPageContent.sections
     delete newPageContent.metadatas
+    delete newPageContent.articles
 
     const page: Page = await prisma.page.create({
-        data: { ...newPageContent, metadatas: { create: metadatas } },
+        data: {
+            ...newPageContent,
+            metadatas: { create: metadatas },
+            sections: { create: sections },
+        },
     })
 
     return res.status(200).json(page)

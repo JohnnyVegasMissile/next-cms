@@ -8,7 +8,9 @@ const config = {
     exclude: ['/admin*', '/install', '/api*', '/server-sitemap.xml'],
     robotsTxtOptions: {
         additionalSitemaps: [
-            `${process.env.SITE_URL}/server-sitemap-index.xml`,
+            `${
+                process.env.SITE_URL || 'http://localhost:3000'
+            }/server-sitemap-index.xml`,
         ],
     },
 }

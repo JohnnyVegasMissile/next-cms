@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
 import type { Page, Metadata, Section } from '@prisma/client'
 import get from 'lodash.get'
 
-const prisma = new PrismaClient()
+import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = parseInt(req.query.uid as string)

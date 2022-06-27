@@ -1,12 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
-import type { Page, Metadata, Section, Article } from '@prisma/client'
-import get from 'lodash.get'
+// import type { Page, Metadata, Section, Article } from '@prisma/client'
+// import get from 'lodash.get'
 
-const prisma = new PrismaClient()
+import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const article = await prisma.article.findMany()
+    const article = await prisma.article.findMany({ include: { page: true } })
 
     return res.status(200).json(article)
 }

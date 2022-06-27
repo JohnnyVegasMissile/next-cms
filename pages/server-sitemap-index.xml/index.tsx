@@ -1,25 +1,45 @@
 // // pages/server-sitemap-index.xml/index.tsx
 import { getServerSideSitemap } from 'next-sitemap'
 import { GetServerSideProps } from 'next'
-import { PrismaClient } from '@prisma/client'
-import type { Page } from '@prisma/client'
 
-const prisma = new PrismaClient()
+import { prisma } from '../../utils/prisma'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const pages: Page[] = await prisma.page.findMany({
+    const pages = await prisma.page.findMany({
         where: {
             published: true,
-            type: 'page',
+            OR: [{ type: 'page' }, { type: 'article' }],
         },
+        include: { articles: true },
     })
 
-    const paths = pages.map((page) => ({
-        loc: `${process.env.SITE_URL}/${page.slug}`,
-        lastmod: new Date().toISOString(),
-    }))
+    const paths = pages.map((page) => {
+        const slug = page.slug
 
-    return getServerSideSitemap(ctx, paths)
+        let articlesSlugs: {
+            loc: string
+            lastmod: string
+        }[] = []
+
+        if (page.articles) {
+            articlesSlugs = page.articles
+                ?.filter((article) => article.published)
+                ?.map((article) => ({
+                    loc: `${process.env.SITE_URL}/${slug}/${article.slug}`,
+                    lastmod: new Date().toISOString(),
+                }))
+        }
+
+        return [
+            {
+                loc: `${process.env.SITE_URL}/${page.slug}`,
+                lastmod: new Date().toISOString(),
+            },
+            ...articlesSlugs,
+        ]
+    })
+
+    return getServerSideSitemap(ctx, paths.flat())
 }
 
 export default function Sitemap() {}

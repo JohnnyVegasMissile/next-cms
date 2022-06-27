@@ -4,12 +4,12 @@ import { IncomingForm } from 'formidable'
 import mv from 'mv'
 import get from 'lodash.get'
 import mime from 'mime-types'
-import { PrismaClient, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import type { Media } from '@prisma/client'
 
 import { makeId } from '../../../utils'
+import { prisma } from '../../../utils/prisma'
 
-const prisma = new PrismaClient()
 const mimeTypesImages = [
     'image/jpeg',
     'image/png',

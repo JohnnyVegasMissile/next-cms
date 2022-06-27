@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
 import type { Media } from '@prisma/client'
 import { promises as fs } from 'fs'
 
-const prisma = new PrismaClient()
+import { prisma } from '../../../utils/prisma'
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = parseInt(req.query.uid as string)

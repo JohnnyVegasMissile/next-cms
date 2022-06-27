@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import {
@@ -8,15 +8,15 @@ import {
     Button,
     // Select,
     Divider,
-    Radio,
+    // Radio,
     Typography,
     Select,
 } from 'antd'
-import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
+// import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import get from 'lodash.get'
-import kebabcase from 'lodash.kebabcase'
+// import kebabcase from 'lodash.kebabcase'
 // import { Prisma } from '@prisma/client'
-import type { Page } from '@prisma/client'
+// import type { Page } from '@prisma/client'
 import { postUser, editUser, getUser } from '../../../network/users'
 
 const { Title } = Typography
@@ -66,7 +66,7 @@ const UsersCreation = () => {
     const router = useRouter()
     const { pid } = router.query
 
-    const { values, errors, handleChange, handleSubmit, setValues } =
+    const { values, /*errors,*/ handleChange, handleSubmit, setValues } =
         useFormik<UserCreation>({
             initialValues,
             validate,

@@ -1,11 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
-import type { User, Login } from '@prisma/client'
-import get from 'lodash.get'
+// import type { User, Login } from '@prisma/client'
+// import get from 'lodash.get'
 import bcrypt from 'bcryptjs'
-import { LoginOutlined } from '@ant-design/icons'
+// import { LoginOutlined } from '@ant-design/icons'
 
-const prisma = new PrismaClient()
+import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = parseInt(req.query.uid as string)

@@ -16,7 +16,7 @@ import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
 // import { Prisma } from '@prisma/client'
-import type { Page } from '@prisma/client'
+// import type { Page } from '@prisma/client'
 import { editPage, postPage } from '../../../network/pages'
 import type { FullPageEdit } from '../../../types'
 
@@ -52,7 +52,7 @@ const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found']
 const initialValues: FullPageEdit = {
     title: '',
     slug: '',
-    sections: [],
+    // sections: [],
     metadatas: [],
     published: true,
 }

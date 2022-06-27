@@ -105,6 +105,15 @@ model Login {
   updatedAt       DateTime      @updatedAt
 }
 
+model Session {
+  id              Int           @id @default(autoincrement())
+  token           String        @unique
+  loginId         Int
+  login           Login         @relation(fields: [loginId], references: [id])
+  expiresAt       DateTime
+  updatedAt       DateTime      @updatedAt
+}
+
 // model Node {
 //   id              Int               @id @default(autoincrement())
 //   title           String
@@ -129,16 +138,14 @@ model Article {
   // metadatas   Metadata[]
   // footer      Element?
   pageId        Int?
-  Page          Page?             @relation(fields: [pageId], references: [id])
+  page          Page?             @relation(fields: [pageId], references: [id])
   published     Boolean           @default(true)
   updatedAt     DateTime          @updatedAt
 }
 
-model Session {
-  id              Int           @id @default(autoincrement())
-  token           String        @unique
-  loginId         Int
-  login           Login         @relation(fields: [loginId], references: [id])
-  expiresAt       DateTime
-  updatedAt       DateTime      @updatedAt
+model Setting {
+  id            Int               @id @default(autoincrement())
+  name          String
+  value         String
+  updatedAt     DateTime          @updatedAt
 }

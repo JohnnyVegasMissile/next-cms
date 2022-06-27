@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import type { Page, User, Login } from '@prisma/client'
+import type { Page, Login } from '@prisma/client'
 
-const prisma = new PrismaClient()
+import { prisma } from '../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const homes: Page[] = await prisma.page.findMany({

@@ -1,10 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
 import type { User } from '@prisma/client'
-import get from 'lodash.get'
+// import get from 'lodash.get'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient()
+import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const users: User[] = await prisma.user.findMany({

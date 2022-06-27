@@ -7,7 +7,9 @@
         "postbuild": "next-sitemap",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "initdb": "npx prisma migrate dev",
+        "studio": "npx prisma studio"
     },
     "dependencies": {
         "@ant-design/icons": "^4.7.0",

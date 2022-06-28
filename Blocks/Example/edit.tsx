@@ -1,5 +1,5 @@
 const Edit = () => {
-    return <p>edit</p>
+    return <section>Edit</section>
 }
 
 export default Edit

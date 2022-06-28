@@ -1,8 +1,10 @@
-import View from './view'
+import View from './View'
+import Edit from './Edit'
 
-const name = 'Example'
-const view = View
+const Example = {
+    name: 'Example',
+    View,
+    Edit,
+}
 
-const config = { view, name }
-
-export default config
+export default Example

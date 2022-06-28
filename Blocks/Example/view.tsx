@@ -1,5 +1,5 @@
 const View = () => {
-    return <p>view</p>
+    return <section>View</section>
 }
 
 export default View

@@ -18,7 +18,7 @@ export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
     })
 
 export const editPage = (
-    id: string,
+    id: string | number,
     data: Prisma.PageCreateInput
 ): Promise<Page> =>
     new Promise((resolve, reject) => {
@@ -48,7 +48,7 @@ export const getPages = (type?: PageTypes): Promise<Page[]> =>
             .catch(reject)
     })
 
-export const deletePage = (id: string): Promise<void> =>
+export const deletePage = (id: string | number): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',

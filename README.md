@@ -2,5 +2,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-npx prisma migrate dev
-npx prisma studio
+npm i
+npm run initdb
+npm run dev
+go to /install

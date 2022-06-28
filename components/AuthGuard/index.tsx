@@ -1,6 +1,7 @@
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { Spin } from 'antd'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
     const { user, initializing /*, setRedirect*/ } = useAuth()
@@ -20,7 +21,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
     /* show loading indicator while the auth provider is still initializing */
     if (initializing) {
-        return <h1>Application Loading</h1>
+        return (
+            <div>
+                <Spin size="large" tip="Loading..." />
+            </div>
+        )
     }
 
     // if auth initialized with a valid user show protected page

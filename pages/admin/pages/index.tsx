@@ -14,7 +14,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
 import { useQuery, UseQueryResult } from 'react-query'
-import { getPages } from '../../../network/pages'
+import { getPages, deletePage } from '../../../network/pages'
 import get from 'lodash.get'
 
 const { confirm } = Modal
@@ -53,17 +53,16 @@ const AdminPages = () => {
     )
 }
 
-const showDeleteConfirm = () => {
+const showDeleteConfirm = (id: number) => {
     confirm({
-        title: 'Are you sure delete this task?',
+        title: 'Are you sure to delete this page?',
         icon: <ExclamationCircleOutlined />,
-        content: 'Some descriptions',
-        okText: 'Yes',
+        content:
+            'Deleting an article page will delete the articles associated to it. if you wish to keep them just pass the page to unpublished',
+        okText: 'Delete',
         okType: 'danger',
-        cancelText: 'No',
-        onOk() {
-            console.log('OK')
-        },
+        cancelText: 'Cancel',
+        onOk: () => deletePage(id),
         onCancel() {
             console.log('Cancel')
         },
@@ -166,21 +165,17 @@ const columns = [
                 </Button>
 
                 {e.type === 'article' ? (
-                    <Button onClick={showDeleteConfirm} danger>
+                    <Button onClick={() => showDeleteConfirm(e.id)} danger>
                         Delete
                     </Button>
                 ) : (
                     <Popconfirm
                         placement="topRight"
-                        title={'ho la la'}
+                        title={'Are you sur to delete this page?'}
                         disabled={e.type === 'error' || e.type === 'home'}
-                        onConfirm={() => {
-                            fetch(`/api/pages/${e.id}`, {
-                                method: 'DELETE',
-                            })
-                        }}
-                        okText="Yes"
-                        cancelText="No"
+                        onConfirm={() => deletePage(e.id)}
+                        okText="Delete"
+                        cancelText="Cancel"
                     >
                         <Button
                             danger

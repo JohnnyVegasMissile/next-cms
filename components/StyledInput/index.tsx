@@ -1,4 +1,4 @@
-import { ChangeEventHandler } from 'react'
+import { CSSProperties } from 'react'
 
 interface Props<T> {
     value: T
@@ -6,7 +6,7 @@ interface Props<T> {
     className?: string
 }
 
-const style = {
+const style: CSSProperties = {
     fontSize: 'inherit',
     fontWeight: 'inherit',
     height: 'inherit',

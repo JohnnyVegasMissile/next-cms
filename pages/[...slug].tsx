@@ -7,9 +7,12 @@ import { FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
 import Link from 'next/link'
+import { useAuth } from '../hooks/useAuth'
+import { Button } from 'antd'
 
 const Pages = (props: FullPage) => {
-    const { title, metadatas, articles, slug } = props
+    const { id, title, metadatas, articles, slug } = props
+    const { isAuth } = useAuth()
 
     return (
         <div>
@@ -23,6 +26,14 @@ const Pages = (props: FullPage) => {
                     />
                 ))}
             </Head>
+
+            {isAuth && (
+                <Button>
+                    <Link href={`/admin/pages/${id}`}>
+                        <a>Edit</a>
+                    </Link>
+                </Button>
+            )}
 
             <header></header>
 

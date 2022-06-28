@@ -6,9 +6,13 @@ import get from 'lodash.get'
 import { FullPage } from 'types'
 
 import { prisma } from '../utils/prisma'
+import { useAuth } from '../hooks/useAuth'
+import { Button } from 'antd'
+import Link from 'next/link'
 
 const Home = (props: FullPage) => {
-    const { title, metadatas } = props
+    const { id, title, metadatas } = props
+    const { isAuth } = useAuth()
 
     return (
         <div>
@@ -22,6 +26,14 @@ const Home = (props: FullPage) => {
                     />
                 ))}
             </Head>
+
+            {isAuth && (
+                <Button>
+                    <Link href={`/admin/pages/${id}`}>
+                        <a>Edit</a>
+                    </Link>
+                </Button>
+            )}
 
             <header></header>
 

@@ -14,7 +14,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             data: {
                 type: 'home',
                 title: 'Home',
-                slug: '/',
+                slug: '',
             },
         })
     }
@@ -28,7 +28,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             data: {
                 type: 'error',
                 title: 'Not Found',
-                slug: '/not-found',
+                slug: 'not-found',
             },
         })
     }

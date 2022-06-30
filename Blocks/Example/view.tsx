@@ -3,6 +3,7 @@ import styles from './Example.module.css'
 
 import type { Props } from '../types'
 import CustomImage from '../../components/CustomImage'
+import get from 'lodash.get'
 
 const parseDefaultValue = (values: string) => {
     try {
@@ -13,18 +14,20 @@ const parseDefaultValue = (values: string) => {
 }
 
 const View = ({ defaultValues, articles }: Props) => {
-    const [values, setValues] = useState<any>(parseDefaultValue(defaultValues))
+    const values = parseDefaultValue(defaultValues)
 
     return (
         <section className={styles.section}>
             <div className={styles.container}>
-                <CustomImage className={styles.leftContainer} />
+                <CustomImage img={values.img} className={styles.leftContainer} />
                 <div className={styles.rightContainer}>
-                    <h1 className={styles.listTitle}>This is a title</h1>
+                    <h1 className={styles.listTitle}>{get(values, 'title', '')}</h1>
                     <ul className={styles.listContainer}>
-                        <li className={styles.listElement}>first</li>
-                        <li className={styles.listElement}>second</li>
-                        <li className={styles.listElement}>third</li>
+                        {values?.list?.map((e: string, idx: number) => (
+                            <li key={idx} className={styles.listElement}>
+                                {e}
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </div>

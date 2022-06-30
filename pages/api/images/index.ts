@@ -36,7 +36,7 @@ export const config = {
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     const form = new IncomingForm()
 
-    await form.parse(req, (err, fields, files) => {
+    await form.parse(req, async (err, fields, files) => {
         if (err) return res.status(500).json({ error: 'err' })
 
         const file: Media | undefined | any = Array.isArray(files.file)
@@ -63,12 +63,14 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             size: file.size,
         }
 
-        prisma.media
-            .create({ data: fileInfos })
-            .then((e) => {
-                res.status(200).json(e)
-            })
-            .catch((err) => res.status(500).json({ error: err }))
+        const createdFile = await prisma.media.create({ data: fileInfos })
+
+        if (!file) {
+            return res.status(500).json({ error: err })
+        }
+
+        return res.status(200).json(createdFile)
+        // .catch((err) => )
     })
 }
 

@@ -3,7 +3,7 @@ const nextConfig = {
     reactStrictMode: true,
     env: {
         UPLOADS_IMAGES_DIR: '/uploads/images',
-        SITE_URL: 'http://localhost:3000',
+        SITE_URL: 'http://localhost:8080',
     },
 }
 

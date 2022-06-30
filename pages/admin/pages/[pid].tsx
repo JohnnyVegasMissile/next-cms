@@ -27,7 +27,7 @@ import kebabcase from 'lodash.kebabcase'
 // import type { Page } from '@prisma/client'
 import { editPage, postPage } from '../../../network/pages'
 import type { FullPageEdit } from '../../../types'
-import Blocks from '../../../blocks'
+import Blocks from '../../../Blocks'
 
 const { Title } = Typography
 
@@ -102,6 +102,7 @@ const Admin = () => {
             initialValues,
             validate,
             onSubmit: async (values) => {
+                console.log('1')
                 setLoading(true)
                 if (pid === 'create') {
                     await postPage(values)

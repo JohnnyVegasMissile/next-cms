@@ -1,4 +1,4 @@
-import styles from './Example.module.css'
+import styles from './ExampleList.module.css'
 
 import type { Props } from '../types'
 import CustomImage from '../../components/CustomImage'
@@ -13,29 +13,24 @@ const parseDefaultValue = (values: string) => {
     }
 }
 
-const View = ({ defaultValues /*, articles*/ }: Props) => {
+const View = ({ defaultValues, page }: Props) => {
     const values = parseDefaultValue(defaultValues)
 
     return (
         <section className={styles.section}>
             <div className={styles.container}>
-                <CustomImage.Background img={values.img} className={styles.leftContainer}>
-                    {get(values, 'button.show', false) && (
-                        <Link href={get(values, 'button.link', '/')}>
-                            <a>
-                                <button type="button" className={styles.button}>
-                                    {get(values, 'button.text', '')}
-                                </button>
-                            </a>
-                        </Link>
-                    )}
-                </CustomImage.Background>
+                <CustomImage.Background
+                    img={values.img}
+                    className={styles.leftContainer}
+                />
                 <div className={styles.rightContainer}>
-                    <h1 className={styles.listTitle}>{get(values, 'title', '')}</h1>
+                    <h1 className={styles.listTitle}>{page?.title}</h1>
                     <ul className={styles.listContainer}>
-                        {values?.list?.map((e: string, idx: number) => (
+                        {page?.articles?.map((article, idx) => (
                             <li key={idx} className={styles.listElement}>
-                                {e}
+                                <Link href={`/${page?.slug}/${article.slug}`}>
+                                    <a>{article.title}</a>
+                                </Link>
                             </li>
                         ))}
                     </ul>

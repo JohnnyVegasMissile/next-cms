@@ -1,4 +1,4 @@
-import Blocks from '../../blocks'
+import Blocks from '../../Blocks'
 import get from 'lodash.get'
 import { Section } from '@prisma/client'
 import { FullPage } from 'types'

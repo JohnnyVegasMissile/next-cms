@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import styles from './Example.module.css'
+import styles from './ExampleList.module.css'
 
 import type { Props } from '../types'
 import CustomImage from '../../components/CustomImage'
@@ -19,7 +19,7 @@ const parseDefaultValue = (values: string) => {
     }
 }
 
-const Edit = ({ defaultValues, onChange }: Props) => {
+const Edit = ({ defaultValues, page, onChange }: Props) => {
     const [values, setValues] = useState<any>(parseDefaultValue(defaultValues))
 
     const handleChange = (name: string, value: any) => {
@@ -36,61 +36,25 @@ const Edit = ({ defaultValues, onChange }: Props) => {
         }
     }
 
+    const arts = ['Lorem ipsum dolor', 'Lorem ipsum dolor', 'Lorem ipsum dolor']
+
     return (
         <EditPanel
             view={
                 <section className={styles.section}>
                     <div className={styles.container}>
                         <CustomImage.Background
-                            img={get(values, 'img', undefined)}
+                            img={values.img}
                             className={styles.leftContainer}
-                        >
-                            {get(values, 'button.show', false) && (
-                                <StyledInput.button
-                                    className={styles.button}
-                                    value={get(values, 'button.text', '')}
-                                    onChange={(e) => handleChange('button.text', e)}
-                                />
-                            )}
-                            {/* <button className={styles.button}>Click Me!</button> */}
-                        </CustomImage.Background>
+                        />
                         <div className={styles.rightContainer}>
-                            <StyledInput.h1
-                                className={styles.listTitle}
-                                value={get(values, 'title', '')}
-                                onChange={(e) => handleChange('title', e)}
-                            />
+                            <h1 className={styles.listTitle}>{page?.title}</h1>
                             <ul className={styles.listContainer}>
-                                {get(values, 'list', []).map((e: string, idx: number) => (
-                                    <Fragment key={idx}>
-                                        <StyledInput.li
-                                            className={styles.listElement}
-                                            value={e}
-                                            onChange={(e) =>
-                                                handleChange(`list.${idx}`, e)
-                                            }
-                                        />
-                                        <Button
-                                            size="small"
-                                            type="primary"
-                                            danger
-                                            shape="circle"
-                                            icon={<CloseOutlined />}
-                                        />
-                                    </Fragment>
+                                {arts.map((article, idx) => (
+                                    <li key={idx} className={styles.listElement}>
+                                        {article}
+                                    </li>
                                 ))}
-                                <Button
-                                    onClick={() =>
-                                        handleChange(
-                                            `list.${get(values, 'list', []).length}`,
-                                            ''
-                                        )
-                                    }
-                                    size="small"
-                                    type="primary"
-                                    shape="circle"
-                                    icon={<PlusOutlined />}
-                                />
                             </ul>
                         </div>
                     </div>
@@ -102,19 +66,6 @@ const Edit = ({ defaultValues, onChange }: Props) => {
                         <MediaModal
                             value={get(values, 'img', undefined)}
                             onMediaSelected={(e) => handleChange('img', e)}
-                        />
-                        <Switch
-                            checked={get(values, 'button.show', false)}
-                            onChange={(e) =>
-                                handleChange(
-                                    'button.show',
-                                    !get(values, 'button.show', false)
-                                )
-                            }
-                        />
-                        <LinkInput
-                            value={get(values, 'button.link', undefined)}
-                            onChange={(e) => handleChange('button.link', e)}
                         />
                     </Space>
                 </>

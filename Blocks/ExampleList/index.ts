@@ -3,7 +3,7 @@ import Edit from './Edit'
 import type { Block } from '../types'
 
 const Example: Block = {
-    name: 'Example',
+    name: 'Example List',
     preview: '',
     View,
     Edit,

@@ -28,7 +28,11 @@ const Home = (props: FullPage) => {
             </Head>
 
             {isAuth && (
-                <Button>
+                <Button
+                    size="small"
+                    type="primary"
+                    style={{ position: 'absolute', right: 5, top: 50 }}
+                >
                     <Link href={`/admin/pages/${id}`}>
                         <a>Edit</a>
                     </Link>

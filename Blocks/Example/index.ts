@@ -1,7 +1,8 @@
 import View from './View'
 import Edit from './Edit'
+import type { Block } from '../types'
 
-const Example = {
+const Example: Block = {
     name: 'Example',
     preview: '',
     View,

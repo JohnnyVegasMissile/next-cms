@@ -1,5 +1,6 @@
 import type { Article, Page } from '@prisma/client'
 import { Space, Button, Table, Breadcrumb, Badge, Popconfirm } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
 import { useQuery, UseQueryResult } from 'react-query'
@@ -22,7 +23,7 @@ const AdminArticles = () => {
             size="large"
             style={{ width: '100%', padding: 15 }}
         >
-            <Button type="primary">
+            <Button type="primary" icon={<PlusOutlined />}>
                 <Link href="/admin/articles/create">
                     <a>Create</a>
                 </Link>

@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev -p 8080",
         "postbuild": "next-sitemap",
         "build": "next build",
         "start": "next start",
@@ -13,7 +13,7 @@
     },
     "dependencies": {
         "@ant-design/icons": "^4.7.0",
-        "@prisma/client": "^3.15.2",
+        "@prisma/client": "^4.0.0",
         "antd": "^4.21.3",
         "axios": "^0.27.2",
         "bcryptjs": "^2.4.3",
@@ -45,7 +45,7 @@
         "eslint": "8.18.0",
         "eslint-config-next": "12.1.6",
         "prettier": "2.7.1",
-        "prisma": "^3.15.2",
+        "prisma": "^4.0.0",
         "typescript": "4.7.4"
     }
 }

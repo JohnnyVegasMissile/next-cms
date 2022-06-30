@@ -1,11 +1,10 @@
-import { AutoComplete, Badge, Typography } from 'antd'
+import { AutoComplete, Typography } from 'antd'
 import { useQuery, UseQueryResult } from 'react-query'
 import { getPages } from '../../network/pages'
 import { getArticles } from '../../network/articles'
 import type { Page } from '@prisma/client'
 import { useMemo } from 'react'
 import { FullArticle } from 'types'
-import get from 'lodash.get'
 
 const { Text } = Typography
 

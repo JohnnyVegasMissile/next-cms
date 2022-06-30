@@ -1,6 +1,6 @@
 import UploadButton from '../../components/UploadButton'
 import { Space, Avatar, InputNumber } from 'antd'
-import { useQuery, UseQueryResult } from 'react-query'
+import { useQuery /*, UseQueryResult*/ } from 'react-query'
 import { Media, Setting } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { getSettings, editSetting } from '../../network/settings'
@@ -13,19 +13,20 @@ const Admin = () => {
     const [settings, setSettings] = useState<any>()
     const [values, setValues] = useState('')
     const [picture, setPicture] = useState<Media | undefined>()
-    const setting: UseQueryResult<Setting[], Error> = useQuery<
-        Setting[],
-        Error
-    >(['setting'], () => getSettings(), {
-        refetchOnWindowFocus: false,
-        onSuccess: (data: Setting[]) => {
-            const newSettings: any = {}
-            for (const sett of data) {
-                newSettings[sett.name] = sett.value
-            }
-            setSettings(newSettings)
-        },
-    })
+    /*const setting: UseQueryResult<Setting[], Error> =*/ useQuery<Setting[], Error>(
+        ['setting'],
+        () => getSettings(),
+        {
+            refetchOnWindowFocus: false,
+            onSuccess: (data: Setting[]) => {
+                const newSettings: any = {}
+                for (const sett of data) {
+                    newSettings[sett.name] = sett.value
+                }
+                setSettings(newSettings)
+            },
+        }
+    )
 
     const debouncedValue = useDebounce<string>(settings?.revalidate, 1500)
 
@@ -37,20 +38,14 @@ const Admin = () => {
     }, [debouncedValue])
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{ width: '100%', padding: 15 }}
-        >
+        <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
             <Space>
                 <Avatar src="/favicon.ico" shape="square" size="large" />
                 <UploadButton.Favicon />
             </Space>
             <InputNumber
                 value={get(settings, 'revalidate', undefined)}
-                onChange={(e) =>
-                    setSettings((prev: any) => ({ ...prev, revalidate: e }))
-                }
+                onChange={(e) => setSettings((prev: any) => ({ ...prev, revalidate: e }))}
             />
             <MediaModal value={picture} onMediaSelected={setPicture} />
             <LinkInput value={values} onChange={setValues} />

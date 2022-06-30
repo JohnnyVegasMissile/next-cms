@@ -4,7 +4,7 @@
 
 .container {
     width: 100%;
-    height: 250px;
+    min-height: 250px;
     display: flex;
     flex-direction: row;
 }
@@ -15,6 +15,10 @@
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .rightContainer {
@@ -28,8 +32,21 @@
     color: white;
 }
 
-.listContainer {
+/* .listContainer {
 }
 
 .listElement {
+} */
+
+.button {
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
 }

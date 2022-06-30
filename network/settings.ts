@@ -1,5 +1,4 @@
 import INSTANCE from './api'
-import { Prisma } from '@prisma/client'
 import type { Setting } from '@prisma/client'
 import { PageTypes } from '../types'
 

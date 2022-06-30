@@ -97,22 +97,23 @@ const Admin = () => {
     const router = useRouter()
     const { pid } = router.query
 
-    const { values, errors, handleChange, handleSubmit, setValues } = useFormik<FullPageEdit>({
-        initialValues,
-        validate,
-        onSubmit: async (values) => {
-            setLoading(true)
-            if (pid === 'create') {
-                await postPage(values)
-            } else {
-                const id = pid as string
+    const { values, errors, handleChange, handleSubmit, setValues } =
+        useFormik<FullPageEdit>({
+            initialValues,
+            validate,
+            onSubmit: async (values) => {
+                setLoading(true)
+                if (pid === 'create') {
+                    await postPage(values)
+                } else {
+                    const id = pid as string
 
-                await editPage(id, values)
-            }
-            router.push('/admin/pages')
-            setLoading(false)
-        },
-    })
+                    await editPage(id, values)
+                }
+                router.push('/admin/pages')
+                setLoading(false)
+            },
+        })
 
     const isLockedPage = values.type === 'error' || values.type === 'home'
 
@@ -224,23 +225,13 @@ const Admin = () => {
         return <div>Loading...</div>
     }
 
-    interface GetEditComponentProps {
-        type: string
-        defaultValues: any
-        onChange: (value: any) => void
-    }
-
-    const GetEditComponent = ({ type, defaultValues, onChange }: GetEditComponentProps) => {
-        if (!type) return null
-
-        const Component = get(Blocks, type, () => 'null')
-
-        return <Component.Edit defaultValues={defaultValues} onChange={onChange} />
-    }
-
     return (
         <form onSubmit={handleSubmit}>
-            <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
+            <Space
+                direction="vertical"
+                size="large"
+                style={{ width: '100%', padding: 15 }}
+            >
                 <Space direction="vertical" size={0} style={{ width: '100%' }}>
                     <Title level={5}>Title</Title>
                     <Input
@@ -295,36 +286,53 @@ const Admin = () => {
 
                     <Title level={5}>Meta Datas</Title>
                     <Space direction="vertical">
-                        {get(values, 'metadatas', []).map((metadata: any, index: number) => (
-                            <Space key={index}>
-                                <Select
-                                    style={{ width: 200 }}
-                                    value={metadata.name}
-                                    onChange={(e) => onHandleChange(`metadatas.${index}.name`, e)}
-                                >
-                                    <Select.Option value="application-name">
-                                        Application name
-                                    </Select.Option>
-                                    <Select.Option value="author">Author</Select.Option>
-                                    <Select.Option value="description">Description</Select.Option>
-                                    <Select.Option value="generator">Generator</Select.Option>
-                                    <Select.Option value="keywords">Keywords</Select.Option>
-                                    <Select.Option value="viewport">Viewport</Select.Option>
-                                </Select>
-                                <Input
-                                    value={metadata.content}
-                                    onChange={(e) =>
-                                        onHandleChange(`metadatas.${index}.content`, e.target.value)
-                                    }
-                                />
-                                <Button
-                                    onClick={() => removeMetadata(index)}
-                                    type="primary"
-                                    shape="circle"
-                                    icon={<MinusOutlined />}
-                                />
-                            </Space>
-                        ))}
+                        {get(values, 'metadatas', []).map(
+                            (metadata: any, index: number) => (
+                                <Space key={index}>
+                                    <Select
+                                        style={{ width: 200 }}
+                                        value={metadata.name}
+                                        onChange={(e) =>
+                                            onHandleChange(`metadatas.${index}.name`, e)
+                                        }
+                                    >
+                                        <Select.Option value="application-name">
+                                            Application name
+                                        </Select.Option>
+                                        <Select.Option value="author">
+                                            Author
+                                        </Select.Option>
+                                        <Select.Option value="description">
+                                            Description
+                                        </Select.Option>
+                                        <Select.Option value="generator">
+                                            Generator
+                                        </Select.Option>
+                                        <Select.Option value="keywords">
+                                            Keywords
+                                        </Select.Option>
+                                        <Select.Option value="viewport">
+                                            Viewport
+                                        </Select.Option>
+                                    </Select>
+                                    <Input
+                                        value={metadata.content}
+                                        onChange={(e) =>
+                                            onHandleChange(
+                                                `metadatas.${index}.content`,
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                    <Button
+                                        onClick={() => removeMetadata(index)}
+                                        type="primary"
+                                        shape="circle"
+                                        icon={<MinusOutlined />}
+                                    />
+                                </Space>
+                            )
+                        )}
                         <Button
                             onClick={addMetadata}
                             type="primary"
@@ -354,8 +362,11 @@ const Admin = () => {
                                                         type="primary"
                                                         shape="circle"
                                                         disabled={
-                                                            get(values, 'slug', '')!.split('/')
-                                                                .length < 2
+                                                            get(
+                                                                values,
+                                                                'slug',
+                                                                ''
+                                                            )!.split('/').length < 2
                                                         }
                                                         icon={<MinusOutlined />}
                                                     />
@@ -369,7 +380,9 @@ const Admin = () => {
                                             )}
                                             <Input
                                                 value={slug}
-                                                onChange={(e) => editSlug(idx, e.target.value)}
+                                                onChange={(e) =>
+                                                    editSlug(idx, e.target.value)
+                                                }
                                                 status={errors.slug ? 'error' : undefined}
                                             />
                                             {lastSlugIndex !== idx && '/'}
@@ -394,7 +407,9 @@ const Admin = () => {
                                         icon={<CaretUpOutlined />}
                                     />
                                     <Button
-                                        disabled={idx === get(values, 'sections', []).length - 1}
+                                        disabled={
+                                            idx === get(values, 'sections', []).length - 1
+                                        }
                                         onClick={() => SectionDown(idx)}
                                         type="primary"
                                         shape="circle"
@@ -442,7 +457,9 @@ const Admin = () => {
                                     <GetEditComponent
                                         type={section.type}
                                         defaultValues={section.content}
-                                        onChange={() => {}}
+                                        onChange={(e) =>
+                                            onHandleChange(`sections.${idx}.content`, e)
+                                        }
                                     />
                                 </Card>
                             </div>
@@ -466,6 +483,20 @@ const Admin = () => {
             </Space>
         </form>
     )
+}
+
+interface GetEditComponentProps {
+    type: string
+    defaultValues: any
+    onChange: (value: any) => void
+}
+
+const GetEditComponent = ({ type, defaultValues, onChange }: GetEditComponentProps) => {
+    if (!type) return null
+
+    const Component = get(Blocks, type, () => null)
+
+    return <Component.Edit defaultValues={defaultValues} onChange={onChange} />
 }
 
 Admin.requireAuth = true

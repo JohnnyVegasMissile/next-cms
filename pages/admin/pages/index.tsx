@@ -29,11 +29,7 @@ const AdminPages = () => {
     )
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{ width: '100%', padding: 15 }}
-        >
+        <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
             <Button type="primary">
                 <Link href="/admin/pages/create">
                     <a>Create</a>
@@ -111,7 +107,7 @@ const columns = [
                 <Link href={`/${e.slug}`}>
                     <a>
                         <Breadcrumb>
-                            {e.slug.split('/').map((s: string, idx: number) => (
+                            {e.slug!.split('/').map((s: string, idx: number) => (
                                 <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
                             ))}
                         </Breadcrumb>
@@ -119,22 +115,6 @@ const columns = [
                 </Link>
             )
         },
-
-        // (
-        //     <Link href={`/${e}`}>
-        //         <a>
-        //             {e.type !== 'page' ? (
-        //                 <Tag color="cyan">{e.type}</Tag>
-        //             ) : (
-        //                 <Breadcrumb>
-        //                     {e.slug.split('/').map((s: string, idx: number) => (
-        //                         <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
-        //                     ))}
-        //                 </Breadcrumb>
-        //             )}
-        //         </a>
-        //     </Link>
-        // ),
     },
     {
         title: 'Published',
@@ -177,10 +157,7 @@ const columns = [
                         okText="Delete"
                         cancelText="Cancel"
                     >
-                        <Button
-                            danger
-                            disabled={e.type === 'error' || e.type === 'home'}
-                        >
+                        <Button danger disabled={e.type === 'error' || e.type === 'home'}>
                             Delete
                         </Button>
                     </Popconfirm>

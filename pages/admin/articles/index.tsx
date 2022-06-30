@@ -10,19 +10,16 @@ import get from 'lodash.get'
 import { FullArticle } from 'types'
 
 const AdminArticles = () => {
-    const articles: UseQueryResult<Article[], Error> = useQuery<
-        Article[],
-        Error
-    >(['articles'], () => getArticles(), {
-        refetchOnWindowFocus: false,
-    })
+    const articles: UseQueryResult<Article[], Error> = useQuery<Article[], Error>(
+        ['articles'],
+        () => getArticles(),
+        {
+            refetchOnWindowFocus: false,
+        }
+    )
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{ width: '100%', padding: 15 }}
-        >
+        <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
             <Button type="primary" icon={<PlusOutlined />}>
                 <Link href="/admin/articles/create">
                     <a>Create</a>
@@ -75,13 +72,9 @@ const columns = [
                 <Link href={`/${e.page.slug}/${e.slug}`}>
                     <a>
                         <Breadcrumb>
-                            {e.page.slug
-                                .split('/')
-                                .map((s: string, idx: number) => (
-                                    <Breadcrumb.Item key={idx}>
-                                        {s}
-                                    </Breadcrumb.Item>
-                                ))}
+                            {e.page.slug!.split('/').map((s: string, idx: number) => (
+                                <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
+                            ))}
                             <Breadcrumb.Item>{e.slug}</Breadcrumb.Item>
                         </Breadcrumb>
                     </a>

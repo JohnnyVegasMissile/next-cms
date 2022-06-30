@@ -102,6 +102,18 @@ const H4 = ({ value, onChange, className }: Props<string>) => (
     </h4>
 )
 
+const Button = ({ value, onChange, className }: Props<string>) => (
+    <button className={className} onClick={(e) => e.preventDefault()}>
+        <input
+            placeholder="Lorem ipsum"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={styles.input}
+            type="text"
+        />
+    </button>
+)
+
 StyledInput.div = StyledInput
 StyledInput.span = Span
 StyledInput.p = P
@@ -110,5 +122,6 @@ StyledInput.h1 = H1
 StyledInput.h2 = H2
 StyledInput.h3 = H3
 StyledInput.h4 = H4
+StyledInput.button = Button
 
 export default StyledInput

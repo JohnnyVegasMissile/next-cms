@@ -3,12 +3,13 @@ import styles from './Example.module.css'
 
 import type { Props } from '../types'
 import CustomImage from '../../components/CustomImage'
-import { Button, Card } from 'antd'
+import { Button, Card, Space, Switch } from 'antd'
 import StyledInput from '../../components/StyledInput'
 import get from 'lodash.get'
 import set from 'lodash.set'
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons'
-import MediaModal from '@components/MediaModal'
+import MediaModal from '../../components/MediaModal'
+import LinkInput from '../../components/LinkInput'
 
 const parseDefaultValue = (values: string) => {
     try {
@@ -40,10 +41,19 @@ const Edit = ({ defaultValues, onChange }: Props) => {
             view={
                 <section className={styles.section}>
                     <div className={styles.container}>
-                        <CustomImage
+                        <CustomImage.Background
                             img={get(values, 'img', undefined)}
                             className={styles.leftContainer}
-                        />
+                        >
+                            {get(values, 'button.show', false) && (
+                                <StyledInput.button
+                                    className={styles.button}
+                                    value={get(values, 'button.text', '')}
+                                    onChange={(e) => handleChange('button.text', e)}
+                                />
+                            )}
+                            {/* <button className={styles.button}>Click Me!</button> */}
+                        </CustomImage.Background>
                         <div className={styles.rightContainer}>
                             <StyledInput.h1
                                 className={styles.listTitle}
@@ -88,10 +98,25 @@ const Edit = ({ defaultValues, onChange }: Props) => {
             }
             panel={
                 <>
-                    <MediaModal
-                        value={get(values, 'img', undefined)}
-                        onMediaSelected={(e) => handleChange('img', e)}
-                    />
+                    <Space direction="vertical">
+                        <MediaModal
+                            value={get(values, 'img', undefined)}
+                            onMediaSelected={(e) => handleChange('img', e)}
+                        />
+                        <Switch
+                            checked={get(values, 'button.show', false)}
+                            onChange={(e) =>
+                                handleChange(
+                                    'button.show',
+                                    !get(values, 'button.show', false)
+                                )
+                            }
+                        />
+                        <LinkInput
+                            value={get(values, 'button.link', undefined)}
+                            onChange={(e) => handleChange('button.link', e)}
+                        />
+                    </Space>
                 </>
             }
         />

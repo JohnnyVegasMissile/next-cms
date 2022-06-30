@@ -40,7 +40,11 @@ const Pages = (props: FullPage) => {
 
             <main>
                 {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} articles={articles} />
+                    <SectionBlock
+                        key={section.id}
+                        section={section}
+                        page={props as FullPage}
+                    />
                 ))}
             </main>
 

@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Setting } from '@prisma/client'
 // import get from 'lodash.get'
-import bcrypt from 'bcryptjs'
 
 import { prisma } from '../../utils/prisma'
 

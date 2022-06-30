@@ -25,43 +25,52 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const newPageContent: FullPage = req.body
 
+    console.log('newPageContent', newPageContent)
+
+    // delete existing metadatas
+    await prisma.metadata.deleteMany({
+        where: { pageId: id },
+    })
+
     // put the metadatas separately
     const newMetadatas: Metadata[] = get(req, 'body.metadatas', [])
     delete newPageContent.metadatas
 
-    // get the actual metadatas
-    const currentMetadatas: Metadata[] = await prisma.metadata.findMany({
+    for (const metadata of newMetadatas) {
+        await prisma.metadata.create({
+            data: {
+                pageId: id,
+                name: metadata.name,
+                content: metadata.content,
+            },
+        })
+    }
+
+    // delete existing sections
+    await prisma.section.deleteMany({
         where: { pageId: id },
     })
 
-    // update the metadatas
-    while (newMetadatas.length) {
-        const tempNewMeta = newMetadatas.shift()
-        const tempOldMeta = currentMetadatas.shift()
+    // create new sections
+    const newSections: Section[] = get(req, 'body.sections', [])
+    delete newPageContent.sections
 
-        if (tempOldMeta) {
-            await prisma.metadata.update({
-                where: { id: tempOldMeta.id },
-                data: { ...tempNewMeta },
-            })
-        } else if (tempNewMeta) {
-            await prisma.metadata.create({
-                data: { ...tempNewMeta, pageId: id },
-            })
-        }
-    }
-
-    // delete the remaining metadatas
-    while (currentMetadatas.length) {
-        const tempMeta = currentMetadatas.shift()
-
-        await prisma.metadata.delete({ where: { id: tempMeta?.id } })
+    for (const section of newSections) {
+        await prisma.section.create({
+            data: {
+                type: section.type,
+                pageId: id,
+                position: section.position,
+                content: section.content,
+            },
+        })
     }
 
     // update the page
-    const page: Page = await prisma.page.update({
+    const page = await prisma.page.update({
         where: { id },
         data: newPageContent,
+        include: { metadatas: true, sections: true },
     })
 
     res.status(200).json(page)
@@ -79,6 +88,12 @@ const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     })
 
     await prisma.section.deleteMany({
+        where: {
+            pageId: id,
+        },
+    })
+
+    await prisma.article.deleteMany({
         where: {
             pageId: id,
         },

@@ -1,4 +1,5 @@
 import { Article } from '@prisma/client'
+import { FullPage } from '../types'
 
 export interface Block {
     name: string
@@ -10,5 +11,5 @@ export interface Block {
 export interface Props {
     defaultValues: string
     onChange?: (values: string) => void
-    articles?: Article[]
+    page?: FullPage
 }

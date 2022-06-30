@@ -1,20 +1,21 @@
 import Blocks from '../../blocks'
 import get from 'lodash.get'
-import { Article, Section } from '@prisma/client'
+import { Section } from '@prisma/client'
+import { FullPage } from 'types'
 
 interface Props {
     section: Section
-    articles?: Article[] | null
+    page?: FullPage
 }
 
-const SectionBlock = ({ section, articles }: Props) => {
+const SectionBlock = ({ section, page }: Props) => {
     const Component = get(Blocks, section.type, null)
 
     if (!Component) {
         return null
     }
 
-    return <Component.View defaultValues={section.content} articles={articles} />
+    return <Component.View defaultValues={section.content} page={page} />
 }
 
 export default SectionBlock

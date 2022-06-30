@@ -1,4 +1,3 @@
-import { Article } from '@prisma/client'
 import { FullPage } from '../types'
 
 export interface Block {

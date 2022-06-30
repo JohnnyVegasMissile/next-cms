@@ -83,7 +83,7 @@ const columns = [
         },
     },
     {
-        title: 'Article',
+        title: 'List',
         dataIndex: 'page',
         render: (e: Page) => e.title,
     },

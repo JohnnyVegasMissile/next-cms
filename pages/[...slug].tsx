@@ -12,7 +12,7 @@ import { Button } from 'antd'
 import SectionBlock from '../components/SectionBlock'
 
 const Pages = (props: FullPage) => {
-    const { id, title, metadatas, articles, sections, type } = props
+    const { id, title, metadatas, sections, type } = props
     const { isAuth } = useAuth()
 
     return (
@@ -40,11 +40,7 @@ const Pages = (props: FullPage) => {
 
             <main>
                 {sections?.map((section) => (
-                    <SectionBlock
-                        key={section.id}
-                        section={section}
-                        page={props as FullPage}
-                    />
+                    <SectionBlock key={section.id} section={section} page={props} />
                 ))}
             </main>
 
@@ -105,7 +101,7 @@ export async function getStaticPaths(context: GetStaticPathsContext) {
     const pages = await prisma.page.findMany({
         where: {
             published: true,
-            OR: [{ type: 'page' }, { type: 'article' }],
+            OR: [{ type: 'page' }, { type: 'list' }],
         },
         include: { articles: true },
     })

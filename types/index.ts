@@ -1,15 +1,8 @@
-import type {
-    User,
-    Login,
-    Page,
-    Metadata,
-    Section,
-    Article,
-} from '@prisma/client'
+import type { User, Login, Page, Metadata, Section, Article } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 export type UserRoleTypes = 'super-admin' | 'admin' | 'user'
-export type PageTypes = 'home' | 'error' | 'article' | 'page'
+export type PageTypes = 'home' | 'error' | 'list' | 'page'
 export interface ContextUser {
     name: string
     email?: string

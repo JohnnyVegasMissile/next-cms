@@ -1,4 +1,4 @@
-import Image, { ImageLoaderProps } from 'next/image'
+//import Image, { ImageLoaderProps } from 'next/image'
 import type { Media } from '@prisma/client'
 
 interface Props {

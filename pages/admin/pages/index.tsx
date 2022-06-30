@@ -77,12 +77,12 @@ const columns = [
     {
         title: 'Type',
         dataIndex: 'type',
-        render: (e: 'home' | 'error' | 'page' | 'article') => {
+        render: (e: 'home' | 'error' | 'page' | 'list') => {
             const types = {
                 home: { label: 'Homepage', color: '#108ee9' },
                 error: { label: 'Not Found', color: '#f50' },
                 page: { label: 'Page', color: '#2db7f5' },
-                article: { label: 'Article', color: '#87d068' },
+                list: { label: 'List', color: '#87d068' },
             }
 
             return <Tag color={types[e].color}>{types[e].label}</Tag>
@@ -144,7 +144,7 @@ const columns = [
                     </Link>
                 </Button>
 
-                {e.type === 'article' ? (
+                {e.type === 'list' ? (
                     <Button onClick={() => showDeleteConfirm(e.id)} danger>
                         Delete
                     </Button>

@@ -1,17 +1,10 @@
 .input {
-    /* font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    font-style: inherit;
-    height: inherit;
-    width: inherit;
-    background-color: transparent;
-    outline: none; */
     all: inherit;
-    resize: none;
 
-    /* border: 'none'; */
+    resize: none;
+    padding: 0;
+    border: none;
+    background-color: transparent;
 }
 
 .input::placeholder {

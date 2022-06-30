@@ -15,10 +15,10 @@ interface CustomSelectProps {
     onChange(value: PageId): void
 }
 
-const ArticlePages = ({ value, onChange }: CustomSelectProps) => {
+const ListPages = ({ value, onChange }: CustomSelectProps) => {
     const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
-        ['pages', { type: 'article' }],
-        () => getPages('article'),
+        ['pages', { type: 'list' }],
+        () => getPages('list'),
         {
             refetchOnWindowFocus: false,
         }
@@ -44,6 +44,6 @@ const ArticlePages = ({ value, onChange }: CustomSelectProps) => {
     )
 }
 
-CustomSelect.ArticlePages = ArticlePages
+CustomSelect.ListPages = ListPages
 
 export default CustomSelect

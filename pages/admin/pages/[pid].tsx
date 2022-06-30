@@ -257,7 +257,7 @@ const Admin = () => {
                         onChange={(e) => onHandleChange('type', e)}
                     >
                         <Select.Option value="page">Page</Select.Option>
-                        <Select.Option value="article">Article</Select.Option>
+                        <Select.Option value="list">List</Select.Option>
                         {isLockedPage && (
                             <>
                                 <Select.Option value="error" disabled>

@@ -12,7 +12,7 @@ import Link from 'next/link'
 import SectionBlock from '../components/SectionBlock'
 
 const Home = (props: FullPage) => {
-    const { id, title, metadatas, articles, sections } = props
+    const { id, title, metadatas, sections } = props
     const { isAuth } = useAuth()
 
     return (
@@ -40,7 +40,7 @@ const Home = (props: FullPage) => {
 
             <main>
                 {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} articles={articles} />
+                    <SectionBlock key={section.id} section={section} page={props} />
                 ))}
             </main>
 

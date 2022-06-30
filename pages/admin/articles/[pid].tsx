@@ -12,11 +12,8 @@ import {
     Typography,
 } from 'antd'
 import get from 'lodash.get'
-import {
-    editArticle,
-    getArticleDetails,
-    postArticle,
-} from '../../../network/articles'
+import kebabcase from 'lodash.kebabcase'
+import { editArticle, getArticleDetails, postArticle } from '../../../network/articles'
 import CustomSelect from '@components/CustomSelect'
 import type { FullArticleEdit } from '../../../types'
 
@@ -46,7 +43,7 @@ const { Title } = Typography
 // interface PageType {
 //     title: string
 //     slug: string
-//     type?: 'home' | 'page' | 'error' | 'article'
+//     type?: 'home' | 'page' | 'error' | 'list'
 //     // sections?: SectionType[];
 //     // metadatas?: MetadataType[];
 //     published: boolean
@@ -210,43 +207,25 @@ const Admin = () => {
                     <Title level={5}>Title</Title>
                     <Input
                         value={get(values, 'title', '')}
-                        onChange={(e) =>
+                        onChange={(e) => {
                             onHandleChange('title', e.target.value)
-                        }
+
+                            if (pid === 'create') {
+                                onHandleChange('slug', kebabcase(e.target.value))
+                            }
+                        }}
                     />
 
                     <Divider />
-
-                    {/* <Select
-                        value={values.type}
-                        style={{ width: 200 }}
-                        disabled={isLockedPage}
-                        onChange={(e) => onHandleChange('type', e)}
-                    >
-                        <Select.Option value="page">Page</Select.Option>
-                        <Select.Option value="article">Article</Select.Option>
-                        {isLockedPage && (
-                            <>
-                                <Select.Option value="error" disabled>
-                                    Not found
-                                </Select.Option>
-                                <Select.Option value="home" disabled>
-                                    Homepage
-                                </Select.Option>
-                            </>
-                        )}
-                    </Select> */}
 
                     <Input
                         value={get(values, 'slug', '')}
                         onChange={(e) => onHandleChange('slug', e.target.value)}
                     />
 
-                    <CustomSelect.ArticlePages
+                    <CustomSelect.ListPages
                         value={values.pageId}
-                        onChange={(e: number | undefined) =>
-                            onHandleChange('pageId', e)
-                        }
+                        onChange={(e: number | undefined) => onHandleChange('pageId', e)}
                     />
 
                     <Divider />
@@ -254,9 +233,7 @@ const Admin = () => {
                     <Title level={5}>Status</Title>
                     <Radio.Group
                         value={values.published}
-                        onChange={(e) =>
-                            onHandleChange('published', e.target.value)
-                        }
+                        onChange={(e) => onHandleChange('published', e.target.value)}
                     >
                         <Radio value={true}>Published</Radio>
                         <Radio value={false}>Unpublished</Radio>

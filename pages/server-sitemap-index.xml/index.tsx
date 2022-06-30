@@ -8,7 +8,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const pages = await prisma.page.findMany({
         where: {
             published: true,
-            OR: [{ type: 'page' }, { type: 'article' }],
+            OR: [{ type: 'page' }, { type: 'list' }],
         },
         include: { articles: true },
     })

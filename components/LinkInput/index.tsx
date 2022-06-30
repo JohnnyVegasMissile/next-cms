@@ -26,13 +26,14 @@ const LinkInput = ({ value, onChange, width = 300 }: Props) => {
         }
     )
 
-    const articles: UseQueryResult<FullArticle[], Error> = useQuery<
-        FullArticle[],
-        Error
-    >(['acticles'], () => getArticles(), {
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-    })
+    const articles: UseQueryResult<FullArticle[], Error> = useQuery<FullArticle[], Error>(
+        ['acticles'],
+        () => getArticles(),
+        {
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
+        }
+    )
 
     const options = useMemo(() => {
         const pagesOptions =
@@ -70,9 +71,7 @@ const LinkInput = ({ value, onChange, width = 300 }: Props) => {
             onChange={onChange}
             allowClear
             filterOption={(inputValue, option) =>
-                option!.searchLabel
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
+                option!.searchLabel.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
             }
         />
     )

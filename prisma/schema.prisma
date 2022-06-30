@@ -14,7 +14,7 @@ model Page {
   id          Int               @id @default(autoincrement())
   title       String
   type        String            @default("page")
-  slug        String            @unique
+  slug        String?            @unique
   // header      Element?
   sections    Section[]
   elements    Element[]
@@ -41,7 +41,6 @@ model Section {
   page            Page?          @relation(fields: [pageId], references: [id])
   position        Int
   content         String?
-  updatedAt       DateTime      @updatedAt
 }
 
 model Element {

@@ -9,9 +9,10 @@ import { prisma } from '../utils/prisma'
 import { useAuth } from '../hooks/useAuth'
 import { Button } from 'antd'
 import Link from 'next/link'
+import SectionBlock from '../components/SectionBlock'
 
 const Home = (props: FullPage) => {
-    const { id, title, metadatas } = props
+    const { id, title, metadatas, articles, sections } = props
     const { isAuth } = useAuth()
 
     return (
@@ -19,11 +20,7 @@ const Home = (props: FullPage) => {
             <Head>
                 <title>{title}</title>
                 {metadatas?.map((meta) => (
-                    <meta
-                        key={meta.id}
-                        name={meta.name}
-                        content={meta.content}
-                    />
+                    <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))}
             </Head>
 
@@ -41,7 +38,11 @@ const Home = (props: FullPage) => {
 
             <header></header>
 
-            <main>{title}</main>
+            <main>
+                {sections?.map((section) => (
+                    <SectionBlock key={section.id} section={section} articles={articles} />
+                ))}
+            </main>
 
             <footer></footer>
         </div>
@@ -51,6 +52,7 @@ const Home = (props: FullPage) => {
 export async function getStaticProps(context: GetStaticPathsContext) {
     const allHomepages = await prisma.page.findMany({
         where: { type: 'home' },
+        include: { metadatas: true, sections: true },
     })
 
     const page: Page = get(allHomepages, '0', {})
@@ -62,9 +64,7 @@ export async function getStaticProps(context: GetStaticPathsContext) {
     return {
         props: {
             ...page,
-            updatedAt: Math.floor(
-                (page?.updatedAt?.getMilliseconds() || 1) / 1000
-            ),
+            updatedAt: Math.floor((page?.updatedAt?.getMilliseconds() || 1) / 1000),
         },
         revalidate: revalidate ? parseInt(revalidate.value) : 60,
     }

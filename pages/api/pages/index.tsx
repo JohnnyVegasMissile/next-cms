@@ -26,7 +26,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     const metadatas: Metadata[] = get(req, 'body.metadatas', [])
     delete newPageContent.sections
     delete newPageContent.metadatas
-    delete newPageContent.articles
+    // delete newPageContent.articles
 
     const page: Page = await prisma.page.create({
         data: {

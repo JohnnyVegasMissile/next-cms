@@ -1,15 +1,5 @@
 import { useState } from 'react'
-import {
-    Button,
-    Card,
-    Col,
-    Modal,
-    Radio,
-    Row,
-    Image,
-    Space,
-    Typography,
-} from 'antd'
+import { Button, Card, Col, Modal, Radio, Row, Image, Space, Typography } from 'antd'
 import { useQuery, UseQueryResult } from 'react-query'
 import { getImages } from '../../network/images'
 import type { Media } from '@prisma/client'
@@ -64,7 +54,7 @@ const MediaModal = ({ value, onMediaSelected }: Props) => {
                 )}
             </Space>
             <Modal
-                title="Modal 1000px width"
+                title="Choose a picture"
                 centered
                 visible={visible}
                 onOk={handleOk}

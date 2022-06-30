@@ -9,7 +9,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const page: Page | null = await prisma.page.findUnique({
         where: { id },
-        include: { metadatas: true },
+        include: { metadatas: true, sections: true },
     })
 
     return res.status(200).json(page)

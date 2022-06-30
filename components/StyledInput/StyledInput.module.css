@@ -1,0 +1,20 @@
+.input {
+    /* font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    font-style: inherit;
+    height: inherit;
+    width: inherit;
+    background-color: transparent;
+    outline: none; */
+    all: inherit;
+    resize: none;
+
+    /* border: 'none'; */
+}
+
+.input::placeholder {
+    all: inherit;
+    opacity: 0.5;
+}

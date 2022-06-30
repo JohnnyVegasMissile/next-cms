@@ -1,7 +1,7 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
 import type { Article } from '@prisma/client'
-import { FullArticleEdit } from '../types'
+import { FullArticle, FullArticleEdit } from '../types'
 
 export const postArticle = (
     data: Prisma.ArticleCreateInput
@@ -36,7 +36,7 @@ export const editArticle = (
             .catch(reject)
     })
 
-export const getArticles = (): Promise<Article[]> =>
+export const getArticles = (): Promise<FullArticle[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',

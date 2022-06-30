@@ -402,6 +402,7 @@ const Admin = () => {
                                     />
                                 </Space>
                                 <Card
+                                    bodyStyle={{ padding: 0 }}
                                     title={
                                         <Select
                                             value={section.type}

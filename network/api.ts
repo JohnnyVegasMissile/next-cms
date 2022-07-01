@@ -23,3 +23,13 @@ export const initPages = (): Promise<void> =>
             .then(resolve)
             .catch(reject)
     })
+
+export const revalidateAll = (): Promise<string[]> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'POST',
+            url: `/revalidate/all`,
+        })
+            .then(resolve)
+            .catch(reject)
+    })

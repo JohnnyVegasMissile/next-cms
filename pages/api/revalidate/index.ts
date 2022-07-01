@@ -1,16 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    // const pages = await prisma.page.findMany()
-
-    // Check for secret to confirm this is a valid request
-    if (req.query.secret !== process.env.REVALIDATE_TOKEN) {
-        return res.status(401).json({ message: 'Invalid token' })
+const POST = async (req: NextApiRequest, res: NextApiResponse) => {
+    if (req.body.url) {
+        return res.status(401).json({ message: 'URL missing' })
     }
 
     try {
-        await res.unstable_revalidate('/path-to-revalidate')
-        return res.json({ revalidated: true })
+        await res.unstable_revalidate(req.body.url)
+        return res.json({ revalidated: req.body.url })
     } catch (err) {
         // If there was an error, Next.js will continue
         // to show the last successfully generated page
@@ -24,8 +21,8 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const pages = async (req: NextApiRequest, res: NextApiResponse) => {
     switch (req.method) {
-        case 'GET': {
-            return await GET(req, res)
+        case 'POST': {
+            return await POST(req, res)
         }
 
         default: {

@@ -1,4 +1,4 @@
-import { Menu } from 'antd'
+import { Menu, Typography } from 'antd'
 import {
     SettingOutlined,
     HomeOutlined,
@@ -9,11 +9,15 @@ import {
     UserOutlined,
     PlusCircleOutlined,
     FileTextOutlined,
+    UndoOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
+import { revalidateAll } from '../../network/api'
 import Link from 'next/link'
 // import { useRouter } from 'next/router'
+
+const { Text } = Typography
 
 const CustomLink = (link: string, label: string) => (
     <Link href={link}>
@@ -37,6 +41,13 @@ function MenuAdmin() {
                     label: CustomLink('/admin', 'Settings'),
                     key: '/admin',
                     icon: <SettingOutlined />,
+                },
+                {
+                    label: (
+                        <Text onClick={() => revalidateAll()}>Revalidate all pages</Text>
+                    ),
+                    key: 'revalidate',
+                    icon: <UndoOutlined />,
                 },
                 {
                     // label: 'Disconnect',
@@ -64,10 +75,7 @@ function MenuAdmin() {
             icon: <FileTextOutlined />,
             children: [
                 {
-                    label: CustomLink(
-                        '/admin/articles/create',
-                        'Create an article'
-                    ),
+                    label: CustomLink('/admin/articles/create', 'Create an article'),
                     key: '/admin/articles/create',
                     icon: <PlusCircleOutlined />,
                 },
@@ -79,10 +87,7 @@ function MenuAdmin() {
             icon: <PicCenterOutlined />,
             children: [
                 {
-                    label: CustomLink(
-                        '/admin/elements/create',
-                        'Create an elements'
-                    ),
+                    label: CustomLink('/admin/elements/create', 'Create an elements'),
                     key: '/admin/elements/create',
                     icon: <PlusCircleOutlined />,
                 },

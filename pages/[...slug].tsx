@@ -8,7 +8,7 @@ import { FullPage } from '../types'
 import { prisma } from '../utils/prisma'
 import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
-import { Button } from 'antd'
+import { Affix, Button } from 'antd'
 import SectionBlock from '../components/SectionBlock'
 
 const Pages = (props: FullPage) => {
@@ -25,15 +25,17 @@ const Pages = (props: FullPage) => {
             </Head>
 
             {isAuth && (
-                <Button
-                    size="small"
-                    type="primary"
-                    style={{ position: 'absolute', right: 5, top: 50 }}
-                >
-                    <Link href={`/admin/${!!type ? 'pages' : 'articles'}/${id}`}>
-                        <a>Edit</a>
-                    </Link>
-                </Button>
+                <Affix offsetTop={0}>
+                    <Button
+                        size="small"
+                        type="primary"
+                        style={{ position: 'absolute', right: 5, marginTop: 5 }}
+                    >
+                        <Link href={`/admin/${!!type ? 'pages' : 'articles'}/${id}`}>
+                            <a>Edit</a>
+                        </Link>
+                    </Button>
+                </Affix>
             )}
 
             <header></header>

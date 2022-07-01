@@ -27,36 +27,11 @@ import kebabcase from 'lodash.kebabcase'
 // import type { Page } from '@prisma/client'
 import { editPage, postPage } from '../../../network/pages'
 import type { FullPageEdit } from '../../../types'
-import Blocks from '../../../Blocks'
+import Blocks from '../../../blocks'
 
 const { Title } = Typography
 
 const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found']
-
-// interface ElementType {
-//         type: string;
-//         section?: Prisma.SectionCreateNestedOneWithoutElementInput | undefined;
-//         fields?: Prisma.FieldCreateNestedManyWithoutElementInput | undefined;
-//         content?: string | ... 1 more ... | undefined;
-//         updatedAt?: string | ... 1 more ... | undefined;
-// }
-
-// interface SectionType {
-//     block: string;
-//     page: Prisma.PageCreateNestedOneWithoutSectionsInput;
-//     element?: Prisma.ElementCreateNestedManyWithoutSectionInput | undefined;
-//     position: number
-//     content?: string
-// }
-
-// interface MetadataType {
-//     name: string;
-//     content: string;
-// }
-
-// interface FullPageEdit extends FullPage {
-//     id?: number
-// }
 
 const initialValues: FullPageEdit = {
     title: '',
@@ -254,7 +229,7 @@ const Admin = () => {
                     <Select
                         value={values.type}
                         style={{ width: 200 }}
-                        disabled={isLockedPage}
+                        disabled={pid !== 'create'}
                         onChange={(e) => onHandleChange('type', e)}
                     >
                         <Select.Option value="page">Page</Select.Option>
@@ -428,8 +403,18 @@ const Admin = () => {
                                             style={{ width: 250 }}
                                         >
                                             {Object.keys(Blocks).map((key) => (
-                                                <Select.Option key={key} value={key}>
-                                                    <Popover
+                                                <Select.Option
+                                                    key={key}
+                                                    value={key}
+                                                    disabled={
+                                                        !get(
+                                                            Blocks,
+                                                            `${key}.pages`,
+                                                            []
+                                                        ).includes(values.type)
+                                                    }
+                                                >
+                                                    {/* <Popover
                                                         content={
                                                             <img
                                                                 src={
@@ -437,9 +422,9 @@ const Admin = () => {
                                                                 }
                                                             />
                                                         }
-                                                    >
-                                                        {get(Blocks, `${key}.name`, '')}
-                                                    </Popover>
+                                                    > */}
+                                                    {get(Blocks, `${key}.name`, '')}
+                                                    {/* </Popover> */}
                                                 </Select.Option>
                                             ))}
                                         </Select>

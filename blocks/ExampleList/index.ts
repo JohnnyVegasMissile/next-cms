@@ -4,6 +4,7 @@ import type { Block } from '../types'
 
 const Example: Block = {
     name: 'Example List',
+    pages: ['list'],
     preview: '',
     View,
     Edit,

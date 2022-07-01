@@ -1,8 +1,9 @@
-import { FullPage } from '../types'
+import { FullPage, PageTypes } from '../types'
 
 export interface Block {
     name: string
     preview: string
+    pages: (PageTypes | 'element')[]
     View: (props: Props) => JSX.Element
     Edit: (props: Props) => JSX.Element
 }

@@ -25,11 +25,11 @@ const Home = (props: FullPage) => {
             </Head>
 
             {isAuth && (
-                <Affix offsetTop={0}>
+                <Affix>
                     <Button
                         size="small"
                         type="primary"
-                        style={{ position: 'absolute', right: 5, marginTop: 5 }}
+                        style={{ position: 'absolute', right: 5, top: 2 }}
                     >
                         <Link href={`/admin/pages/${id}`}>
                             <a>Edit</a>

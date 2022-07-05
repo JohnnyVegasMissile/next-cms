@@ -66,10 +66,10 @@ const showDeleteConfirm = (id: number) => {
 }
 
 const columns = [
-    {
-        title: 'ID',
-        dataIndex: 'id',
-    },
+    // {
+    //     title: 'ID',
+    //     dataIndex: 'id',
+    // },
     {
         title: 'Title',
         dataIndex: 'title',

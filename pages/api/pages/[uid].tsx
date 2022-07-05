@@ -5,7 +5,7 @@ import get from 'lodash.get'
 import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     const page: Page | null = await prisma.page.findUnique({
         where: { id },
@@ -21,11 +21,9 @@ interface FullPage extends Page {
 }
 
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     const newPageContent: FullPage = req.body
-
-    console.log('newPageContent', newPageContent)
 
     // delete existing metadatas
     await prisma.metadata.deleteMany({
@@ -79,7 +77,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     await prisma.metadata.deleteMany({
         where: {

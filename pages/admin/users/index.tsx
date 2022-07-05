@@ -27,11 +27,7 @@ const AdminUsers = () => {
     )
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{ width: '100%', padding: 15 }}
-        >
+        <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
             <Button type="primary">
                 <Link href="/admin/users/create">
                     <a>Create</a>
@@ -52,10 +48,10 @@ const AdminUsers = () => {
 }
 
 const columns = [
-    {
-        title: 'ID',
-        dataIndex: 'id',
-    },
+    // {
+    //     title: 'ID',
+    //     dataIndex: 'id',
+    // },
     {
         title: 'Type',
         dataIndex: 'login',

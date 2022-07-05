@@ -218,7 +218,7 @@ function MenuAdmin() {
             style={{
                 borderBottom: '1px solid #f0f0f0',
                 width: '100%',
-                padding: '3px 7px',
+                padding: '3px 12px',
             }}
         >
             <Dropdown overlay={homeMenu}>

@@ -14,14 +14,12 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 
             await res.unstable_revalidate(slug)
             urls.push(slug)
-            console.log('slug', slug)
 
             for (const article of page.articles) {
                 const slugArticle = `${slug}/${article.slug}`
 
                 await res.unstable_revalidate(slugArticle)
                 urls.push(slugArticle)
-                console.log('slugArticle', slugArticle)
             }
         }
 
@@ -38,7 +36,6 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const pages = async (req: NextApiRequest, res: NextApiResponse) => {
-    console.log('Mth', req.method)
     switch (req.method) {
         case 'POST': {
             return await POST(req, res)

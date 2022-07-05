@@ -13,6 +13,8 @@ import {
     Select,
     Card,
     Popover,
+    Cascader,
+    Modal,
 } from 'antd'
 import {
     PlusOutlined,
@@ -202,219 +204,235 @@ const Admin = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Space
-                direction="vertical"
-                size="large"
-                style={{ width: '100%', padding: 15 }}
-            >
-                <Space direction="vertical" size={0} style={{ width: '100%' }}>
-                    <Title level={5}>Title</Title>
-                    <Input
-                        value={get(values, 'title', '')}
-                        onChange={(e) => {
-                            onHandleChange('title', e.target.value)
+        <>
+            <form onSubmit={handleSubmit}>
+                <Space
+                    direction="vertical"
+                    size="large"
+                    style={{ width: '100%', padding: 15 }}
+                >
+                    <Space direction="vertical" size={0} style={{ width: '100%' }}>
+                        <Title level={5}>Title</Title>
+                        <Input
+                            value={get(values, 'title', '')}
+                            onChange={(e) => {
+                                onHandleChange('title', e.target.value)
 
-                            if (pid === 'create') {
-                                let newValue = [...get(values, 'slug', '')!.split('/')]
-                                newValue[lastSlugIndex] = kebabcase(e.target.value)
+                                if (pid === 'create') {
+                                    let newValue = [
+                                        ...get(values, 'slug', '')!.split('/'),
+                                    ]
+                                    newValue[lastSlugIndex] = kebabcase(e.target.value)
 
-                                onHandleChange('slug', newValue.join('/'))
-                            }
-                        }}
-                    />
+                                    onHandleChange('slug', newValue.join('/'))
+                                }
+                            }}
+                        />
 
-                    <Divider />
+                        <Divider />
 
-                    <Select
-                        value={values.type}
-                        style={{ width: 200 }}
-                        disabled={pid !== 'create'}
-                        onChange={(e) => onHandleChange('type', e)}
-                    >
-                        <Select.Option value="page">Page</Select.Option>
-                        <Select.Option value="list">List</Select.Option>
-                        {isLockedPage && (
+                        <Select
+                            value={values.type}
+                            style={{ width: 200 }}
+                            disabled={true}
+                            // onChange={(e) => {
+                            //     onHandleChange('type', e)
+                            //     onHandleChange('sections', [])
+                            // }}
+                        >
+                            <Select.Option value="page">Page</Select.Option>
+                            <Select.Option value="list">List</Select.Option>
+                            {isLockedPage && (
+                                <>
+                                    <Select.Option value="error" disabled>
+                                        Not found
+                                    </Select.Option>
+                                    <Select.Option value="home" disabled>
+                                        Homepage
+                                    </Select.Option>
+                                </>
+                            )}
+                        </Select>
+
+                        <Divider />
+
+                        <Title level={5}>Status</Title>
+                        <Radio.Group
+                            value={values.published}
+                            onChange={(e) => onHandleChange('published', e.target.value)}
+                            disabled={pid !== 'create' && isLockedPage}
+                        >
+                            <Radio value={true}>Published</Radio>
+                            <Radio value={false}>Unpublished</Radio>
+                        </Radio.Group>
+
+                        <Divider />
+
+                        <Title level={5}>Meta Datas</Title>
+                        <Space direction="vertical">
+                            {get(values, 'metadatas', []).map(
+                                (metadata: any, index: number) => (
+                                    <Space key={index}>
+                                        <Select
+                                            style={{ width: 200 }}
+                                            value={metadata.name}
+                                            onChange={(e) =>
+                                                onHandleChange(
+                                                    `metadatas.${index}.name`,
+                                                    e
+                                                )
+                                            }
+                                        >
+                                            <Select.Option value="application-name">
+                                                Application name
+                                            </Select.Option>
+                                            <Select.Option value="author">
+                                                Author
+                                            </Select.Option>
+                                            <Select.Option value="description">
+                                                Description
+                                            </Select.Option>
+                                            <Select.Option value="generator">
+                                                Generator
+                                            </Select.Option>
+                                            <Select.Option value="keywords">
+                                                Keywords
+                                            </Select.Option>
+                                            <Select.Option value="viewport">
+                                                Viewport
+                                            </Select.Option>
+                                        </Select>
+                                        <Input
+                                            value={metadata.content}
+                                            onChange={(e) =>
+                                                onHandleChange(
+                                                    `metadatas.${index}.content`,
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                        <Button
+                                            onClick={() => removeMetadata(index)}
+                                            type="primary"
+                                            shape="circle"
+                                            icon={<MinusOutlined />}
+                                        />
+                                    </Space>
+                                )
+                            )}
+                            <Button
+                                onClick={addMetadata}
+                                type="primary"
+                                shape="circle"
+                                icon={<PlusOutlined />}
+                            />
+                        </Space>
+
+                        <Divider />
+
+                        <Title level={5}>Header</Title>
+
+                        <Divider />
+
+                        {!isLockedPage && (
                             <>
-                                <Select.Option value="error" disabled>
-                                    Not found
-                                </Select.Option>
-                                <Select.Option value="home" disabled>
-                                    Homepage
-                                </Select.Option>
+                                <Title level={5}>Page URL</Title>
+                                <Space style={{ width: '100%' }}>
+                                    {get(values, 'slug', '')!
+                                        .split('/')
+                                        .map((slug: string, idx: number) => (
+                                            <Fragment key={idx}>
+                                                {idx === lastSlugIndex && (
+                                                    <>
+                                                        <Button
+                                                            onClick={removeSlug}
+                                                            type="primary"
+                                                            shape="circle"
+                                                            disabled={
+                                                                get(
+                                                                    values,
+                                                                    'slug',
+                                                                    ''
+                                                                )!.split('/').length < 2
+                                                            }
+                                                            icon={<MinusOutlined />}
+                                                        />
+                                                        <Button
+                                                            onClick={addSlug}
+                                                            type="primary"
+                                                            shape="circle"
+                                                            icon={<PlusOutlined />}
+                                                        />
+                                                    </>
+                                                )}
+                                                <Input
+                                                    value={slug}
+                                                    onChange={(e) =>
+                                                        editSlug(idx, e.target.value)
+                                                    }
+                                                    status={
+                                                        errors.slug ? 'error' : undefined
+                                                    }
+                                                />
+                                                {lastSlugIndex !== idx && '/'}
+                                            </Fragment>
+                                        ))}
+                                </Space>
                             </>
                         )}
-                    </Select>
+                        <Divider />
 
-                    <Divider />
+                        <Title level={5}>Page content</Title>
 
-                    <Title level={5}>Status</Title>
-                    <Radio.Group
-                        value={values.published}
-                        onChange={(e) => onHandleChange('published', e.target.value)}
-                        disabled={pid !== 'create' && isLockedPage}
-                    >
-                        <Radio value={true}>Published</Radio>
-                        <Radio value={false}>Unpublished</Radio>
-                    </Radio.Group>
-
-                    <Divider />
-
-                    <Title level={5}>Meta Datas</Title>
-                    <Space direction="vertical">
-                        {get(values, 'metadatas', []).map(
-                            (metadata: any, index: number) => (
-                                <Space key={index}>
-                                    <Select
-                                        style={{ width: 200 }}
-                                        value={metadata.name}
-                                        onChange={(e) =>
-                                            onHandleChange(`metadatas.${index}.name`, e)
-                                        }
-                                    >
-                                        <Select.Option value="application-name">
-                                            Application name
-                                        </Select.Option>
-                                        <Select.Option value="author">
-                                            Author
-                                        </Select.Option>
-                                        <Select.Option value="description">
-                                            Description
-                                        </Select.Option>
-                                        <Select.Option value="generator">
-                                            Generator
-                                        </Select.Option>
-                                        <Select.Option value="keywords">
-                                            Keywords
-                                        </Select.Option>
-                                        <Select.Option value="viewport">
-                                            Viewport
-                                        </Select.Option>
-                                    </Select>
-                                    <Input
-                                        value={metadata.content}
-                                        onChange={(e) =>
-                                            onHandleChange(
-                                                `metadatas.${index}.content`,
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                    <Button
-                                        onClick={() => removeMetadata(index)}
-                                        type="primary"
-                                        shape="circle"
-                                        icon={<MinusOutlined />}
-                                    />
-                                </Space>
-                            )
-                        )}
-                        <Button
-                            onClick={addMetadata}
-                            type="primary"
-                            shape="circle"
-                            icon={<PlusOutlined />}
-                        />
-                    </Space>
-
-                    <Divider />
-
-                    <Title level={5}>Header</Title>
-
-                    <Divider />
-
-                    {!isLockedPage && (
-                        <>
-                            <Title level={5}>Page URL</Title>
-                            <Space style={{ width: '100%' }}>
-                                {get(values, 'slug', '')!
-                                    .split('/')
-                                    .map((slug: string, idx: number) => (
-                                        <Fragment key={idx}>
-                                            {idx === lastSlugIndex && (
-                                                <>
-                                                    <Button
-                                                        onClick={removeSlug}
-                                                        type="primary"
-                                                        shape="circle"
-                                                        disabled={
-                                                            get(
-                                                                values,
-                                                                'slug',
-                                                                ''
-                                                            )!.split('/').length < 2
-                                                        }
-                                                        icon={<MinusOutlined />}
-                                                    />
-                                                    <Button
-                                                        onClick={addSlug}
-                                                        type="primary"
-                                                        shape="circle"
-                                                        icon={<PlusOutlined />}
-                                                    />
-                                                </>
-                                            )}
-                                            <Input
-                                                value={slug}
-                                                onChange={(e) =>
-                                                    editSlug(idx, e.target.value)
-                                                }
-                                                status={errors.slug ? 'error' : undefined}
-                                            />
-                                            {lastSlugIndex !== idx && '/'}
-                                        </Fragment>
-                                    ))}
-                            </Space>
-                        </>
-                    )}
-                    <Divider />
-
-                    <Title level={5}>Page content</Title>
-
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        {get(values, 'sections', []).map((section, idx) => (
-                            <div key={idx} style={{ display: 'flex', gap: 8 }}>
-                                <Space direction="vertical">
-                                    <Button
-                                        disabled={idx === 0}
-                                        onClick={() => SectionUp(idx)}
-                                        type="primary"
-                                        shape="circle"
-                                        icon={<CaretUpOutlined />}
-                                    />
-                                    <Button
-                                        disabled={
-                                            idx === get(values, 'sections', []).length - 1
-                                        }
-                                        onClick={() => SectionDown(idx)}
-                                        type="primary"
-                                        shape="circle"
-                                        icon={<CaretDownOutlined />}
-                                    />
-                                </Space>
-                                <Card
-                                    bodyStyle={{ padding: 0 }}
-                                    title={
-                                        <Select
-                                            value={section.type}
-                                            onChange={(e) =>
-                                                onHandleChange(`sections.${idx}.type`, e)
+                        <Space direction="vertical" style={{ width: '100%' }}>
+                            {get(values, 'sections', []).map((section, idx) => (
+                                <div key={idx} style={{ display: 'flex', gap: 8 }}>
+                                    <Space direction="vertical">
+                                        <Button
+                                            disabled={idx === 0}
+                                            onClick={() => SectionUp(idx)}
+                                            type="primary"
+                                            shape="circle"
+                                            icon={<CaretUpOutlined />}
+                                        />
+                                        <Button
+                                            disabled={
+                                                idx ===
+                                                get(values, 'sections', []).length - 1
                                             }
-                                            style={{ width: 250 }}
-                                        >
-                                            {Object.keys(Blocks).map((key) => (
-                                                <Select.Option
-                                                    key={key}
-                                                    value={key}
-                                                    disabled={
-                                                        !get(
-                                                            Blocks,
-                                                            `${key}.pages`,
-                                                            []
-                                                        ).includes(values.type)
+                                            onClick={() => SectionDown(idx)}
+                                            type="primary"
+                                            shape="circle"
+                                            icon={<CaretDownOutlined />}
+                                        />
+                                    </Space>
+                                    <Card
+                                        bodyStyle={{ padding: 0 }}
+                                        title={
+                                            <Space>
+                                                <Select
+                                                    value={section.type}
+                                                    onChange={(e) =>
+                                                        onHandleChange(
+                                                            `sections.${idx}.type`,
+                                                            e
+                                                        )
                                                     }
+                                                    style={{ width: 250 }}
                                                 >
-                                                    {/* <Popover
+                                                    {Object.keys(Blocks).map((key) => (
+                                                        <Select.Option
+                                                            key={key}
+                                                            value={key}
+                                                            disabled={
+                                                                !get(
+                                                                    Blocks,
+                                                                    `${key}.pages`,
+                                                                    []
+                                                                ).includes(values.type)
+                                                            }
+                                                        >
+                                                            {/* <Popover
                                                         content={
                                                             <img
                                                                 src={
@@ -423,56 +441,148 @@ const Admin = () => {
                                                             />
                                                         }
                                                     > */}
-                                                    {get(Blocks, `${key}.name`, '')}
-                                                    {/* </Popover> */}
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
-                                    }
-                                    extra={
-                                        <Button
-                                            // type="primary"
-                                            onClick={() => removeSection(idx)}
-                                            danger
-                                            shape="circle"
-                                            icon={<CloseOutlined />}
-                                        />
-                                    }
-                                    style={{ flex: 1 }}
-                                >
-                                    <GetEditComponent
-                                        type={section.type}
-                                        defaultValues={section.content}
-                                        onChange={(e) =>
-                                            onHandleChange(`sections.${idx}.content`, e)
+                                                            {get(
+                                                                Blocks,
+                                                                `${key}.name`,
+                                                                ''
+                                                            )}
+                                                            {/* </Popover> */}
+                                                        </Select.Option>
+                                                    ))}
+                                                </Select>
+                                                <Cascader
+                                                    value={
+                                                        section.type
+                                                            ? [section.type]
+                                                            : section.element?.type
+                                                            ? ['', section.element?.type]
+                                                            : []
+                                                    }
+                                                    displayRender={(labels: string[]) => {
+                                                        if (labels.length === 1) {
+                                                            return labels[0]
+                                                        }
+                                                        if (labels.length === 2) {
+                                                            return `${labels[1]} (Element)`
+                                                        }
+                                                        return
+                                                    }}
+                                                    style={{ width: 250 }}
+                                                    options={[
+                                                        {
+                                                            value: '',
+                                                            label: 'Elements',
+                                                            children: [
+                                                                {
+                                                                    value: 'hangzhou',
+                                                                    label: 'Hangzhou',
+                                                                },
+                                                            ],
+                                                        },
+                                                        ...Object.keys(Blocks).map(
+                                                            (key) => ({
+                                                                value: key,
+                                                                label: get(
+                                                                    Blocks,
+                                                                    `${key}.name`,
+                                                                    ''
+                                                                ),
+                                                                disabled: !get(
+                                                                    Blocks,
+                                                                    `${key}.pages`,
+                                                                    []
+                                                                ).includes(values.type),
+                                                            })
+                                                        ),
+                                                    ]}
+                                                    onChange={(e) => console.log(e)}
+                                                />
+                                            </Space>
                                         }
-                                    />
-                                </Card>
-                            </div>
-                        ))}
-                        <Button
-                            onClick={addSection}
-                            type="primary"
-                            shape="circle"
-                            icon={<PlusOutlined />}
-                        />
+                                        extra={
+                                            <Button
+                                                // type="primary"
+                                                onClick={() => removeSection(idx)}
+                                                danger
+                                                shape="circle"
+                                                icon={<CloseOutlined />}
+                                            />
+                                        }
+                                        style={{ flex: 1 }}
+                                    >
+                                        <GetEditComponent
+                                            type={section.type}
+                                            defaultValues={section.content}
+                                            onChange={(e) =>
+                                                onHandleChange(
+                                                    `sections.${idx}.content`,
+                                                    e
+                                                )
+                                            }
+                                        />
+                                    </Card>
+                                </div>
+                            ))}
+                            <Button
+                                onClick={addSection}
+                                type="primary"
+                                shape="circle"
+                                icon={<PlusOutlined />}
+                            />
+                        </Space>
+                        <Divider />
+
+                        <Title level={5}>Footer</Title>
+
+                        <Divider />
+                        <Button type="primary" htmlType="submit">
+                            Save
+                        </Button>
                     </Space>
-                    <Divider />
-
-                    <Title level={5}>Footer</Title>
-
-                    <Divider />
-                    <Button type="primary" htmlType="submit">
-                        Save
-                    </Button>
                 </Space>
-            </Space>
-        </form>
+            </form>
+            <PageTypeModal
+                visible={!loading && !values.type}
+                onSelect={(e) => onHandleChange('type', e)}
+            />
+        </>
+    )
+}
+
+const PageTypeModal = ({
+    visible,
+    onSelect,
+}: {
+    visible: boolean
+    onSelect(e: 'page' | 'list'): void
+}) => {
+    const router = useRouter()
+    const [type, setType] = useState<'page' | 'list' | undefined>()
+
+    return (
+        <Modal
+            title="Page type"
+            closable={false}
+            visible={visible}
+            onOk={() => onSelect(type!)}
+            onCancel={() => router.push('/admin/pages')}
+            okButtonProps={{ disabled: !type }}
+            cancelText={null}
+        >
+            <Radio.Group
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                buttonStyle="solid"
+            >
+                <Radio.Button value="page">Page</Radio.Button>
+                <Radio.Button value="list">List</Radio.Button>
+            </Radio.Group>
+        </Modal>
     )
 }
 
 interface GetEditComponentProps {
-    type: string
+    type?: string | null
     defaultValues: any
     onChange: (value: any) => void
 }

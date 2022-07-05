@@ -49,7 +49,7 @@ const AdminPages = () => {
     )
 }
 
-const showDeleteConfirm = (id: number) => {
+const showDeleteConfirm = (id: string) => {
     confirm({
         title: 'Are you sure to delete this page?',
         icon: <ExclamationCircleOutlined />,

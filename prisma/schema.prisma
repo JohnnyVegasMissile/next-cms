@@ -111,6 +111,7 @@ model Article {
   coverId           String?
   cover             Media?          @relation(fields: [coverId], references: [id])
   description       String?
+  author            String?
   slug              String          @unique
   pageId            String?
   page              Page?           @relation(fields: [pageId], references: [id])

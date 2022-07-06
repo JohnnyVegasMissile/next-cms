@@ -3,7 +3,7 @@ import Head from 'next/head'
 // import Router, { useRouter } from 'next/router'
 // import { PrismaClient } from '@prisma/client'
 import type { Article } from '@prisma/client'
-import { FullPage } from '../types'
+import { FullArticle, FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ import { Affix, Button } from 'antd'
 import SectionBlock from '../components/SectionBlock'
 
 const Pages = (props: FullPage) => {
-    const { id, title, metadatas, sections, type } = props
+    const { id, title, metadatas, sections, type, header, footer } = props
     const { isAuth } = useAuth()
 
     return (
@@ -38,7 +38,7 @@ const Pages = (props: FullPage) => {
                 </Affix>
             )}
 
-            <header></header>
+            <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 
             <main>
                 {sections?.map((section) => (
@@ -46,7 +46,7 @@ const Pages = (props: FullPage) => {
                 ))}
             </main>
 
-            <footer></footer>
+            <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer>
         </div>
     )
 }
@@ -63,7 +63,13 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
     let props
     const page = await prisma.page.findUnique({
         where: { slug: slug.join('/') },
-        include: { articles: true, metadatas: true, sections: true },
+        include: {
+            articles: true,
+            metadatas: true,
+            sections: true,
+            header: true,
+            footer: true,
+        },
     })
 
     if (!!page) {
@@ -72,14 +78,35 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
             updatedAt: Math.floor((article.updatedAt?.getMilliseconds() || 1) / 1000),
         }))
 
+        const header = page.header
+            ? {
+                  ...page.header,
+                  updatedAt: Math.floor(
+                      (page.header.updatedAt?.getMilliseconds() || 1) / 1000
+                  ),
+              }
+            : undefined
+
+        const footer = page.header
+            ? {
+                  ...page.header,
+                  updatedAt: Math.floor(
+                      (page.header.updatedAt?.getMilliseconds() || 1) / 1000
+                  ),
+              }
+            : undefined
+
         props = {
             ...page,
+            header,
+            footer,
             articles,
             updatedAt: Math.floor((page.updatedAt?.getMilliseconds() || 1) / 1000),
         }
     } else {
         const article: Article | null = await prisma.article.findUnique({
             where: { slug: slug[slug.length - 1] },
+            include: { page: true },
         })
 
         props = {

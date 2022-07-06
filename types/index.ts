@@ -27,6 +27,8 @@ export type FullPage = Page & {
     metadatas?: Metadata[] | null
     sections?: FullSection[] | null
     articles?: Article[] | null
+    header?: Element | null
+    footer?: Element | null
 }
 
 export type FullSection = Section & {

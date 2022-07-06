@@ -12,7 +12,7 @@ import Link from 'next/link'
 import SectionBlock from '../components/SectionBlock'
 
 const Home = (props: FullPage) => {
-    const { id, title, metadatas, sections } = props
+    const { id, title, metadatas, sections, header, footer } = props
     const { isAuth } = useAuth()
 
     return (
@@ -38,7 +38,7 @@ const Home = (props: FullPage) => {
                 </Affix>
             )}
 
-            <header></header>
+            <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 
             <main>
                 {sections?.map((section) => (
@@ -46,7 +46,7 @@ const Home = (props: FullPage) => {
                 ))}
             </main>
 
-            <footer></footer>
+            <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer>
         </div>
     )
 }
@@ -54,7 +54,7 @@ const Home = (props: FullPage) => {
 export async function getStaticProps(context: GetStaticPathsContext) {
     const allHomepages = await prisma.page.findMany({
         where: { type: 'home' },
-        include: { metadatas: true, sections: true },
+        include: { metadatas: true, sections: true, header: true, footer: true },
     })
 
     const page: Page = get(allHomepages, '0', {})

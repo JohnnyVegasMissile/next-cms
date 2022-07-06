@@ -264,6 +264,55 @@ const Admin = () => {
                             <Radio value={false}>Unpublished</Radio>
                         </Radio.Group>
                         <Divider />
+
+                        {!isLockedPage && (
+                            <>
+                                <Title level={5}>Page URL</Title>
+                                <Space style={{ width: '100%' }}>
+                                    {get(values, 'slug', '')!
+                                        .split('/')
+                                        .map((slug: string, idx: number) => (
+                                            <Fragment key={idx}>
+                                                {idx === lastSlugIndex && (
+                                                    <>
+                                                        <Button
+                                                            onClick={removeSlug}
+                                                            type="primary"
+                                                            shape="circle"
+                                                            disabled={
+                                                                get(values, 'slug', '')!.split(
+                                                                    '/'
+                                                                ).length < 2
+                                                            }
+                                                            icon={<MinusOutlined />}
+                                                        />
+                                                        <Button
+                                                            onClick={addSlug}
+                                                            disabled={
+                                                                get(values, 'slug', '')!.split(
+                                                                    '/'
+                                                                ).length > 6
+                                                            }
+                                                            type="primary"
+                                                            shape="circle"
+                                                            icon={<PlusOutlined />}
+                                                        />
+                                                    </>
+                                                )}
+                                                <Input
+                                                    value={slug}
+                                                    onChange={(e) =>
+                                                        editSlug(idx, e.target.value)
+                                                    }
+                                                    status={errors.slug ? 'error' : undefined}
+                                                />
+                                                {lastSlugIndex !== idx && '/'}
+                                            </Fragment>
+                                        ))}
+                                </Space>
+                            </>
+                        )}
+                        <Divider />
                         <Title level={5}>Meta Datas</Title>
                         <Space direction="vertical">
                             {get(values, 'metadatas', []).map(
@@ -336,50 +385,6 @@ const Admin = () => {
                         >
                             {values.headerId && <DisplayElementView id={values.headerId} />}
                         </Card>
-
-                        <Divider />
-                        {!isLockedPage && (
-                            <>
-                                <Title level={5}>Page URL</Title>
-                                <Space style={{ width: '100%' }}>
-                                    {get(values, 'slug', '')!
-                                        .split('/')
-                                        .map((slug: string, idx: number) => (
-                                            <Fragment key={idx}>
-                                                {idx === lastSlugIndex && (
-                                                    <>
-                                                        <Button
-                                                            onClick={removeSlug}
-                                                            type="primary"
-                                                            shape="circle"
-                                                            disabled={
-                                                                get(values, 'slug', '')!.split(
-                                                                    '/'
-                                                                ).length < 2
-                                                            }
-                                                            icon={<MinusOutlined />}
-                                                        />
-                                                        <Button
-                                                            onClick={addSlug}
-                                                            type="primary"
-                                                            shape="circle"
-                                                            icon={<PlusOutlined />}
-                                                        />
-                                                    </>
-                                                )}
-                                                <Input
-                                                    value={slug}
-                                                    onChange={(e) =>
-                                                        editSlug(idx, e.target.value)
-                                                    }
-                                                    status={errors.slug ? 'error' : undefined}
-                                                />
-                                                {lastSlugIndex !== idx && '/'}
-                                            </Fragment>
-                                        ))}
-                                </Space>
-                            </>
-                        )}
                         <Divider />
                         <Title level={5}>Page content</Title>
                         <Space direction="vertical" style={{ width: '100%' }}>
@@ -544,9 +549,10 @@ const ElementsSelect = ({
     return (
         <Select
             allowClear
+            placeholder="Please select"
             value={value}
             onChange={onChange}
-            style={{ width: 240 }}
+            style={{ width: 240, fontWeight: 'normal' }}
             status={elements.isError ? 'error' : undefined}
             loading={elements.isLoading}
         >
@@ -606,6 +612,7 @@ const SectionCascader = ({
 
     return (
         <Cascader
+            placeholder="Please select"
             value={!!section ? [section] : !!element ? ['', element] : []}
             displayRender={(labels: string[]) => {
                 if (labels.length === 1) {
@@ -621,7 +628,7 @@ const SectionCascader = ({
                 }
                 return
             }}
-            style={{ width: 250 }}
+            style={{ width: 240, fontWeight: 'normal' }}
             options={[
                 {
                     value: '',

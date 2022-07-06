@@ -19,46 +19,9 @@ import type { FullArticleEdit } from '../../../types'
 
 const { Title } = Typography
 
-// interface ElementType {
-//         type: string;
-//         section?: Prisma.SectionCreateNestedOneWithoutElementInput | undefined;
-//         fields?: Prisma.FieldCreateNestedManyWithoutElementInput | undefined;
-//         content?: string | ... 1 more ... | undefined;
-//         updatedAt?: string | ... 1 more ... | undefined;
-// }
-
-// interface SectionType {
-//     block: string;
-//     page: Prisma.PageCreateNestedOneWithoutSectionsInput;
-//     element?: Prisma.ElementCreateNestedManyWithoutSectionInput | undefined;
-//     position: number
-//     content?: string
-// }
-
-// interface MetadataType {
-//     name: string;
-//     content: string;
-// }
-
-// interface PageType {
-//     title: string
-//     slug: string
-//     type?: 'home' | 'page' | 'error' | 'list'
-//     // sections?: SectionType[];
-//     // metadatas?: MetadataType[];
-//     published: boolean
-//     homepage?: boolean
-// }
-
 const initialValues: FullArticleEdit = {
-    //     title: '',
-    //     slug: '',
-    //     // sections: [],
-    //     // metadatas: [],
-    //     published: true,
     title: '',
     slug: '',
-    // Page: undefined,
     published: true,
     pageId: undefined,
 }
@@ -135,63 +98,6 @@ const Admin = () => {
         handleChange({ target: { name, value } })
     }
 
-    // const addSlug = () => {
-    //     let newValue = [...get(values, 'slug', '').split('/')]
-    //     newValue.splice(lastSlugIndex, 0, '')
-
-    //     onHandleChange('slug', newValue.join('/'))
-    // }
-
-    // const removeSlug = () => {
-    //     let newValue = [...get(values, 'slug', '').split('/')]
-    //     newValue.splice(lastSlugIndex - 1, 1)
-
-    //     onHandleChange('slug', newValue.join('/'))
-    // }
-
-    // const editSlug = (index: number, value: string) => {
-    //     let newValue = [...get(values, 'slug', '').split('/')]
-    //     newValue[index] = value
-
-    //     onHandleChange('slug', newValue.join('/'))
-    // }
-
-    // const addSection = () => {
-    //     handleChange({
-    //         target: {
-    //             name: 'sections',
-    //             value: get(values, 'sections', []).concat([
-    //                 { type: 'banner', content: '' },
-    //             ]),
-    //         },
-    //     })
-    // }
-
-    // const removeSection = (index: number) => {
-    //     let newValue = [...get(values, 'sections', [])]
-    //     newValue.splice(index, 1)
-
-    //     handleChange({ target: { name: 'sections', value: newValue } })
-    // }
-
-    // const addMetadata = () => {
-    //     handleChange({
-    //         target: {
-    //             name: 'metadatas',
-    //             value: get(values, 'metadatas', []).concat([
-    //                 { name: '', content: '' },
-    //             ]),
-    //         },
-    //     })
-    // }
-
-    // const removeMetadata = (index: number) => {
-    //     let newValue = [...get(values, 'metadatas', [])]
-    //     newValue.splice(index, 1)
-
-    //     handleChange({ target: { name: 'metadatas', value: newValue } })
-    // }
-
     if (loading || pid === undefined) {
         return <div>Loading...</div>
     }
@@ -225,7 +131,7 @@ const Admin = () => {
 
                     <CustomSelect.ListPages
                         value={values.pageId}
-                        onChange={(e: number | undefined) => onHandleChange('pageId', e)}
+                        onChange={(e: string | undefined) => onHandleChange('pageId', e)}
                     />
 
                     <Divider />

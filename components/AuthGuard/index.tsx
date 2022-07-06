@@ -22,8 +22,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     /* show loading indicator while the auth provider is still initializing */
     if (initializing) {
         return (
-            <div>
-                <Spin size="large" tip="Loading..." />
+            <div
+                style={{
+                    height: '100vh',
+                    width: '100vw',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <Spin size="large" tip="Initializing..." />
             </div>
         )
     }

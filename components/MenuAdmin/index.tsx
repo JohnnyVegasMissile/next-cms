@@ -13,6 +13,7 @@ import {
     SmileOutlined,
     DownOutlined,
     SearchOutlined,
+    TeamOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -29,7 +30,7 @@ const CustomLink = (link: string, label: string) => (
 )
 
 function MenuAdmin() {
-    const { isAuth, signOut } = useAuth()
+    const { isAuth, signOut, user } = useAuth()
     // const router = useRouter()
 
     if (!isAuth) return null
@@ -212,85 +213,112 @@ function MenuAdmin() {
     )
 
     return (
-        // <Affix>
-        <Space
-            size="small"
-            style={{
-                borderBottom: '1px solid #f0f0f0',
-                width: '100%',
-                padding: '3px 12px',
-            }}
-        >
-            <Dropdown overlay={homeMenu}>
-                <Space>
-                    <Link href="/">
+        <Affix>
+            <div
+                style={{
+                    borderBottom: '1px solid #f0f0f0',
+                    width: '100%',
+                    padding: '3px 12px',
+                    backgroundColor: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                }}
+            >
+                <Space size="small">
+                    <Space>
+                        <Link href="/">
+                            <a>
+                                <Text>
+                                    <HomeOutlined style={{ marginRight: 4 }} />
+                                    Home
+                                </Text>
+                            </a>
+                        </Link>
+                    </Space>
+                    <Divider type="vertical" />
+
+                    <Dropdown overlay={pageMenu}>
+                        <Space>
+                            <Link href="/admin/pages">
+                                <a>
+                                    <Text>
+                                        <FileImageOutlined style={{ marginRight: 4 }} />
+                                        Pages
+                                    </Text>
+                                </a>
+                            </Link>
+                        </Space>
+                    </Dropdown>
+                    <Divider type="vertical" />
+
+                    <Dropdown overlay={articlesMenu}>
+                        <Space>
+                            <Link href="/admin/articles">
+                                <a>
+                                    <Text>
+                                        <FileTextOutlined style={{ marginRight: 4 }} />
+                                        Articles
+                                    </Text>
+                                </a>
+                            </Link>
+                        </Space>
+                    </Dropdown>
+                    <Divider type="vertical" />
+
+                    <Dropdown overlay={elementsMenu}>
+                        <Space>
+                            <Link href="/admin/elements">
+                                <a>
+                                    <Text>
+                                        <PicCenterOutlined style={{ marginRight: 4 }} />
+                                        Elements
+                                    </Text>
+                                </a>
+                            </Link>
+                        </Space>
+                    </Dropdown>
+                    <Divider type="vertical" />
+
+                    <Dropdown overlay={usersMenu}>
+                        <Space>
+                            <Link href="/admin/users">
+                                <a>
+                                    <Text>
+                                        <TeamOutlined style={{ marginRight: 4 }} />
+                                        Users
+                                    </Text>
+                                </a>
+                            </Link>
+                        </Space>
+                    </Dropdown>
+                    <Divider type="vertical" />
+
+                    <Link href="/admin/images">
                         <a>
-                            <SearchOutlined style={{ marginRight: 4 }} />
-                            Home
+                            <Text>
+                                <PictureOutlined style={{ marginRight: 4 }} />
+                                Images
+                            </Text>
                         </a>
                     </Link>
                 </Space>
-            </Dropdown>
-            <Divider type="vertical" />
 
-            <Dropdown overlay={pageMenu}>
-                <Space>
-                    <Link href="/admin/pages">
-                        <a>
-                            <FileImageOutlined style={{ marginRight: 4 }} />
-                            Pages
-                        </a>
-                    </Link>
-                </Space>
-            </Dropdown>
-            <Divider type="vertical" />
-
-            <Dropdown overlay={articlesMenu}>
-                <Space>
-                    <Link href="/admin/articles">
-                        <a>
-                            <FileTextOutlined style={{ marginRight: 4 }} />
-                            Articles
-                        </a>
-                    </Link>
-                </Space>
-            </Dropdown>
-            <Divider type="vertical" />
-
-            <Dropdown overlay={elementsMenu}>
-                <Space>
-                    <Link href="/admin/elements">
-                        <a>
-                            <PicCenterOutlined style={{ marginRight: 4 }} />
-                            Elements
-                        </a>
-                    </Link>
-                </Space>
-            </Dropdown>
-            <Divider type="vertical" />
-
-            <Dropdown overlay={usersMenu}>
-                <Space>
-                    <Link href="/admin/users">
-                        <a>
-                            <UserOutlined style={{ marginRight: 4 }} />
-                            Users
-                        </a>
-                    </Link>
-                </Space>
-            </Dropdown>
-            <Divider type="vertical" />
-
-            <Link href="/admin/images">
-                <a>
-                    <PictureOutlined style={{ marginRight: 4 }} />
-                    Images
-                </a>
-            </Link>
-        </Space>
-        // </Affix>
+                <Dropdown overlay={homeMenu}>
+                    <Space>
+                        <Link href="/">
+                            <a>
+                                <Text>
+                                    <UserOutlined style={{ marginRight: 4 }} />
+                                    {user!.name}
+                                </Text>
+                            </a>
+                        </Link>
+                    </Space>
+                </Dropdown>
+            </div>
+        </Affix>
     )
-    // return <Menu mode="horizontal" items={items} />
 }
 
 export default MenuAdmin

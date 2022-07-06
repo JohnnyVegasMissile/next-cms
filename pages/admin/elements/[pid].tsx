@@ -93,7 +93,7 @@ const Admin = () => {
             <Space
                 direction="vertical"
                 size="large"
-                style={{ width: '100%', padding: 15 }}
+                style={{ width: '100%', padding: 15, backgroundColor: '#f0f2f5' }}
             >
                 <Space direction="vertical" style={{ width: '100%' }}>
                     <Title level={5}>Title</Title>

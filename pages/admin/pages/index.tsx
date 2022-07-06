@@ -68,10 +68,6 @@ const showDeleteConfirm = (id: string) => {
 }
 
 const columns = [
-    // {
-    //     title: 'ID',
-    //     dataIndex: 'id',
-    // },
     {
         title: 'Title',
         dataIndex: 'title',
@@ -93,8 +89,6 @@ const columns = [
     {
         title: 'URL',
         render: (e: Page) => {
-            if (e.type === 'error') return null
-
             if (e.type === 'home') {
                 return (
                     <Link href="/">

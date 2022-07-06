@@ -3,7 +3,7 @@ import Head from 'next/head'
 // import Router, { useRouter } from 'next/router'
 // import { PrismaClient } from '@prisma/client'
 import type { Article } from '@prisma/client'
-import { FullArticle, FullPage } from '../types'
+import { FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
 import Link from 'next/link'
@@ -25,11 +25,11 @@ const Pages = (props: FullPage) => {
             </Head>
 
             {isAuth && (
-                <Affix offsetTop={0}>
+                <Affix offsetTop={33}>
                     <Button
                         size="small"
                         type="primary"
-                        style={{ position: 'absolute', right: 5, marginTop: 5 }}
+                        style={{ position: 'absolute', right: 5 }}
                     >
                         <Link href={`/admin/${!!type ? 'pages' : 'articles'}/${id}`}>
                             <a>Edit</a>
@@ -85,16 +85,16 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
                       (page.header.updatedAt?.getMilliseconds() || 1) / 1000
                   ),
               }
-            : undefined
+            : null
 
-        const footer = page.header
+        const footer = page.footer
             ? {
-                  ...page.header,
+                  ...page.footer,
                   updatedAt: Math.floor(
-                      (page.header.updatedAt?.getMilliseconds() || 1) / 1000
+                      (page.footer.updatedAt?.getMilliseconds() || 1) / 1000
                   ),
               }
-            : undefined
+            : null
 
         props = {
             ...page,

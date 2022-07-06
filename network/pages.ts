@@ -1,7 +1,7 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
 import type { Page } from '@prisma/client'
-import { PageTypes } from '../types'
+import { FullPageEdit, PageTypes } from '../types'
 
 export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
     new Promise(async (resolve, reject) => {
@@ -52,6 +52,16 @@ export const deletePage = (id: string | number): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
+            url: `/api/pages/${id}`,
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const getPageDetails = (id: number | string): Promise<FullPageEdit> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
             url: `/api/pages/${id}`,
         })
             .then(resolve)

@@ -14,7 +14,7 @@ import {
 import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
 import { editArticle, getArticleDetails, postArticle } from '../../../network/articles'
-import CustomSelect from '@components/CustomSelect'
+import CustomSelect from '../../../components/CustomSelect'
 import type { FullArticleEdit } from '../../../types'
 
 const { Title } = Typography

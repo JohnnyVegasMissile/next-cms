@@ -10,7 +10,7 @@ import {
     Popconfirm,
     Modal,
 } from 'antd'
-import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
 import { useQuery, UseQueryResult } from 'react-query'
@@ -30,11 +30,13 @@ const AdminPages = () => {
 
     return (
         <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
-            <Button type="primary">
-                <Link href="/admin/pages/create">
-                    <a>Create</a>
-                </Link>
-            </Button>
+            <Link href="/admin/pages/create">
+                <a>
+                    <Button type="primary" icon={<PlusOutlined />}>
+                        Create
+                    </Button>
+                </a>
+            </Link>
             <Table
                 bordered={false}
                 loading={pages.isLoading}

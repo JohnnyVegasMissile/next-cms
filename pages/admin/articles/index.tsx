@@ -20,11 +20,13 @@ const AdminArticles = () => {
 
     return (
         <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
-            <Button type="primary" icon={<PlusOutlined />}>
-                <Link href="/admin/articles/create">
-                    <a>Create</a>
-                </Link>
-            </Button>
+            <Link href="/admin/articles/create">
+                <a>
+                    <Button type="primary" icon={<PlusOutlined />}>
+                        Create
+                    </Button>
+                </a>
+            </Link>
             <Table
                 bordered={false}
                 loading={articles.isLoading}

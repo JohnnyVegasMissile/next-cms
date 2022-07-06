@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     const article = await prisma.article.findUnique({
         where: { id },
@@ -17,7 +17,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     const article = await prisma.article.update({
         where: { id },
@@ -30,7 +30,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     const article = await prisma.article.delete({ where: { id } })
 

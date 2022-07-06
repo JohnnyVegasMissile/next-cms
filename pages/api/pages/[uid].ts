@@ -3,6 +3,7 @@ import type { Page, Metadata, Section } from '@prisma/client'
 import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
+import { FullPageEdit } from 'types'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
@@ -15,15 +16,10 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(200).json(page)
 }
 
-interface FullPage extends Page {
-    metadatas?: Metadata[]
-    sections?: Section[]
-}
-
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const newPageContent: FullPage = req.body
+    const newPageContent: FullPageEdit = req.body
 
     // delete existing metadatas
     await prisma.metadata.deleteMany({

@@ -1,16 +1,9 @@
-import type {
-    User,
-    Login,
-    Page,
-    Metadata,
-    Section,
-    Article,
-    Element,
-} from '@prisma/client'
+import type { User, Login, Page, Metadata, Section, Article, Element } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 export type UserRoleTypes = 'super-admin' | 'admin' | 'user'
 export type PageTypes = 'home' | 'error' | 'list' | 'page'
+
 export interface ContextUser {
     name: string
     email?: string
@@ -27,7 +20,7 @@ export type FullArticle = Article & {
 }
 
 export type FullArticleEdit = Prisma.ArticleCreateInput & {
-    pageId: number | undefined
+    pageId: string | undefined
 }
 
 export type FullPage = Page & {
@@ -43,5 +36,7 @@ export type FullSection = Section & {
 export type FullPageEdit = Prisma.PageCreateInput & {
     metadatas?: Metadata[] | null
     sections?: FullSection[] | null
-    articles?: Article[] | null
+    headerId: string | undefined
+    footerId: string | undefined
+    // articles?: Article[] | null
 }

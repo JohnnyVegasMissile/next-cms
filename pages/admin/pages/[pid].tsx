@@ -12,7 +12,6 @@ import {
     Typography,
     Select,
     Card,
-    Popover,
     Cascader,
     Modal,
 } from 'antd'
@@ -30,17 +29,23 @@ import kebabcase from 'lodash.kebabcase'
 import { editPage, postPage } from '../../../network/pages'
 import type { FullPageEdit } from '../../../types'
 import Blocks from '../../../blocks'
+import GetEditComponent from '../../../components/GetEditComponent'
+import { useQuery, UseQueryResult } from 'react-query'
+import { getElementDetails, getElements } from '../../../network/elements'
+import type { Element } from '@prisma/client'
 
-const { Title } = Typography
+const { Title, Text } = Typography
 
 const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found']
 
 const initialValues: FullPageEdit = {
     title: '',
     slug: '',
-    // sections: [],
+    sections: [],
     metadatas: [],
     published: true,
+    headerId: '',
+    footerId: '',
 }
 
 const validate = (values: FullPageEdit) => {
@@ -74,24 +79,23 @@ const Admin = () => {
     const router = useRouter()
     const { pid } = router.query
 
-    const { values, errors, handleChange, handleSubmit, setValues } =
-        useFormik<FullPageEdit>({
-            initialValues,
-            validate,
-            onSubmit: async (values) => {
-                console.log('1')
-                setLoading(true)
-                if (pid === 'create') {
-                    await postPage(values)
-                } else {
-                    const id = pid as string
+    const { values, errors, handleChange, handleSubmit, setValues } = useFormik<FullPageEdit>({
+        initialValues,
+        validate,
+        onSubmit: async (values) => {
+            console.log('1')
+            setLoading(true)
+            if (pid === 'create') {
+                await postPage(values)
+            } else {
+                const id = pid as string
 
-                    await editPage(id, values)
-                }
-                router.push('/admin/pages')
-                setLoading(false)
-            },
-        })
+                await editPage(id, values)
+            }
+            router.push('/admin/pages')
+            setLoading(false)
+        },
+    })
 
     const isLockedPage = values.type === 'error' || values.type === 'home'
 
@@ -219,18 +223,14 @@ const Admin = () => {
                                 onHandleChange('title', e.target.value)
 
                                 if (pid === 'create') {
-                                    let newValue = [
-                                        ...get(values, 'slug', '')!.split('/'),
-                                    ]
+                                    let newValue = [...get(values, 'slug', '')!.split('/')]
                                     newValue[lastSlugIndex] = kebabcase(e.target.value)
 
                                     onHandleChange('slug', newValue.join('/'))
                                 }
                             }}
                         />
-
                         <Divider />
-
                         <Select
                             value={values.type}
                             style={{ width: 200 }}
@@ -253,9 +253,7 @@ const Admin = () => {
                                 </>
                             )}
                         </Select>
-
                         <Divider />
-
                         <Title level={5}>Status</Title>
                         <Radio.Group
                             value={values.published}
@@ -265,9 +263,7 @@ const Admin = () => {
                             <Radio value={true}>Published</Radio>
                             <Radio value={false}>Unpublished</Radio>
                         </Radio.Group>
-
                         <Divider />
-
                         <Title level={5}>Meta Datas</Title>
                         <Space direction="vertical">
                             {get(values, 'metadatas', []).map(
@@ -277,10 +273,7 @@ const Admin = () => {
                                             style={{ width: 200 }}
                                             value={metadata.name}
                                             onChange={(e) =>
-                                                onHandleChange(
-                                                    `metadatas.${index}.name`,
-                                                    e
-                                                )
+                                                onHandleChange(`metadatas.${index}.name`, e)
                                             }
                                         >
                                             <Select.Option value="application-name">
@@ -327,13 +320,24 @@ const Admin = () => {
                                 icon={<PlusOutlined />}
                             />
                         </Space>
-
                         <Divider />
 
-                        <Title level={5}>Header</Title>
+                        <Card
+                            title={
+                                <Space>
+                                    <Title level={5}>Header</Title>
+                                    <ElementsSelect
+                                        value={values.headerId}
+                                        onChange={(e) => onHandleChange('headerId', e)}
+                                    />
+                                </Space>
+                            }
+                            bodyStyle={{ padding: 0 }}
+                        >
+                            {values.headerId && <DisplayElementView id={values.headerId} />}
+                        </Card>
 
                         <Divider />
-
                         {!isLockedPage && (
                             <>
                                 <Title level={5}>Page URL</Title>
@@ -349,11 +353,9 @@ const Admin = () => {
                                                             type="primary"
                                                             shape="circle"
                                                             disabled={
-                                                                get(
-                                                                    values,
-                                                                    'slug',
-                                                                    ''
-                                                                )!.split('/').length < 2
+                                                                get(values, 'slug', '')!.split(
+                                                                    '/'
+                                                                ).length < 2
                                                             }
                                                             icon={<MinusOutlined />}
                                                         />
@@ -370,9 +372,7 @@ const Admin = () => {
                                                     onChange={(e) =>
                                                         editSlug(idx, e.target.value)
                                                     }
-                                                    status={
-                                                        errors.slug ? 'error' : undefined
-                                                    }
+                                                    status={errors.slug ? 'error' : undefined}
                                                 />
                                                 {lastSlugIndex !== idx && '/'}
                                             </Fragment>
@@ -381,9 +381,7 @@ const Admin = () => {
                             </>
                         )}
                         <Divider />
-
                         <Title level={5}>Page content</Title>
-
                         <Space direction="vertical" style={{ width: '100%' }}>
                             {get(values, 'sections', []).map((section, idx) => (
                                 <div key={idx} style={{ display: 'flex', gap: 8 }}>
@@ -397,8 +395,7 @@ const Admin = () => {
                                         />
                                         <Button
                                             disabled={
-                                                idx ===
-                                                get(values, 'sections', []).length - 1
+                                                idx === get(values, 'sections', []).length - 1
                                             }
                                             onClick={() => SectionDown(idx)}
                                             type="primary"
@@ -410,92 +407,22 @@ const Admin = () => {
                                         bodyStyle={{ padding: 0 }}
                                         title={
                                             <Space>
-                                                <Select
-                                                    value={section.type}
-                                                    onChange={(e) =>
+                                                <SectionCascader
+                                                    page={values.type}
+                                                    section={section.type || undefined}
+                                                    element={section.elementId || undefined}
+                                                    onSectionChange={(e) =>
                                                         onHandleChange(
                                                             `sections.${idx}.type`,
                                                             e
                                                         )
                                                     }
-                                                    style={{ width: 250 }}
-                                                >
-                                                    {Object.keys(Blocks).map((key) => (
-                                                        <Select.Option
-                                                            key={key}
-                                                            value={key}
-                                                            disabled={
-                                                                !get(
-                                                                    Blocks,
-                                                                    `${key}.pages`,
-                                                                    []
-                                                                ).includes(values.type)
-                                                            }
-                                                        >
-                                                            {/* <Popover
-                                                        content={
-                                                            <img
-                                                                src={
-                                                                    'https://www.google.com.hk/images/branding/googlelogo/1x/googlelogo_light_color_272x92dp.png'
-                                                                }
-                                                            />
-                                                        }
-                                                    > */}
-                                                            {get(
-                                                                Blocks,
-                                                                `${key}.name`,
-                                                                ''
-                                                            )}
-                                                            {/* </Popover> */}
-                                                        </Select.Option>
-                                                    ))}
-                                                </Select>
-                                                <Cascader
-                                                    value={
-                                                        section.type
-                                                            ? [section.type]
-                                                            : section.element?.type
-                                                            ? ['', section.element?.type]
-                                                            : []
+                                                    onElementChange={(e) =>
+                                                        onHandleChange(
+                                                            `sections.${idx}.elementId`,
+                                                            e
+                                                        )
                                                     }
-                                                    displayRender={(labels: string[]) => {
-                                                        if (labels.length === 1) {
-                                                            return labels[0]
-                                                        }
-                                                        if (labels.length === 2) {
-                                                            return `${labels[1]} (Element)`
-                                                        }
-                                                        return
-                                                    }}
-                                                    style={{ width: 250 }}
-                                                    options={[
-                                                        {
-                                                            value: '',
-                                                            label: 'Elements',
-                                                            children: [
-                                                                {
-                                                                    value: 'hangzhou',
-                                                                    label: 'Hangzhou',
-                                                                },
-                                                            ],
-                                                        },
-                                                        ...Object.keys(Blocks).map(
-                                                            (key) => ({
-                                                                value: key,
-                                                                label: get(
-                                                                    Blocks,
-                                                                    `${key}.name`,
-                                                                    ''
-                                                                ),
-                                                                disabled: !get(
-                                                                    Blocks,
-                                                                    `${key}.pages`,
-                                                                    []
-                                                                ).includes(values.type),
-                                                            })
-                                                        ),
-                                                    ]}
-                                                    onChange={(e) => console.log(e)}
                                                 />
                                             </Space>
                                         }
@@ -510,16 +437,21 @@ const Admin = () => {
                                         }
                                         style={{ flex: 1 }}
                                     >
-                                        <GetEditComponent
-                                            type={section.type}
-                                            defaultValues={section.content}
-                                            onChange={(e) =>
-                                                onHandleChange(
-                                                    `sections.${idx}.content`,
-                                                    e
-                                                )
-                                            }
-                                        />
+                                        {!!section.type && (
+                                            <GetEditComponent
+                                                type={section.type}
+                                                defaultValues={section.content}
+                                                onChange={(e) =>
+                                                    onHandleChange(
+                                                        `sections.${idx}.content`,
+                                                        e
+                                                    )
+                                                }
+                                            />
+                                        )}
+                                        {!!section.elementId && (
+                                            <DisplayElementView id={section.elementId} />
+                                        )}
                                     </Card>
                                 </div>
                             ))}
@@ -532,7 +464,20 @@ const Admin = () => {
                         </Space>
                         <Divider />
 
-                        <Title level={5}>Footer</Title>
+                        <Card
+                            title={
+                                <Space>
+                                    <Title level={5}>Footer</Title>
+                                    <ElementsSelect
+                                        value={values.footerId}
+                                        onChange={(e) => onHandleChange('footerId', e)}
+                                    />
+                                </Space>
+                            }
+                            bodyStyle={{ padding: 0 }}
+                        >
+                            {values.footerId && <DisplayElementView id={values.footerId} />}
+                        </Card>
 
                         <Divider />
                         <Button type="primary" htmlType="submit">
@@ -581,18 +526,132 @@ const PageTypeModal = ({
     )
 }
 
-interface GetEditComponentProps {
-    type?: string | null
-    defaultValues: any
-    onChange: (value: any) => void
+const ElementsSelect = ({
+    value,
+    onChange,
+}: {
+    value?: string
+    onChange(value: string | undefined): void
+}) => {
+    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
+        ['elements'],
+        () => getElements(),
+        {
+            refetchOnWindowFocus: false,
+        }
+    )
+
+    return (
+        <Select
+            allowClear
+            value={value}
+            onChange={onChange}
+            style={{ width: 240 }}
+            status={elements.isError ? 'error' : undefined}
+            loading={elements.isLoading}
+        >
+            {elements.data?.map((e) => (
+                <Select.Option key={e.id} value={e.id}>
+                    {e.title}
+                </Select.Option>
+            ))}
+        </Select>
+    )
 }
 
-const GetEditComponent = ({ type, defaultValues, onChange }: GetEditComponentProps) => {
-    if (!type) return null
+const DisplayElementView = ({ id }: { id: string }) => {
+    const element: UseQueryResult<Element, Error> = useQuery<Element, Error>(
+        ['elements', { id }],
+        () => getElementDetails(id),
+        {
+            refetchOnWindowFocus: false,
+        }
+    )
 
-    const Component = get(Blocks, type, () => null)
+    if (element.isLoading) {
+        return <Text>Loading...</Text>
+    }
 
-    return <Component.Edit defaultValues={defaultValues} onChange={onChange} />
+    if (element.isError || element.data === undefined) {
+        return <Text>Error</Text>
+    }
+
+    const Component = get(Blocks, element.data.type, () => null)
+
+    return <Component.View defaultValues={element.data.content} />
+}
+
+interface SectionCascaderProps {
+    page?: string
+    section?: string
+    element?: string
+    onSectionChange(type: string | undefined): void
+    onElementChange(type: string | undefined): void
+}
+
+const SectionCascader = ({
+    page,
+    section,
+    element,
+    onSectionChange,
+    onElementChange,
+}: SectionCascaderProps) => {
+    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
+        ['elements'],
+        () => getElements(),
+        {
+            refetchOnWindowFocus: false,
+        }
+    )
+
+    return (
+        <Cascader
+            value={!!section ? [section] : !!element ? ['', element] : []}
+            displayRender={(labels: string[]) => {
+                if (labels.length === 1) {
+                    return labels[0]
+                }
+                if (labels.length === 2) {
+                    return (
+                        <Text>
+                            {labels[1]}
+                            <Text type="secondary"> (Element)</Text>
+                        </Text>
+                    )
+                }
+                return
+            }}
+            style={{ width: 250 }}
+            options={[
+                {
+                    value: '',
+                    label: 'Elements:',
+                    loading: elements.isLoading,
+                    children: get(elements, 'data', []).map((e) => ({
+                        value: e.id,
+                        label: e.title,
+                    })),
+                },
+                ...Object.keys(Blocks).map((key) => ({
+                    value: key,
+                    label: get(Blocks, `${key}.name`, ''),
+                    disabled: !get(Blocks, `${key}.pages`, []).includes(page),
+                })),
+            ]}
+            onChange={(e) => {
+                if (e?.length === 1) {
+                    onSectionChange(`${e[0]}`)
+                    onElementChange(undefined)
+                } else if (e?.length === 2) {
+                    onSectionChange(undefined)
+                    onElementChange(`${e[1]}`)
+                } else {
+                    onSectionChange(undefined)
+                    onElementChange(undefined)
+                }
+            }}
+        />
+    )
 }
 
 Admin.requireAuth = true

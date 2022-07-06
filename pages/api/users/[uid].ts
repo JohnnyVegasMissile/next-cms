@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     const user = await prisma.user.findUnique({
         where: { id },
@@ -28,7 +28,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     const { type, name, password } = req.body
 
@@ -56,7 +56,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = parseInt(req.query.uid as string)
+    const id = req.query.uid as string
 
     await prisma.login.delete({
         where: { userId: id },

@@ -29,7 +29,7 @@ import kebabcase from 'lodash.kebabcase'
 // import { Prisma } from '@prisma/client'
 // import type { Page } from '@prisma/client'
 import { editPage, getPageDetails, postPage } from '../../../network/pages'
-import type { FullPageEdit } from '../../../types'
+import type { FullPageEdit, FullSection } from '../../../types'
 import Blocks from '../../../blocks'
 import GetEditComponent from '../../../components/GetEditComponent'
 import { useMutation, useQuery, UseQueryResult } from 'react-query'
@@ -82,12 +82,29 @@ const Admin = () => {
     const router = useRouter()
     const { pid } = router.query
 
-    const { values, errors, handleChange, handleSubmit, setValues } =
-        useFormik<FullPageEdit>({
-            initialValues,
-            validate,
-            onSubmit: async (values) => mutation.mutate({ pid: pid as string, values }),
-        })
+    const { values, errors, handleChange, handleSubmit, setValues } = useFormik<FullPageEdit>({
+        initialValues,
+        validate,
+        onSubmit: async (values) => {
+            let i = 0
+            const sections: FullSection[] = []
+
+            if (!!values.sections) {
+                for (const section of values.sections) {
+                    if (!!section.type || !!section.elementId) {
+                        sections.push({
+                            ...section,
+                            position: i,
+                        })
+
+                        i = i + 1
+                    }
+                }
+            }
+
+            mutation.mutate({ pid: pid as string, values: { ...values, sections } })
+        },
+    })
 
     const page: UseQueryResult<FullPageEdit, Error> = useQuery<FullPageEdit, Error>(
         ['pages', { id: pid }],
@@ -95,16 +112,20 @@ const Admin = () => {
         {
             refetchOnWindowFocus: false,
             enabled: !!pid && pid !== 'create',
-            onSuccess: (data: FullPageEdit) => setValues(data),
+            onSuccess: (data: FullPageEdit) => {
+                const sections = get(data, 'sections', []).sort(
+                    (a, b) => a.position - b.position
+                )
+
+                setValues({ ...data, sections })
+            },
             onError: (err) => router.push('/admin/pages'),
         }
     )
 
     const mutation = useMutation(
         (data: { pid: string; values: FullPageEdit }) =>
-            data.pid === 'create'
-                ? postPage(data.values)
-                : editPage(data.pid, data.values),
+            data.pid === 'create' ? postPage(data.values) : editPage(data.pid, data.values),
         {
             onSuccess: (data: Page) => {
                 message.success(`Page ${data.title} saved`)
@@ -246,28 +267,20 @@ const Admin = () => {
 
                                                 if (pid === 'create') {
                                                     let newValue = [
-                                                        ...get(values, 'slug', '')!.split(
-                                                            '/'
-                                                        ),
+                                                        ...get(values, 'slug', '')!.split('/'),
                                                     ]
                                                     newValue[lastSlugIndex] = kebabcase(
                                                         e.target.value
                                                     )
 
-                                                    onHandleChange(
-                                                        'slug',
-                                                        newValue.join('/')
-                                                    )
+                                                    onHandleChange('slug', newValue.join('/'))
                                                 }
                                             }}
                                         />
                                     </Space>
                                     <Space direction="vertical" style={{ width: '100%' }}>
                                         <Text>Type</Text>
-                                        <Radio.Group
-                                            value={values.type}
-                                            buttonStyle="solid"
-                                        >
+                                        <Radio.Group value={values.type} buttonStyle="solid">
                                             <Radio.Button
                                                 value="page"
                                                 disabled={values.type !== 'page'}
@@ -299,10 +312,7 @@ const Admin = () => {
                                         <Radio.Group
                                             value={values.published}
                                             onChange={(e) =>
-                                                onHandleChange(
-                                                    'published',
-                                                    e.target.value
-                                                )
+                                                onHandleChange('published', e.target.value)
                                             }
                                             disabled={pid !== 'create' && isLockedPage}
                                         >
@@ -332,12 +342,10 @@ const Admin = () => {
                                                                             values,
                                                                             'slug',
                                                                             ''
-                                                                        )!.split('/')
-                                                                            .length < 2
+                                                                        )!.split('/').length <
+                                                                        2
                                                                     }
-                                                                    icon={
-                                                                        <MinusOutlined />
-                                                                    }
+                                                                    icon={<MinusOutlined />}
                                                                 />
                                                                 <Button
                                                                     onClick={addSlug}
@@ -346,14 +354,12 @@ const Admin = () => {
                                                                             values,
                                                                             'slug',
                                                                             ''
-                                                                        )!.split('/')
-                                                                            .length > 5
+                                                                        )!.split('/').length >
+                                                                        5
                                                                     }
                                                                     type="primary"
                                                                     shape="circle"
-                                                                    icon={
-                                                                        <PlusOutlined />
-                                                                    }
+                                                                    icon={<PlusOutlined />}
                                                                 />
                                                             </>
                                                         )}
@@ -363,10 +369,7 @@ const Admin = () => {
                                                             }}
                                                             value={slug}
                                                             onChange={(e) =>
-                                                                editSlug(
-                                                                    idx,
-                                                                    e.target.value
-                                                                )
+                                                                editSlug(idx, e.target.value)
                                                             }
                                                             status={
                                                                 errors.slug
@@ -459,9 +462,7 @@ const Admin = () => {
                             }
                             bodyStyle={{ padding: 0 }}
                         >
-                            {values.headerId && (
-                                <DisplayElementView id={values.headerId} />
-                            )}
+                            {values.headerId && <DisplayElementView id={values.headerId} />}
                         </Card>
                         <Divider />
                         <Title level={5} style={{ marginLeft: 45 }}>
@@ -480,8 +481,7 @@ const Admin = () => {
                                         />
                                         <Button
                                             disabled={
-                                                idx ===
-                                                get(values, 'sections', []).length - 1
+                                                idx === get(values, 'sections', []).length - 1
                                             }
                                             onClick={() => SectionDown(idx)}
                                             type="primary"
@@ -496,9 +496,7 @@ const Admin = () => {
                                                 <SectionCascader
                                                     page={values.type}
                                                     section={section.type || undefined}
-                                                    element={
-                                                        section.elementId || undefined
-                                                    }
+                                                    element={section.elementId || undefined}
                                                     onSectionChange={(e) =>
                                                         onHandleChange(
                                                             `sections.${idx}.type`,
@@ -575,9 +573,7 @@ const Admin = () => {
                             }
                             bodyStyle={{ padding: 0 }}
                         >
-                            {values.footerId && (
-                                <DisplayElementView id={values.footerId} />
-                            )}
+                            {values.footerId && <DisplayElementView id={values.footerId} />}
                         </Card>
 
                         <Divider />

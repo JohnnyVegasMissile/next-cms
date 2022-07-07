@@ -40,11 +40,19 @@ const Pages = (props: FullPage) => {
 
             <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 
-            <main>
-                {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} />
-                ))}
-            </main>
+            {!!type ? (
+                <main>
+                    {sections?.map((section) => (
+                        <SectionBlock key={section.id} section={section} page={props} />
+                    ))}
+                </main>
+            ) : (
+                <article>
+                    {sections?.map((section) => (
+                        <SectionBlock key={section.id} section={section} page={props} />
+                    ))}
+                </article>
+            )}
 
             <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer>
         </div>

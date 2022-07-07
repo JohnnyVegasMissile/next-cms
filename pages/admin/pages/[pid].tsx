@@ -2,20 +2,20 @@ import { useEffect, useState, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import {
-    // Breadcrumb,
+    Spin,
+    Card,
+    Radio,
+    Modal,
     Input,
     Space,
     Button,
-    // Select,
     Divider,
-    Radio,
-    Typography,
     Select,
-    Card,
-    Cascader,
-    Modal,
-    Spin,
     message,
+    Cascader,
+    // Select,
+    Typography,
+    // Breadcrumb,
 } from 'antd'
 import {
     PlusOutlined,
@@ -26,16 +26,17 @@ import {
 } from '@ant-design/icons'
 import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
+import type { Element, Page } from '@prisma/client'
+import { useMutation, useQuery, UseQueryResult } from 'react-query'
 // import { Prisma } from '@prisma/client'
 // import type { Page } from '@prisma/client'
-import { editPage, getPageDetails, postPage } from '../../../network/pages'
-import type { FullPageEdit, FullSection } from '../../../types'
 import Blocks from '../../../blocks'
-import GetEditComponent from '../../../components/GetEditComponent'
-import { useMutation, useQuery, UseQueryResult } from 'react-query'
-import { getElementDetails, getElements } from '../../../network/elements'
-import type { Element, Page } from '@prisma/client'
 import CustomSelect from '../../../components/CustomSelect'
+import type { FullPageEdit, FullSection } from '../../../types'
+import GetEditComponent from '../../../components/GetEditComponent'
+import DisplayElementView from '../../../components/DisplayElementView'
+import { getElementDetails, getElements } from '../../../network/elements'
+import { editPage, getPageDetails, postPage } from '../../../network/pages'
 
 const { Title, Text } = Typography
 
@@ -47,8 +48,6 @@ const initialValues: FullPageEdit = {
     sections: [],
     metadatas: [],
     published: true,
-    // headerId: '',
-    // footerId: '',
 }
 
 const validate = (values: FullPageEdit) => {
@@ -257,7 +256,7 @@ const Admin = () => {
                         <Card title="Description">
                             <Space direction="vertical" style={{ width: '100%' }}>
                                 <Space size="large">
-                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Space direction="vertical">
                                         <Text>Title</Text>
                                         <Input
                                             style={{ width: 240 }}
@@ -278,7 +277,7 @@ const Admin = () => {
                                             }}
                                         />
                                     </Space>
-                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Space direction="vertical">
                                         <Text>Type</Text>
                                         <Radio.Group value={values.type} buttonStyle="solid">
                                             <Radio.Button
@@ -307,7 +306,7 @@ const Admin = () => {
                                             </Radio.Button>
                                         </Radio.Group>
                                     </Space>
-                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Space direction="vertical">
                                         <Text>Status</Text>
                                         <Radio.Group
                                             value={values.published}
@@ -321,6 +320,7 @@ const Admin = () => {
                                         </Radio.Group>
                                     </Space>
                                 </Space>
+
                                 <Divider />
 
                                 {!isLockedPage && (
@@ -493,7 +493,7 @@ const Admin = () => {
                                         bodyStyle={{ padding: 0 }}
                                         title={
                                             <Space>
-                                                <SectionCascader
+                                                <CustomSelect.ListSections
                                                     page={values.type}
                                                     section={section.type || undefined}
                                                     element={section.elementId || undefined}
@@ -552,6 +552,7 @@ const Admin = () => {
                                     shape="round"
                                     icon={<PlusOutlined />}
                                     // size="small"
+                                    onClick={addSection}
                                 >
                                     Add section
                                 </Button>
@@ -620,103 +621,6 @@ const PageTypeModal = ({
                 <Radio.Button value="list">List</Radio.Button>
             </Radio.Group>
         </Modal>
-    )
-}
-
-const DisplayElementView = ({ id }: { id: string }) => {
-    const element: UseQueryResult<Element, Error> = useQuery<Element, Error>(
-        ['elements', { id }],
-        () => getElementDetails(id),
-        {
-            refetchOnWindowFocus: false,
-        }
-    )
-
-    if (element.isLoading) {
-        return <Text>Loading...</Text>
-    }
-
-    if (element.isError || element.data === undefined) {
-        return <Text>Error</Text>
-    }
-
-    const Component = get(Blocks, element.data.type, () => null)
-
-    return <Component.View defaultValues={element.data.content} />
-}
-
-interface SectionCascaderProps {
-    page?: string
-    section?: string
-    element?: string
-    onSectionChange(type: string | undefined): void
-    onElementChange(type: string | undefined): void
-}
-
-const SectionCascader = ({
-    page,
-    section,
-    element,
-    onSectionChange,
-    onElementChange,
-}: SectionCascaderProps) => {
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
-        ['elements'],
-        () => getElements(),
-        {
-            refetchOnWindowFocus: false,
-        }
-    )
-
-    return (
-        <Cascader
-            placeholder="Please select"
-            value={!!section ? [section] : !!element ? ['', element] : []}
-            displayRender={(labels: string[]) => {
-                if (labels.length === 1) {
-                    return labels[0]
-                }
-                if (labels.length === 2) {
-                    return (
-                        <Text>
-                            {labels[1]}
-                            <Text type="secondary"> (Element)</Text>
-                        </Text>
-                    )
-                }
-                return
-            }}
-            style={{ width: 240, fontWeight: 'normal' }}
-            options={[
-                {
-                    value: '',
-                    label: 'Elements:',
-                    loading: elements.isLoading,
-                    disabled: !get(elements, 'data', []).length && !elements.isLoading,
-                    children: get(elements, 'data', []).map((e) => ({
-                        value: e.id,
-                        label: e.title,
-                    })),
-                },
-                ...Object.keys(Blocks).map((key) => ({
-                    value: key,
-                    label: get(Blocks, `${key}.name`, ''),
-                    disabled: !get(Blocks, `${key}.pages`, []).includes(page),
-                })),
-            ]}
-            onChange={(e) => {
-                if (e?.length === 1) {
-                    onSectionChange(`${e[0]}`)
-                    onElementChange(undefined)
-                } else if (e?.length === 2) {
-                    onSectionChange(undefined)
-                    onElementChange(`${e[1]}`)
-                } else {
-                    onSectionChange(undefined)
-                    onElementChange(undefined)
-                }
-            }}
-        />
     )
 }
 

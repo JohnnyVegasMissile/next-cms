@@ -43,8 +43,12 @@
         "baseUrl": "./",
         "paths": {
             "@components/*": ["components/*"],
-            "@hooks/*": ["hooks/*"]
-            // "@types/*": ["types/*"]
+            "@hooks/*": ["hooks/*"],
+            "@blocks": ["blocks"],
+            "@network/*": ["network/*"],
+            "@types": ["types"],
+            "@utils/*": ["utils/index.ts"],
+            "@utils": ["utils"]
         },
         // "rootDirs": [],
         // "typeRoots": [],

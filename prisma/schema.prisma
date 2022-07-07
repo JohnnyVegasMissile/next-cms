@@ -42,8 +42,10 @@ model Section {
   id                String          @id @default(cuid())
   type              String?
   // pageId          Int?
-  pageId            String
-  page              Page            @relation(fields: [pageId], references: [id])
+  pageId            String?
+  page              Page?           @relation(fields: [pageId], references: [id])
+  articleId         String?
+  article           Article?        @relation(fields: [articleId], references: [id])
   elementId         String?
   element           Element?        @relation(fields: [elementId], references: [id])
   position          Int
@@ -113,6 +115,7 @@ model Article {
   description       String?
   author            String?
   slug              String          @unique
+  sections          Section[]
   pageId            String?
   page              Page?           @relation(fields: [pageId], references: [id])
   published         Boolean         @default(true)

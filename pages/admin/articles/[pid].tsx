@@ -10,14 +10,28 @@ import {
     Divider,
     Radio,
     Typography,
+    Card,
+    Spin,
+    message,
 } from 'antd'
 import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
 import { editArticle, getArticleDetails, postArticle } from '../../../network/articles'
+import GetEditComponent from '../../../components/GetEditComponent'
 import CustomSelect from '../../../components/CustomSelect'
-import type { FullArticleEdit } from '../../../types'
+import type { FullArticle, FullArticleEdit } from '../../../types'
+import {
+    CaretDownOutlined,
+    CaretUpOutlined,
+    CloseOutlined,
+    PlusOutlined,
+} from '@ant-design/icons'
+import DisplayElementView from '../../../components/DisplayElementView'
+import { useMutation, useQuery, UseQueryResult } from 'react-query'
+import { Article } from '@prisma/client'
 
-const { Title } = Typography
+const { Title, Text } = Typography
+const { TextArea } = Input
 
 const initialValues: FullArticleEdit = {
     title: '',
@@ -49,7 +63,6 @@ const validate = (values: FullArticleEdit) => {
 }
 
 const Admin = () => {
-    const [loading, setLoading] = useState(false)
     const router = useRouter()
     const { pid } = router.query
 
@@ -58,48 +71,139 @@ const Admin = () => {
             initialValues,
             validate,
             onSubmit: async (values) => {
-                setLoading(true)
-                if (pid === 'create') {
-                    await postArticle(values)
-                } else {
-                    const id = pid as string
+                let i = 0
+                const sections: FullArticle[] = []
 
-                    await editArticle(id, values)
+                if (!!values.sections) {
+                    for (const section of values.sections) {
+                        if (!!section.type || !!section.elementId) {
+                            sections.push({
+                                ...section,
+                                position: i,
+                            })
+
+                            i = i + 1
+                        }
+                    }
                 }
-                router.push('/admin/articles')
-                setLoading(false)
+
+                mutation.mutate({ pid: pid as string, values: { ...values, sections } })
             },
         })
 
-    // const isLockedPage = values.type === 'error' || values.type === 'home'
+    const article: UseQueryResult<FullArticleEdit, Error> = useQuery<FullArticleEdit, Error>(
+        ['pages', { id: pid }],
+        () => getArticleDetails(pid as string),
+        {
+            refetchOnWindowFocus: false,
+            enabled: !!pid && pid !== 'create',
+            onSuccess: (data: FullArticleEdit) => {
+                const sections = get(data, 'sections', []).sort(
+                    (a, b) => a.position - b.position
+                )
 
-    useEffect(() => {
-        const getPageInfos = async () => {
-            if (pid === undefined) {
-                return
-            }
-            if (pid !== 'create') {
-                const data = await getArticleDetails(pid as string)
-
-                if (!data) router.push('/admin/articles')
-
-                setValues(data)
-            } else {
-                setValues(initialValues)
-            }
+                setValues({ ...data, sections })
+            },
+            onError: (err) => router.push('/admin/articles'),
         }
-        getPageInfos()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pid])
+    )
 
-    // const lastSlugIndex = get(values, 'slug', '').split('/').length - 1
+    const mutation = useMutation(
+        (data: { pid: string; values: FullArticleEdit }) =>
+            data.pid === 'create'
+                ? postArticle(data.values)
+                : editArticle(data.pid, data.values),
+        {
+            onSuccess: (data: Article) => {
+                message.success(`Article ${data.title} saved`)
+                router.push('/admin/articles')
+            },
+            onError: (err) => {
+                message.error('An error occured, while creating or updating the article')
+                router.push('/admin/articles')
+            },
+        }
+    )
+
+    // useEffect(() => {
+    //     const getPageInfos = async () => {
+    //         if (pid === undefined) {
+    //             return
+    //         }
+    //         if (pid !== 'create') {
+    //             const data = await getArticleDetails(pid as string)
+
+    //             if (!data) router.push('/admin/articles')
+
+    //             setValues(data)
+    //         } else {
+    //             setValues(initialValues)
+    //         }
+    //     }
+    //     getPageInfos()
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [pid])
+
+    const addSection = () => {
+        handleChange({
+            target: {
+                name: 'sections',
+                value: [
+                    ...get(values, 'sections', []),
+                    {
+                        type: undefined,
+                        position: get(values, 'sections', []).length,
+                        content: '{}',
+                    },
+                ],
+            },
+        })
+    }
+
+    const removeSection = (index: number) => {
+        let newValue = [...get(values, 'sections', [])]
+        newValue.splice(index, 1)
+
+        handleChange({ target: { name: 'sections', value: newValue } })
+    }
+
+    const SectionUp = (index: number) => {
+        let newValue = [...get(values, 'sections', [])]
+        const temp = newValue[index]
+        newValue[index] = newValue[index - 1]
+        newValue[index - 1] = temp
+
+        handleChange({ target: { name: 'sections', value: newValue } })
+    }
+
+    const SectionDown = (index: number) => {
+        let newValue = [...get(values, 'sections', [])]
+        const temp = newValue[index]
+        newValue[index] = newValue[index + 1]
+        newValue[index + 1] = temp
+
+        handleChange({ target: { name: 'sections', value: newValue } })
+    }
 
     const onHandleChange = (name: string, value: any) => {
         handleChange({ target: { name, value } })
     }
 
-    if (loading || pid === undefined) {
-        return <div>Loading...</div>
+    if (article.isLoading || !pid) {
+        return (
+            <div
+                style={{
+                    height: '50vh',
+                    width: '100vw',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#f0f2f5',
+                }}
+            >
+                <Spin size="large" tip="Loading..." />
+            </div>
+        )
     }
 
     return (
@@ -107,48 +211,190 @@ const Admin = () => {
             <Space
                 direction="vertical"
                 size="large"
-                style={{ width: '100%', padding: 15 }}
+                style={{
+                    width: '100%',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                }}
             >
-                <Space direction="vertical" size={0}>
-                    <Title level={5}>Title</Title>
-                    <Input
-                        value={get(values, 'title', '')}
-                        onChange={(e) => {
-                            onHandleChange('title', e.target.value)
+                <Space
+                    direction="vertical"
+                    style={{
+                        width: '100%',
+                    }}
+                >
+                    <Card title="description">
+                        <Space
+                            direction="vertical"
+                            style={{
+                                width: '100%',
+                            }}
+                        >
+                            <Space size="large">
+                                <Space direction="vertical">
+                                    <Text>Title</Text>
+                                    <Input
+                                        style={{ width: 240 }}
+                                        value={get(values, 'title', '')}
+                                        onChange={(e) =>
+                                            onHandleChange('title', e.target.value)
+                                        }
+                                    />
+                                </Space>
 
-                            if (pid === 'create') {
-                                onHandleChange('slug', kebabcase(e.target.value))
-                            }
-                        }}
-                    />
+                                <Space direction="vertical">
+                                    <Text>Slug</Text>
+                                    <Input
+                                        style={{ width: 240 }}
+                                        value={get(values, 'slug', '')}
+                                        onChange={(e) =>
+                                            onHandleChange('slug', e.target.value)
+                                        }
+                                    />
+                                </Space>
+
+                                <Space direction="vertical">
+                                    <Text>Page list</Text>
+                                    <CustomSelect.ListPages
+                                        value={values.pageId}
+                                        onChange={(e: string | undefined) =>
+                                            onHandleChange('pageId', e)
+                                        }
+                                    />
+                                </Space>
+
+                                <Space direction="vertical">
+                                    <Text>Status</Text>
+                                    <Radio.Group
+                                        value={values.published}
+                                        onChange={(e) =>
+                                            onHandleChange('published', e.target.value)
+                                        }
+                                    >
+                                        <Radio value={true}>Published</Radio>
+                                        <Radio value={false}>Unpublished</Radio>
+                                    </Radio.Group>
+                                </Space>
+                            </Space>
+                            <Divider />
+                            <Space size="large" align="start">
+                                <Space direction="vertical">
+                                    <Text>Author</Text>
+                                    <Input
+                                        style={{ width: 240 }}
+                                        value={get(values, 'author', '')!}
+                                        onChange={(e) =>
+                                            onHandleChange('author', e.target.value)
+                                        }
+                                    />
+                                </Space>
+
+                                <Space direction="vertical">
+                                    <Text>Description</Text>
+                                    <TextArea
+                                        style={{ width: 240 * 2 + 24 }}
+                                        value={get(values, 'description', '')!}
+                                        onChange={(e) =>
+                                            onHandleChange('description', e.target.value)
+                                        }
+                                        autoSize={{ minRows: 3, maxRows: 6 }}
+                                    />
+                                </Space>
+
+                                <Space direction="vertical">
+                                    <Text>Cover</Text>
+                                </Space>
+                            </Space>
+                        </Space>
+                    </Card>
 
                     <Divider />
-
-                    <Input
-                        value={get(values, 'slug', '')}
-                        onChange={(e) => onHandleChange('slug', e.target.value)}
-                    />
-
-                    <CustomSelect.ListPages
-                        value={values.pageId}
-                        onChange={(e: string | undefined) => onHandleChange('pageId', e)}
-                    />
-
-                    <Divider />
-
-                    <Title level={5}>Status</Title>
-                    <Radio.Group
-                        value={values.published}
-                        onChange={(e) => onHandleChange('published', e.target.value)}
-                    >
-                        <Radio value={true}>Published</Radio>
-                        <Radio value={false}>Unpublished</Radio>
-                    </Radio.Group>
-
-                    <Divider />
-
-                    <Title level={5}>Header</Title>
-
+                    <Title level={5} style={{ marginLeft: 45 }}>
+                        Page sections
+                    </Title>
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                        {get(values, 'sections', []).map((section, idx) => (
+                            <div key={idx} style={{ display: 'flex', gap: 8 }}>
+                                <Space direction="vertical">
+                                    <Button
+                                        disabled={idx === 0}
+                                        onClick={() => SectionUp(idx)}
+                                        type="primary"
+                                        shape="circle"
+                                        icon={<CaretUpOutlined />}
+                                    />
+                                    <Button
+                                        disabled={
+                                            idx === get(values, 'sections', []).length - 1
+                                        }
+                                        onClick={() => SectionDown(idx)}
+                                        type="primary"
+                                        shape="circle"
+                                        icon={<CaretDownOutlined />}
+                                    />
+                                </Space>
+                                <Card
+                                    bodyStyle={{ padding: 0 }}
+                                    title={
+                                        <Space>
+                                            <CustomSelect.ListSections
+                                                page="page"
+                                                section={section.type || undefined}
+                                                element={section.elementId || undefined}
+                                                onSectionChange={(e) =>
+                                                    onHandleChange(`sections.${idx}.type`, e)
+                                                }
+                                                onElementChange={(e) =>
+                                                    onHandleChange(
+                                                        `sections.${idx}.elementId`,
+                                                        e
+                                                    )
+                                                }
+                                            />
+                                        </Space>
+                                    }
+                                    extra={
+                                        <Button
+                                            type="primary"
+                                            onClick={() => removeSection(idx)}
+                                            danger
+                                            shape="circle"
+                                            icon={<CloseOutlined />}
+                                        />
+                                    }
+                                    style={{ flex: 1 }}
+                                >
+                                    {!!section.type && (
+                                        <GetEditComponent
+                                            type={section.type}
+                                            defaultValues={section.content}
+                                            onChange={(e) =>
+                                                onHandleChange(`sections.${idx}.content`, e)
+                                            }
+                                        />
+                                    )}
+                                    {!!section.elementId && (
+                                        <DisplayElementView id={section.elementId} />
+                                    )}
+                                </Card>
+                            </div>
+                        ))}
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Button
+                                type="primary"
+                                shape="round"
+                                icon={<PlusOutlined />}
+                                onClick={addSection}
+                            >
+                                Add section
+                            </Button>
+                        </div>
+                    </Space>
                     <Divider />
 
                     <Button type="primary" htmlType="submit">

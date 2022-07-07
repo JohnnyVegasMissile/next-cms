@@ -11,22 +11,18 @@ import {
     // Radio,
     Typography,
     Select,
+    Card,
 } from 'antd'
 // import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import get from 'lodash.get'
 // import kebabcase from 'lodash.kebabcase'
-// import { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 // import type { Page } from '@prisma/client'
 import { postUser, editUser, getUser } from '../../../network/users'
+import { UseQueryResult, useQuery, useMutation } from 'react-query'
+import { FullUser, UserCreation } from '@types'
 
-const { Title } = Typography
-
-interface UserCreation {
-    type: string
-    name: string
-    email: string
-    password: string
-}
+const { Text, Title } = Typography
 
 const initialValues: UserCreation = {
     type: 'user',
@@ -70,99 +66,143 @@ const UsersCreation = () => {
         useFormik<UserCreation>({
             initialValues,
             validate,
-            onSubmit: async (values) => {
-                setLoading(true)
-                if (pid === 'create') {
-                    await postUser(values)
-                } else {
-                    const id = pid as string
-                    await editUser(id, values)
-                }
-                router.push('/admin/users')
-                setLoading(false)
-            },
+            onSubmit: async (values) => mutation.mutate({ pid: pid as string, values }),
         })
 
-    useEffect(() => {
-        const getPageInfos = async () => {
-            if (pid === undefined) {
-                return
-            }
-            if (pid !== 'create') {
-                const id = pid as string
-                const data = await getUser(id)
+    const user: UseQueryResult<FullUser, Error> = useQuery<FullUser, Error>(
+        ['users', { id: pid }],
+        () => getUser(pid as string),
+        {
+            refetchOnWindowFocus: false,
+            enabled: !!pid && pid !== 'create',
+            onSuccess: (data: FullUser) =>
                 setValues({
-                    type: data?.login?.type || 'user',
-                    name: data.name || '',
-                    email: data?.login?.email || '',
-                    password: '',
-                })
-            } else {
-                setValues(initialValues)
-            }
+                    type: data.type,
+                    name: '',
+                    email: '',
+                }),
+            onError: (err) => router.push('/admin/users'),
         }
-        getPageInfos()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pid])
+    )
+
+    // const mutation = useMutation(
+    //     (data: { pid: string; values: UserCreation }) =>
+    //         data.pid === 'create'
+    //             ? postUser(data.values)
+    //             : editUser(data.pid, data.values),
+    //     {
+    //         onSuccess: (data: Element) => {
+    //             message.success(`Element ${data.title} saved`)
+    //             router.push('/admin/elements')
+    //         },
+    //         onError: (err) => {
+    //             message.error('An error occured, while creating or updating the element')
+    //             router.push('/admin/elements')
+    //         },
+    //     }
+    // )
 
     const onHandleChange = (name: string, value: any) => {
         handleChange({ target: { name, value } })
     }
 
-    if (loading || pid === undefined) {
-        return <div>Loading...</div>
-    }
+    // if (user.isLoading || !pid) {
+    //     return (
+    //         <div
+    //             style={{
+    //                 height: '50vh',
+    //                 width: '100vw',
+    //                 display: 'flex',
+    //                 justifyContent: 'center',
+    //                 alignItems: 'center',
+    //                 backgroundColor: '#f0f2f5',
+    //             }}
+    //         >
+    //             <Spin size="large" tip="Loading..." />
+    //         </div>
+    //     )
+    // }
 
     return (
         <form onSubmit={handleSubmit}>
             <Space
                 direction="vertical"
                 size="large"
-                style={{ width: '100%', padding: 15 }}
+                style={{
+                    width: '100%',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                }}
             >
-                <Space direction="vertical" size={0}>
-                    <Title level={5}>Title</Title>
-                    <Input
-                        value={get(values, 'name', '')}
-                        onChange={(e) => onHandleChange('name', e.target.value)}
-                    />
+                <Space
+                    direction="vertical"
+                    style={{
+                        width: '100%',
+                    }}
+                >
+                    <Card title="Description">
+                        <Space
+                            direction="vertical"
+                            style={{
+                                width: '100%',
+                            }}
+                        >
+                            <Space size="large">
+                                <Space direction="vertical">
+                                    <Text>Name</Text>
+                                    <Input
+                                        style={{ width: 240 }}
+                                        value={get(values, 'name', '')}
+                                        onChange={(e) =>
+                                            onHandleChange('name', e.target.value)
+                                        }
+                                    />
+                                </Space>
 
-                    <Divider />
+                                <Space direction="vertical">
+                                    <Text>Type</Text>
+                                    <Select
+                                        value={values.type}
+                                        style={{ width: 240 }}
+                                        onChange={(e) => onHandleChange('type', e)}
+                                        disabled={values.type === 'super-admin'}
+                                    >
+                                        <Select.Option value="user">User</Select.Option>
+                                        <Select.Option value="admin">Admin</Select.Option>
+                                        {values.type === 'super-admin' && (
+                                            <Select.Option disabled value="super-admin">
+                                                Admin
+                                            </Select.Option>
+                                        )}
+                                    </Select>
+                                </Space>
+                            </Space>
+                            <Divider />
+                            <Space size="large">
+                                <Space direction="vertical">
+                                    <Text>Email</Text>
+                                    <Input
+                                        style={{ width: 240 }}
+                                        value={get(values, 'email', '')}
+                                        onChange={(e) =>
+                                            onHandleChange('email', e.target.value)
+                                        }
+                                    />
+                                </Space>
 
-                    <Input
-                        value={get(values, 'email', '')}
-                        onChange={(e) =>
-                            onHandleChange('email', e.target.value)
-                        }
-                    />
-
-                    <Divider />
-
-                    <Select
-                        value={values.type}
-                        style={{ width: 200 }}
-                        onChange={(e) => onHandleChange('type', e)}
-                        disabled={values.type === 'super-admin'}
-                    >
-                        <Select.Option value="user">User</Select.Option>
-                        <Select.Option value="admin">Admin</Select.Option>
-                        {values.type === 'super-admin' && (
-                            <Select.Option disabled value="super-admin">
-                                Admin
-                            </Select.Option>
-                        )}
-                    </Select>
-
-                    <Divider />
-
-                    <Input.Password
-                        value={get(values, 'password', '')}
-                        onChange={(e) =>
-                            onHandleChange('password', e.target.value)
-                        }
-                    />
-
-                    <Divider />
+                                <Space direction="vertical">
+                                    <Text>Password</Text>
+                                    <Input.Password
+                                        style={{ width: 240 }}
+                                        value={get(values, 'password', '')}
+                                        onChange={(e) =>
+                                            onHandleChange('password', e.target.value)
+                                        }
+                                    />
+                                </Space>
+                            </Space>
+                        </Space>
+                    </Card>
 
                     <Button type="primary" htmlType="submit">
                         Save

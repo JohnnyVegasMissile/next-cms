@@ -1,11 +1,11 @@
 import Blocks from '../../blocks'
 import get from 'lodash.get'
 import { Section, Element } from '@prisma/client'
-import { FullPage } from 'types'
+import { FullPage, FullArticle } from 'types'
 
 interface Props {
     section: Section | Element
-    page?: FullPage
+    page?: FullPage | FullArticle
 }
 
 const SectionBlock = ({ section, page }: Props) => {

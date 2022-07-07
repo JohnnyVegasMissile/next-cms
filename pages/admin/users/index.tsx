@@ -16,6 +16,7 @@ import { useQuery, UseQueryResult } from 'react-query'
 import { getUsers } from '../../../network/users'
 import type { FullUser } from '../../../types'
 import get from 'lodash.get'
+import { PlusOutlined } from '@ant-design/icons'
 
 const AdminUsers = () => {
     const users: UseQueryResult<User[], Error> = useQuery<User[], Error>(
@@ -28,11 +29,13 @@ const AdminUsers = () => {
 
     return (
         <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
-            <Button type="primary">
-                <Link href="/admin/users/create">
-                    <a>Create</a>
-                </Link>
-            </Button>
+            <Link href="/admin/users/create">
+                <a>
+                    <Button type="primary" icon={<PlusOutlined />}>
+                        Create
+                    </Button>
+                </a>
+            </Link>
             <Table
                 bordered={false}
                 loading={users.isLoading}

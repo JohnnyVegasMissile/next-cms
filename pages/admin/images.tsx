@@ -28,7 +28,7 @@ const AdminImages = () => {
         })
     }
 
-    const deleteFile = async (id: number) => {
+    const deleteFile = async (id: string) => {
         deleteImage(id)
 
         await queryClient.setQueryData('images', (oldData: any) => {
@@ -49,11 +49,7 @@ const AdminImages = () => {
             {files.isLoading && <div>Loading...</div>}
             {get(files, 'data', []).map((img, idx) => (
                 <Col key={idx} className="gutter-row" span={6}>
-                    <ImageCard
-                        img={img}
-                        onDelete={deleteFile}
-                        onEdit={editImage}
-                    />
+                    <ImageCard img={img} onDelete={deleteFile} onEdit={editImage} />
                 </Col>
             ))}
         </Row>
@@ -62,8 +58,8 @@ const AdminImages = () => {
 
 interface ImageCardProps {
     img: Media
-    onDelete(id: number): void
-    onEdit(id: number, alt: string): void
+    onDelete(id: number | string): void
+    onEdit(id: number | string, alt: string): void
 }
 
 const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
@@ -85,10 +81,7 @@ const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
                 />
             }
         >
-            <Space
-                direction="vertical"
-                style={{ width: '100%', alignItems: 'center' }}
-            >
+            <Space direction="vertical" style={{ width: '100%', alignItems: 'center' }}>
                 <Image
                     width={200}
                     height={200}

@@ -2,26 +2,40 @@ import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 // import Router, { useRouter } from 'next/router'
 // import { PrismaClient } from '@prisma/client'
-import type { Article } from '@prisma/client'
-import { FullPage } from '../types'
+import type { Article, Metadata } from '@prisma/client'
+import { FullArticle, FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
 import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { Affix, Button } from 'antd'
 import SectionBlock from '../components/SectionBlock'
+import get from 'lodash.get'
 
-const Pages = (props: FullPage) => {
-    const { id, title, metadatas, sections, type, header, footer } = props
+const Pages = (props: FullPage | FullArticle) => {
+    // const { id, title, metadatas, sections, type, header, footer } = props
     const { isAuth } = useAuth()
 
     return (
         <div>
             <Head>
-                <title>{title}</title>
-                {metadatas?.map((meta) => (
+                <title>{props.title}</title>
+                {get(props, 'metadatas', []).map((meta: Metadata) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))}
+                {!get(props, 'type', false) && (
+                    <>
+                        {!!get(props, 'author', false) && (
+                            <meta name="author" content={get(props, 'author')} />
+                        )}
+                        {!!get(props, 'description', false) && (
+                            <meta
+                                name="description"
+                                content={get(props, 'description')}
+                            />
+                        )}
+                    </>
+                )}
             </Head>
 
             {isAuth && (
@@ -31,30 +45,42 @@ const Pages = (props: FullPage) => {
                         type="primary"
                         style={{ position: 'absolute', right: 5 }}
                     >
-                        <Link href={`/admin/${!!type ? 'pages' : 'articles'}/${id}`}>
+                        <Link
+                            href={`/admin/${
+                                !!get(props, 'type', false) ? 'pages' : 'articles'
+                            }/${props.id}`}
+                        >
                             <a>Edit</a>
                         </Link>
                     </Button>
                 </Affix>
             )}
 
-            <header>{!!header && <SectionBlock section={header} page={props} />}</header>
+            <header>
+                {!!get(props, 'header', false) && (
+                    <SectionBlock section={get(props, 'header')} page={props} />
+                )}
+            </header>
 
-            {!!type ? (
+            {!!get(props, 'type', false) ? (
                 <main>
-                    {sections?.map((section) => (
+                    {get(props, 'sections', [])?.map((section) => (
                         <SectionBlock key={section.id} section={section} page={props} />
                     ))}
                 </main>
             ) : (
                 <article>
-                    {sections?.map((section) => (
+                    {get(props, 'sections', [])?.map((section) => (
                         <SectionBlock key={section.id} section={section} page={props} />
                     ))}
                 </article>
             )}
 
-            <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer>
+            <footer>
+                {!!get(props, 'footer', false) && (
+                    <SectionBlock section={get(props, 'footer')} page={props} />
+                )}
+            </footer>
         </div>
     )
 }

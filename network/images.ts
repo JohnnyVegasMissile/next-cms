@@ -41,7 +41,7 @@ export const getImages = (): Promise<Media[]> =>
             .catch(reject)
     })
 
-export const deleteImage = (id: number): Promise<void> =>
+export const deleteImage = (id: string | number): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
@@ -51,12 +51,22 @@ export const deleteImage = (id: number): Promise<void> =>
             .catch(reject)
     })
 
-export const editImage = (id: number, alt: string): Promise<Media> =>
+export const editImage = (id: number | string, alt: string): Promise<Media> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
             url: `/api/images/${id}`,
             data: { alt },
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const getImageDetail = (id: number | string): Promise<Media> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
+            url: `/api/images/${id}`,
         })
             .then(resolve)
             .catch(reject)

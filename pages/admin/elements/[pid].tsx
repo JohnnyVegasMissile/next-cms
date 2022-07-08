@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
-import { Input, Space, Button, Typography, Card, Select } from 'antd'
+import { Input, Space, Button, Typography, Card, Select, message, Spin } from 'antd'
 import get from 'lodash.get'
 import { editElement, getElementDetails, postElement } from '../../../network/elements'
-import { Prisma } from '@prisma/client'
+import { Prisma, Element } from '@prisma/client'
 import Blocks from '../../../blocks'
 import GetEditComponent from '../../../components/GetEditComponent'
+import { useMutation, useQuery, UseQueryResult } from 'react-query'
 
-const { Title } = Typography
+const { Title, Text } = Typography
 
 const initialValues: Prisma.ElementCreateInput = {
     title: '',
@@ -47,45 +48,74 @@ const Admin = () => {
         useFormik<Prisma.ElementCreateInput>({
             initialValues,
             validate,
-            onSubmit: async (values) => {
-                setLoading(true)
-                if (pid === 'create') {
-                    await postElement(values)
-                } else {
-                    const id = pid as string
-
-                    await editElement(id, values)
-                }
-                router.push('/admin/elements')
-                setLoading(false)
-            },
+            onSubmit: async (values) => mutation.mutate({ pid: pid as string, values }),
         })
 
-    useEffect(() => {
-        const getPageInfos = async () => {
-            if (pid === undefined) {
-                return
-            }
-            if (pid !== 'create') {
-                const data = await getElementDetails(pid as string)
+    // useEffect(() => {
+    //     const getPageInfos = async () => {
+    //         if (pid === undefined) {
+    //             return
+    //         }
+    //         if (pid !== 'create') {
+    //             const data = await getElementDetails(pid as string)
 
-                if (!data) router.push('/admin/elements')
+    //             if (!data) router.push('/admin/elements')
 
-                setValues(data)
-            } else {
-                setValues(initialValues)
-            }
+    //             setValues(data)
+    //         } else {
+    //             setValues(initialValues)
+    //         }
+    //     }
+    //     getPageInfos()
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [pid])
+
+    const element: UseQueryResult<Prisma.ElementCreateInput, Error> = useQuery<
+        Prisma.ElementCreateInput,
+        Error
+    >(['elements', { id: pid }], () => getElementDetails(pid as string), {
+        refetchOnWindowFocus: false,
+        enabled: !!pid && pid !== 'create',
+        onSuccess: (data: Prisma.ElementCreateInput) => setValues(data),
+        onError: (err) => router.push('/admin/articles'),
+    })
+
+    const mutation = useMutation(
+        (data: { pid: string; values: Prisma.ElementCreateInput }) =>
+            data.pid === 'create'
+                ? postElement(data.values)
+                : editElement(data.pid, data.values),
+        {
+            onSuccess: (data: Element) => {
+                message.success(`Element ${data.title} saved`)
+                router.push('/admin/elements')
+            },
+            onError: (err) => {
+                message.error('An error occured, while creating or updating the element')
+                router.push('/admin/elements')
+            },
         }
-        getPageInfos()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pid])
+    )
 
     const onHandleChange = (name: string, value: any) => {
         handleChange({ target: { name, value } })
     }
 
-    if (loading || pid === undefined) {
-        return <div>Loading...</div>
+    if (element.isLoading || !pid) {
+        return (
+            <div
+                style={{
+                    height: '50vh',
+                    width: '100vw',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#f0f2f5',
+                }}
+            >
+                <Spin size="large" tip="Loading..." />
+            </div>
+        )
     }
 
     return (
@@ -96,11 +126,20 @@ const Admin = () => {
                 style={{ width: '100%', padding: 15, backgroundColor: '#f0f2f5' }}
             >
                 <Space direction="vertical" style={{ width: '100%' }}>
-                    <Title level={5}>Title</Title>
-                    <Input
-                        value={get(values, 'title', '')}
-                        onChange={(e) => onHandleChange('title', e.target.value)}
-                    />
+                    <Card title="Description">
+                        <Space size="large">
+                            <Space direction="vertical">
+                                <Text>Title</Text>
+                                <Input
+                                    style={{ width: 240 }}
+                                    value={get(values, 'title', '')}
+                                    onChange={(e) =>
+                                        onHandleChange('title', e.target.value)
+                                    }
+                                />
+                            </Space>
+                        </Space>
+                    </Card>
 
                     <Card
                         bodyStyle={{ padding: 0 }}

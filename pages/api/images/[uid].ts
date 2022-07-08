@@ -4,6 +4,18 @@ import { promises as fs } from 'fs'
 
 import { prisma } from '../../../utils/prisma'
 
+const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+    const id = req.query.uid as string
+
+    const image = await prisma.media.findUnique({
+        where: { id },
+    })
+
+    if (!image) return res.status(500).json({ error: 'Image not found' })
+
+    return res.status(200).json(image)
+}
+
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
@@ -39,6 +51,10 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const pages = async (req: NextApiRequest, res: NextApiResponse) => {
     switch (req.method) {
+        case 'GET': {
+            return await GET(req, res)
+        }
+
         case 'DELETE': {
             return await DELETE(req, res)
         }

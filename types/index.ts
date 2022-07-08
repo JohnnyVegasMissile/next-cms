@@ -1,4 +1,12 @@
-import type { User, Login, Page, Metadata, Section, Article, Element } from '@prisma/client'
+import type {
+    User,
+    Login,
+    Page,
+    Metadata,
+    Section,
+    Article,
+    Element,
+} from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 export type UserRoleTypes = 'super-admin' | 'admin' | 'user'
@@ -15,13 +23,21 @@ export type FullUser = User & {
     login: Login | null
 }
 
+export type UserCreation = Prisma.UserCreateInput & {
+    email?: string
+    type?: string
+    password?: string
+}
+
 export type FullArticle = Article & {
+    coverId?: string
     page: Page
     sections?: FullSection[] | null
 }
 
 export type FullArticleEdit = Prisma.ArticleCreateInput & {
-    pageId: string | undefined
+    coverId?: string
+    pageId?: string
     sections?: FullSection[] | null
 }
 
@@ -43,3 +59,10 @@ export type FullPageEdit = Prisma.PageCreateInput & {
     headerId?: string | undefined
     footerId?: string | undefined
 }
+
+// title: 'Login Successful',
+// detail: 'Successfully validated login credentials',
+// token: session.token,
+// expiresAt: session.expiresAt,
+// // type: login.type,
+// user: { ...login.user, type: login.type },

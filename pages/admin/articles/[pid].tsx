@@ -13,13 +13,14 @@ import {
     Card,
     Spin,
     message,
+    Image,
 } from 'antd'
 import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
 import { editArticle, getArticleDetails, postArticle } from '../../../network/articles'
 import GetEditComponent from '../../../components/GetEditComponent'
 import CustomSelect from '../../../components/CustomSelect'
-import type { FullArticle, FullArticleEdit } from '../../../types'
+import type { FullArticle, FullArticleEdit, FullSection } from '../../../types'
 import {
     CaretDownOutlined,
     CaretUpOutlined,
@@ -28,7 +29,10 @@ import {
 } from '@ant-design/icons'
 import DisplayElementView from '../../../components/DisplayElementView'
 import { useMutation, useQuery, UseQueryResult } from 'react-query'
-import { Article } from '@prisma/client'
+import { Article, Media, Section } from '@prisma/client'
+import { getImageDetail } from '../../../network/images'
+import UploadButton from '../../../components/UploadButton'
+import MediaModal from '@components/MediaModal'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -37,7 +41,6 @@ const initialValues: FullArticleEdit = {
     title: '',
     slug: '',
     published: true,
-    pageId: undefined,
 }
 
 const validate = (values: FullArticleEdit) => {
@@ -72,7 +75,7 @@ const Admin = () => {
             validate,
             onSubmit: async (values) => {
                 let i = 0
-                const sections: FullArticle[] = []
+                const sections: FullSection[] = []
 
                 if (!!values.sections) {
                     for (const section of values.sections) {
@@ -91,20 +94,28 @@ const Admin = () => {
             },
         })
 
-    const article: UseQueryResult<FullArticleEdit, Error> = useQuery<FullArticleEdit, Error>(
-        ['pages', { id: pid }],
-        () => getArticleDetails(pid as string),
+    const article: UseQueryResult<FullArticleEdit, Error> = useQuery<
+        FullArticleEdit,
+        Error
+    >(['pages', { id: pid }], () => getArticleDetails(pid as string), {
+        refetchOnWindowFocus: false,
+        enabled: !!pid && pid !== 'create',
+        onSuccess: (data: FullArticleEdit) => {
+            const sections = get(data, 'sections', [])!.sort(
+                (a, b) => a.position - b.position
+            )
+
+            setValues({ ...data, sections })
+        },
+        onError: (err) => router.push('/admin/articles'),
+    })
+
+    const cover: UseQueryResult<Media, Error> = useQuery<Media, Error>(
+        ['images', { id: values.coverId }],
+        () => getImageDetail(values?.coverId!),
         {
             refetchOnWindowFocus: false,
-            enabled: !!pid && pid !== 'create',
-            onSuccess: (data: FullArticleEdit) => {
-                const sections = get(data, 'sections', []).sort(
-                    (a, b) => a.position - b.position
-                )
-
-                setValues({ ...data, sections })
-            },
-            onError: (err) => router.push('/admin/articles'),
+            enabled: !!values.coverId,
         }
     )
 
@@ -125,34 +136,15 @@ const Admin = () => {
         }
     )
 
-    // useEffect(() => {
-    //     const getPageInfos = async () => {
-    //         if (pid === undefined) {
-    //             return
-    //         }
-    //         if (pid !== 'create') {
-    //             const data = await getArticleDetails(pid as string)
-
-    //             if (!data) router.push('/admin/articles')
-
-    //             setValues(data)
-    //         } else {
-    //             setValues(initialValues)
-    //         }
-    //     }
-    //     getPageInfos()
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [pid])
-
     const addSection = () => {
         handleChange({
             target: {
                 name: 'sections',
                 value: [
-                    ...get(values, 'sections', []),
+                    ...get(values, 'sections', [])!,
                     {
                         type: undefined,
-                        position: get(values, 'sections', []).length,
+                        position: get(values, 'sections', [])!.length,
                         content: '{}',
                     },
                 ],
@@ -161,14 +153,14 @@ const Admin = () => {
     }
 
     const removeSection = (index: number) => {
-        let newValue = [...get(values, 'sections', [])]
+        let newValue = [...get(values, 'sections', [])!]
         newValue.splice(index, 1)
 
         handleChange({ target: { name: 'sections', value: newValue } })
     }
 
     const SectionUp = (index: number) => {
-        let newValue = [...get(values, 'sections', [])]
+        let newValue = [...get(values, 'sections', [])!]
         const temp = newValue[index]
         newValue[index] = newValue[index - 1]
         newValue[index - 1] = temp
@@ -177,7 +169,7 @@ const Admin = () => {
     }
 
     const SectionDown = (index: number) => {
-        let newValue = [...get(values, 'sections', [])]
+        let newValue = [...get(values, 'sections', [])!]
         const temp = newValue[index]
         newValue[index] = newValue[index + 1]
         newValue[index + 1] = temp
@@ -223,7 +215,7 @@ const Admin = () => {
                         width: '100%',
                     }}
                 >
-                    <Card title="description">
+                    <Card title="Description">
                         <Space
                             direction="vertical"
                             style={{
@@ -303,6 +295,21 @@ const Admin = () => {
 
                                 <Space direction="vertical">
                                     <Text>Cover</Text>
+                                    {values.coverId && !cover.isLoading && (
+                                        <Image
+                                            width={200}
+                                            height={200}
+                                            src={`${process.env.UPLOADS_IMAGES_DIR}/${
+                                                cover.data?.uri || ''
+                                            }`}
+                                            alt={cover.data?.alt || ''}
+                                        />
+                                    )}
+                                    <MediaModal
+                                        onMediaSelected={(e) =>
+                                            onHandleChange('coverId', e?.id)
+                                        }
+                                    />
                                 </Space>
                             </Space>
                         </Space>
@@ -313,7 +320,7 @@ const Admin = () => {
                         Page sections
                     </Title>
                     <Space direction="vertical" style={{ width: '100%' }}>
-                        {get(values, 'sections', []).map((section, idx) => (
+                        {get(values, 'sections', [])!.map((section, idx) => (
                             <div key={idx} style={{ display: 'flex', gap: 8 }}>
                                 <Space direction="vertical">
                                     <Button
@@ -325,7 +332,8 @@ const Admin = () => {
                                     />
                                     <Button
                                         disabled={
-                                            idx === get(values, 'sections', []).length - 1
+                                            idx ===
+                                            get(values, 'sections', [])!.length - 1
                                         }
                                         onClick={() => SectionDown(idx)}
                                         type="primary"
@@ -342,7 +350,10 @@ const Admin = () => {
                                                 section={section.type || undefined}
                                                 element={section.elementId || undefined}
                                                 onSectionChange={(e) =>
-                                                    onHandleChange(`sections.${idx}.type`, e)
+                                                    onHandleChange(
+                                                        `sections.${idx}.type`,
+                                                        e
+                                                    )
                                                 }
                                                 onElementChange={(e) =>
                                                     onHandleChange(
@@ -369,7 +380,10 @@ const Admin = () => {
                                             type={section.type}
                                             defaultValues={section.content}
                                             onChange={(e) =>
-                                                onHandleChange(`sections.${idx}.content`, e)
+                                                onHandleChange(
+                                                    `sections.${idx}.content`,
+                                                    e
+                                                )
                                             }
                                         />
                                     )}

@@ -38,6 +38,8 @@ const AdminArticles = () => {
                 loading={articles.isLoading}
                 dataSource={get(articles, 'data', [])}
                 columns={columns}
+                size="small"
+                scroll={{ y: 'calc(100vh - 300px)' }}
                 pagination={{
                     hideOnSinglePage: true,
                     pageSize: get(articles, 'data', []).length,
@@ -65,10 +67,6 @@ const AdminArticles = () => {
 // }
 
 const columns = [
-    // {
-    //     title: 'ID',
-    //     dataIndex: 'id',
-    // },
     {
         title: 'Title',
         dataIndex: 'title',
@@ -114,7 +112,7 @@ const columns = [
         render: (e: Date) => moment(e).fromNow(),
     },
     {
-        width: 1,
+        width: 155,
         render: (e: Article) => (
             <Space>
                 <Button type="primary">

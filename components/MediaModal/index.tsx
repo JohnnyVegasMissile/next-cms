@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import { Button, Card, Col, Modal, Radio, Row, Image, Space, Typography } from 'antd'
+import { useEffect, useState } from 'react'
+import { Button, Card, Col, Modal, Radio, Row, Image, Space, Typography, Table } from 'antd'
 import { useQuery, UseQueryResult } from 'react-query'
 import { getImages } from '../../network/images'
 import type { Media } from '@prisma/client'
 import get from 'lodash.get'
 import { CloseOutlined } from '@ant-design/icons'
+import Link from 'next/link'
+import moment from 'moment'
 
 const { Text } = Typography
 
@@ -23,6 +25,10 @@ const MediaModal = ({ value, onMediaSelected }: Props) => {
             refetchOnWindowFocus: false,
         }
     )
+
+    useEffect(() => {
+        setSelected(value || null)
+    }, [value])
 
     const handleOk = () => {
         onMediaSelected(selected!)
@@ -45,9 +51,10 @@ const MediaModal = ({ value, onMediaSelected }: Props) => {
                     <>
                         <Text>{value?.name}</Text>
                         <Button
+                            type="primary"
                             danger
                             onClick={() => onMediaSelected(undefined)}
-                            shape="circle"
+                            // shape="circle"
                             icon={<CloseOutlined />}
                         />
                     </>
@@ -60,34 +67,69 @@ const MediaModal = ({ value, onMediaSelected }: Props) => {
                 onOk={handleOk}
                 onCancel={handleCancel}
                 okButtonProps={{ disabled: !selected }}
-                width={'90%'}
+                width={'calc(100vw - 150px)'}
+                bodyStyle={
+                    {
+                        // maxHeight: 'calc(100vh - 200px)',
+                        // overflowY: 'scroll',
+                        // overflowX: 'hidden',
+                    }
+                }
             >
-                <Row gutter={[8, 16]} style={{ width: '100%', padding: 15 }}>
-                    {files.isLoading && <div>Loading...</div>}
-                    {get(files, 'data', []).map((img, idx) => (
-                        <Col key={idx} className="gutter-row" span={6}>
-                            <Card
-                                title={img.name}
-                                extra={
-                                    <Radio
-                                        checked={selected?.id === img.id}
-                                        onClick={() => setSelected(img)}
-                                    />
-                                }
-                            >
-                                <Image
-                                    width={200}
-                                    height={200}
-                                    src={`${process.env.UPLOADS_IMAGES_DIR}/${img.uri}`}
-                                    alt=""
-                                />
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
+                <Table
+                    // bordered={false}
+                    loading={files.isLoading}
+                    dataSource={get(files, 'data', [])}
+                    columns={columns}
+                    pagination={{
+                        hideOnSinglePage: true,
+                        pageSize: get(files, 'data', []).length,
+                    }}
+                    size="small"
+                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    rowKey="id"
+                    rowSelection={{
+                        type: 'radio',
+                        selectedRowKeys: !!selected?.id ? [selected?.id] : [],
+                        onChange: (selectedRowKeys: React.Key[], selectedRows: Media[]) =>
+                            setSelected(get(selectedRows, '0', undefined)),
+                    }}
+                />
             </Modal>
         </>
     )
 }
+
+const columns = [
+    {
+        width: 85,
+        render: (image: Media) => (
+            <Image
+                width={50}
+                height={50}
+                src={`${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`}
+                alt=""
+            />
+        ),
+    },
+    {
+        title: 'Name',
+        // dataIndex: 'name',
+        render: (image: Media) => (
+            <a
+                target="_blank"
+                rel="noreferrer"
+                href={`${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`}
+            >
+                {image.name}
+            </a>
+        ),
+    },
+    {
+        title: 'Upload Time',
+        dataIndex: 'uploadTime',
+        render: (e: Date) => moment(e).fromNow(),
+    },
+]
 
 export default MediaModal

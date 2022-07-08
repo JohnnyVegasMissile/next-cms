@@ -48,6 +48,8 @@ const AdminUsers = () => {
                 loading={users.isLoading}
                 dataSource={get(users, 'data', [])}
                 columns={columns}
+                size="small"
+                scroll={{ y: 'calc(100vh - 300px)' }}
                 pagination={{
                     hideOnSinglePage: true,
                     pageSize: get(users, 'data', []).length,
@@ -89,7 +91,7 @@ const columns = [
         render: (e: Login) => e?.email,
     },
     {
-        width: 1,
+        width: 155,
         render: (e: FullUser) => (
             <Space>
                 <Button type="primary">

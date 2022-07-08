@@ -49,6 +49,8 @@ const AdminPages = () => {
                 loading={pages.isLoading}
                 dataSource={get(pages, 'data', [])}
                 columns={columns}
+                size="small"
+                scroll={{ y: 'calc(100vh - 300px)' }}
                 pagination={{
                     hideOnSinglePage: true,
                     pageSize: get(pages, 'data', []).length,
@@ -138,7 +140,7 @@ const columns = [
         render: (e: Date) => moment(e).fromNow(),
     },
     {
-        width: 1,
+        width: 155,
         render: (e: Page) => (
             <Space>
                 <Button type="primary">

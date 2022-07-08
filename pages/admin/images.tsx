@@ -65,7 +65,7 @@ const AdminImages = () => {
 
     const columns = [
         {
-            width: 1,
+            width: 75,
             render: (image: Media) => (
                 <Image
                     width={50}
@@ -79,9 +79,13 @@ const AdminImages = () => {
             title: 'Name',
             // dataIndex: 'name',
             render: (image: Media) => (
-                <Link href={`${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`}>
-                    <a>{image.name}</a>
-                </Link>
+                <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`}
+                >
+                    {image.name}
+                </a>
             ),
         },
         {
@@ -90,11 +94,15 @@ const AdminImages = () => {
             render: bytesToSize,
         },
         {
-            width: 1,
+            width: 256,
             title: 'Alt',
             dataIndex: 'alt',
             render: (alt: string) => (
-                <Form.Item hasFeedback validateStatus="success" /*"warning"*/>
+                <Form.Item
+                    style={{ margin: 0 }}
+                    hasFeedback
+                    validateStatus="success" /*"warning"*/
+                >
                     <Input placeholder="Alt" defaultValue={alt} style={{ width: 240 }} />
                 </Form.Item>
             ),
@@ -105,7 +113,7 @@ const AdminImages = () => {
             render: (e: Date) => moment(e).fromNow(),
         },
         {
-            width: 1,
+            width: 95,
             render: (e: Media) => (
                 <Space>
                     <Popconfirm
@@ -148,6 +156,8 @@ const AdminImages = () => {
                     loading={files.isLoading}
                     dataSource={get(files, 'data', [])}
                     columns={columns}
+                    size="small"
+                    scroll={{ y: 'calc(100vh - 160px)' }}
                     pagination={{
                         hideOnSinglePage: true,
                         pageSize: get(files, 'data', []).length,
@@ -157,52 +167,52 @@ const AdminImages = () => {
         </>
     )
 }
-interface ImageCardProps {
-    img: Media
-    onDelete(id: number | string): void
-    onEdit(id: number | string, alt: string): void
-}
+// interface ImageCardProps {
+//     img: Media
+//     onDelete(id: number | string): void
+//     onEdit(id: number | string, alt: string): void
+// }
 
-const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
-    const [alt, setAlt] = useState<string>(img.alt || '')
+// const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
+//     const [alt, setAlt] = useState<string>(img.alt || '')
 
-    return (
-        <Card
-            title={
-                <Tooltip title={img.name}>
-                    <span>{img.name}</span>
-                </Tooltip>
-            }
-            extra={
-                <Button
-                    onClick={() => onDelete(img.id)}
-                    shape="circle"
-                    type="dashed"
-                    icon={<CloseOutlined />}
-                />
-            }
-        >
-            <Space direction="vertical" style={{ width: '100%', alignItems: 'center' }}>
-                <Image
-                    width={200}
-                    height={200}
-                    src={`${process.env.UPLOADS_IMAGES_DIR}/${img.uri}`}
-                    alt=""
-                />
-                <Space>
-                    <Input.Search
-                        value={alt}
-                        onChange={(e) => setAlt(e.target.value)}
-                        addonBefore="Alt :"
-                        // placeholder="Alt"
-                        onSearch={(e) => onEdit(img.id, e)}
-                        enterButton={<CheckOutlined />}
-                    />
-                </Space>
-            </Space>
-        </Card>
-    )
-}
+//     return (
+//         <Card
+//             title={
+//                 <Tooltip title={img.name}>
+//                     <span>{img.name}</span>
+//                 </Tooltip>
+//             }
+//             extra={
+//                 <Button
+//                     onClick={() => onDelete(img.id)}
+//                     shape="circle"
+//                     type="dashed"
+//                     icon={<CloseOutlined />}
+//                 />
+//             }
+//         >
+//             <Space direction="vertical" style={{ width: '100%', alignItems: 'center' }}>
+//                 <Image
+//                     width={200}
+//                     height={200}
+//                     src={`${process.env.UPLOADS_IMAGES_DIR}/${img.uri}`}
+//                     alt=""
+//                 />
+//                 <Space>
+//                     <Input.Search
+//                         value={alt}
+//                         onChange={(e) => setAlt(e.target.value)}
+//                         addonBefore="Alt :"
+//                         // placeholder="Alt"
+//                         onSearch={(e) => onEdit(img.id, e)}
+//                         enterButton={<CheckOutlined />}
+//                     />
+//                 </Space>
+//             </Space>
+//         </Card>
+//     )
+// }
 
 AdminImages.requireAuth = true
 

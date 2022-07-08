@@ -1,5 +1,5 @@
 import type { Article, Page } from '@prisma/client'
-import { Space, Button, Table, Breadcrumb, Badge, Popconfirm } from 'antd'
+import { Space, Button, Table, Breadcrumb, Badge, Popconfirm, Input } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
@@ -20,13 +20,19 @@ const AdminArticles = () => {
 
     return (
         <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
-            <Link href="/admin/articles/create">
-                <a>
-                    <Button type="primary" icon={<PlusOutlined />}>
-                        Create
-                    </Button>
-                </a>
-            </Link>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Space>
+                    <Input placeholder="Search" />
+                    <Input placeholder="List" />
+                </Space>
+                <Link href="/admin/articles/create">
+                    <a>
+                        <Button type="primary" icon={<PlusOutlined />}>
+                            Create
+                        </Button>
+                    </a>
+                </Link>
+            </div>
             <Table
                 bordered={false}
                 loading={articles.isLoading}

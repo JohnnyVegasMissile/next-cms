@@ -1,5 +1,5 @@
 import type { Element } from '@prisma/client'
-import { Space, Button, Table, Popconfirm } from 'antd'
+import { Space, Button, Table, Popconfirm, Input } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
@@ -18,13 +18,19 @@ const AdminElements = () => {
 
     return (
         <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
-            <Link href="/admin/elements/create">
-                <a>
-                    <Button type="primary" icon={<PlusOutlined />}>
-                        Create
-                    </Button>
-                </a>
-            </Link>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Space>
+                    <Input placeholder="Search" />
+                    <Input placeholder="Block" />
+                </Space>
+                <Link href="/admin/elements/create">
+                    <a>
+                        <Button type="primary" icon={<PlusOutlined />}>
+                            Create
+                        </Button>
+                    </a>
+                </Link>
+            </div>
             <Table
                 bordered={false}
                 loading={elements.isLoading}
@@ -44,6 +50,7 @@ const columns = [
         title: 'Title',
         dataIndex: 'title',
     },
+    { title: 'Block', dataIndex: 'type' },
     {
         title: 'Last updated',
         dataIndex: 'updatedAt',

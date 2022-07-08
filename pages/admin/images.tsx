@@ -1,7 +1,19 @@
 import { useState } from 'react'
 // import type { Page } from '@prisma/client'
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
-import { Space, Button, Image, Row, Col, Input, Card, Tooltip } from 'antd'
+import {
+    Space,
+    Button,
+    Image,
+    Row,
+    Col,
+    Input,
+    Card,
+    Tooltip,
+    Table,
+    Popconfirm,
+    Form,
+} from 'antd'
 // import Link from 'next/link'
 // import moment from 'moment'
 import type { Media } from '@prisma/client'
@@ -10,6 +22,8 @@ import get from 'lodash.get'
 
 import UploadButton from '../../components/UploadButton'
 import { getImages, deleteImage, editImage } from '../../network/images'
+import Link from 'next/link'
+import moment from 'moment'
 
 const AdminImages = () => {
     const queryClient = useQueryClient()
@@ -41,21 +55,108 @@ const AdminImages = () => {
         })
     }
 
+    function bytesToSize(bytes: number) {
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+        if (bytes === 0 || !bytes) return '0 Byte'
+
+        var i = Math.floor(Math.log(bytes) / Math.log(1024))
+        return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i]
+    }
+
+    const columns = [
+        {
+            width: 1,
+            render: (image: Media) => (
+                <Image
+                    width={50}
+                    height={50}
+                    src={`${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`}
+                    alt=""
+                />
+            ),
+        },
+        {
+            title: 'Name',
+            // dataIndex: 'name',
+            render: (image: Media) => (
+                <Link href={`${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`}>
+                    <a>{image.name}</a>
+                </Link>
+            ),
+        },
+        {
+            title: 'size',
+            dataIndex: 'size',
+            render: bytesToSize,
+        },
+        {
+            width: 1,
+            title: 'Alt',
+            dataIndex: 'alt',
+            render: (alt: string) => (
+                <Form.Item hasFeedback validateStatus="success" /*"warning"*/>
+                    <Input placeholder="Alt" defaultValue={alt} style={{ width: 240 }} />
+                </Form.Item>
+            ),
+        },
+        {
+            title: 'Upload Time',
+            dataIndex: 'uploadTime',
+            render: (e: Date) => moment(e).fromNow(),
+        },
+        {
+            width: 1,
+            render: (e: Media) => (
+                <Space>
+                    <Popconfirm
+                        placement="topRight"
+                        title={'Are you sur to delete this image?'}
+                        onConfirm={() => deleteFile(e.id)}
+                        okText="Delete"
+                        cancelText="Cancel"
+                    >
+                        <Button danger>Delete</Button>
+                    </Popconfirm>
+                </Space>
+            ),
+        },
+    ]
+
     return (
-        <Row gutter={[8, 16]} style={{ width: '100%', padding: 15 }}>
-            <Col span={24}>
-                <UploadButton onFileRecieved={addFile} />
-            </Col>
-            {files.isLoading && <div>Loading...</div>}
-            {get(files, 'data', []).map((img, idx) => (
-                <Col key={idx} className="gutter-row" span={6}>
-                    <ImageCard img={img} onDelete={deleteFile} onEdit={editImage} />
+        <>
+            {/* <Row gutter={[8, 16]} style={{ width: '100%', padding: 15 }}>
+                <Col span={24}>
+                    <UploadButton onFileRecieved={addFile} />
                 </Col>
-            ))}
-        </Row>
+                {files.isLoading && <div>Loading...</div>}
+                {get(files, 'data', []).map((img, idx) => (
+                    <Col key={idx} className="gutter-row" span={6}>
+                        <ImageCard img={img} onDelete={deleteFile} onEdit={editImage} />
+                    </Col>
+                ))}
+            </Row> */}
+            <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Space>
+                        <Input placeholder="Search" />
+                        <Input placeholder="Type" />
+                    </Space>
+                    <UploadButton onFileRecieved={addFile} />
+                </div>
+                <Table
+                    bordered={false}
+                    loading={files.isLoading}
+                    dataSource={get(files, 'data', [])}
+                    columns={columns}
+                    pagination={{
+                        hideOnSinglePage: true,
+                        pageSize: get(files, 'data', []).length,
+                    }}
+                />
+            </Space>
+        </>
     )
 }
-
 interface ImageCardProps {
     img: Media
     onDelete(id: number | string): void

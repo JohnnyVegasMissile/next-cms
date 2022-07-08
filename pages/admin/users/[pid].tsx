@@ -152,7 +152,7 @@ const UsersCreation = () => {
                                     <Text>Name</Text>
                                     <Input
                                         style={{ width: 240 }}
-                                        value={get(values, 'name', '')}
+                                        value={get(values, 'name', '')!}
                                         onChange={(e) =>
                                             onHandleChange('name', e.target.value)
                                         }

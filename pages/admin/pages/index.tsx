@@ -9,6 +9,7 @@ import {
     Typography,
     Popconfirm,
     Modal,
+    Input,
 } from 'antd'
 import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
@@ -30,13 +31,19 @@ const AdminPages = () => {
 
     return (
         <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
-            <Link href="/admin/pages/create">
-                <a>
-                    <Button type="primary" icon={<PlusOutlined />}>
-                        Create
-                    </Button>
-                </a>
-            </Link>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Space>
+                    <Input placeholder="Search" />
+                    <Input placeholder="Type" />
+                </Space>
+                <Link href="/admin/pages/create">
+                    <a>
+                        <Button type="primary" icon={<PlusOutlined />}>
+                            Create
+                        </Button>
+                    </a>
+                </Link>
+            </div>
             <Table
                 bordered={false}
                 loading={pages.isLoading}

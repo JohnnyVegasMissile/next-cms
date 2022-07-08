@@ -9,6 +9,7 @@ import {
     Tag,
     // Typography,
     Popconfirm,
+    Input,
 } from 'antd'
 import Link from 'next/link'
 // import moment from 'moment'
@@ -29,13 +30,19 @@ const AdminUsers = () => {
 
     return (
         <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
-            <Link href="/admin/users/create">
-                <a>
-                    <Button type="primary" icon={<PlusOutlined />}>
-                        Create
-                    </Button>
-                </a>
-            </Link>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Space>
+                    <Input placeholder="Search" />
+                    <Input placeholder="Role" />
+                </Space>
+                <Link href="/admin/users/create">
+                    <a>
+                        <Button type="primary" icon={<PlusOutlined />}>
+                            Create
+                        </Button>
+                    </a>
+                </Link>
+            </div>
             <Table
                 bordered={false}
                 loading={users.isLoading}

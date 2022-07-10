@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import bcrypt from 'bcryptjs'
-import type { Page, Login } from '@prisma/client'
+import type { Page, Login, UserType } from '@prisma/client'
 
 import { prisma } from '../../utils/prisma'
 
@@ -33,8 +33,34 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
+    const superAdminType: UserType[] = await prisma.userType.findMany({
+        where: { id: 'super-admin' },
+    })
+
+    if (!superAdminType.length) {
+        await prisma.userType.create({
+            data: {
+                id: 'super-admin',
+                name: 'Super Admin',
+            },
+        })
+    }
+
+    const adminType: UserType[] = await prisma.userType.findMany({
+        where: { id: 'admin' },
+    })
+
+    if (!adminType.length) {
+        await prisma.userType.create({
+            data: {
+                id: 'admin',
+                name: 'Admin',
+            },
+        })
+    }
+
     const admins: Login[] = await prisma.login.findMany({
-        where: { type: 'super-admin' },
+        where: { typeId: 'super-admin' },
     })
 
     if (!admins.length) {
@@ -45,7 +71,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
                 name: 'root',
                 login: {
                     create: {
-                        type: 'super-admin',
+                        typeId: 'super-admin',
                         email: 'root',
                         password: hash,
                     },

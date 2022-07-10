@@ -24,7 +24,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
         return (
             <div
                 style={{
-                    height: '100vh',
+                    height: 'calc(100vh - 29px)',
                     width: '100vw',
                     display: 'flex',
                     justifyContent: 'center',

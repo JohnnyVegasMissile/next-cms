@@ -17,10 +17,7 @@ export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
             .catch(reject)
     })
 
-export const editPage = (
-    id: string | number,
-    data: Prisma.PageCreateInput
-): Promise<Page> =>
+export const editPage = (id: string, data: Prisma.PageCreateInput): Promise<Page> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
@@ -34,7 +31,7 @@ export const editPage = (
             .catch(reject)
     })
 
-export const getPages = (type?: PageTypes): Promise<Page[]> =>
+export const getPages = (type?: PageTypes, q?: string): Promise<Page[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
@@ -42,13 +39,13 @@ export const getPages = (type?: PageTypes): Promise<Page[]> =>
             headers: {
                 'Content-Type': 'application/json',
             },
-            params: { type },
+            params: { type, q },
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const deletePage = (id: string | number): Promise<void> =>
+export const deletePage = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
@@ -58,7 +55,7 @@ export const deletePage = (id: string | number): Promise<void> =>
             .catch(reject)
     })
 
-export const getPageDetails = (id: number | string): Promise<FullPageEdit> =>
+export const getPageDetails = (id: string): Promise<FullPageEdit> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',

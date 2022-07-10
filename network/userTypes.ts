@@ -1,14 +1,14 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
-import type { Article } from '@prisma/client'
+import type { Article, UserType } from '@prisma/client'
 
 import { FullArticle, FullArticleEdit } from '../types'
 
-export const postArticle = (data: Prisma.ArticleCreateInput): Promise<Article> =>
+export const postUserType = (data: Prisma.UserTypeCreateInput): Promise<UserType> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
-            url: `/api/articles`,
+            url: `/api/users/types`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -18,11 +18,14 @@ export const postArticle = (data: Prisma.ArticleCreateInput): Promise<Article> =
             .catch(reject)
     })
 
-export const editArticle = (id: string, data: Prisma.ArticleCreateInput): Promise<Article> =>
+export const editUserType = (
+    id: string,
+    data: Prisma.UserTypeCreateInput
+): Promise<UserType> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
-            url: `/api/articles/${id}`,
+            url: `/api/users/types/${id}`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -32,32 +35,32 @@ export const editArticle = (id: string, data: Prisma.ArticleCreateInput): Promis
             .catch(reject)
     })
 
-export const getArticles = (pageId?: string, q?: string): Promise<FullArticle[]> =>
+export const getUserTypes = (q?: string): Promise<UserType[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/articles`,
-            params: { pageId, q },
+            url: `/api/users/types`,
+            params: { q },
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const getArticleDetails = (id: string): Promise<FullArticleEdit> =>
+export const getUserTypeDetails = (id: string): Promise<UserType> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/articles/${id}`,
+            url: `/api/users/types/${id}`,
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const deleteArticle = (id: string): Promise<void> =>
+export const deleteUserType = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
-            url: `/api/articles/${id}`,
+            url: `/api/users/types/${id}`,
         })
             .then(resolve)
             .catch(reject)

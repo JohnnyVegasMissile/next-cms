@@ -4,9 +4,46 @@ import type { User } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 import { prisma } from '../../../utils/prisma'
+import { UserRoleTypes } from '../../../types'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+    const typeId = req.query.typeId as string | undefined
+    const q = req.query.q as string | undefined
+
+    let search: any = { where: {} }
+
+    if (!!typeId) {
+        if (typeId === 'admin' || typeId === 'super-admin') {
+            search.where.login = {
+                OR: [{ typeId: 'admin' }, { typeId: 'super-admin' }],
+            }
+        } else {
+            search.where.login = {
+                typeId,
+            }
+        }
+    }
+
+    if (!!q) {
+        const sliptedQ = q.split(' ')
+
+        if (sliptedQ.length === 1) {
+            search.where.name = {
+                contains: q,
+            }
+        } else {
+            let OR = sliptedQ.map((word) => ({
+                name: {
+                    contains: word,
+                },
+            }))
+
+            search.where.OR = OR
+        }
+    }
+
     const users: User[] = await prisma.user.findMany({
+        ...search,
         include: {
             login: {
                 select: {
@@ -39,9 +76,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         include: { login: true },
     })
 
-    return res
-        .status(200)
-        .json({ ...user, type: user.login?.type, login: undefined })
+    return res.status(200).json({ ...user, type: user.login?.typeId, login: undefined })
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {

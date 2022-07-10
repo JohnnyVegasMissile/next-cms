@@ -8,9 +8,7 @@ export function makeId(length: number) {
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     var charactersLength = characters.length
     for (var i = 0; i < length; i++) {
-        result += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
-        )
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
     }
     return result
 }
@@ -24,13 +22,11 @@ export const isEmail = (e_mail: string) => {
     return emailRegex.test(e_mail)
 }
 
-export const initSession = async (loginId: number) => {
+export const initSession = async (loginId: string) => {
     const expiresAt = new Date()
     expiresAt.setMonth(expiresAt.getMonth() + 2)
 
-    const token: string = generateToken(
-        `${loginId}.${expiresAt.getMilliseconds()}`
-    )
+    const token: string = generateToken(`${loginId}.${expiresAt.getMilliseconds()}`)
     const session = await prisma.session.create({
         data: {
             token,

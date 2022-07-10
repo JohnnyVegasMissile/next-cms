@@ -1,7 +1,7 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
 // import type { User, Login } from '@prisma/client'
-import { FullUser } from '../types'
+import { FullUser, UserRoleTypes } from '../types'
 
 export const postUser = (data: Prisma.UserCreateInput): Promise<FullUser> =>
     new Promise(async (resolve, reject) => {
@@ -17,7 +17,7 @@ export const postUser = (data: Prisma.UserCreateInput): Promise<FullUser> =>
             .catch(reject)
     })
 
-export const editUser = (id: number | string, data: any): Promise<FullUser> =>
+export const editUser = (id: string, data: any): Promise<FullUser> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
@@ -31,17 +31,18 @@ export const editUser = (id: number | string, data: any): Promise<FullUser> =>
             .catch(reject)
     })
 
-export const getUsers = (): Promise<FullUser[]> =>
+export const getUsers = (typeId?: string, q?: string): Promise<FullUser[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
             url: `/api/users`,
+            params: { typeId, q },
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const getUser = (id: number | string): Promise<FullUser> =>
+export const getUser = (id: string): Promise<FullUser> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
@@ -51,7 +52,7 @@ export const getUser = (id: number | string): Promise<FullUser> =>
             .catch(reject)
     })
 
-export const deleteUser = (id: number | string): Promise<void> =>
+export const deleteUser = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',

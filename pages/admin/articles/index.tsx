@@ -1,5 +1,5 @@
 import type { Article, Page } from '@prisma/client'
-import { Space, Button, Table, Breadcrumb, Badge, Popconfirm, Input } from 'antd'
+import { Space, Button, Table, Breadcrumb, Badge, Popconfirm, Input, Select } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
@@ -7,23 +7,47 @@ import { useQuery, UseQueryResult } from 'react-query'
 
 import { getArticles } from '../../../network/articles'
 import get from 'lodash.get'
+import trim from 'lodash.trim'
 import { FullArticle } from 'types'
+import { useState } from 'react'
+import useDebounce from '../../../hooks/useDebounce'
+import CustomSelect from '../../../components/CustomSelect'
+
+const { Option } = Select
 
 const AdminArticles = () => {
+    const [q, setQ] = useState<string | undefined>()
+    const [pageId, setPageId] = useState<string | undefined>()
+    const debouncedQ = useDebounce<string | undefined>(q, 750)
     const articles: UseQueryResult<Article[], Error> = useQuery<Article[], Error>(
-        ['articles'],
-        () => getArticles(),
+        ['articles', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, pageId }],
+        () => getArticles(pageId, trim(debouncedQ)?.toLocaleLowerCase()),
         {
             refetchOnWindowFocus: false,
         }
     )
 
     return (
-        <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
+        <Space
+            direction="vertical"
+            size="large"
+            style={{
+                width: '100%',
+                padding: 15,
+                backgroundColor: '#f0f2f5',
+                minHeight: 'calc(100vh - 29px)',
+            }}
+        >
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Space>
-                    <Input placeholder="Search" />
-                    <Input placeholder="List" />
+                    <Input
+                        value={q}
+                        allowClear
+                        placeholder="Search"
+                        style={{ width: 180 }}
+                        onChange={(e) => setQ(e.target.value)}
+                    />
+                    <CustomSelect.ListPages width={180} value={pageId} onChange={setPageId} />
                 </Space>
                 <Link href="/admin/articles/create">
                     <a>

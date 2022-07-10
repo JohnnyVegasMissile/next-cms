@@ -30,7 +30,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const { type, name, password } = req.body
+    const { type, name, password, email } = req.body
 
     const updatedUser = await prisma.user.update({
         where: { id },
@@ -48,11 +48,12 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         where: { userId: id },
         data: {
             password: hash,
-            type,
+            typeId: type,
+            email,
         },
     })
 
-    return res.status(200).json({ ...updatedUser, type: updatedLogin.type })
+    return res.status(200).json({ ...updatedUser, type: updatedLogin.typeId, email })
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

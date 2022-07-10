@@ -17,10 +17,7 @@ export const postElement = (data: Prisma.PageCreateInput): Promise<Element> =>
             .catch(reject)
     })
 
-export const editElement = (
-    id: string | number,
-    data: Prisma.ElementCreateInput
-): Promise<Element> =>
+export const editElement = (id: string, data: Prisma.ElementCreateInput): Promise<Element> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
@@ -34,20 +31,21 @@ export const editElement = (
             .catch(reject)
     })
 
-export const getElements = (): Promise<Element[]> =>
+export const getElements = (type?: string, q?: string): Promise<Element[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
             url: `/api/elements`,
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            // headers: {
+            //     'Content-Type': 'application/json',
+            // },
+            params: { type, q },
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const deleteElement = (id: string | number): Promise<void> =>
+export const deleteElement = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
@@ -57,7 +55,7 @@ export const deleteElement = (id: string | number): Promise<void> =>
             .catch(reject)
     })
 
-export const getElementDetails = (id: number | string): Promise<Element> =>
+export const getElementDetails = (id: string): Promise<Element> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',

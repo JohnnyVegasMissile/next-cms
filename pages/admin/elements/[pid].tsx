@@ -7,7 +7,7 @@ import { editElement, getElementDetails, postElement } from '../../../network/el
 import { Prisma, Element } from '@prisma/client'
 import Blocks from '../../../blocks'
 import GetEditComponent from '../../../components/GetEditComponent'
-import { useMutation, useQuery, UseQueryResult } from 'react-query'
+import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 
 const { Title, Text } = Typography
 
@@ -40,9 +40,9 @@ const validate = (values: Prisma.ElementCreateInput) => {
 }
 
 const Admin = () => {
-    const [loading, setLoading] = useState(false)
     const router = useRouter()
     const { pid } = router.query
+    const queryClient = useQueryClient()
 
     const { values, /*errors,*/ handleSubmit, handleChange, setValues } =
         useFormik<Prisma.ElementCreateInput>({
@@ -50,25 +50,6 @@ const Admin = () => {
             validate,
             onSubmit: async (values) => mutation.mutate({ pid: pid as string, values }),
         })
-
-    // useEffect(() => {
-    //     const getPageInfos = async () => {
-    //         if (pid === undefined) {
-    //             return
-    //         }
-    //         if (pid !== 'create') {
-    //             const data = await getElementDetails(pid as string)
-
-    //             if (!data) router.push('/admin/elements')
-
-    //             setValues(data)
-    //         } else {
-    //             setValues(initialValues)
-    //         }
-    //     }
-    //     getPageInfos()
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [pid])
 
     const element: UseQueryResult<Prisma.ElementCreateInput, Error> = useQuery<
         Prisma.ElementCreateInput,
@@ -88,10 +69,12 @@ const Admin = () => {
         {
             onSuccess: (data: Element) => {
                 message.success(`Element ${data.title} saved`)
+                queryClient.invalidateQueries('elements')
                 router.push('/admin/elements')
             },
             onError: (err) => {
                 message.error('An error occured, while creating or updating the element')
+                queryClient.invalidateQueries('elements')
                 router.push('/admin/elements')
             },
         }
@@ -105,7 +88,7 @@ const Admin = () => {
         return (
             <div
                 style={{
-                    height: '50vh',
+                    height: 'calc(100vh - 29px)',
                     width: '100vw',
                     display: 'flex',
                     justifyContent: 'center',
@@ -123,7 +106,12 @@ const Admin = () => {
             <Space
                 direction="vertical"
                 size="large"
-                style={{ width: '100%', padding: 15, backgroundColor: '#f0f2f5' }}
+                style={{
+                    width: '100%',
+                    minHeight: 'calc(100vh - 29px)',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                }}
             >
                 <Space direction="vertical" style={{ width: '100%' }}>
                     <Card title="Description">
@@ -133,9 +121,7 @@ const Admin = () => {
                                 <Input
                                     style={{ width: 240 }}
                                     value={get(values, 'title', '')}
-                                    onChange={(e) =>
-                                        onHandleChange('title', e.target.value)
-                                    }
+                                    onChange={(e) => onHandleChange('title', e.target.value)}
                                 />
                             </Space>
                         </Space>
@@ -148,7 +134,7 @@ const Admin = () => {
                                 <Select
                                     value={values.type}
                                     onChange={(e) => onHandleChange('type', e)}
-                                    style={{ width: 250 }}
+                                    style={{ width: 240 }}
                                 >
                                     {Object.keys(Blocks).map((key) => (
                                         <Select.Option key={key} value={key}>

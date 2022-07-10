@@ -1,19 +1,30 @@
 import { useState, useEffect } from 'react'
 // import { Divider, Steps } from 'antd'
-import { Button, Result } from 'antd'
+import { Button, Result, Spin } from 'antd'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import Head from 'next/head'
 // import Image from 'next/image'
 import { initPages } from '../network/api'
+import { useQuery, UseQueryResult } from 'react-query'
 
 const Install: NextPage = () => {
-    const [initialazing, setInitialazing] = useState<boolean>(true)
-    useEffect(() => {
-        initPages()
-            .then(() => setInitialazing(false))
-            .catch(() => setInitialazing(false))
-    }, [])
+    // const [initialazing, setInitialazing] = useState<boolean>(true)
+    // useEffect(() => {
+    //     initPages()
+    //         .then(() => setInitialazing(false))
+    //         .catch(() => setInitialazing(false))
+    // }, [])
+
+    const install: UseQueryResult<void, Error> = useQuery<void, Error>(
+        ['install'],
+        () => initPages(),
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchOnReconnect: false,
+        }
+    )
 
     return (
         <div>
@@ -28,22 +39,39 @@ const Install: NextPage = () => {
             <header></header>
 
             <main>
-                {initialazing ? (
-                    'Initialazing...'
-                ) : (
-                    <Result
-                        status="success"
-                        title="Successfully Purchased Cloud Server ECS!"
-                        subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
-                        extra={[
-                            <Link href="/" key="home">
-                                <a>
-                                    <Button type="primary">Back home</Button>
-                                </a>
-                            </Link>,
-                        ]}
-                    />
-                )}
+                <div
+                    style={{
+                        backgroundColor: '#f0f2f5',
+                        height: 'calc(100vh - 29px)',
+                        width: '100vw',
+                    }}
+                >
+                    {install.isLoading ? (
+                        <Spin tip="Installing..." />
+                    ) : (
+                        <Result
+                            status={install.status === 'error' ? 'error' : 'success'}
+                            title={
+                                install.status === 'error'
+                                    ? 'Installation failed, please try again'
+                                    : 'Installation completed successfully'
+                            }
+                            extra={[
+                                install.status === 'error' ? (
+                                    <Button onClick={() => install.refetch} type="primary">
+                                        Retry
+                                    </Button>
+                                ) : (
+                                    <Link href="/" key="home">
+                                        <a>
+                                            <Button type="primary">Back home</Button>
+                                        </a>
+                                    </Link>
+                                ),
+                            ]}
+                        />
+                    )}
+                </div>
             </main>
 
             <footer></footer>

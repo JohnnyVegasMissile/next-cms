@@ -14,6 +14,7 @@ import {
     DownOutlined,
     SearchOutlined,
     TeamOutlined,
+    IdcardOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -22,12 +23,6 @@ import Link from 'next/link'
 // import { useRouter } from 'next/router'
 
 const { Text } = Typography
-
-const CustomLink = (link: string, label: string) => (
-    <Link href={link}>
-        <a>{label}</a>
-    </Link>
-)
 
 function MenuAdmin() {
     const { isAuth, signOut, user } = useAuth()
@@ -207,6 +202,15 @@ function MenuAdmin() {
                         </Link>
                     ),
                     icon: <PlusCircleOutlined />,
+                },
+                {
+                    key: '2',
+                    label: (
+                        <Link href="/admin/users/types">
+                            <a>User Types</a>
+                        </Link>
+                    ),
+                    icon: <IdcardOutlined />,
                 },
             ]}
         />

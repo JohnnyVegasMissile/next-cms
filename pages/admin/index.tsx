@@ -31,14 +31,22 @@ const Admin = () => {
     const debouncedValue = useDebounce<string>(settings?.revalidate, 1500)
 
     useEffect(() => {
-        const update = async () =>
-            editSetting('revalidate', settings?.revalidate.toString())
+        const update = async () => editSetting('revalidate', settings?.revalidate.toString())
 
         if (settings?.revalidate) update()
     }, [debouncedValue])
 
     return (
-        <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
+        <Space
+            direction="vertical"
+            size="large"
+            style={{
+                width: '100%',
+                padding: 15,
+                backgroundColor: '#f0f2f5',
+                minHeight: 'calc(100vh - 29px)',
+            }}
+        >
             <Space>
                 <Avatar src="/favicon.ico" shape="square" size="large" />
                 <UploadButton.Favicon />

@@ -1,25 +1,25 @@
 import { Cascader, Select, Typography } from 'antd'
 import { useQuery, UseQueryResult /*, useQueryClient*/ } from 'react-query'
-import type { Page } from '@prisma/client'
+import type { Page, UserType } from '@prisma/client'
 import { getPages } from '../../network/pages'
 import get from 'lodash.get'
 import { getElements } from '../../network/elements'
 import type { Element } from '@prisma/client'
 import Blocks from '../../blocks'
+import { getUserTypes } from '@network/userTypes'
 
 const { Option } = Select
 const { Title, Text } = Typography
 
 const CustomSelect = () => null
 
-type PageId = string | undefined
-
 interface CustomSelectProps {
-    value: PageId
-    onChange(value: PageId): void
+    value: string | undefined
+    onChange(value: string | undefined): void
+    width?: number
 }
 
-const ListPages = ({ value, onChange }: CustomSelectProps) => {
+const ListPages = ({ value, onChange, width = 240 }: CustomSelectProps) => {
     const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
         ['pages', { type: 'list' }],
         () => getPages('list'),
@@ -30,11 +30,13 @@ const ListPages = ({ value, onChange }: CustomSelectProps) => {
 
     return (
         <Select
+            allowClear
             value={value}
             onChange={onChange}
             style={{
-                width: 240,
+                width,
             }}
+            placeholder="List"
             loading={pages.isLoading}
         >
             {get(pages, 'data', [])
@@ -56,7 +58,7 @@ const ListElements = ({
     onChange(value: string | undefined): void
 }) => {
     const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
-        ['elements'],
+        ['elements', {}],
         () => getElements(),
         {
             refetchOnWindowFocus: false,
@@ -82,6 +84,40 @@ const ListElements = ({
     )
 }
 
+const ListUserTypes = ({
+    value,
+    onChange,
+}: {
+    value?: string
+    onChange(value: string | undefined): void
+}) => {
+    const userTypes: UseQueryResult<UserType[], Error> = useQuery<UserType[], Error>(
+        ['userTypes', {}],
+        () => getUserTypes(),
+        {
+            refetchOnWindowFocus: false,
+        }
+    )
+
+    return (
+        <Select
+            allowClear
+            placeholder="Please select"
+            value={value}
+            onChange={onChange}
+            style={{ width: 240, fontWeight: 'normal' }}
+            status={userTypes.isError ? 'error' : undefined}
+            loading={userTypes.isLoading}
+        >
+            {userTypes.data?.map((e) => (
+                <Select.Option key={e.id} value={e.id}>
+                    {e.name}
+                </Select.Option>
+            ))}
+        </Select>
+    )
+}
+
 interface SectionCascaderProps {
     page?: string
     section?: string
@@ -98,7 +134,7 @@ const SectionCascader = ({
     onElementChange,
 }: SectionCascaderProps) => {
     const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
-        ['elements'],
+        ['elements', {}],
         () => getElements(),
         {
             refetchOnWindowFocus: false,
@@ -160,5 +196,6 @@ const SectionCascader = ({
 CustomSelect.ListPages = ListPages
 CustomSelect.ListElements = ListElements
 CustomSelect.ListSections = SectionCascader
+CustomSelect.ListUserTypes = ListUserTypes
 
 export default CustomSelect

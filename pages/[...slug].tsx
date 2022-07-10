@@ -29,10 +29,7 @@ const Pages = (props: FullPage | FullArticle) => {
                             <meta name="author" content={get(props, 'author')} />
                         )}
                         {!!get(props, 'description', false) && (
-                            <meta
-                                name="description"
-                                content={get(props, 'description')}
-                            />
+                            <meta name="description" content={get(props, 'description')} />
                         )}
                     </>
                 )}

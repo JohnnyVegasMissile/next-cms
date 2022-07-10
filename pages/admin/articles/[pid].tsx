@@ -28,7 +28,7 @@ import {
     PlusOutlined,
 } from '@ant-design/icons'
 import DisplayElementView from '../../../components/DisplayElementView'
-import { useMutation, useQuery, UseQueryResult } from 'react-query'
+import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import { Article, Media, Section } from '@prisma/client'
 import { getImageDetail } from '../../../network/images'
 import UploadButton from '../../../components/UploadButton'
@@ -68,6 +68,7 @@ const validate = (values: FullArticleEdit) => {
 const Admin = () => {
     const router = useRouter()
     const { pid } = router.query
+    const queryClient = useQueryClient()
 
     const { values, /*errors,*/ handleSubmit, handleChange, setValues } =
         useFormik<FullArticleEdit>({
@@ -94,24 +95,25 @@ const Admin = () => {
             },
         })
 
-    const article: UseQueryResult<FullArticleEdit, Error> = useQuery<
-        FullArticleEdit,
-        Error
-    >(['pages', { id: pid }], () => getArticleDetails(pid as string), {
-        refetchOnWindowFocus: false,
-        enabled: !!pid && pid !== 'create',
-        onSuccess: (data: FullArticleEdit) => {
-            const sections = get(data, 'sections', [])!.sort(
-                (a, b) => a.position - b.position
-            )
+    const article: UseQueryResult<FullArticleEdit, Error> = useQuery<FullArticleEdit, Error>(
+        ['pages', { id: pid }],
+        () => getArticleDetails(pid as string),
+        {
+            refetchOnWindowFocus: false,
+            enabled: !!pid && pid !== 'create',
+            onSuccess: (data: FullArticleEdit) => {
+                const sections = get(data, 'sections', [])!.sort(
+                    (a, b) => a.position - b.position
+                )
 
-            setValues({ ...data, sections })
-        },
-        onError: (err) => router.push('/admin/articles'),
-    })
+                setValues({ ...data, sections })
+            },
+            onError: (err) => router.push('/admin/articles'),
+        }
+    )
 
     const cover: UseQueryResult<Media, Error> = useQuery<Media, Error>(
-        ['images', { id: values.coverId }],
+        ['medias', { id: values.coverId }],
         () => getImageDetail(values?.coverId!),
         {
             refetchOnWindowFocus: false,
@@ -127,10 +129,12 @@ const Admin = () => {
         {
             onSuccess: (data: Article) => {
                 message.success(`Article ${data.title} saved`)
+                queryClient.invalidateQueries('images')
                 router.push('/admin/articles')
             },
             onError: (err) => {
                 message.error('An error occured, while creating or updating the article')
+                queryClient.invalidateQueries('images')
                 router.push('/admin/articles')
             },
         }
@@ -185,7 +189,7 @@ const Admin = () => {
         return (
             <div
                 style={{
-                    height: '50vh',
+                    height: 'calc(100vh - 29px)',
                     width: '100vw',
                     display: 'flex',
                     justifyContent: 'center',
@@ -205,6 +209,7 @@ const Admin = () => {
                 size="large"
                 style={{
                     width: '100%',
+                    minHeight: 'calc(100vh - 29px)',
                     padding: 15,
                     backgroundColor: '#f0f2f5',
                 }}
@@ -332,8 +337,7 @@ const Admin = () => {
                                     />
                                     <Button
                                         disabled={
-                                            idx ===
-                                            get(values, 'sections', [])!.length - 1
+                                            idx === get(values, 'sections', [])!.length - 1
                                         }
                                         onClick={() => SectionDown(idx)}
                                         type="primary"
@@ -350,10 +354,7 @@ const Admin = () => {
                                                 section={section.type || undefined}
                                                 element={section.elementId || undefined}
                                                 onSectionChange={(e) =>
-                                                    onHandleChange(
-                                                        `sections.${idx}.type`,
-                                                        e
-                                                    )
+                                                    onHandleChange(`sections.${idx}.type`, e)
                                                 }
                                                 onElementChange={(e) =>
                                                     onHandleChange(
@@ -380,10 +381,7 @@ const Admin = () => {
                                             type={section.type}
                                             defaultValues={section.content}
                                             onChange={(e) =>
-                                                onHandleChange(
-                                                    `sections.${idx}.content`,
-                                                    e
-                                                )
+                                                onHandleChange(`sections.${idx}.content`, e)
                                             }
                                         />
                                     )}

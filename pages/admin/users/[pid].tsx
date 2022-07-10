@@ -12,6 +12,8 @@ import {
     Typography,
     Select,
     Card,
+    message,
+    Spin,
 } from 'antd'
 // import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import get from 'lodash.get'
@@ -19,13 +21,14 @@ import get from 'lodash.get'
 import { Prisma } from '@prisma/client'
 // import type { Page } from '@prisma/client'
 import { postUser, editUser, getUser } from '../../../network/users'
-import { UseQueryResult, useQuery, useMutation } from 'react-query'
+import { UseQueryResult, useQuery, useMutation, useQueryClient } from 'react-query'
 import { FullUser, UserCreation } from '@types'
+import CustomSelect from '@components/CustomSelect'
 
 const { Text, Title } = Typography
 
 const initialValues: UserCreation = {
-    type: 'user',
+    type: '',
     name: '',
     email: '',
     password: '',
@@ -58,9 +61,9 @@ const validate = (values: UserCreation) => {
 }
 
 const UsersCreation = () => {
-    const [loading, setLoading] = useState(false)
     const router = useRouter()
     const { pid } = router.query
+    const queryClient = useQueryClient()
 
     const { values, /*errors,*/ handleChange, handleSubmit, setValues } =
         useFormik<UserCreation>({
@@ -77,51 +80,51 @@ const UsersCreation = () => {
             enabled: !!pid && pid !== 'create',
             onSuccess: (data: FullUser) =>
                 setValues({
-                    type: data.type,
-                    name: '',
-                    email: '',
+                    type: data.login?.typeId,
+                    name: data.name,
+                    email: data.login?.email,
                 }),
             onError: (err) => router.push('/admin/users'),
         }
     )
 
-    // const mutation = useMutation(
-    //     (data: { pid: string; values: UserCreation }) =>
-    //         data.pid === 'create'
-    //             ? postUser(data.values)
-    //             : editUser(data.pid, data.values),
-    //     {
-    //         onSuccess: (data: Element) => {
-    //             message.success(`Element ${data.title} saved`)
-    //             router.push('/admin/elements')
-    //         },
-    //         onError: (err) => {
-    //             message.error('An error occured, while creating or updating the element')
-    //             router.push('/admin/elements')
-    //         },
-    //     }
-    // )
+    const mutation = useMutation(
+        (data: { pid: string; values: UserCreation }) =>
+            data.pid === 'create' ? postUser(data.values) : editUser(data.pid, data.values),
+        {
+            onSuccess: (data: FullUser) => {
+                message.success(`Element ${data.name} saved`)
+                queryClient.invalidateQueries('users')
+                router.push('/admin/users')
+            },
+            onError: (err) => {
+                message.error('An error occured, while creating or updating the element')
+                queryClient.invalidateQueries('users')
+                router.push('/admin/users')
+            },
+        }
+    )
 
     const onHandleChange = (name: string, value: any) => {
         handleChange({ target: { name, value } })
     }
 
-    // if (user.isLoading || !pid) {
-    //     return (
-    //         <div
-    //             style={{
-    //                 height: '50vh',
-    //                 width: '100vw',
-    //                 display: 'flex',
-    //                 justifyContent: 'center',
-    //                 alignItems: 'center',
-    //                 backgroundColor: '#f0f2f5',
-    //             }}
-    //         >
-    //             <Spin size="large" tip="Loading..." />
-    //         </div>
-    //     )
-    // }
+    if (user.isLoading || !pid) {
+        return (
+            <div
+                style={{
+                    height: 'calc(100vh - 29px)',
+                    width: '100vw',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#f0f2f5',
+                }}
+            >
+                <Spin size="large" tip="Loading..." />
+            </div>
+        )
+    }
 
     return (
         <form onSubmit={handleSubmit}>
@@ -130,6 +133,7 @@ const UsersCreation = () => {
                 size="large"
                 style={{
                     width: '100%',
+                    minHeight: 'calc(100vh - 29px)',
                     padding: 15,
                     backgroundColor: '#f0f2f5',
                 }}
@@ -161,10 +165,12 @@ const UsersCreation = () => {
 
                                 <Space direction="vertical">
                                     <Text>Type</Text>
-                                    <Select
+                                    <CustomSelect.ListUserTypes
                                         value={values.type}
-                                        style={{ width: 240 }}
                                         onChange={(e) => onHandleChange('type', e)}
+                                    />
+                                    {/* <Select
+                                        style={{ width: 240 }}
                                         disabled={values.type === 'super-admin'}
                                     >
                                         <Select.Option value="user">User</Select.Option>
@@ -174,7 +180,7 @@ const UsersCreation = () => {
                                                 Admin
                                             </Select.Option>
                                         )}
-                                    </Select>
+                                    </Select> */}
                                 </Space>
                             </Space>
                             <Divider />

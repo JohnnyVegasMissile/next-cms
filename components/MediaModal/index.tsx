@@ -19,7 +19,7 @@ const MediaModal = ({ value, onMediaSelected }: Props) => {
     const [visible, setVisible] = useState(false)
     const [selected, setSelected] = useState<Media | null>(value || null)
     const files: UseQueryResult<Media[], Error> = useQuery<Media[], Error>(
-        ['images'],
+        ['medias', { type: 'images' }],
         () => getImages(),
         {
             refetchOnWindowFocus: false,
@@ -102,7 +102,7 @@ const MediaModal = ({ value, onMediaSelected }: Props) => {
 
 const columns = [
     {
-        width: 85,
+        width: 75,
         render: (image: Media) => (
             <Image
                 width={50}
@@ -126,6 +126,7 @@ const columns = [
         ),
     },
     {
+        width: 150,
         title: 'Upload Time',
         dataIndex: 'uploadTime',
         render: (e: Date) => moment(e).fromNow(),

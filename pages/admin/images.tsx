@@ -19,16 +19,20 @@ import {
 import type { Media } from '@prisma/client'
 import { useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import get from 'lodash.get'
+import trim from 'lodash.trim'
 
 import UploadButton from '../../components/UploadButton'
 import { getImages, deleteImage, editImage } from '../../network/images'
 import Link from 'next/link'
 import moment from 'moment'
+import useDebounce from '../../hooks/useDebounce'
 
 const AdminImages = () => {
+    const [q, setQ] = useState<string | undefined>()
+    const debouncedQ = useDebounce<string | undefined>(q, 750)
     const queryClient = useQueryClient()
     const files: UseQueryResult<Media[], Error> = useQuery<Media[], Error>(
-        ['images'],
+        ['medias', { type: 'image', q: trim(debouncedQ)?.toLocaleLowerCase() || undefined }],
         () => getImages(),
         {
             refetchOnWindowFocus: false,
@@ -56,10 +60,10 @@ const AdminImages = () => {
     }
 
     function bytesToSize(bytes: number) {
-        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+        let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
         if (bytes === 0 || !bytes) return '0 Byte'
 
-        var i = Math.floor(Math.log(bytes) / Math.log(1024))
+        let i = Math.floor(Math.log(bytes) / Math.log(1024))
         return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i]
     }
 
@@ -89,25 +93,19 @@ const AdminImages = () => {
             ),
         },
         {
+            width: 256,
+            title: 'Alt',
+            // dataIndex: 'alt',
+            render: (e: Media) => <AltInput id={e.id} value={e.alt || ''} />,
+        },
+        {
+            width: 150,
             title: 'size',
             dataIndex: 'size',
             render: bytesToSize,
         },
         {
-            width: 256,
-            title: 'Alt',
-            dataIndex: 'alt',
-            render: (alt: string) => (
-                <Form.Item
-                    style={{ margin: 0 }}
-                    hasFeedback
-                    validateStatus="success" /*"warning"*/
-                >
-                    <Input placeholder="Alt" defaultValue={alt} style={{ width: 240 }} />
-                </Form.Item>
-            ),
-        },
-        {
+            width: 150,
             title: 'Upload Time',
             dataIndex: 'uploadTime',
             render: (e: Date) => moment(e).fromNow(),
@@ -131,88 +129,48 @@ const AdminImages = () => {
     ]
 
     return (
-        <>
-            {/* <Row gutter={[8, 16]} style={{ width: '100%', padding: 15 }}>
-                <Col span={24}>
-                    <UploadButton onFileRecieved={addFile} />
-                </Col>
-                {files.isLoading && <div>Loading...</div>}
-                {get(files, 'data', []).map((img, idx) => (
-                    <Col key={idx} className="gutter-row" span={6}>
-                        <ImageCard img={img} onDelete={deleteFile} onEdit={editImage} />
-                    </Col>
-                ))}
-            </Row> */}
-            <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Space>
-                        <Input placeholder="Search" />
-                        <Input placeholder="Type" />
-                    </Space>
-                    <UploadButton onFileRecieved={addFile} />
-                </div>
-                <Table
-                    bordered={false}
-                    loading={files.isLoading}
-                    dataSource={get(files, 'data', [])}
-                    columns={columns}
-                    size="small"
-                    scroll={{ y: 'calc(100vh - 160px)' }}
-                    pagination={{
-                        hideOnSinglePage: true,
-                        pageSize: get(files, 'data', []).length,
-                    }}
+        <Space
+            direction="vertical"
+            size="large"
+            style={{
+                width: '100%',
+                padding: 15,
+                backgroundColor: '#f0f2f5',
+                minHeight: 'calc(100vh - 29px)',
+            }}
+        >
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Input
+                    placeholder="Search"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    style={{ width: 180 }}
                 />
-            </Space>
-        </>
+                <UploadButton onFileRecieved={addFile} />
+            </div>
+            <Table
+                bordered={false}
+                loading={files.isLoading}
+                dataSource={get(files, 'data', [])}
+                columns={columns}
+                size="small"
+                scroll={{ y: 'calc(100vh - 160px)' }}
+                pagination={{
+                    hideOnSinglePage: true,
+                    pageSize: get(files, 'data', []).length,
+                }}
+            />
+        </Space>
     )
 }
-// interface ImageCardProps {
-//     img: Media
-//     onDelete(id: number | string): void
-//     onEdit(id: number | string, alt: string): void
-// }
 
-// const ImageCard = ({ img, onDelete, onEdit }: ImageCardProps) => {
-//     const [alt, setAlt] = useState<string>(img.alt || '')
-
-//     return (
-//         <Card
-//             title={
-//                 <Tooltip title={img.name}>
-//                     <span>{img.name}</span>
-//                 </Tooltip>
-//             }
-//             extra={
-//                 <Button
-//                     onClick={() => onDelete(img.id)}
-//                     shape="circle"
-//                     type="dashed"
-//                     icon={<CloseOutlined />}
-//                 />
-//             }
-//         >
-//             <Space direction="vertical" style={{ width: '100%', alignItems: 'center' }}>
-//                 <Image
-//                     width={200}
-//                     height={200}
-//                     src={`${process.env.UPLOADS_IMAGES_DIR}/${img.uri}`}
-//                     alt=""
-//                 />
-//                 <Space>
-//                     <Input.Search
-//                         value={alt}
-//                         onChange={(e) => setAlt(e.target.value)}
-//                         addonBefore="Alt :"
-//                         // placeholder="Alt"
-//                         onSearch={(e) => onEdit(img.id, e)}
-//                         enterButton={<CheckOutlined />}
-//                     />
-//                 </Space>
-//             </Space>
-//         </Card>
-//     )
-// }
+const AltInput = ({ id, value }: { id: string; value: string }) => {
+    return (
+        <Form.Item style={{ margin: 0 }} hasFeedback validateStatus="success" /*"warning"*/>
+            <Input placeholder="Alt" defaultValue={value} style={{ width: 240 }} />
+        </Form.Item>
+    )
+}
 
 AdminImages.requireAuth = true
 

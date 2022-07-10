@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client'
+import { useState } from 'react'
 import {
     Space,
     Button,
@@ -10,31 +10,67 @@ import {
     Popconfirm,
     Modal,
     Input,
+    Select,
 } from 'antd'
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
-import { useQuery, UseQueryResult } from 'react-query'
-import { getPages, deletePage } from '../../../network/pages'
 import get from 'lodash.get'
+import trim from 'lodash.trim'
+import type { Page } from '@prisma/client'
+import { useQuery, UseQueryResult } from 'react-query'
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
+
+import useDebounce from '../../../hooks/useDebounce'
+import { getPages, deletePage } from '../../../network/pages'
+import { PageTypes } from '../../../types'
 
 const { confirm } = Modal
+const { Option } = Select
 
 const AdminPages = () => {
+    const [q, setQ] = useState<string | undefined>()
+    const [type, setType] = useState<PageTypes | undefined>()
+    const debouncedQ = useDebounce<string | undefined>(q, 750)
     const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
-        ['pages'],
-        () => getPages(),
+        ['pages', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, type }],
+        () => getPages(type, trim(debouncedQ)?.toLocaleLowerCase()),
         {
             refetchOnWindowFocus: false,
         }
     )
 
     return (
-        <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
+        <Space
+            direction="vertical"
+            size="large"
+            style={{
+                width: '100%',
+                padding: 15,
+                backgroundColor: '#f0f2f5',
+                minHeight: 'calc(100vh - 29px)',
+            }}
+        >
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Space>
-                    <Input placeholder="Search" />
-                    <Input placeholder="Type" />
+                    <Input
+                        value={q}
+                        allowClear
+                        placeholder="Search"
+                        style={{ width: 180 }}
+                        onChange={(e) => setQ(e.target.value)}
+                    />
+                    <Select
+                        allowClear
+                        value={type}
+                        onChange={setType}
+                        placeholder="Type"
+                        style={{ width: 180 }}
+                    >
+                        <Option value="page">Page</Option>
+                        <Option value="list">List</Option>
+                        <Option value="home">Homepage</Option>
+                        <Option value="error">Not found</Option>
+                    </Select>
                 </Space>
                 <Link href="/admin/pages/create">
                     <a>

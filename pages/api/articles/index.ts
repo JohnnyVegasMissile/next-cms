@@ -1,11 +1,36 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-// import type { Page, Metadata, Section, Article } from '@prisma/client'
-// import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const article = await prisma.article.findMany({ include: { page: true } })
+    const pageId = req.query.pageId as string | undefined
+    const q = req.query.q as string | undefined
+
+    let search: any = { where: {} }
+
+    if (!!pageId) {
+        search.where.pageId = pageId
+    }
+
+    if (!!q) {
+        const sliptedQ = q.split(' ')
+
+        if (sliptedQ.length === 1) {
+            search.where.title = {
+                contains: q,
+            }
+        } else {
+            let OR = sliptedQ.map((word) => ({
+                title: {
+                    contains: word,
+                },
+            }))
+
+            search.where.OR = OR
+        }
+    }
+
+    const article = await prisma.article.findMany({ ...search, include: { page: true } })
 
     return res.status(200).json(article)
 }

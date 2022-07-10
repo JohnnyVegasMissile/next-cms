@@ -10,30 +10,66 @@ import {
     // Typography,
     Popconfirm,
     Input,
+    Select,
 } from 'antd'
 import Link from 'next/link'
 // import moment from 'moment'
 import { useQuery, UseQueryResult } from 'react-query'
 import { getUsers } from '../../../network/users'
-import type { FullUser } from '../../../types'
+import type { FullUser, UserRoleTypes } from '../../../types'
 import get from 'lodash.get'
+import trim from 'lodash.trim'
 import { PlusOutlined } from '@ant-design/icons'
+import { useState } from 'react'
+import useDebounce from '../../../hooks/useDebounce'
+import CustomSelect from '@components/CustomSelect'
+
+const { Option } = Select
 
 const AdminUsers = () => {
+    const [q, setQ] = useState<string | undefined>()
+    const [typeId, setTypeId] = useState<string | undefined>()
+    const debouncedQ = useDebounce<string | undefined>(q, 750)
     const users: UseQueryResult<User[], Error> = useQuery<User[], Error>(
-        ['users'],
-        () => getUsers(),
+        ['users', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, typeId }],
+        () => getUsers(typeId, trim(debouncedQ)?.toLocaleLowerCase()),
         {
             refetchOnWindowFocus: false,
         }
     )
 
     return (
-        <Space direction="vertical" size="large" style={{ width: '100%', padding: 15 }}>
+        <Space
+            direction="vertical"
+            size="large"
+            style={{
+                width: '100%',
+                padding: 15,
+                backgroundColor: '#f0f2f5',
+                minHeight: 'calc(100vh - 29px)',
+            }}
+        >
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Space>
-                    <Input placeholder="Search" />
-                    <Input placeholder="Role" />
+                    <Input
+                        value={q}
+                        allowClear
+                        placeholder="Search"
+                        style={{ width: 180 }}
+                        onChange={(e) => setQ(e.target.value)}
+                    />
+
+                    <CustomSelect.ListUserTypes value={typeId} onChange={setTypeId} />
+                    {/* <Select
+                        allowClear
+                        value={type}
+                        onChange={setType}
+                        placeholder="Role"
+                        style={{ width: 180 }}
+                    >
+                        <Option value="admin">Admin</Option>
+                        <Option value="user">User</Option>
+                    </Select> */}
                 </Space>
                 <Link href="/admin/users/create">
                     <a>
@@ -68,17 +104,16 @@ const columns = [
         title: 'Type',
         dataIndex: 'login',
         render: (e: Login) => {
+            const type: string = get(e, 'type.id', '')
+            const color =
+                type === 'super-admin' ? 'magenta' : type === 'admin' ? 'red' : 'blue'
             const types = {
                 admin: { label: 'Admin', color: 'red' },
                 'super-admin': { label: 'Admin', color: 'magenta' },
                 user: { label: 'User', color: 'blue' },
             }
 
-            return (
-                <Tag color={get(types, e?.type, types.user).color}>
-                    {get(types, e?.type, types.user).label}
-                </Tag>
-            )
+            return <Tag color={color}>{get(e, 'type.name', '')}</Tag>
         },
     },
     {
@@ -103,7 +138,7 @@ const columns = [
                 <Popconfirm
                     placement="topRight"
                     title={'ho la la'}
-                    disabled={e?.login?.type === 'super-admin'}
+                    // disabled={e?.login?.type === 'super-admin'}
                     onConfirm={() => {
                         fetch(`/api/users/${e.id}`, {
                             method: 'DELETE',
@@ -112,7 +147,7 @@ const columns = [
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button danger disabled={e?.login?.type === 'super-admin'}>
+                    <Button danger /*disabled={e?.login?.type === 'super-admin'}*/>
                         Delete
                     </Button>
                 </Popconfirm>

@@ -90,9 +90,17 @@ model Login {
   userId            String          @unique
   user              User            @relation(fields: [userId], references: [id])
   sessions          Session[]
-  type              String          @default("user") // user admin super-admin
+  typeId            String
+  type              UserType        @relation(fields: [typeId], references: [id])
   email             String          @unique
   password          String
+  updatedAt         DateTime        @updatedAt
+}
+
+model UserType {
+  id                String          @id @default(cuid())
+  name              String
+  logins            Login[]
   updatedAt         DateTime        @updatedAt
 }
 

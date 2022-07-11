@@ -31,12 +31,12 @@ export const editUser = (id: string, data: any): Promise<FullUser> =>
             .catch(reject)
     })
 
-export const getUsers = (typeId?: string, q?: string): Promise<FullUser[]> =>
+export const getUsers = (roleId?: string, q?: string): Promise<FullUser[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
             url: `/api/users`,
-            params: { typeId, q },
+            params: { roleId, q },
         })
             .then(resolve)
             .catch(reject)

@@ -1,10 +1,7 @@
 import { User } from '@prisma/client'
+import { AuthResponse } from '../types'
 
 import INSTANCE from './api'
-
-interface AuthResponse {
-    user: User
-}
 
 export const signUp = (
     email: string,
@@ -25,10 +22,7 @@ export const signUp = (
             .catch(reject)
     })
 
-export const signIn = (
-    email: string,
-    password: string
-): Promise<AuthResponse> =>
+export const signIn = (email: string, password: string): Promise<AuthResponse> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',

@@ -48,8 +48,10 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const sections: Section[] = get(req, 'body.sections', [])
     const metadatas: Metadata[] = get(req, 'body.metadatas', [])
+    const accesses: string[] = get(req, 'body.accesses', [])
     delete newPageContent.sections
     delete newPageContent.metadatas
+    delete newPageContent.accesses
     // delete newPageContent.articles
 
     const page: Page = await prisma.page.create({
@@ -57,6 +59,9 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             ...(newPageContent as Prisma.PageCreateInput),
             metadatas: { create: metadatas },
             sections: { create: sections },
+            accesses: {
+                create: accesses.map((access) => ({ roleId: access })),
+            },
         },
     })
 

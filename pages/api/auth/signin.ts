@@ -8,7 +8,7 @@ import { prisma } from '../../../utils/prisma'
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
         const { email, password } = req.body
-        if (!isEmail(email)) {
+        if (!email /* || !isEmail(email)*/) {
             return res.status(400).json({
                 errors: [
                     {
@@ -34,6 +34,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             where: { email },
             include: { user: true },
         })
+
         if (!login) {
             throw new Error('No login found')
         }
@@ -54,8 +55,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             detail: 'Successfully validated login credentials',
             token: session.token,
             expiresAt: session.expiresAt,
-            // type: login.type,
-            user: { ...login.user, type: login.type },
+            user: { ...login.user, role: login.roleId, email: login.email },
         })
     } catch (err) {
         res.status(401).json({ errors: err })

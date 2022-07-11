@@ -11,11 +11,10 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const user = await prisma.user.findUnique({
         where: { id },
-        // include: { login: true },
         include: {
             login: {
                 select: {
-                    type: true,
+                    role: true,
                     email: true,
                 },
             },
@@ -30,7 +29,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const { type, name, password, email } = req.body
+    const { roleId, name, password, email } = req.body
 
     const updatedUser = await prisma.user.update({
         where: { id },
@@ -48,12 +47,15 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         where: { userId: id },
         data: {
             password: hash,
-            typeId: type,
+            roleId,
             email,
         },
     })
 
-    return res.status(200).json({ ...updatedUser, type: updatedLogin.typeId, email })
+    return res.status(200).json({
+        ...updatedUser,
+        login: { roleId: updatedLogin.roleId, email: updatedLogin.email },
+    })
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

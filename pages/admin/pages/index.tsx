@@ -23,6 +23,7 @@ import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import useDebounce from '../../../hooks/useDebounce'
 import { getPages, deletePage } from '../../../network/pages'
 import { PageTypes } from '../../../types'
+import Head from 'next/head'
 
 const { confirm } = Modal
 const { Option } = Select
@@ -40,59 +41,65 @@ const AdminPages = () => {
     )
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{
-                width: '100%',
-                padding: 15,
-                backgroundColor: '#f0f2f5',
-                minHeight: 'calc(100vh - 29px)',
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Space>
-                    <Input
-                        value={q}
-                        allowClear
-                        placeholder="Search"
-                        style={{ width: 180 }}
-                        onChange={(e) => setQ(e.target.value)}
-                    />
-                    <Select
-                        allowClear
-                        value={type}
-                        onChange={setType}
-                        placeholder="Type"
-                        style={{ width: 180 }}
-                    >
-                        <Option value="page">Page</Option>
-                        <Option value="list">List</Option>
-                        <Option value="home">Homepage</Option>
-                        <Option value="error">Not found</Option>
-                    </Select>
-                </Space>
-                <Link href="/admin/pages/create">
-                    <a>
-                        <Button type="primary" icon={<PlusOutlined />}>
-                            Create
-                        </Button>
-                    </a>
-                </Link>
-            </div>
-            <Table
-                bordered={false}
-                loading={pages.isLoading}
-                dataSource={get(pages, 'data', [])}
-                columns={columns}
-                size="small"
-                scroll={{ y: 'calc(100vh - 300px)' }}
-                pagination={{
-                    hideOnSinglePage: true,
-                    pageSize: get(pages, 'data', []).length,
+        <>
+            <Head>
+                <title>Admin - Pages</title>
+            </Head>
+
+            <Space
+                direction="vertical"
+                size="large"
+                style={{
+                    width: '100%',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                    minHeight: 'calc(100vh - 29px)',
                 }}
-            />
-        </Space>
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Space>
+                        <Input
+                            value={q}
+                            allowClear
+                            placeholder="Search"
+                            style={{ width: 180 }}
+                            onChange={(e) => setQ(e.target.value)}
+                        />
+                        <Select
+                            allowClear
+                            value={type}
+                            onChange={setType}
+                            placeholder="Type"
+                            style={{ width: 180 }}
+                        >
+                            <Option value="page">Page</Option>
+                            <Option value="list">List</Option>
+                            <Option value="home">Homepage</Option>
+                            <Option value="error">Not found</Option>
+                        </Select>
+                    </Space>
+                    <Link href="/admin/pages/create">
+                        <a>
+                            <Button type="primary" icon={<PlusOutlined />}>
+                                Create
+                            </Button>
+                        </a>
+                    </Link>
+                </div>
+                <Table
+                    bordered={false}
+                    loading={pages.isLoading}
+                    dataSource={get(pages, 'data', [])}
+                    columns={columns}
+                    size="small"
+                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    pagination={{
+                        hideOnSinglePage: true,
+                        pageSize: get(pages, 'data', []).length,
+                    }}
+                />
+            </Space>
+        </>
     )
 }
 
@@ -120,12 +127,13 @@ const columns = [
     {
         title: 'Type',
         dataIndex: 'type',
-        render: (e: 'home' | 'error' | 'page' | 'list') => {
+        render: (e: 'home' | 'error' | 'signin' | 'page' | 'list') => {
             const types = {
                 home: { label: 'Homepage', color: '#108ee9' },
                 error: { label: 'Not Found', color: '#f50' },
                 page: { label: 'Page', color: '#2db7f5' },
                 list: { label: 'List', color: '#87d068' },
+                signin: { label: 'Sign In', color: '#1d39c4' },
             }
 
             return <Tag color={types[e].color}>{types[e].label}</Tag>
@@ -193,12 +201,12 @@ const columns = [
                     <Popconfirm
                         placement="topRight"
                         title={'Are you sur to delete this page?'}
-                        disabled={e.type === 'error' || e.type === 'home'}
+                        disabled={e.type !== 'page' && e.type !== 'list'}
                         onConfirm={() => deletePage(e.id)}
                         okText="Delete"
                         cancelText="Cancel"
                     >
-                        <Button danger disabled={e.type === 'error' || e.type === 'home'}>
+                        <Button danger disabled={e.type !== 'page' && e.type !== 'list'}>
                             Delete
                         </Button>
                     </Popconfirm>

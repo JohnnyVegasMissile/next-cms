@@ -2,7 +2,7 @@ import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 // import Router, { useRouter } from 'next/router'
 // import { PrismaClient } from '@prisma/client'
-import type { Article, Metadata } from '@prisma/client'
+import type { Access, Article, Metadata } from '@prisma/client'
 import { FullArticle, FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
@@ -10,11 +10,23 @@ import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { Affix, Button } from 'antd'
 import SectionBlock from '../components/SectionBlock'
+import EditPageButton from '../components/EditPageButton'
 import get from 'lodash.get'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 const Pages = (props: FullPage | FullArticle) => {
+    const router = useRouter()
     // const { id, title, metadatas, sections, type, header, footer } = props
-    const { isAuth } = useAuth()
+    const { isAuth, user } = useAuth()
+
+    useEffect(() => {
+        const access: Access[] = get(props, 'accesses', get(props, 'page.accesses', []))
+
+        // if (!!access.length && ) {
+        //     router.push('/')
+        // }
+    }, [user?.role])
 
     return (
         <div>
@@ -35,23 +47,11 @@ const Pages = (props: FullPage | FullArticle) => {
                 )}
             </Head>
 
-            {isAuth && (
-                <Affix offsetTop={33}>
-                    <Button
-                        size="small"
-                        type="primary"
-                        style={{ position: 'absolute', right: 5 }}
-                    >
-                        <Link
-                            href={`/admin/${
-                                !!get(props, 'type', false) ? 'pages' : 'articles'
-                            }/${props.id}`}
-                        >
-                            <a>Edit</a>
-                        </Link>
-                    </Button>
-                </Affix>
-            )}
+            <EditPageButton
+                redirectTo={`/admin/${!!get(props, 'type', false) ? 'pages' : 'articles'}/${
+                    props.id
+                }`}
+            />
 
             <header>
                 {!!get(props, 'header', false) && (
@@ -100,6 +100,7 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
             sections: true,
             header: true,
             footer: true,
+            accesses: true,
         },
     })
 

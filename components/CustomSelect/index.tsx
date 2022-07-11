@@ -1,12 +1,12 @@
 import { Cascader, Select, Typography } from 'antd'
 import { useQuery, UseQueryResult /*, useQueryClient*/ } from 'react-query'
-import type { Page, UserType } from '@prisma/client'
+import type { Page, Role } from '@prisma/client'
 import { getPages } from '../../network/pages'
 import get from 'lodash.get'
 import { getElements } from '../../network/elements'
 import type { Element } from '@prisma/client'
 import Blocks from '../../blocks'
-import { getUserTypes } from '@network/userTypes'
+import { getRoles } from '../../network/roles'
 
 const { Option } = Select
 const { Title, Text } = Typography
@@ -84,16 +84,18 @@ const ListElements = ({
     )
 }
 
-const ListUserTypes = ({
+const ListRoles = ({
     value,
     onChange,
+    width = 240,
 }: {
     value?: string
     onChange(value: string | undefined): void
+    width?: number
 }) => {
-    const userTypes: UseQueryResult<UserType[], Error> = useQuery<UserType[], Error>(
-        ['userTypes', {}],
-        () => getUserTypes(),
+    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(
+        ['roles', {}],
+        () => getRoles(),
         {
             refetchOnWindowFocus: false,
         }
@@ -105,15 +107,17 @@ const ListUserTypes = ({
             placeholder="Please select"
             value={value}
             onChange={onChange}
-            style={{ width: 240, fontWeight: 'normal' }}
-            status={userTypes.isError ? 'error' : undefined}
-            loading={userTypes.isLoading}
+            style={{ width, fontWeight: 'normal' }}
+            status={roles.isError ? 'error' : undefined}
+            loading={roles.isLoading}
         >
-            {userTypes.data?.map((e) => (
-                <Select.Option key={e.id} value={e.id}>
-                    {e.name}
-                </Select.Option>
-            ))}
+            {roles.data
+                ?.filter((e) => e.id !== 'super-admin')
+                ?.map((e) => (
+                    <Select.Option key={e.id} value={e.id}>
+                        {e.name}
+                    </Select.Option>
+                ))}
         </Select>
     )
 }
@@ -196,6 +200,6 @@ const SectionCascader = ({
 CustomSelect.ListPages = ListPages
 CustomSelect.ListElements = ListElements
 CustomSelect.ListSections = SectionCascader
-CustomSelect.ListUserTypes = ListUserTypes
+CustomSelect.ListRoles = ListRoles
 
 export default CustomSelect

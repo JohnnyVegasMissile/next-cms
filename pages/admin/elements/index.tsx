@@ -10,6 +10,7 @@ import trim from 'lodash.trim'
 import useDebounce from '../../../hooks/useDebounce'
 import { useState } from 'react'
 import Blocks from '../../../blocks'
+import Head from 'next/head'
 
 const { Option } = Select
 
@@ -26,60 +27,66 @@ const AdminElements = () => {
     )
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{
-                width: '100%',
-                padding: 15,
-                backgroundColor: '#f0f2f5',
-                minHeight: 'calc(100vh - 29px)',
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Space>
-                    <Input
-                        value={q}
-                        allowClear
-                        placeholder="Search"
-                        style={{ width: 180 }}
-                        onChange={(e) => setQ(e.target.value)}
-                    />
-                    <Select
-                        allowClear
-                        value={type}
-                        onChange={setType}
-                        placeholder="Block"
-                        style={{ width: 180 }}
-                    >
-                        {Object.keys(Blocks).map((key) => (
-                            <Option key={key} value={key}>
-                                {get(Blocks, `${key}.name`, '')}
-                            </Option>
-                        ))}
-                    </Select>
-                </Space>
-                <Link href="/admin/elements/create">
-                    <a>
-                        <Button type="primary" icon={<PlusOutlined />}>
-                            Create
-                        </Button>
-                    </a>
-                </Link>
-            </div>
-            <Table
-                bordered={false}
-                loading={elements.isLoading}
-                dataSource={get(elements, 'data', [])}
-                columns={columns}
-                size="small"
-                scroll={{ y: 'calc(100vh - 300px)' }}
-                pagination={{
-                    hideOnSinglePage: true,
-                    pageSize: get(elements, 'data', []).length,
+        <>
+            <Head>
+                <title>Admin - Elements</title>
+            </Head>
+
+            <Space
+                direction="vertical"
+                size="large"
+                style={{
+                    width: '100%',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                    minHeight: 'calc(100vh - 29px)',
                 }}
-            />
-        </Space>
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Space>
+                        <Input
+                            value={q}
+                            allowClear
+                            placeholder="Search"
+                            style={{ width: 180 }}
+                            onChange={(e) => setQ(e.target.value)}
+                        />
+                        <Select
+                            allowClear
+                            value={type}
+                            onChange={setType}
+                            placeholder="Block"
+                            style={{ width: 180 }}
+                        >
+                            {Object.keys(Blocks).map((key) => (
+                                <Option key={key} value={key}>
+                                    {get(Blocks, `${key}.name`, '')}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Space>
+                    <Link href="/admin/elements/create">
+                        <a>
+                            <Button type="primary" icon={<PlusOutlined />}>
+                                Create
+                            </Button>
+                        </a>
+                    </Link>
+                </div>
+                <Table
+                    bordered={false}
+                    loading={elements.isLoading}
+                    dataSource={get(elements, 'data', [])}
+                    columns={columns}
+                    size="small"
+                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    pagination={{
+                        hideOnSinglePage: true,
+                        pageSize: get(elements, 'data', []).length,
+                    }}
+                />
+            </Space>
+        </>
     )
 }
 

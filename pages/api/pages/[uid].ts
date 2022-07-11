@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Page, Metadata, Section } from '@prisma/client'
+import type { Page, Metadata, Section, Access, Prisma } from '@prisma/client'
 import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
@@ -10,7 +10,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const page: Page | null = await prisma.page.findUnique({
         where: { id },
-        include: { metadatas: true, sections: true },
+        include: { metadatas: true, sections: true, accesses: true },
     })
 
     return res.status(200).json(page)
@@ -60,10 +60,28 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
+    // delete existing sections
+    await prisma.access.deleteMany({
+        where: { pageId: id },
+    })
+
+    // create new sections
+    const newAccesses: string[] = get(req, 'body.accesses', [])
+    delete newPageContent.accesses
+
+    for (const roleId of newAccesses) {
+        await prisma.access.create({
+            data: {
+                pageId: id,
+                roleId,
+            },
+        })
+    }
+
     // update the page
     const page = await prisma.page.update({
         where: { id },
-        data: newPageContent,
+        data: newPageContent as Prisma.PageCreateInput,
         include: { metadatas: true, sections: true },
     })
 

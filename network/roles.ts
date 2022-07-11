@@ -1,10 +1,10 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
-import type { Article, UserType } from '@prisma/client'
+import type { Article, Role } from '@prisma/client'
 
 import { FullArticle, FullArticleEdit } from '../types'
 
-export const postUserType = (data: Prisma.UserTypeCreateInput): Promise<UserType> =>
+export const postRole = (data: Prisma.RoleCreateInput): Promise<Role> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
@@ -18,10 +18,7 @@ export const postUserType = (data: Prisma.UserTypeCreateInput): Promise<UserType
             .catch(reject)
     })
 
-export const editUserType = (
-    id: string,
-    data: Prisma.UserTypeCreateInput
-): Promise<UserType> =>
+export const editRole = (id: string, data: Prisma.RoleCreateInput): Promise<Role> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
@@ -35,7 +32,7 @@ export const editUserType = (
             .catch(reject)
     })
 
-export const getUserTypes = (q?: string): Promise<UserType[]> =>
+export const getRoles = (q?: string): Promise<Role[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
@@ -46,7 +43,7 @@ export const getUserTypes = (q?: string): Promise<UserType[]> =>
             .catch(reject)
     })
 
-export const getUserTypeDetails = (id: string): Promise<UserType> =>
+export const getRoleDetails = (id: string): Promise<Role> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
@@ -56,7 +53,7 @@ export const getUserTypeDetails = (id: string): Promise<UserType> =>
             .catch(reject)
     })
 
-export const deleteUserType = (id: string): Promise<void> =>
+export const deleteRole = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',

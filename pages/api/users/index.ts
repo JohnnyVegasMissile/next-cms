@@ -1,25 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { User } from '@prisma/client'
-// import get from 'lodash.get'
 import bcrypt from 'bcryptjs'
 
 import { prisma } from '../../../utils/prisma'
-import { UserRoleTypes } from '../../../types'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const typeId = req.query.typeId as string | undefined
+    const roleId = req.query.roleId as string | undefined
     const q = req.query.q as string | undefined
 
     let search: any = { where: {} }
 
-    if (!!typeId) {
-        if (typeId === 'admin' || typeId === 'super-admin') {
+    if (!!roleId) {
+        if (roleId === 'admin' || roleId === 'super-admin') {
             search.where.login = {
-                OR: [{ typeId: 'admin' }, { typeId: 'super-admin' }],
+                OR: [{ roleId: 'admin' }, { roleId: 'super-admin' }],
             }
         } else {
             search.where.login = {
-                typeId,
+                roleId,
             }
         }
     }
@@ -47,7 +45,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         include: {
             login: {
                 select: {
-                    type: true,
+                    role: true,
                     email: true,
                 },
             },
@@ -67,7 +65,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             name,
             login: {
                 create: {
-                    type,
+                    roleId: type,
                     email,
                     password: hash,
                 },
@@ -76,7 +74,10 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         include: { login: true },
     })
 
-    return res.status(200).json({ ...user, type: user.login?.typeId, login: undefined })
+    return res.status(200).json({
+        ...user,
+        login: { roleId: user.login?.roleId, email: user.login?.email },
+    })
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {

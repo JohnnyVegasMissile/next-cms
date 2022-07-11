@@ -33,6 +33,7 @@ import { Article, Media, Section } from '@prisma/client'
 import { getImageDetail } from '../../../network/images'
 import UploadButton from '../../../components/UploadButton'
 import MediaModal from '@components/MediaModal'
+import Head from 'next/head'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -203,218 +204,230 @@ const Admin = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Space
-                direction="vertical"
-                size="large"
-                style={{
-                    width: '100%',
-                    minHeight: 'calc(100vh - 29px)',
-                    padding: 15,
-                    backgroundColor: '#f0f2f5',
-                }}
-            >
+        <>
+            <Head>
+                <title>Admin - Articles</title>
+            </Head>
+
+            <form onSubmit={handleSubmit}>
                 <Space
                     direction="vertical"
+                    size="large"
                     style={{
                         width: '100%',
+                        minHeight: 'calc(100vh - 29px)',
+                        padding: 15,
+                        backgroundColor: '#f0f2f5',
                     }}
                 >
-                    <Card title="Description">
-                        <Space
-                            direction="vertical"
-                            style={{
-                                width: '100%',
-                            }}
-                        >
-                            <Space size="large">
-                                <Space direction="vertical">
-                                    <Text>Title</Text>
-                                    <Input
-                                        style={{ width: 240 }}
-                                        value={get(values, 'title', '')}
-                                        onChange={(e) =>
-                                            onHandleChange('title', e.target.value)
-                                        }
-                                    />
-                                </Space>
-
-                                <Space direction="vertical">
-                                    <Text>Slug</Text>
-                                    <Input
-                                        style={{ width: 240 }}
-                                        value={get(values, 'slug', '')}
-                                        onChange={(e) =>
-                                            onHandleChange('slug', e.target.value)
-                                        }
-                                    />
-                                </Space>
-
-                                <Space direction="vertical">
-                                    <Text>Page list</Text>
-                                    <CustomSelect.ListPages
-                                        value={values.pageId}
-                                        onChange={(e: string | undefined) =>
-                                            onHandleChange('pageId', e)
-                                        }
-                                    />
-                                </Space>
-
-                                <Space direction="vertical">
-                                    <Text>Status</Text>
-                                    <Radio.Group
-                                        value={values.published}
-                                        onChange={(e) =>
-                                            onHandleChange('published', e.target.value)
-                                        }
-                                    >
-                                        <Radio value={true}>Published</Radio>
-                                        <Radio value={false}>Unpublished</Radio>
-                                    </Radio.Group>
-                                </Space>
-                            </Space>
-                            <Divider />
-                            <Space size="large" align="start">
-                                <Space direction="vertical">
-                                    <Text>Author</Text>
-                                    <Input
-                                        style={{ width: 240 }}
-                                        value={get(values, 'author', '')!}
-                                        onChange={(e) =>
-                                            onHandleChange('author', e.target.value)
-                                        }
-                                    />
-                                </Space>
-
-                                <Space direction="vertical">
-                                    <Text>Description</Text>
-                                    <TextArea
-                                        style={{ width: 240 * 2 + 24 }}
-                                        value={get(values, 'description', '')!}
-                                        onChange={(e) =>
-                                            onHandleChange('description', e.target.value)
-                                        }
-                                        autoSize={{ minRows: 3, maxRows: 6 }}
-                                    />
-                                </Space>
-
-                                <Space direction="vertical">
-                                    <Text>Cover</Text>
-                                    {values.coverId && !cover.isLoading && (
-                                        <Image
-                                            width={200}
-                                            height={200}
-                                            src={`${process.env.UPLOADS_IMAGES_DIR}/${
-                                                cover.data?.uri || ''
-                                            }`}
-                                            alt={cover.data?.alt || ''}
+                    <Space
+                        direction="vertical"
+                        style={{
+                            width: '100%',
+                        }}
+                    >
+                        <Card title="Description">
+                            <Space
+                                direction="vertical"
+                                style={{
+                                    width: '100%',
+                                }}
+                            >
+                                <Space size="large">
+                                    <Space direction="vertical">
+                                        <Text>Title</Text>
+                                        <Input
+                                            style={{ width: 240 }}
+                                            value={get(values, 'title', '')}
+                                            onChange={(e) =>
+                                                onHandleChange('title', e.target.value)
+                                            }
                                         />
-                                    )}
-                                    <MediaModal
-                                        onMediaSelected={(e) =>
-                                            onHandleChange('coverId', e?.id)
-                                        }
-                                    />
+                                    </Space>
+
+                                    <Space direction="vertical">
+                                        <Text>Slug</Text>
+                                        <Input
+                                            style={{ width: 240 }}
+                                            value={get(values, 'slug', '')}
+                                            onChange={(e) =>
+                                                onHandleChange('slug', e.target.value)
+                                            }
+                                        />
+                                    </Space>
+
+                                    <Space direction="vertical">
+                                        <Text>Page list</Text>
+                                        <CustomSelect.ListPages
+                                            value={values.pageId}
+                                            onChange={(e: string | undefined) =>
+                                                onHandleChange('pageId', e)
+                                            }
+                                        />
+                                    </Space>
+
+                                    <Space direction="vertical">
+                                        <Text>Status</Text>
+                                        <Radio.Group
+                                            value={values.published}
+                                            onChange={(e) =>
+                                                onHandleChange('published', e.target.value)
+                                            }
+                                        >
+                                            <Radio value={true}>Published</Radio>
+                                            <Radio value={false}>Unpublished</Radio>
+                                        </Radio.Group>
+                                    </Space>
+                                </Space>
+                                <Divider />
+                                <Space size="large" align="start">
+                                    <Space direction="vertical">
+                                        <Text>Author</Text>
+                                        <Input
+                                            style={{ width: 240 }}
+                                            value={get(values, 'author', '')!}
+                                            onChange={(e) =>
+                                                onHandleChange('author', e.target.value)
+                                            }
+                                        />
+                                    </Space>
+
+                                    <Space direction="vertical">
+                                        <Text>Description</Text>
+                                        <TextArea
+                                            style={{ width: 240 * 2 + 24 }}
+                                            value={get(values, 'description', '')!}
+                                            onChange={(e) =>
+                                                onHandleChange('description', e.target.value)
+                                            }
+                                            autoSize={{ minRows: 3, maxRows: 6 }}
+                                        />
+                                    </Space>
+
+                                    <Space direction="vertical">
+                                        <Text>Cover</Text>
+                                        {values.coverId && !cover.isLoading && (
+                                            <Image
+                                                width={200}
+                                                height={200}
+                                                src={`${process.env.UPLOADS_IMAGES_DIR}/${
+                                                    cover.data?.uri || ''
+                                                }`}
+                                                alt={cover.data?.alt || ''}
+                                            />
+                                        )}
+                                        <MediaModal
+                                            onMediaSelected={(e) =>
+                                                onHandleChange('coverId', e?.id)
+                                            }
+                                        />
+                                    </Space>
                                 </Space>
                             </Space>
-                        </Space>
-                    </Card>
+                        </Card>
 
-                    <Divider />
-                    <Title level={5} style={{ marginLeft: 45 }}>
-                        Page sections
-                    </Title>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        {get(values, 'sections', [])!.map((section, idx) => (
-                            <div key={idx} style={{ display: 'flex', gap: 8 }}>
-                                <Space direction="vertical">
-                                    <Button
-                                        disabled={idx === 0}
-                                        onClick={() => SectionUp(idx)}
-                                        type="primary"
-                                        shape="circle"
-                                        icon={<CaretUpOutlined />}
-                                    />
-                                    <Button
-                                        disabled={
-                                            idx === get(values, 'sections', [])!.length - 1
+                        <Divider />
+                        <Title level={5} style={{ marginLeft: 45 }}>
+                            Page sections
+                        </Title>
+                        <Space direction="vertical" style={{ width: '100%' }}>
+                            {get(values, 'sections', [])!.map((section, idx) => (
+                                <div key={idx} style={{ display: 'flex', gap: 8 }}>
+                                    <Space direction="vertical">
+                                        <Button
+                                            disabled={idx === 0}
+                                            onClick={() => SectionUp(idx)}
+                                            type="primary"
+                                            shape="circle"
+                                            icon={<CaretUpOutlined />}
+                                        />
+                                        <Button
+                                            disabled={
+                                                idx === get(values, 'sections', [])!.length - 1
+                                            }
+                                            onClick={() => SectionDown(idx)}
+                                            type="primary"
+                                            shape="circle"
+                                            icon={<CaretDownOutlined />}
+                                        />
+                                    </Space>
+                                    <Card
+                                        bodyStyle={{ padding: 0 }}
+                                        title={
+                                            <Space>
+                                                <CustomSelect.ListSections
+                                                    page="page"
+                                                    section={section.type || undefined}
+                                                    element={section.elementId || undefined}
+                                                    onSectionChange={(e) =>
+                                                        onHandleChange(
+                                                            `sections.${idx}.type`,
+                                                            e
+                                                        )
+                                                    }
+                                                    onElementChange={(e) =>
+                                                        onHandleChange(
+                                                            `sections.${idx}.elementId`,
+                                                            e
+                                                        )
+                                                    }
+                                                />
+                                            </Space>
                                         }
-                                        onClick={() => SectionDown(idx)}
-                                        type="primary"
-                                        shape="circle"
-                                        icon={<CaretDownOutlined />}
-                                    />
-                                </Space>
-                                <Card
-                                    bodyStyle={{ padding: 0 }}
-                                    title={
-                                        <Space>
-                                            <CustomSelect.ListSections
-                                                page="page"
-                                                section={section.type || undefined}
-                                                element={section.elementId || undefined}
-                                                onSectionChange={(e) =>
-                                                    onHandleChange(`sections.${idx}.type`, e)
-                                                }
-                                                onElementChange={(e) =>
+                                        extra={
+                                            <Button
+                                                type="primary"
+                                                onClick={() => removeSection(idx)}
+                                                danger
+                                                shape="circle"
+                                                icon={<CloseOutlined />}
+                                            />
+                                        }
+                                        style={{ flex: 1 }}
+                                    >
+                                        {!!section.type && (
+                                            <GetEditComponent
+                                                type={section.type}
+                                                defaultValues={section.content}
+                                                onChange={(e) =>
                                                     onHandleChange(
-                                                        `sections.${idx}.elementId`,
+                                                        `sections.${idx}.content`,
                                                         e
                                                     )
                                                 }
                                             />
-                                        </Space>
-                                    }
-                                    extra={
-                                        <Button
-                                            type="primary"
-                                            onClick={() => removeSection(idx)}
-                                            danger
-                                            shape="circle"
-                                            icon={<CloseOutlined />}
-                                        />
-                                    }
-                                    style={{ flex: 1 }}
-                                >
-                                    {!!section.type && (
-                                        <GetEditComponent
-                                            type={section.type}
-                                            defaultValues={section.content}
-                                            onChange={(e) =>
-                                                onHandleChange(`sections.${idx}.content`, e)
-                                            }
-                                        />
-                                    )}
-                                    {!!section.elementId && (
-                                        <DisplayElementView id={section.elementId} />
-                                    )}
-                                </Card>
-                            </div>
-                        ))}
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <Button
-                                type="primary"
-                                shape="round"
-                                icon={<PlusOutlined />}
-                                onClick={addSection}
+                                        )}
+                                        {!!section.elementId && (
+                                            <DisplayElementView id={section.elementId} />
+                                        )}
+                                    </Card>
+                                </div>
+                            ))}
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                }}
                             >
-                                Add section
-                            </Button>
-                        </div>
-                    </Space>
-                    <Divider />
+                                <Button
+                                    type="primary"
+                                    shape="round"
+                                    icon={<PlusOutlined />}
+                                    onClick={addSection}
+                                >
+                                    Add section
+                                </Button>
+                            </div>
+                        </Space>
+                        <Divider />
 
-                    <Button type="primary" htmlType="submit">
-                        Save
-                    </Button>
+                        <Button type="primary" htmlType="submit">
+                            Save
+                        </Button>
+                    </Space>
                 </Space>
-            </Space>
-        </form>
+            </form>
+        </>
     )
 }
 

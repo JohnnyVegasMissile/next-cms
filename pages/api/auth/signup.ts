@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import bcrypt from 'bcryptjs'
-// import type { Login, /* Session,*/ User } from '@prisma/client'
+import type { Login, /* Session,*/ User } from '@prisma/client'
 
 import { isEmail, initSession } from '../../../utils'
 import { prisma } from '../../../utils/prisma'
@@ -9,7 +9,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
         const { email, password, name } = req.body
 
-        if (!isEmail(email)) {
+        if (!isEmail(email) && typeof email !== 'string') {
             throw new Error('Email must be a valid email address.')
         }
 
@@ -17,34 +17,37 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             throw new Error('Password must be a string.')
         }
 
+        if (typeof name !== 'string') {
+            throw new Error('Name must be a string.')
+        }
+
         const hash = await bcrypt.hash(password, 10)
 
-        const user = await prisma.user.create({
+        const login = await prisma.login.create({
             data: {
-                name,
-                login: {
+                email: email as string,
+                password: hash as string,
+                user: {
                     create: {
-                        email,
-                        password: hash,
+                        name: name as string,
                     },
                 },
             },
-            include: { login: true },
+            include: { user: true },
         })
 
-        if (!user.login) {
+        if (!login) {
             throw new Error('Email already exist.')
         }
 
-        const session = await initSession(user.login.id)
+        const session = await initSession(login.id)
 
         return res.status(201).json({
             title: 'Login Successful',
             detail: 'Successfully validated login credentials',
             token: session.token,
             expiresAt: session.expiresAt,
-            // type: login.type,
-            user: { ...user, type: user.login.type, login: null },
+            user: { ...login.user, role: login.roleId, email: login.email },
         })
     } catch (err) {
         res.status(400).json({ errors: err })

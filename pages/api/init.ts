@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import bcrypt from 'bcryptjs'
-import type { Page, Login, UserType } from '@prisma/client'
+import type { Page, Login, Role } from '@prisma/client'
 
 import { prisma } from '../../utils/prisma'
 
@@ -33,12 +33,26 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
-    const superAdminType: UserType[] = await prisma.userType.findMany({
+    const signins: Page[] = await prisma.page.findMany({
+        where: { type: 'signin' },
+    })
+
+    if (!signins.length) {
+        await prisma.page.create({
+            data: {
+                type: 'signin',
+                title: 'Sign In',
+                slug: 'signin',
+            },
+        })
+    }
+
+    const superAdminType: Role[] = await prisma.role.findMany({
         where: { id: 'super-admin' },
     })
 
     if (!superAdminType.length) {
-        await prisma.userType.create({
+        await prisma.role.create({
             data: {
                 id: 'super-admin',
                 name: 'Super Admin',
@@ -46,12 +60,12 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
-    const adminType: UserType[] = await prisma.userType.findMany({
+    const adminType: Role[] = await prisma.role.findMany({
         where: { id: 'admin' },
     })
 
     if (!adminType.length) {
-        await prisma.userType.create({
+        await prisma.role.create({
             data: {
                 id: 'admin',
                 name: 'Admin',
@@ -59,8 +73,21 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
+    const userType: Role[] = await prisma.role.findMany({
+        where: { id: 'user' },
+    })
+
+    if (!userType.length) {
+        await prisma.role.create({
+            data: {
+                id: 'user',
+                name: 'User',
+            },
+        })
+    }
+
     const admins: Login[] = await prisma.login.findMany({
-        where: { typeId: 'super-admin' },
+        where: { roleId: 'super-admin' },
     })
 
     if (!admins.length) {
@@ -71,7 +98,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
                 name: 'root',
                 login: {
                     create: {
-                        typeId: 'super-admin',
+                        roleId: 'super-admin',
                         email: 'root',
                         password: hash,
                     },

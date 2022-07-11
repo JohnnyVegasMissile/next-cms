@@ -12,6 +12,7 @@ import { FullArticle } from 'types'
 import { useState } from 'react'
 import useDebounce from '../../../hooks/useDebounce'
 import CustomSelect from '../../../components/CustomSelect'
+import Head from 'next/head'
 
 const { Option } = Select
 
@@ -28,48 +29,58 @@ const AdminArticles = () => {
     )
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{
-                width: '100%',
-                padding: 15,
-                backgroundColor: '#f0f2f5',
-                minHeight: 'calc(100vh - 29px)',
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Space>
-                    <Input
-                        value={q}
-                        allowClear
-                        placeholder="Search"
-                        style={{ width: 180 }}
-                        onChange={(e) => setQ(e.target.value)}
-                    />
-                    <CustomSelect.ListPages width={180} value={pageId} onChange={setPageId} />
-                </Space>
-                <Link href="/admin/articles/create">
-                    <a>
-                        <Button type="primary" icon={<PlusOutlined />}>
-                            Create
-                        </Button>
-                    </a>
-                </Link>
-            </div>
-            <Table
-                bordered={false}
-                loading={articles.isLoading}
-                dataSource={get(articles, 'data', [])}
-                columns={columns}
-                size="small"
-                scroll={{ y: 'calc(100vh - 300px)' }}
-                pagination={{
-                    hideOnSinglePage: true,
-                    pageSize: get(articles, 'data', []).length,
+        <>
+            <Head>
+                <title>Admin - Articles</title>
+            </Head>
+
+            <Space
+                direction="vertical"
+                size="large"
+                style={{
+                    width: '100%',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                    minHeight: 'calc(100vh - 29px)',
                 }}
-            />
-        </Space>
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Space>
+                        <Input
+                            value={q}
+                            allowClear
+                            placeholder="Search"
+                            style={{ width: 180 }}
+                            onChange={(e) => setQ(e.target.value)}
+                        />
+                        <CustomSelect.ListPages
+                            width={180}
+                            value={pageId}
+                            onChange={setPageId}
+                        />
+                    </Space>
+                    <Link href="/admin/articles/create">
+                        <a>
+                            <Button type="primary" icon={<PlusOutlined />}>
+                                Create
+                            </Button>
+                        </a>
+                    </Link>
+                </div>
+                <Table
+                    bordered={false}
+                    loading={articles.isLoading}
+                    dataSource={get(articles, 'data', [])}
+                    columns={columns}
+                    size="small"
+                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    pagination={{
+                        hideOnSinglePage: true,
+                        pageSize: get(articles, 'data', []).length,
+                    }}
+                />
+            </Space>
+        </>
     )
 }
 

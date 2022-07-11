@@ -6,14 +6,11 @@ import get from 'lodash.get'
 import { FullPage } from 'types'
 
 import { prisma } from '../utils/prisma'
-import { useAuth } from '../hooks/useAuth'
-import { Affix, Button } from 'antd'
-import Link from 'next/link'
 import SectionBlock from '../components/SectionBlock'
+import EditPageButton from '../components/EditPageButton'
 
 const Home = (props: FullPage) => {
     const { id, title, metadatas, sections, header, footer } = props
-    const { isAuth } = useAuth()
 
     return (
         <div>
@@ -24,19 +21,7 @@ const Home = (props: FullPage) => {
                 ))}
             </Head>
 
-            {isAuth && (
-                <Affix offsetTop={33}>
-                    <Button
-                        size="small"
-                        type="primary"
-                        style={{ position: 'absolute', right: 5 }}
-                    >
-                        <Link href={`/admin/pages/${id}`}>
-                            <a>Edit</a>
-                        </Link>
-                    </Button>
-                </Affix>
-            )}
+            <EditPageButton redirectTo={`/admin/pages/${id}`} />
 
             <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 

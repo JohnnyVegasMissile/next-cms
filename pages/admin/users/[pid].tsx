@@ -24,6 +24,7 @@ import { postUser, editUser, getUser } from '../../../network/users'
 import { UseQueryResult, useQuery, useMutation, useQueryClient } from 'react-query'
 import { FullUser, UserCreation } from '@types'
 import CustomSelect from '@components/CustomSelect'
+import Head from 'next/head'
 
 const { Text, Title } = Typography
 
@@ -80,7 +81,7 @@ const UsersCreation = () => {
             enabled: !!pid && pid !== 'create',
             onSuccess: (data: FullUser) =>
                 setValues({
-                    type: data.login?.typeId,
+                    type: data.login?.roleId,
                     name: data.name,
                     email: data.login?.email,
                 }),
@@ -127,49 +128,54 @@ const UsersCreation = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Space
-                direction="vertical"
-                size="large"
-                style={{
-                    width: '100%',
-                    minHeight: 'calc(100vh - 29px)',
-                    padding: 15,
-                    backgroundColor: '#f0f2f5',
-                }}
-            >
+        <>
+            <Head>
+                <title>Admin - Users</title>
+            </Head>
+
+            <form onSubmit={handleSubmit}>
                 <Space
                     direction="vertical"
+                    size="large"
                     style={{
                         width: '100%',
+                        minHeight: 'calc(100vh - 29px)',
+                        padding: 15,
+                        backgroundColor: '#f0f2f5',
                     }}
                 >
-                    <Card title="Description">
-                        <Space
-                            direction="vertical"
-                            style={{
-                                width: '100%',
-                            }}
-                        >
-                            <Space size="large">
-                                <Space direction="vertical">
-                                    <Text>Name</Text>
-                                    <Input
-                                        style={{ width: 240 }}
-                                        value={get(values, 'name', '')!}
-                                        onChange={(e) =>
-                                            onHandleChange('name', e.target.value)
-                                        }
-                                    />
-                                </Space>
+                    <Space
+                        direction="vertical"
+                        style={{
+                            width: '100%',
+                        }}
+                    >
+                        <Card title="Description">
+                            <Space
+                                direction="vertical"
+                                style={{
+                                    width: '100%',
+                                }}
+                            >
+                                <Space size="large">
+                                    <Space direction="vertical">
+                                        <Text>Name</Text>
+                                        <Input
+                                            style={{ width: 240 }}
+                                            value={get(values, 'name', '')!}
+                                            onChange={(e) =>
+                                                onHandleChange('name', e.target.value)
+                                            }
+                                        />
+                                    </Space>
 
-                                <Space direction="vertical">
-                                    <Text>Type</Text>
-                                    <CustomSelect.ListUserTypes
-                                        value={values.type}
-                                        onChange={(e) => onHandleChange('type', e)}
-                                    />
-                                    {/* <Select
+                                    <Space direction="vertical">
+                                        <Text>Type</Text>
+                                        <CustomSelect.ListRoles
+                                            value={values.type}
+                                            onChange={(e) => onHandleChange('type', e)}
+                                        />
+                                        {/* <Select
                                         style={{ width: 240 }}
                                         disabled={values.type === 'super-admin'}
                                     >
@@ -181,41 +187,42 @@ const UsersCreation = () => {
                                             </Select.Option>
                                         )}
                                     </Select> */}
+                                    </Space>
+                                </Space>
+                                <Divider />
+                                <Space size="large">
+                                    <Space direction="vertical">
+                                        <Text>Email</Text>
+                                        <Input
+                                            style={{ width: 240 }}
+                                            value={get(values, 'email', '')}
+                                            onChange={(e) =>
+                                                onHandleChange('email', e.target.value)
+                                            }
+                                        />
+                                    </Space>
+
+                                    <Space direction="vertical">
+                                        <Text>Password</Text>
+                                        <Input.Password
+                                            style={{ width: 240 }}
+                                            value={get(values, 'password', '')}
+                                            onChange={(e) =>
+                                                onHandleChange('password', e.target.value)
+                                            }
+                                        />
+                                    </Space>
                                 </Space>
                             </Space>
-                            <Divider />
-                            <Space size="large">
-                                <Space direction="vertical">
-                                    <Text>Email</Text>
-                                    <Input
-                                        style={{ width: 240 }}
-                                        value={get(values, 'email', '')}
-                                        onChange={(e) =>
-                                            onHandleChange('email', e.target.value)
-                                        }
-                                    />
-                                </Space>
+                        </Card>
 
-                                <Space direction="vertical">
-                                    <Text>Password</Text>
-                                    <Input.Password
-                                        style={{ width: 240 }}
-                                        value={get(values, 'password', '')}
-                                        onChange={(e) =>
-                                            onHandleChange('password', e.target.value)
-                                        }
-                                    />
-                                </Space>
-                            </Space>
-                        </Space>
-                    </Card>
-
-                    <Button type="primary" htmlType="submit">
-                        Save
-                    </Button>
+                        <Button type="primary" htmlType="submit">
+                            Save
+                        </Button>
+                    </Space>
                 </Space>
-            </Space>
-        </form>
+            </form>
+        </>
     )
 }
 

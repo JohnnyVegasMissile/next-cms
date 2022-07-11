@@ -19,17 +19,18 @@ import {
 import get from 'lodash.get'
 // import kebabcase from 'lodash.kebabcase'
 import { Prisma } from '@prisma/client'
-import type { UserType } from '@prisma/client'
-import { postUserType, editUserType, getUserTypeDetails } from '../../../../network/userTypes'
+import type { Role } from '@prisma/client'
+import { postRole, editRole, getRoleDetails } from '../../../../network/roles'
 import { UseQueryResult, useQuery, useMutation, useQueryClient } from 'react-query'
+import Head from 'next/head'
 
 const { Text, Title } = Typography
 
-const initialValues: Prisma.UserTypeCreateInput = {
+const initialValues: Prisma.RoleCreateInput = {
     name: '',
 }
 
-const validate = (values: Prisma.UserTypeCreateInput) => {
+const validate = (values: Prisma.RoleCreateInput) => {
     let errors: any = {}
 
     // if (!values.title) {
@@ -61,37 +62,35 @@ const UsersCreation = () => {
     const queryClient = useQueryClient()
 
     const { values, /*errors,*/ handleChange, handleSubmit, setValues } =
-        useFormik<Prisma.UserTypeCreateInput>({
+        useFormik<Prisma.RoleCreateInput>({
             initialValues,
             validate,
             onSubmit: async (values) => mutation.mutate({ pid: pid as string, values }),
         })
 
-    const userType: UseQueryResult<UserType, Error> = useQuery<UserType, Error>(
-        ['userTypes', { id: pid }],
-        () => getUserTypeDetails(pid as string),
+    const role: UseQueryResult<Role, Error> = useQuery<Role, Error>(
+        ['roles', { id: pid }],
+        () => getRoleDetails(pid as string),
         {
             refetchOnWindowFocus: false,
             enabled: !!pid && pid !== 'create',
-            onSuccess: (data: UserType) => setValues(data),
+            onSuccess: (data: Role) => setValues(data),
             onError: (err) => router.push('/admin/users'),
         }
     )
 
     const mutation = useMutation(
-        (data: { pid: string; values: Prisma.UserTypeCreateInput }) =>
-            data.pid === 'create'
-                ? postUserType(data.values)
-                : editUserType(data.pid, data.values),
+        (data: { pid: string; values: Prisma.RoleCreateInput }) =>
+            data.pid === 'create' ? postRole(data.values) : editRole(data.pid, data.values),
         {
-            onSuccess: (data: UserType) => {
+            onSuccess: (data: Role) => {
                 message.success(`User types ${data.name} saved`)
-                queryClient.invalidateQueries('userTypes')
+                queryClient.invalidateQueries('roles')
                 router.push('/admin/users/types')
             },
             onError: (err) => {
                 message.error('An error occured, while creating or updating the user types')
-                queryClient.invalidateQueries('userTypes')
+                queryClient.invalidateQueries('roles')
                 router.push('/admin/users/types')
             },
         }
@@ -101,7 +100,7 @@ const UsersCreation = () => {
         handleChange({ target: { name, value } })
     }
 
-    if (userType.isLoading || !pid) {
+    if (role.isLoading || !pid) {
         return (
             <div
                 style={{
@@ -119,33 +118,39 @@ const UsersCreation = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Space
-                direction="vertical"
-                size="large"
-                style={{
-                    width: '100%',
-                    minHeight: 'calc(100vh - 29px)',
-                    padding: 15,
-                    backgroundColor: '#f0f2f5',
-                }}
-            >
-                <Card title="Description">
-                    <Space direction="vertical">
-                        <Text>Name</Text>
-                        <Input
-                            style={{ width: 240 }}
-                            value={get(values, 'name', '')!}
-                            onChange={(e) => onHandleChange('name', e.target.value)}
-                        />
-                    </Space>
-                </Card>
+        <>
+            <Head>
+                <title>Admin - User Types</title>
+            </Head>
 
-                <Button type="primary" htmlType="submit">
-                    Save
-                </Button>
-            </Space>
-        </form>
+            <form onSubmit={handleSubmit}>
+                <Space
+                    direction="vertical"
+                    size="large"
+                    style={{
+                        width: '100%',
+                        minHeight: 'calc(100vh - 29px)',
+                        padding: 15,
+                        backgroundColor: '#f0f2f5',
+                    }}
+                >
+                    <Card title="Description">
+                        <Space direction="vertical">
+                            <Text>Name</Text>
+                            <Input
+                                style={{ width: 240 }}
+                                value={get(values, 'name', '')!}
+                                onChange={(e) => onHandleChange('name', e.target.value)}
+                            />
+                        </Space>
+                    </Card>
+
+                    <Button type="primary" htmlType="submit">
+                        Save
+                    </Button>
+                </Space>
+            </form>
+        </>
     )
 }
 

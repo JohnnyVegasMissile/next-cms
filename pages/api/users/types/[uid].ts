@@ -7,19 +7,19 @@ import { prisma } from '../../../../utils/prisma'
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const userType = await prisma.userType.findUnique({
+    const role = await prisma.role.findUnique({
         where: { id },
     })
 
-    if (!userType) return res.status(500).json({ error: 'User type not found' })
+    if (!role) return res.status(500).json({ error: 'User type not found' })
 
-    return res.status(200).json(userType)
+    return res.status(200).json(role)
 }
 
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const article = await prisma.userType.update({
+    const article = await prisma.role.update({
         where: { id },
         data: req.body,
     })
@@ -30,9 +30,9 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const userType = await prisma.userType.delete({ where: { id } })
+    const role = await prisma.role.delete({ where: { id } })
 
-    return res.status(200).json(userType)
+    return res.status(200).json(role)
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {

@@ -23,44 +23,54 @@ import { PlusOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import useDebounce from '../../../hooks/useDebounce'
 import CustomSelect from '@components/CustomSelect'
+import Head from 'next/head'
 
 const { Option } = Select
 
 const AdminUsers = () => {
     const [q, setQ] = useState<string | undefined>()
-    const [typeId, setTypeId] = useState<string | undefined>()
+    const [roleId, setTypeId] = useState<string | undefined>()
     const debouncedQ = useDebounce<string | undefined>(q, 750)
     const users: UseQueryResult<User[], Error> = useQuery<User[], Error>(
-        ['users', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, typeId }],
-        () => getUsers(typeId, trim(debouncedQ)?.toLocaleLowerCase()),
+        ['users', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, roleId }],
+        () => getUsers(roleId, trim(debouncedQ)?.toLocaleLowerCase()),
         {
             refetchOnWindowFocus: false,
         }
     )
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{
-                width: '100%',
-                padding: 15,
-                backgroundColor: '#f0f2f5',
-                minHeight: 'calc(100vh - 29px)',
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Space>
-                    <Input
-                        value={q}
-                        allowClear
-                        placeholder="Search"
-                        style={{ width: 180 }}
-                        onChange={(e) => setQ(e.target.value)}
-                    />
+        <>
+            <Head>
+                <title>Admin - Users</title>
+            </Head>
 
-                    <CustomSelect.ListUserTypes value={typeId} onChange={setTypeId} />
-                    {/* <Select
+            <Space
+                direction="vertical"
+                size="large"
+                style={{
+                    width: '100%',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                    minHeight: 'calc(100vh - 29px)',
+                }}
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Space>
+                        <Input
+                            value={q}
+                            allowClear
+                            placeholder="Search"
+                            style={{ width: 180 }}
+                            onChange={(e) => setQ(e.target.value)}
+                        />
+
+                        <CustomSelect.ListRoles
+                            width={180}
+                            value={roleId}
+                            onChange={setTypeId}
+                        />
+                        {/* <Select
                         allowClear
                         value={type}
                         onChange={setType}
@@ -70,28 +80,29 @@ const AdminUsers = () => {
                         <Option value="admin">Admin</Option>
                         <Option value="user">User</Option>
                     </Select> */}
-                </Space>
-                <Link href="/admin/users/create">
-                    <a>
-                        <Button type="primary" icon={<PlusOutlined />}>
-                            Create
-                        </Button>
-                    </a>
-                </Link>
-            </div>
-            <Table
-                bordered={false}
-                loading={users.isLoading}
-                dataSource={get(users, 'data', [])}
-                columns={columns}
-                size="small"
-                scroll={{ y: 'calc(100vh - 300px)' }}
-                pagination={{
-                    hideOnSinglePage: true,
-                    pageSize: get(users, 'data', []).length,
-                }}
-            />
-        </Space>
+                    </Space>
+                    <Link href="/admin/users/create">
+                        <a>
+                            <Button type="primary" icon={<PlusOutlined />}>
+                                Create
+                            </Button>
+                        </a>
+                    </Link>
+                </div>
+                <Table
+                    bordered={false}
+                    loading={users.isLoading}
+                    dataSource={get(users, 'data', [])}
+                    columns={columns}
+                    size="small"
+                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    pagination={{
+                        hideOnSinglePage: true,
+                        pageSize: get(users, 'data', []).length,
+                    }}
+                />
+            </Space>
+        </>
     )
 }
 
@@ -104,16 +115,11 @@ const columns = [
         title: 'Type',
         dataIndex: 'login',
         render: (e: Login) => {
-            const type: string = get(e, 'type.id', '')
+            const type: string = get(e, 'role.id', '')
             const color =
                 type === 'super-admin' ? 'magenta' : type === 'admin' ? 'red' : 'blue'
-            const types = {
-                admin: { label: 'Admin', color: 'red' },
-                'super-admin': { label: 'Admin', color: 'magenta' },
-                user: { label: 'User', color: 'blue' },
-            }
 
-            return <Tag color={color}>{get(e, 'type.name', '')}</Tag>
+            return <Tag color={color}>{get(e, 'role.name', '')}</Tag>
         },
     },
     {
@@ -138,7 +144,7 @@ const columns = [
                 <Popconfirm
                     placement="topRight"
                     title={'ho la la'}
-                    // disabled={e?.login?.type === 'super-admin'}
+                    disabled={e?.login?.role?.id === 'super-admin'}
                     onConfirm={() => {
                         fetch(`/api/users/${e.id}`, {
                             method: 'DELETE',
@@ -147,7 +153,7 @@ const columns = [
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button danger /*disabled={e?.login?.type === 'super-admin'}*/>
+                    <Button danger disabled={e?.login?.role?.id === 'super-admin'}>
                         Delete
                     </Button>
                 </Popconfirm>

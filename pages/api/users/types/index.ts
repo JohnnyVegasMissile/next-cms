@@ -25,17 +25,17 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         }
     }
 
-    const userTypes = await prisma.userType.findMany(search)
+    const roles = await prisma.role.findMany(search)
 
-    return res.status(200).json(userTypes)
+    return res.status(200).json(roles)
 }
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
-    const userType = await prisma.userType.create({
+    const role = await prisma.role.create({
         data: { ...req.body },
     })
 
-    return res.status(200).json(userType)
+    return res.status(200).json(role)
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {

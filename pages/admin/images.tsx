@@ -26,6 +26,7 @@ import { getImages, deleteImage, editImage } from '../../network/images'
 import Link from 'next/link'
 import moment from 'moment'
 import useDebounce from '../../hooks/useDebounce'
+import Head from 'next/head'
 
 const AdminImages = () => {
     const [q, setQ] = useState<string | undefined>()
@@ -129,38 +130,44 @@ const AdminImages = () => {
     ]
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{
-                width: '100%',
-                padding: 15,
-                backgroundColor: '#f0f2f5',
-                minHeight: 'calc(100vh - 29px)',
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Input
-                    placeholder="Search"
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    style={{ width: 180 }}
-                />
-                <UploadButton onFileRecieved={addFile} />
-            </div>
-            <Table
-                bordered={false}
-                loading={files.isLoading}
-                dataSource={get(files, 'data', [])}
-                columns={columns}
-                size="small"
-                scroll={{ y: 'calc(100vh - 160px)' }}
-                pagination={{
-                    hideOnSinglePage: true,
-                    pageSize: get(files, 'data', []).length,
+        <>
+            <Head>
+                <title>Admin - Images</title>
+            </Head>
+
+            <Space
+                direction="vertical"
+                size="large"
+                style={{
+                    width: '100%',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                    minHeight: 'calc(100vh - 29px)',
                 }}
-            />
-        </Space>
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Input
+                        placeholder="Search"
+                        value={q}
+                        onChange={(e) => setQ(e.target.value)}
+                        style={{ width: 180 }}
+                    />
+                    <UploadButton onFileRecieved={addFile} />
+                </div>
+                <Table
+                    bordered={false}
+                    loading={files.isLoading}
+                    dataSource={get(files, 'data', [])}
+                    columns={columns}
+                    size="small"
+                    scroll={{ y: 'calc(100vh - 160px)' }}
+                    pagination={{
+                        hideOnSinglePage: true,
+                        pageSize: get(files, 'data', []).length,
+                    }}
+                />
+            </Space>
+        </>
     )
 }
 

@@ -8,6 +8,7 @@ import get from 'lodash.get'
 import useDebounce from '../../hooks/useDebounce'
 import MediaModal from '../../components/MediaModal'
 import LinkInput from '@components/LinkInput'
+import Head from 'next/head'
 
 const Admin = () => {
     const [settings, setSettings] = useState<any>()
@@ -37,27 +38,33 @@ const Admin = () => {
     }, [debouncedValue])
 
     return (
-        <Space
-            direction="vertical"
-            size="large"
-            style={{
-                width: '100%',
-                padding: 15,
-                backgroundColor: '#f0f2f5',
-                minHeight: 'calc(100vh - 29px)',
-            }}
-        >
-            <Space>
-                <Avatar src="/favicon.ico" shape="square" size="large" />
-                <UploadButton.Favicon />
+        <>
+            <Head>
+                <title>Admin - Settings</title>
+            </Head>
+
+            <Space
+                direction="vertical"
+                size="large"
+                style={{
+                    width: '100%',
+                    padding: 15,
+                    backgroundColor: '#f0f2f5',
+                    minHeight: 'calc(100vh - 29px)',
+                }}
+            >
+                <Space>
+                    <Avatar src="/favicon.ico" shape="square" size="large" />
+                    <UploadButton.Favicon />
+                </Space>
+                <InputNumber
+                    value={get(settings, 'revalidate', undefined)}
+                    onChange={(e) => setSettings((prev: any) => ({ ...prev, revalidate: e }))}
+                />
+                <MediaModal value={picture} onMediaSelected={setPicture} />
+                <LinkInput value={values} onChange={setValues} />
             </Space>
-            <InputNumber
-                value={get(settings, 'revalidate', undefined)}
-                onChange={(e) => setSettings((prev: any) => ({ ...prev, revalidate: e }))}
-            />
-            <MediaModal value={picture} onMediaSelected={setPicture} />
-            <LinkInput value={values} onChange={setValues} />
-        </Space>
+        </>
     )
 }
 

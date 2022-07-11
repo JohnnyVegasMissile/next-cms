@@ -13,6 +13,9 @@ import {
     Select,
     message,
     Typography,
+    Checkbox,
+    Row,
+    Col,
 } from 'antd'
 import {
     PlusOutlined,
@@ -23,7 +26,7 @@ import {
 } from '@ant-design/icons'
 import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
-import type { Element, Page } from '@prisma/client'
+import type { Element, Page, Role } from '@prisma/client'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 // import { Prisma } from '@prisma/client'
 // import type { Page } from '@prisma/client'
@@ -34,6 +37,9 @@ import GetEditComponent from '../../../components/GetEditComponent'
 import DisplayElementView from '../../../components/DisplayElementView'
 import { getElementDetails, getElements } from '../../../network/elements'
 import { editPage, getPageDetails, postPage } from '../../../network/pages'
+import Head from 'next/head'
+import { CheckboxValueType } from 'antd/lib/checkbox/Group'
+import { getRoles } from '../../../network/roles'
 
 const { Title, Text } = Typography
 
@@ -44,6 +50,7 @@ const initialValues: FullPageEdit = {
     slug: '',
     sections: [],
     metadatas: [],
+    accesses: [],
     published: true,
 }
 
@@ -113,7 +120,11 @@ const Admin = () => {
                     (a, b) => a.position - b.position
                 )
 
-                setValues({ ...data, sections })
+                const accesses = get(data, 'accesses', []).map((access) =>
+                    get(access, 'roleId', '')
+                )
+
+                setValues({ ...data, sections, accesses })
             },
             onError: (err) => router.push('/admin/pages'),
         }
@@ -136,7 +147,7 @@ const Admin = () => {
         }
     )
 
-    const isLockedPage = values.type === 'error' || values.type === 'home'
+    const isLockedPage = values.type !== 'page' && values.type !== 'list'
 
     const lastSlugIndex = get(values, 'slug', '')!.split('/').length - 1
 
@@ -241,6 +252,10 @@ const Admin = () => {
 
     return (
         <>
+            <Head>
+                <title>Admin - Pages</title>
+            </Head>
+
             <form onSubmit={handleSubmit}>
                 <Space
                     direction="vertical"
@@ -304,6 +319,12 @@ const Admin = () => {
                                             >
                                                 Homepage
                                             </Radio.Button>
+                                            <Radio.Button
+                                                value="signin"
+                                                disabled={values.type !== 'signin'}
+                                            >
+                                                Sign In
+                                            </Radio.Button>
                                         </Radio.Group>
                                     </Space>
                                     <Space direction="vertical">
@@ -319,12 +340,19 @@ const Admin = () => {
                                             <Radio value={false}>Unpublished</Radio>
                                         </Radio.Group>
                                     </Space>
-                                </Space>
 
-                                <Divider />
+                                    <Space direction="vertical">
+                                        <Text>Access</Text>
+                                        <PageAccessCheckboxes
+                                            value={values.accesses || []}
+                                            onChange={(e) => onHandleChange('accesses', e)}
+                                        />
+                                    </Space>
+                                </Space>
 
                                 {!isLockedPage && (
                                     <>
+                                        <Divider />
                                         <Title level={5}>Page URL</Title>
                                         <Space style={{ width: '100%' }}>
                                             {get(values, 'slug', '')!
@@ -589,6 +617,36 @@ const Admin = () => {
                 onSelect={(e) => onHandleChange('type', e)}
             />
         </>
+    )
+}
+
+const PageAccessCheckboxes = ({
+    value,
+    onChange,
+}: {
+    value: string[]
+    onChange(e: CheckboxValueType[]): void
+}) => {
+    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(
+        ['roles', {}],
+        () => getRoles(),
+        {
+            refetchOnWindowFocus: false,
+        }
+    )
+
+    return (
+        <Checkbox.Group value={value} style={{ width: 350 }} onChange={onChange}>
+            <Row>
+                {roles?.data
+                    ?.filter((e) => e.id !== 'super-admin')
+                    ?.map((role) => (
+                        <Col key={role.id} span={8}>
+                            <Checkbox value={role.id}>{role.name}</Checkbox>
+                        </Col>
+                    ))}
+            </Row>
+        </Checkbox.Group>
     )
 }
 

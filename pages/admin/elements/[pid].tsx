@@ -8,6 +8,7 @@ import { Prisma, Element } from '@prisma/client'
 import Blocks from '../../../blocks'
 import GetEditComponent from '../../../components/GetEditComponent'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
+import Head from 'next/head'
 
 const { Title, Text } = Typography
 
@@ -102,63 +103,71 @@ const Admin = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Space
-                direction="vertical"
-                size="large"
-                style={{
-                    width: '100%',
-                    minHeight: 'calc(100vh - 29px)',
-                    padding: 15,
-                    backgroundColor: '#f0f2f5',
-                }}
-            >
-                <Space direction="vertical" style={{ width: '100%' }}>
-                    <Card title="Description">
-                        <Space size="large">
-                            <Space direction="vertical">
-                                <Text>Title</Text>
-                                <Input
-                                    style={{ width: 240 }}
-                                    value={get(values, 'title', '')}
-                                    onChange={(e) => onHandleChange('title', e.target.value)}
-                                />
-                            </Space>
-                        </Space>
-                    </Card>
+        <>
+            <Head>
+                <title>Admin - Elements</title>
+            </Head>
 
-                    <Card
-                        bodyStyle={{ padding: 0 }}
-                        title={
-                            <Space>
-                                <Select
-                                    value={values.type}
-                                    onChange={(e) => onHandleChange('type', e)}
-                                    style={{ width: 240 }}
-                                >
-                                    {Object.keys(Blocks).map((key) => (
-                                        <Select.Option key={key} value={key}>
-                                            {get(Blocks, `${key}.name`, '')}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
+            <form onSubmit={handleSubmit}>
+                <Space
+                    direction="vertical"
+                    size="large"
+                    style={{
+                        width: '100%',
+                        minHeight: 'calc(100vh - 29px)',
+                        padding: 15,
+                        backgroundColor: '#f0f2f5',
+                    }}
+                >
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                        <Card title="Description">
+                            <Space size="large">
+                                <Space direction="vertical">
+                                    <Text>Title</Text>
+                                    <Input
+                                        style={{ width: 240 }}
+                                        value={get(values, 'title', '')}
+                                        onChange={(e) =>
+                                            onHandleChange('title', e.target.value)
+                                        }
+                                    />
+                                </Space>
                             </Space>
-                        }
-                        style={{ flex: 1 }}
-                    >
-                        <GetEditComponent
-                            type={values.type}
-                            defaultValues={values.content}
-                            onChange={(e) => onHandleChange('content', e)}
-                        />
-                    </Card>
+                        </Card>
 
-                    <Button type="primary" htmlType="submit">
-                        Save
-                    </Button>
+                        <Card
+                            bodyStyle={{ padding: 0 }}
+                            title={
+                                <Space>
+                                    <Select
+                                        value={values.type}
+                                        onChange={(e) => onHandleChange('type', e)}
+                                        style={{ width: 240 }}
+                                    >
+                                        {Object.keys(Blocks).map((key) => (
+                                            <Select.Option key={key} value={key}>
+                                                {get(Blocks, `${key}.name`, '')}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </Space>
+                            }
+                            style={{ flex: 1 }}
+                        >
+                            <GetEditComponent
+                                type={values.type}
+                                defaultValues={values.content}
+                                onChange={(e) => onHandleChange('content', e)}
+                            />
+                        </Card>
+
+                        <Button type="primary" htmlType="submit">
+                            Save
+                        </Button>
+                    </Space>
                 </Space>
-            </Space>
-        </form>
+            </form>
+        </>
     )
 }
 

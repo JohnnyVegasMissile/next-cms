@@ -15,9 +15,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
                 setRedirect(router.route)
                 // redirect
                 router.push('/signin')
-            } else if (isAuth && user?.type !== 'super-admin' && user?.type !== 'admin') {
+            } else if (isAuth && user?.role !== 'super-admin' && user?.role !== 'admin') {
                 router.push('/')
-                // user?.type !== 'super-admin' && user?.type !== 'admin'
             }
         }
     }, [setRedirect, initializing, router, user])

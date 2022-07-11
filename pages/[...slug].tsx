@@ -6,9 +6,7 @@ import type { Access, Article, Metadata } from '@prisma/client'
 import { FullArticle, FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
-import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
-import { Affix, Button } from 'antd'
 import SectionBlock from '../components/SectionBlock'
 import EditPageButton from '../components/EditPageButton'
 import get from 'lodash.get'
@@ -18,14 +16,23 @@ import { useRouter } from 'next/router'
 const Pages = (props: FullPage | FullArticle) => {
     const router = useRouter()
     // const { id, title, metadatas, sections, type, header, footer } = props
-    const { isAuth, user } = useAuth()
+    const { isAuth, user, setRedirect } = useAuth()
 
     useEffect(() => {
         const access: Access[] = get(props, 'accesses', get(props, 'page.accesses', []))
 
-        // if (!!access.length && ) {
-        //     router.push('/')
-        // }
+        if (!access.length || user?.role === 'super-admin' || 'admin') return
+
+        const flatAccess = access?.map((e) => e.roleId)
+
+        if (!isAuth) {
+            setRedirect(router.route)
+            router.push('/signin')
+        }
+
+        if (!user?.role || !flatAccess.includes(user?.role)) {
+            router.push('/')
+        }
     }, [user?.role])
 
     return (

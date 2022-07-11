@@ -27,7 +27,7 @@ const { Text } = Typography
 function MenuAdmin() {
     const { isAuth, signOut, user } = useAuth()
 
-    if (!isAuth || (user?.type !== 'super-admin' && user?.type !== 'admin')) return null
+    if (!isAuth || (user?.role !== 'super-admin' && user?.role !== 'admin')) return null
 
     const homeMenu = (
         <Menu

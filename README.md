@@ -6,3 +6,5 @@ npm i
 npm run initdb
 npm run dev
 go to /install
+
+root/root

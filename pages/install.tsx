@@ -42,8 +42,11 @@ const Install: NextPage = () => {
                 <div
                     style={{
                         backgroundColor: '#f0f2f5',
-                        height: 'calc(100vh - 29px)',
+                        height: '100vh',
                         width: '100vw',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                     }}
                 >
                     {install.isLoading ? (

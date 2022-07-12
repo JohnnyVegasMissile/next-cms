@@ -28,7 +28,7 @@ export const revalidateAll = (): Promise<string[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'POST',
-            url: `/revalidate/all`,
+            url: `/api/revalidate/all`,
         })
             .then(resolve)
             .catch(reject)

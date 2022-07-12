@@ -1,4 +1,4 @@
-import { Affix, Divider, Dropdown, Menu, Space, Typography } from 'antd'
+import { Affix, Divider, Dropdown, Menu, message, Space, Typography } from 'antd'
 import {
     SettingOutlined,
     HomeOutlined,
@@ -9,20 +9,31 @@ import {
     UserOutlined,
     PlusCircleOutlined,
     FileTextOutlined,
-    UndoOutlined,
     TeamOutlined,
     IdcardOutlined,
+    LoadingOutlined,
+    ReloadOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
 import { revalidateAll } from '../../network/api'
 import Link from 'next/link'
+import { useMutation } from 'react-query'
 // import { useRouter } from 'next/router'
 
 const { Text } = Typography
 
 function MenuAdmin() {
     const { isAuth, signOut, user } = useAuth()
+
+    const mutation = useMutation(() => revalidateAll(), {
+        onSuccess: () => {
+            message.success('Pages successfully revalidated')
+        },
+        onError: (err) => {
+            message.error('Error Revalidating pages')
+        },
+    })
 
     if (!isAuth || (user?.role !== 'super-admin' && user?.role !== 'admin')) return null
 
@@ -40,9 +51,9 @@ function MenuAdmin() {
                 },
                 {
                     key: '2',
-                    label: 'Revalidate all pages',
-                    icon: <UndoOutlined />,
-                    onClick: revalidateAll,
+                    label: 'Revalidate all',
+                    icon: mutation.isLoading ? <LoadingOutlined /> : <ReloadOutlined />,
+                    onClick: () => mutation.mutate(),
                 },
                 {
                     type: 'divider',

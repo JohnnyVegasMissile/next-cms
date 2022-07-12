@@ -13,10 +13,11 @@ import { prisma } from '../utils/prisma'
 import { FullPage } from '../types'
 import SectionBlock from '@components/SectionBlock'
 import EditPageButton from '@components/EditPageButton'
+import { useFormik } from 'formik'
 
 const SignIn = (props: FullPage) => {
     const { id, title, metadatas, sections, header, footer } = props
-    const { isAuth, signIn } = useAuth()
+    const { isAuth } = useAuth()
     const router = useRouter()
 
     useEffect(() => {
@@ -39,48 +40,74 @@ const SignIn = (props: FullPage) => {
             <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 
             <main>
-                {(!sections || !sections.length) && (
-                    <div
-                        style={{
-                            height: '100vh',
-                            width: '100vw',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Card title="Sign In" style={{ width: 400 }}>
-                            <form /*onSubmit={signIn}*/>
-                                <Space direction="vertical">
-                                    <Input prefix={<UserOutlined />} placeholder="Username" />
-                                    <Input
-                                        prefix={<LockOutlined />}
-                                        type="password"
-                                        placeholder="Password"
-                                    />
+                {(!sections || !sections.length) && <DefaultSignInForm />}
 
-                                    <Button
-                                        loading={signIn!.isLoading}
-                                        style={{ width: '100%' }}
-                                        type="primary"
-                                        // htmlType="submit"
-                                        onClick={() =>
-                                            signIn!.mutate({ email: 'root', password: 'root' })
-                                        }
-                                    >
-                                        Sign In
-                                    </Button>
-                                </Space>
-                            </form>
-                        </Card>
-                    </div>
-                )}
                 {sections?.map((section) => (
                     <SectionBlock key={section.id} section={section} page={props} />
                 ))}
             </main>
 
             <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer>
+        </div>
+    )
+}
+
+const DefaultSignInForm = () => {
+    const { signIn } = useAuth()
+    // const router = useRouter()
+
+    const { values, /*errors,*/ handleSubmit, handleChange } = useFormik<{
+        email: string
+        password: string
+    }>({
+        initialValues: { email: '', password: '' },
+        validate: (values) => values,
+        onSubmit: async (values) => console.log(values),
+        // onSubmit: async (values) => signIn!.mutate(values),
+    })
+
+    const onHandleChange = (name: string, value: any) => {
+        handleChange({ target: { name, value } })
+    }
+
+    return (
+        <div
+            style={{
+                height: '100vh',
+                width: '100vw',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            <Card title="Sign In" style={{ width: 400 }}>
+                <form onSubmit={handleSubmit}>
+                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                        <Input
+                            prefix={<UserOutlined />}
+                            value={values.email}
+                            onChange={(e) => onHandleChange('email', e.target.value)}
+                            placeholder="Username"
+                        />
+                        <Input
+                            prefix={<LockOutlined />}
+                            value={values.password}
+                            onChange={(e) => onHandleChange('password', e.target.value)}
+                            type="password"
+                            placeholder="Password"
+                        />
+
+                        <Button
+                            loading={signIn!.isLoading}
+                            style={{ width: '100%' }}
+                            type="primary"
+                            htmlType="submit"
+                        >
+                            Sign In
+                        </Button>
+                    </Space>
+                </form>
+            </Card>
         </div>
     )
 }

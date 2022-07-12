@@ -21,13 +21,15 @@ const Pages = (props: FullPage | FullArticle) => {
     useEffect(() => {
         const access: Access[] = get(props, 'accesses', get(props, 'page.accesses', []))
 
-        if (!access.length || user?.role === 'super-admin' || 'admin') return
+        console.log('1', user?.role)
+        if (!access.length || user?.role === 'super-admin' || user?.role === 'admin') return
 
         const flatAccess = access?.map((e) => e.roleId)
 
         if (!isAuth) {
             setRedirect(router.route)
             router.push('/signin')
+            return
         }
 
         if (!user?.role || !flatAccess.includes(user?.role)) {

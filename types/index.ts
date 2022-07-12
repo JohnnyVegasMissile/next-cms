@@ -64,6 +64,8 @@ export type FullPageEdit = Prisma.PageCreateInput & {
     accesses?: string[] | null
     headerId?: string | undefined
     footerId?: string | undefined
+
+    slugEdit?: (string | undefined)[]
 }
 
 export type AuthResponse = {

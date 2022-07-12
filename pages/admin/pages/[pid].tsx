@@ -16,6 +16,7 @@ import {
     Checkbox,
     Row,
     Col,
+    Form,
 } from 'antd'
 import {
     PlusOutlined,
@@ -43,11 +44,12 @@ import { getRoles } from '../../../network/roles'
 
 const { Title, Text } = Typography
 
-const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found']
+const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found', 'signin']
 
 const initialValues: FullPageEdit = {
     title: '',
-    slug: '',
+    // slug: '',
+    slugEdit: [''],
     sections: [],
     metadatas: [],
     accesses: [],
@@ -61,21 +63,23 @@ const validate = (values: FullPageEdit) => {
         errors.title = 'Required'
     }
 
-    const splittedSlug = values.slug!.split('/')
-    for (const slug of splittedSlug) {
-        if (!slug) {
-            errors.slug = 'Forbiden slug'
-            break
-        }
-    }
+    // const splittedSlug = values.slug!.split('/')
+    // for (const slug of splittedSlug) {
+    //     if (!slug) {
+    //         errors.slug = 'Forbiden slug'
+    //         break
+    //     }
+    // }
 
-    if (!values.slug) {
-        errors.slug = 'Required'
-    }
+    // if (values.type === 'page' || values.type === 'list') {
+    //     if (!values.slug) {
+    //         errors.slugEdit = 'Required'
+    //     }
 
-    if (forbidenSlugs.includes(values.slug!.split('/')[0])) {
-        errors.slug = 'Forbiden slug'
-    }
+    //     if (forbidenSlugs.includes(get(values, 'slugEdit.0', ''))) {
+    //         errors.slugEdit = 'Forbiden slug'
+    //     }
+    // }
 
     return errors
 }
@@ -105,7 +109,12 @@ const Admin = () => {
                 }
             }
 
-            mutation.mutate({ pid: pid as string, values: { ...values, sections } })
+            const slug = get(values, 'slugEdit', []).join('/')
+
+            mutation.mutate({
+                pid: pid as string,
+                values: { ...values, sections, slug, slugEdit: undefined },
+            })
         },
     })
 
@@ -124,7 +133,9 @@ const Admin = () => {
                     get(access, 'roleId', '')
                 )
 
-                setValues({ ...data, sections, accesses })
+                const slugEdit = get(values, 'slug', '')!.split('/')
+
+                setValues({ ...data, sections, accesses, slugEdit })
             },
             onError: (err) => router.push('/admin/pages'),
         }
@@ -149,32 +160,32 @@ const Admin = () => {
 
     const isLockedPage = values.type !== 'page' && values.type !== 'list'
 
-    const lastSlugIndex = get(values, 'slug', '')!.split('/').length - 1
+    const lastSlugIndex = get(values, 'slugEdit', []).length - 1
 
     const onHandleChange = (name: string, value: any) => {
         handleChange({ target: { name, value } })
     }
 
     const addSlug = () => {
-        let newValue = [...get(values, 'slug', '')!.split('/')]
+        let newValue = [...get(values, 'slugEdit', [])]
         newValue.splice(lastSlugIndex, 0, '')
 
-        onHandleChange('slug', newValue.join('/'))
+        onHandleChange('slugEdit', newValue)
     }
 
     const removeSlug = () => {
-        let newValue = [...get(values, 'slug', '')!.split('/')]
+        let newValue = [...get(values, 'slugEdit', [])]
         newValue.splice(lastSlugIndex - 1, 1)
 
-        onHandleChange('slug', newValue.join('/'))
+        onHandleChange('slugEdit', newValue)
     }
 
-    const editSlug = (index: number, value: string) => {
-        let newValue = [...get(values, 'slug', '')!.split('/')]
-        newValue[index] = value
+    // const editSlug = (index: number, value: string) => {
+    //     let newValue = [...get(values, 'slug', '')]
+    //     newValue[index] = value
 
-        onHandleChange('slug', newValue.join('/'))
-    }
+    //     onHandleChange('slug', newValue.join('/'))
+    // }
 
     const addSection = () => {
         handleChange({
@@ -272,7 +283,7 @@ const Admin = () => {
                             <Space direction="vertical" style={{ width: '100%' }}>
                                 <Space size="large">
                                     <Space direction="vertical">
-                                        <Text>Title</Text>
+                                        <Text>Title :</Text>
                                         <Input
                                             style={{ width: 240 }}
                                             value={get(values, 'title', '')}
@@ -280,14 +291,10 @@ const Admin = () => {
                                                 onHandleChange('title', e.target.value)
 
                                                 if (pid === 'create') {
-                                                    let newValue = [
-                                                        ...get(values, 'slug', '')!.split('/'),
-                                                    ]
-                                                    newValue[lastSlugIndex] = kebabcase(
-                                                        e.target.value
+                                                    onHandleChange(
+                                                        `slugEdit.${lastSlugIndex}`,
+                                                        kebabcase(e.target.value)
                                                     )
-
-                                                    onHandleChange('slug', newValue.join('/'))
                                                 }
                                             }}
                                         />
@@ -355,59 +362,50 @@ const Admin = () => {
                                         <Divider />
                                         <Title level={5}>Page URL</Title>
                                         <Space style={{ width: '100%' }}>
-                                            {get(values, 'slug', '')!
-                                                .split('/')
-                                                .map((slug: string, idx: number) => (
-                                                    <Fragment key={idx}>
-                                                        {idx === lastSlugIndex && (
-                                                            <>
-                                                                <Button
-                                                                    onClick={removeSlug}
-                                                                    type="primary"
-                                                                    shape="circle"
-                                                                    disabled={
-                                                                        get(
-                                                                            values,
-                                                                            'slug',
-                                                                            ''
-                                                                        )!.split('/').length <
-                                                                        2
-                                                                    }
-                                                                    icon={<MinusOutlined />}
-                                                                />
-                                                                <Button
-                                                                    onClick={addSlug}
-                                                                    disabled={
-                                                                        get(
-                                                                            values,
-                                                                            'slug',
-                                                                            ''
-                                                                        )!.split('/').length >
-                                                                        5
-                                                                    }
-                                                                    type="primary"
-                                                                    shape="circle"
-                                                                    icon={<PlusOutlined />}
-                                                                />
-                                                            </>
-                                                        )}
-                                                        <Input
-                                                            style={{
-                                                                minWidth: 200,
-                                                            }}
-                                                            value={slug}
-                                                            onChange={(e) =>
-                                                                editSlug(idx, e.target.value)
-                                                            }
-                                                            status={
-                                                                errors.slug
-                                                                    ? 'error'
-                                                                    : undefined
-                                                            }
-                                                        />
-                                                        {lastSlugIndex !== idx && '/'}
-                                                    </Fragment>
-                                                ))}
+                                            {get(values, 'slugEdit', []).map((slug, idx) => (
+                                                <Fragment key={idx}>
+                                                    {idx === lastSlugIndex && (
+                                                        <>
+                                                            <Button
+                                                                onClick={removeSlug}
+                                                                type="primary"
+                                                                shape="circle"
+                                                                disabled={
+                                                                    get(values, 'slugEdit', [])
+                                                                        .length < 2
+                                                                }
+                                                                icon={<MinusOutlined />}
+                                                            />
+                                                            <Button
+                                                                onClick={addSlug}
+                                                                disabled={
+                                                                    get(values, 'slugEdit', [])
+                                                                        .length > 5
+                                                                }
+                                                                type="primary"
+                                                                shape="circle"
+                                                                icon={<PlusOutlined />}
+                                                            />
+                                                        </>
+                                                    )}
+                                                    <Input
+                                                        style={{
+                                                            minWidth: 200,
+                                                        }}
+                                                        value={slug}
+                                                        onChange={(e) =>
+                                                            onHandleChange(
+                                                                `slugEdit.${idx}`,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        status={
+                                                            errors.slug ? 'error' : undefined
+                                                        }
+                                                    />
+                                                    {lastSlugIndex !== idx && '/'}
+                                                </Fragment>
+                                            ))}
                                         </Space>
                                     </>
                                 )}

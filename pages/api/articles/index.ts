@@ -1,3 +1,6 @@
+import { Prisma, Section } from '@prisma/client'
+import { FullArticleEdit } from '../../../types'
+import get from 'lodash.get'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { prisma } from '../../../utils/prisma'
@@ -36,8 +39,16 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
+    const newArticleContent = req.body as FullArticleEdit
+
+    const sections: Section[] = get(req, 'body.sections', [])
+    delete newArticleContent.sections
+
     const article = await prisma.article.create({
-        data: { ...req.body },
+        data: {
+            ...(newArticleContent as Prisma.ArticleCreateInput),
+            sections: { create: sections },
+        },
     })
 
     return res.status(200).json(article)

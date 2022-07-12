@@ -17,14 +17,15 @@ import { useFormik } from 'formik'
 
 const SignIn = (props: FullPage) => {
     const { id, title, metadatas, sections, header, footer } = props
-    const { isAuth } = useAuth()
-    const router = useRouter()
+    // const { isAuth } = useAuth()
+    // const router = useRouter()
 
-    useEffect(() => {
-        if (isAuth) {
-            router.push('/')
-        }
-    }, [isAuth])
+    // useEffect(() => {
+    //     if (isAuth) {
+    //         console.log('Redirection from Sign In', router.route)
+    //         router.push('/')
+    //     }
+    // }, [router.route])
 
     return (
         <div>
@@ -61,9 +62,11 @@ const DefaultSignInForm = () => {
         password: string
     }>({
         initialValues: { email: '', password: '' },
-        validate: (values) => values,
-        onSubmit: async (values) => console.log(values),
-        // onSubmit: async (values) => signIn!.mutate(values),
+        // validate: (values) => ({}),
+        // onSubmit: async (values) => {
+        //     console.log(values)
+        // },
+        onSubmit: async (values) => signIn!.mutate(values),
     })
 
     const onHandleChange = (name: string, value: any) => {
@@ -80,16 +83,18 @@ const DefaultSignInForm = () => {
                 alignItems: 'center',
             }}
         >
-            <Card title="Sign In" style={{ width: 400 }}>
+            <Card title="Authentification" style={{ width: 400 }}>
                 <form onSubmit={handleSubmit}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         <Input
+                            name="email"
                             prefix={<UserOutlined />}
                             value={values.email}
                             onChange={(e) => onHandleChange('email', e.target.value)}
-                            placeholder="Username"
+                            placeholder="Email"
                         />
                         <Input
+                            name="password"
                             prefix={<LockOutlined />}
                             value={values.password}
                             onChange={(e) => onHandleChange('password', e.target.value)}

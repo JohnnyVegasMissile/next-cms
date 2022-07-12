@@ -51,7 +51,10 @@ export const useProvideAuth = (): UseProvideAuthProps => {
     }, [])
 
     useEffect(() => {
-        setRedirect(undefined)
+        console.log('rute', router.route)
+        if (router.route !== '/signin') {
+            setRedirect(undefined)
+        }
     }, [router.route])
 
     const signIn = useMutation(
@@ -62,25 +65,17 @@ export const useProvideAuth = (): UseProvideAuthProps => {
                 setUser({
                     name: data.user.name || '',
                     email: data.user.email,
-                    type: data.user.type,
+                    role: data.user.role,
                     expiresAt: data.expiresAt,
                 })
                 localStorage.setItem('user', JSON.stringify(data.user))
                 localStorage.setItem('token', data.token)
 
-                if (!!redirect) router.push(redirect)
+                console.log('Redirection from Auth', redirect)
+                !!redirect ? router.push(redirect) : router.push('/')
             },
         }
     )
-
-    // const signIn = () => {
-    //     const user = { name: 'alex', type: 'admin', email: '' }
-    //     setLoading(true)
-    //     setUser(user)
-    //     localStorage.setItem('user', JSON.stringify(user))
-    //     // router.push('/')
-    //     setLoading(false)
-    // }
 
     const signOut = () => {
         setUser(null)

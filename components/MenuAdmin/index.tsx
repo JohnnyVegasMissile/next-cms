@@ -230,7 +230,7 @@ function MenuAdmin() {
                     <Space>
                         <Link href="/">
                             <a>
-                                <Text>
+                                <Text className="logged-username">
                                     <UserOutlined style={{ marginRight: 4 }} />
                                     {`${user?.name}`}
                                 </Text>

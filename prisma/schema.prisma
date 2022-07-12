@@ -123,8 +123,8 @@ model Article {
   author            String?
   slug              String          @unique
   sections          Section[]
-  pageId            String?
-  page              Page?           @relation(fields: [pageId], references: [id])
+  pageId            String
+  page              Page           @relation(fields: [pageId], references: [id])
   published         Boolean         @default(true)
   updatedAt         DateTime        @updatedAt
 }

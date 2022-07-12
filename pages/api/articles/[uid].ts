@@ -1,14 +1,18 @@
+import { FullArticleEdit } from '../../../types'
 import type { NextApiRequest, NextApiResponse } from 'next'
 // import type { Page, Metadata, Section, Article } from '@prisma/client'
 // import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
+import { Prisma, Section } from '@prisma/client'
+import get from 'lodash.get'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
     const article = await prisma.article.findUnique({
         where: { id },
+        include: { sections: true },
     })
 
     if (!article) return res.status(500).json({ error: 'User not found' })
@@ -18,15 +22,37 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
+    const newArticleContent: FullArticleEdit = req.body
+
+    // delete existing sections
+    await prisma.section.deleteMany({
+        where: { articleId: id },
+    })
+
+    // create new sections
+    const newSections: Section[] = get(req, 'body.sections', [])
+    delete newArticleContent.sections
+
+    for (const section of newSections) {
+        await prisma.section.create({
+            data: {
+                type: section.type,
+                articleId: id,
+                position: section.position,
+                content: section.content,
+            },
+        })
+    }
 
     const article = await prisma.article.update({
         where: { id },
-        data: req.body,
+        data: newArticleContent as Prisma.ArticleCreateInput,
+        include: { sections: true, page: true },
     })
 
-    return res.status(200).json(article)
+    res.status(200).json(article)
 
-    // return res.unstable_revalidate(`/${page.slug}`)
+    return res.unstable_revalidate(`/${article.page.slug}/${article.slug}`)
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

@@ -12,27 +12,33 @@ import EditPageButton from '../components/EditPageButton'
 import get from 'lodash.get'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import useSsr from '../hooks/useSsr'
 
 const Pages = (props: FullPage | FullArticle) => {
     const router = useRouter()
     // const { id, title, metadatas, sections, type, header, footer } = props
     const { isAuth, user, setRedirect } = useAuth()
+    const { isServer } = useSsr()
 
     useEffect(() => {
         const access: Access[] = get(props, 'accesses', get(props, 'page.accesses', []))
 
-        console.log('1', user?.role)
-        if (!access.length || user?.role === 'super-admin' || user?.role === 'admin') return
+        if (
+            !access.length ||
+            user?.role === 'super-admin' ||
+            user?.role === 'admin' ||
+            isServer
+        ) {
+            return
+        }
 
         const flatAccess = access?.map((e) => e.roleId)
 
         if (!isAuth) {
             setRedirect(router.route)
             router.push('/signin')
-            return
-        }
-
-        if (!user?.role || !flatAccess.includes(user?.role)) {
+        } else if (!user?.role || !flatAccess.includes(user?.role)) {
+            console.log('Redirection from Page')
             router.push('/')
         }
     }, [user?.role])

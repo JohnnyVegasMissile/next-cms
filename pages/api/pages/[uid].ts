@@ -13,6 +13,10 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         include: { metadatas: true, sections: true, accesses: true },
     })
 
+    if (!page) {
+        return res.status(404).json({ error: 'Page not found' })
+    }
+
     return res.status(200).json(page)
 }
 
@@ -60,12 +64,12 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
-    // delete existing sections
+    // delete existing access
     await prisma.access.deleteMany({
         where: { pageId: id },
     })
 
-    // create new sections
+    // create new access
     const newAccesses: string[] = get(req, 'body.accesses', [])
     delete newPageContent.accesses
 

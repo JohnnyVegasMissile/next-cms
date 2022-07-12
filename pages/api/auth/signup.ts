@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import bcrypt from 'bcryptjs'
-import type { Login, /* Session,*/ User } from '@prisma/client'
 
 import { isEmail, initSession } from '../../../utils'
 import { prisma } from '../../../utils/prisma'

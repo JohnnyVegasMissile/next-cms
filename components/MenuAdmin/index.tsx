@@ -1,4 +1,4 @@
-import { Affix, Button, Divider, Dropdown, Menu, Space, Typography } from 'antd'
+import { Affix, Divider, Dropdown, Menu, Space, Typography } from 'antd'
 import {
     SettingOutlined,
     HomeOutlined,
@@ -10,9 +10,6 @@ import {
     PlusCircleOutlined,
     FileTextOutlined,
     UndoOutlined,
-    SmileOutlined,
-    DownOutlined,
-    SearchOutlined,
     TeamOutlined,
     IdcardOutlined,
 } from '@ant-design/icons'

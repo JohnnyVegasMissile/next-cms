@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Page, Metadata, Section, Access, Prisma } from '@prisma/client'
+import type { Page, Metadata, Section, Prisma } from '@prisma/client'
 import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'

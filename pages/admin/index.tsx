@@ -35,6 +35,7 @@ const Admin = () => {
         const update = async () => editSetting('revalidate', settings?.revalidate.toString())
 
         if (settings?.revalidate) update()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedValue])
 
     return (

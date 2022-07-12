@@ -1,8 +1,6 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
-import type { Article, Role } from '@prisma/client'
-
-import { FullArticle, FullArticleEdit } from '../types'
+import type { Role } from '@prisma/client'
 
 export const postRole = (data: Prisma.RoleCreateInput): Promise<Role> =>
     new Promise(async (resolve, reject) => {

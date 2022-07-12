@@ -1,15 +1,12 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import styles from './ExampleList.module.css'
 
 import type { Props } from '../types'
 import CustomImage from '../../components/CustomImage'
-import { Button, Card, Space, Switch } from 'antd'
-import StyledInput from '../../components/StyledInput'
+import { Card, Space } from 'antd'
 import get from 'lodash.get'
 import set from 'lodash.set'
-import { CloseOutlined, PlusOutlined } from '@ant-design/icons'
 import MediaModal from '../../components/MediaModal'
-import LinkInput from '../../components/LinkInput'
 
 const parseDefaultValue = (values: string) => {
     try {
@@ -83,11 +80,7 @@ const EditPanel = ({ view, panel }: PanelProps) => (
     <div style={{ display: 'flex' }}>
         <div style={{ flex: 5 }}>{view}</div>
         {!!panel && (
-            <Card
-                title="Settings Panel"
-                style={{ flex: 1, marginTop: 1 }}
-                bordered={false}
-            >
+            <Card title="Settings Panel" style={{ flex: 1, marginTop: 1 }} bordered={false}>
                 {panel}
             </Card>
         )}

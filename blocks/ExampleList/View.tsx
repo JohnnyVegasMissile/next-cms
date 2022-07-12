@@ -2,7 +2,6 @@ import styles from './ExampleList.module.css'
 
 import type { Props } from '../types'
 import CustomImage from '../../components/CustomImage'
-import get from 'lodash.get'
 import Link from 'next/link'
 
 const parseDefaultValue = (values: string) => {
@@ -19,10 +18,7 @@ const View = ({ defaultValues, page }: Props) => {
     return (
         <section className={styles.section}>
             <div className={styles.container}>
-                <CustomImage.Background
-                    img={values.img}
-                    className={styles.leftContainer}
-                />
+                <CustomImage.Background img={values.img} className={styles.leftContainer} />
                 <div className={styles.rightContainer}>
                     <h1 className={styles.listTitle}>{page?.title}</h1>
                     <ul className={styles.listContainer}>

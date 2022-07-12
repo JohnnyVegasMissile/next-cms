@@ -2,7 +2,7 @@ import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 // import Router, { useRouter } from 'next/router'
 // import { PrismaClient } from '@prisma/client'
-import type { Access, Article, Metadata } from '@prisma/client'
+import type { Access, Metadata } from '@prisma/client'
 import { FullArticle, FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
@@ -41,6 +41,7 @@ const Pages = (props: FullPage | FullArticle) => {
             console.log('Redirection from Page')
             router.push('/')
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.role])
 
     return (
@@ -151,13 +152,19 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
             updatedAt: Math.floor((page.updatedAt?.getMilliseconds() || 1) / 1000),
         }
     } else {
-        const article: Article | null = await prisma.article.findUnique({
+        const article = await prisma.article.findUnique({
             where: { slug: slug[slug.length - 1] },
             include: { page: true },
         })
 
+        const page = {
+            ...article?.page,
+            updatedAt: Math.floor((article?.page.updatedAt?.getMilliseconds() || 1) / 1000),
+        }
+
         props = {
             ...article,
+            page,
             updatedAt: Math.floor((article?.updatedAt?.getMilliseconds() || 1) / 1000),
         }
     }

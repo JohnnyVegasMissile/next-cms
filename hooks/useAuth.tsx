@@ -51,7 +51,6 @@ export const useProvideAuth = (): UseProvideAuthProps => {
     }, [])
 
     useEffect(() => {
-        console.log('rute', router.route)
         if (router.route !== '/signin') {
             setRedirect(undefined)
         }

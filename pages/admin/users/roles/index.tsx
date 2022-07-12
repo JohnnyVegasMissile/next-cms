@@ -1,22 +1,19 @@
 // import { useState, useEffect } from 'react'
-import type { User, Login, Role } from '@prisma/client'
+import type { Role } from '@prisma/client'
 import {
     Space,
     Button,
     Table,
     // Breadcrumb,
     // Badge,
-    Tag,
     // Typography,
     Popconfirm,
     Input,
-    Select,
 } from 'antd'
 import Link from 'next/link'
 // import moment from 'moment'
 import { useQuery, UseQueryResult } from 'react-query'
 import { getRoles } from '../../../../network/roles'
-import type { FullUser, UserRoleTypes } from '../../../../types'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
 import { PlusOutlined } from '@ant-design/icons'

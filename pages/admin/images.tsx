@@ -1,19 +1,6 @@
 import { useState } from 'react'
 // import type { Page } from '@prisma/client'
-import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
-import {
-    Space,
-    Button,
-    Image,
-    Row,
-    Col,
-    Input,
-    Card,
-    Tooltip,
-    Table,
-    Popconfirm,
-    Form,
-} from 'antd'
+import { Space, Button, Image, Input, Table, Popconfirm, Form } from 'antd'
 // import Link from 'next/link'
 // import moment from 'moment'
 import type { Media } from '@prisma/client'
@@ -22,8 +9,7 @@ import get from 'lodash.get'
 import trim from 'lodash.trim'
 
 import UploadButton from '../../components/UploadButton'
-import { getImages, deleteImage, editImage } from '../../network/images'
-import Link from 'next/link'
+import { getImages, deleteImage } from '../../network/images'
 import moment from 'moment'
 import useDebounce from '../../hooks/useDebounce'
 import Head from 'next/head'

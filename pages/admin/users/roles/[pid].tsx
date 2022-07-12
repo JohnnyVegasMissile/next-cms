@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import {
@@ -7,10 +6,8 @@ import {
     Space,
     Button,
     // Select,
-    Divider,
     // Radio,
     Typography,
-    Select,
     Card,
     message,
     Spin,
@@ -24,7 +21,7 @@ import { postRole, editRole, getRoleDetails } from '../../../../network/roles'
 import { UseQueryResult, useQuery, useMutation, useQueryClient } from 'react-query'
 import Head from 'next/head'
 
-const { Text, Title } = Typography
+const { Text } = Typography
 
 const initialValues: Prisma.RoleCreateInput = {
     name: '',

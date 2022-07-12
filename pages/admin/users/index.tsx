@@ -10,13 +10,12 @@ import {
     // Typography,
     Popconfirm,
     Input,
-    Select,
 } from 'antd'
 import Link from 'next/link'
 // import moment from 'moment'
 import { useQuery, UseQueryResult } from 'react-query'
 import { getUsers } from '../../../network/users'
-import type { FullUser, UserRoleTypes } from '../../../types'
+import type { FullUser } from '../../../types'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
 import { PlusOutlined } from '@ant-design/icons'
@@ -24,8 +23,6 @@ import { useState } from 'react'
 import useDebounce from '../../../hooks/useDebounce'
 import CustomSelect from '@components/CustomSelect'
 import Head from 'next/head'
-
-const { Option } = Select
 
 const AdminUsers = () => {
     const [q, setQ] = useState<string | undefined>()

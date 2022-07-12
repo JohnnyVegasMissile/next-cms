@@ -7,7 +7,6 @@ import type {
     Article,
     Element,
     Role,
-    Access,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
@@ -44,6 +43,7 @@ export type FullArticleEdit = Prisma.ArticleCreateInput & {
     coverId?: string
     pageId?: string
     sections?: FullSection[] | null
+    page?: string
 }
 
 export type FullPage = Page & {

@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import {
@@ -16,7 +16,6 @@ import {
     Checkbox,
     Row,
     Col,
-    Form,
 } from 'antd'
 import {
     PlusOutlined,
@@ -27,16 +26,14 @@ import {
 } from '@ant-design/icons'
 import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
-import type { Element, Page, Role } from '@prisma/client'
+import type { Page, Role } from '@prisma/client'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 // import { Prisma } from '@prisma/client'
 // import type { Page } from '@prisma/client'
-import Blocks from '../../../blocks'
 import CustomSelect from '../../../components/CustomSelect'
 import type { FullPageEdit, FullSection } from '../../../types'
 import GetEditComponent from '../../../components/GetEditComponent'
 import DisplayElementView from '../../../components/DisplayElementView'
-import { getElementDetails, getElements } from '../../../network/elements'
 import { editPage, getPageDetails, postPage } from '../../../network/pages'
 import Head from 'next/head'
 import { CheckboxValueType } from 'antd/lib/checkbox/Group'
@@ -44,7 +41,7 @@ import { getRoles } from '../../../network/roles'
 
 const { Title, Text } = Typography
 
-const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found', 'signin']
+// const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found', 'signin']
 
 const initialValues: FullPageEdit = {
     title: '',

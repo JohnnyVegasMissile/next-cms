@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import {
@@ -16,11 +15,10 @@ import {
     Image,
 } from 'antd'
 import get from 'lodash.get'
-import kebabcase from 'lodash.kebabcase'
 import { editArticle, getArticleDetails, postArticle } from '../../../network/articles'
 import GetEditComponent from '../../../components/GetEditComponent'
 import CustomSelect from '../../../components/CustomSelect'
-import type { FullArticle, FullArticleEdit, FullSection } from '../../../types'
+import type { FullArticleEdit, FullSection } from '../../../types'
 import {
     CaretDownOutlined,
     CaretUpOutlined,
@@ -29,9 +27,8 @@ import {
 } from '@ant-design/icons'
 import DisplayElementView from '../../../components/DisplayElementView'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
-import { Article, Media, Section } from '@prisma/client'
+import { Article, Media } from '@prisma/client'
 import { getImageDetail } from '../../../network/images'
-import UploadButton from '../../../components/UploadButton'
 import MediaModal from '@components/MediaModal'
 import Head from 'next/head'
 
@@ -41,6 +38,7 @@ const { TextArea } = Input
 const initialValues: FullArticleEdit = {
     title: '',
     slug: '',
+    page: '',
     published: true,
 }
 

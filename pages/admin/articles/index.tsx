@@ -1,5 +1,5 @@
 import type { Article, Page } from '@prisma/client'
-import { Space, Button, Table, Breadcrumb, Badge, Popconfirm, Input, Select } from 'antd'
+import { Space, Button, Table, Breadcrumb, Badge, Popconfirm, Input } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
@@ -13,8 +13,6 @@ import { useState } from 'react'
 import useDebounce from '../../../hooks/useDebounce'
 import CustomSelect from '../../../components/CustomSelect'
 import Head from 'next/head'
-
-const { Option } = Select
 
 const AdminArticles = () => {
     const [q, setQ] = useState<string | undefined>()

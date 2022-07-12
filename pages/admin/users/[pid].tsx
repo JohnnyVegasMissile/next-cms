@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import {
@@ -10,7 +9,6 @@ import {
     Divider,
     // Radio,
     Typography,
-    Select,
     Card,
     message,
     Spin,
@@ -18,7 +16,6 @@ import {
 // import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import get from 'lodash.get'
 // import kebabcase from 'lodash.kebabcase'
-import { Prisma } from '@prisma/client'
 // import type { Page } from '@prisma/client'
 import { postUser, editUser, getUser } from '../../../network/users'
 import { UseQueryResult, useQuery, useMutation, useQueryClient } from 'react-query'
@@ -26,7 +23,7 @@ import { FullUser, UserCreation } from '@types'
 import CustomSelect from '@components/CustomSelect'
 import Head from 'next/head'
 
-const { Text, Title } = Typography
+const { Text } = Typography
 
 const initialValues: UserCreation = {
     type: '',

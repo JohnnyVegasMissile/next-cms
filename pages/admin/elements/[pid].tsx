@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import { Input, Space, Button, Typography, Card, Select, message, Spin } from 'antd'
@@ -10,7 +9,7 @@ import GetEditComponent from '../../../components/GetEditComponent'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import Head from 'next/head'
 
-const { Title, Text } = Typography
+const { Text } = Typography
 
 const initialValues: Prisma.ElementCreateInput = {
     title: '',

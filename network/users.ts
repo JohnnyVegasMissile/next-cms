@@ -1,7 +1,7 @@
 import INSTANCE from './api'
 import { Prisma } from '@prisma/client'
 // import type { User, Login } from '@prisma/client'
-import { FullUser, UserRoleTypes } from '../types'
+import { FullUser } from '../types'
 
 export const postUser = (data: Prisma.UserCreateInput): Promise<FullUser> =>
     new Promise(async (resolve, reject) => {

@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 // import { Divider, Steps } from 'antd'
 import { Button, Result, Spin } from 'antd'
 import type { NextPage } from 'next'

@@ -9,7 +9,7 @@ import Blocks from '../../blocks'
 import { getRoles } from '../../network/roles'
 
 const { Option } = Select
-const { Title, Text } = Typography
+const { Text } = Typography
 
 const CustomSelect = () => null
 

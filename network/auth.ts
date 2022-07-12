@@ -1,4 +1,3 @@
-import { User } from '@prisma/client'
 import { AuthResponse } from '../types'
 
 import INSTANCE from './api'

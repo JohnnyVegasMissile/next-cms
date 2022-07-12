@@ -1,8 +1,6 @@
 import { useAuth } from '../hooks/useAuth'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Input, Card, Space } from 'antd'
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
 
 import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'

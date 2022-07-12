@@ -14,6 +14,7 @@ interface Props {
 const CustomImage = ({ img, className }: Props) => {
     const imageURL = `${process.env.UPLOADS_IMAGES_DIR}/${img?.uri}`
 
+    // eslint-disable-next-line @next/next/no-img-element
     return <img src={imageURL} alt={img?.alt || ''} className={className} />
     // return (
     //     <Image
@@ -37,6 +38,7 @@ const Background = ({ img, className, children }: Props) => {
                 {children}
             </div>
             <noscript>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={imageURL} alt={img?.alt || ''} />
                 {/* <Image
                     className={className}

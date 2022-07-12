@@ -20,6 +20,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
                 router.push('/')
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setRedirect, initializing, router, user?.role])
 
     /* show loading indicator while the auth provider is still initializing */

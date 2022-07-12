@@ -38,7 +38,7 @@ const { TextArea } = Input
 const initialValues: FullArticleEdit = {
     title: '',
     slug: '',
-    page: '',
+    // page: '',
     published: true,
 }
 
@@ -90,12 +90,15 @@ const Admin = () => {
                     }
                 }
 
-                mutation.mutate({ pid: pid as string, values: { ...values, sections } })
+                mutation.mutate({
+                    pid: pid as string,
+                    values: { ...values, sections, page: undefined },
+                })
             },
         })
 
     const article: UseQueryResult<FullArticleEdit, Error> = useQuery<FullArticleEdit, Error>(
-        ['pages', { id: pid }],
+        ['articles', { id: pid }],
         () => getArticleDetails(pid as string),
         {
             refetchOnWindowFocus: false,

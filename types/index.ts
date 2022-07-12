@@ -43,7 +43,7 @@ export type FullArticleEdit = Prisma.ArticleCreateInput & {
     coverId?: string
     pageId?: string
     sections?: FullSection[] | null
-    page?: string
+    // page?: string | undefined
 }
 
 export type FullPage = Page & {

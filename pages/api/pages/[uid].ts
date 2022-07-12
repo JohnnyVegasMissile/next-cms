@@ -56,8 +56,9 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     for (const section of newSections) {
         await prisma.section.create({
             data: {
-                type: section.type,
                 pageId: id,
+                type: section.type,
+                elementId: section.elementId,
                 position: section.position,
                 content: section.content,
             },

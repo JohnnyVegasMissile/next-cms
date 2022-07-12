@@ -130,7 +130,7 @@ const Admin = () => {
                     get(access, 'roleId', '')
                 )
 
-                const slugEdit = get(values, 'slug', '')!.split('/')
+                const slugEdit = get(data, 'slug', '')!.split('/')
 
                 setValues({ ...data, sections, accesses, slugEdit })
             },

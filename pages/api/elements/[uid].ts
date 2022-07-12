@@ -24,9 +24,59 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         data: req.body,
     })
 
-    return res.status(200).json(element)
+    res.status(200).json(element)
 
-    // return res.unstable_revalidate(`/${page.slug}`)
+    const URIs = new Set<string>()
+
+    const pagesReval = await prisma.page.findMany({
+        where: {
+            OR: [
+                { headerId: id },
+                { footerId: id },
+                {
+                    sections: {
+                        some: {
+                            elementId: id,
+                        },
+                    },
+                },
+            ],
+            published: true,
+        },
+        include: { articles: true },
+    })
+
+    for (const page of pagesReval) {
+        const slug = `/${page.slug}`
+        URIs.add(slug)
+
+        for (const article of page.articles) {
+            const slugArticle = `${slug}/${article.slug}`
+
+            await res.unstable_revalidate(slugArticle)
+            URIs.add(slugArticle)
+        }
+    }
+
+    const sectionsReval = await prisma.section.findMany({
+        where: {
+            elementId: id,
+        },
+        include: { page: true, article: { include: { page: true } } },
+    })
+
+    for (const section of sectionsReval) {
+        if (!!section.page) {
+            const slug = `/${section.page?.slug}`
+            URIs.add(slug)
+        } else if (!!section.article) {
+            const slug = `/${section.article?.page.slug}/${section.article?.slug}`
+            URIs.add(slug)
+        }
+    }
+
+    console.log(URIs)
+    await URIs.forEach((uri) => res.unstable_revalidate(uri))
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

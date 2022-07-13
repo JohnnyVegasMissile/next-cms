@@ -38,7 +38,6 @@ const { TextArea } = Input
 const initialValues: FullArticleEdit = {
     title: '',
     slug: '',
-    // page: '',
     published: true,
 }
 
@@ -92,7 +91,7 @@ const Admin = () => {
 
                 mutation.mutate({
                     pid: pid as string,
-                    values: { ...values, sections, page: undefined },
+                    values: { ...values, sections },
                 })
             },
         })

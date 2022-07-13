@@ -4,7 +4,7 @@ import type { Article } from '@prisma/client'
 
 import { FullArticle, FullArticleEdit } from '../types'
 
-export const postArticle = (data: Prisma.ArticleCreateInput): Promise<Article> =>
+export const postArticle = (data: FullArticleEdit): Promise<Article> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
@@ -18,7 +18,7 @@ export const postArticle = (data: Prisma.ArticleCreateInput): Promise<Article> =
             .catch(reject)
     })
 
-export const editArticle = (id: string, data: Prisma.ArticleCreateInput): Promise<Article> =>
+export const editArticle = (id: string, data: FullArticleEdit): Promise<Article> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',

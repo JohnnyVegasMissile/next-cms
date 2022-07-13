@@ -39,7 +39,9 @@ export type FullArticle = Article & {
     sections?: FullSection[] | null
 }
 
-export type FullArticleEdit = Prisma.ArticleCreateInput & {
+interface ArticleCreateInput extends Omit<Prisma.ArticleCreateInput, 'page'> {}
+
+export type FullArticleEdit = ArticleCreateInput & {
     coverId?: string
     pageId?: string
     sections?: FullSection[] | null

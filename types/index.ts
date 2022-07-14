@@ -49,9 +49,15 @@ export type FullArticleEdit = ArticleCreateInput & {
     // page?: string | undefined
 }
 
+export interface FormFieldCreateInput extends Omit<Prisma.FormFieldCreateInput, 'form'> {}
+
 export type FullFormEdit = Prisma.FormCreateInput & {
-    fields?: FormField[] | null
+    fields?: FormFieldCreateInput[] | null
 }
+
+// export type FormFieldEdit = Prisma.FormCreateInput & {
+//     fields?: FormField[] | null
+// }
 
 export type FullPage = Page & {
     metadatas?: Metadata[] | null

@@ -1,82 +1,55 @@
-import { useState, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import {
     Spin,
     Card,
-    Radio,
-    Modal,
     Input,
     Space,
     Button,
     Divider,
-    Select,
     message,
     Typography,
-    Checkbox,
-    Row,
-    Col,
+    Radio,
+    Select,
+    Switch,
 } from 'antd'
 import {
     PlusOutlined,
-    MinusOutlined,
     CaretUpOutlined,
     CaretDownOutlined,
     CloseOutlined,
 } from '@ant-design/icons'
 import get from 'lodash.get'
 import kebabcase from 'lodash.kebabcase'
-import type { Page, Role } from '@prisma/client'
+import type { Form, FormField } from '@prisma/client'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
-// import { Prisma } from '@prisma/client'
-// import type { Page } from '@prisma/client'
-import CustomSelect from '../../../components/CustomSelect'
-import type { FullPageEdit, FullSection } from '../../../types'
-import GetEditComponent from '../../../components/GetEditComponent'
-import DisplayElementView from '../../../components/DisplayElementView'
-import { editPage, getPageDetails, postPage } from '../../../network/pages'
+import type { FormFieldCreateInput, FullFormEdit } from '../../../types'
 import Head from 'next/head'
-import { CheckboxValueType } from 'antd/lib/checkbox/Group'
-import { getRoles } from '../../../network/roles'
+import { editForm, getFormDetails, postForm } from '../../../network/forms'
 
 const { Title, Text } = Typography
 
-// const forbidenSlugs = ['new', 'edit', 'delete', 'api', 'admin', 'not-found', 'signin']
-
-const initialValues: FullPageEdit = {
-    title: '',
-    // slug: '',
-    slugEdit: [''],
-    sections: [],
-    metadatas: [],
-    accesses: [],
-    published: true,
+const initialField: FormFieldCreateInput = {
+    type: 'input',
+    label: '',
+    placeholder: '',
+    position: 0,
+    required: false,
 }
 
-const validate = (values: FullPageEdit) => {
+const initialValues: FullFormEdit = {
+    title: '',
+    sendMail: false,
+    sendTo: '',
+    fields: [initialField],
+}
+
+const validate = (values: FullFormEdit) => {
     let errors: any = {}
 
     if (!values.title) {
         errors.title = 'Required'
     }
-
-    // const splittedSlug = values.slug!.split('/')
-    // for (const slug of splittedSlug) {
-    //     if (!slug) {
-    //         errors.slug = 'Forbiden slug'
-    //         break
-    //     }
-    // }
-
-    // if (values.type === 'page' || values.type === 'list') {
-    //     if (!values.slug) {
-    //         errors.slugEdit = 'Required'
-    //     }
-
-    //     if (forbidenSlugs.includes(get(values, 'slugEdit.0', ''))) {
-    //         errors.slugEdit = 'Forbiden slug'
-    //     }
-    // }
 
     return errors
 }
@@ -86,162 +59,109 @@ const Admin = () => {
     const { pid } = router.query
     const queryClient = useQueryClient()
 
-    const { values, errors, handleChange, handleSubmit, setValues } = useFormik<FullPageEdit>({
+    const { values, errors, handleChange, handleSubmit, setValues } = useFormik<FullFormEdit>({
         initialValues,
         validate,
         onSubmit: async (values) => {
             let i = 0
-            const sections: FullSection[] = []
+            const fields: FormFieldCreateInput[] = []
 
-            if (!!values.sections) {
-                for (const section of values.sections) {
-                    if (!!section.type || !!section.elementId) {
-                        sections.push({
-                            ...section,
-                            position: i,
-                        })
+            if (!!values.fields) {
+                for (const field of values.fields) {
+                    fields.push({
+                        ...field,
+                        position: i,
+                    })
 
-                        i = i + 1
-                    }
+                    i = i + 1
                 }
             }
 
-            const slug = get(values, 'slugEdit', []).join('/')
-
             mutation.mutate({
                 pid: pid as string,
-                values: { ...values, sections, slug, slugEdit: undefined },
+                values: { ...values, fields },
             })
         },
     })
 
-    const page: UseQueryResult<FullPageEdit, Error> = useQuery<FullPageEdit, Error>(
-        ['pages', { id: pid }],
-        () => getPageDetails(pid as string),
+    const form: UseQueryResult<FullFormEdit, Error> = useQuery<FullFormEdit, Error>(
+        ['forms', { id: pid }],
+        () => getFormDetails(pid as string),
         {
             refetchOnWindowFocus: false,
             enabled: !!pid && pid !== 'create',
-            onSuccess: (data: FullPageEdit) => {
-                const sections = get(data, 'sections', []).sort(
-                    (a, b) => a.position - b.position
-                )
+            onSuccess: (data: FullFormEdit) => {
+                const fields = get(data, 'fields', []).sort((a, b) => a.position - b.position)
 
-                const accesses = get(data, 'accesses', []).map((access) =>
-                    get(access, 'roleId', '')
-                )
-
-                const slugEdit = get(data, 'slug', '')!.split('/')
-
-                setValues({ ...data, sections, accesses, slugEdit })
+                setValues({ ...data, fields })
             },
-            onError: (err) => router.push('/admin/pages'),
+            onError: (err) => router.push('/admin/forms'),
         }
     )
 
     const mutation = useMutation(
-        (data: { pid: string; values: FullPageEdit }) =>
-            data.pid === 'create' ? postPage(data.values) : editPage(data.pid, data.values),
+        (data: { pid: string; values: FullFormEdit }) =>
+            data.pid === 'create' ? postForm(data.values) : editForm(data.pid, data.values),
         {
-            onSuccess: (data: Page) => {
-                message.success(`Page ${data.title} saved`)
-                queryClient.invalidateQueries('pages')
-                router.push('/admin/pages')
+            onSuccess: (data: Form) => {
+                message.success(`Form ${data.title} saved`)
+                queryClient.invalidateQueries('forms')
+                router.push('/admin/forms')
             },
-            onError: (err) => {
-                message.error('An error occured, while creating or updating the page')
-                queryClient.invalidateQueries('pages')
-                router.push('/admin/pages')
+            onError: () => {
+                message.error('An error occured, while creating or updating the form')
+                queryClient.invalidateQueries('forms')
+                router.push('/admin/forms')
             },
         }
     )
-
-    const isLockedPage = values.type !== 'page' && values.type !== 'list'
-
-    const lastSlugIndex = get(values, 'slugEdit', []).length - 1
 
     const onHandleChange = (name: string, value: any) => {
         handleChange({ target: { name, value } })
     }
 
-    const addSlug = () => {
-        let newValue = [...get(values, 'slugEdit', [])]
-        newValue.splice(lastSlugIndex, 0, '')
-
-        onHandleChange('slugEdit', newValue)
-    }
-
-    const removeSlug = () => {
-        let newValue = [...get(values, 'slugEdit', [])]
-        newValue.splice(lastSlugIndex - 1, 1)
-
-        onHandleChange('slugEdit', newValue)
-    }
-
-    // const editSlug = (index: number, value: string) => {
-    //     let newValue = [...get(values, 'slug', '')]
-    //     newValue[index] = value
-
-    //     onHandleChange('slug', newValue.join('/'))
-    // }
-
-    const addSection = () => {
+    const addField = () => {
         handleChange({
             target: {
-                name: 'sections',
+                name: 'fields',
                 value: [
-                    ...get(values, 'sections', []),
+                    ...get(values, 'fields', []),
                     {
                         type: undefined,
-                        position: get(values, 'sections', []).length,
-                        content: '{}',
+                        position: get(values, 'fields', []).length,
+                        content: initialField,
                     },
                 ],
             },
         })
     }
 
-    const removeSection = (index: number) => {
-        let newValue = [...get(values, 'sections', [])]
+    const removeField = (index: number) => {
+        let newValue = [...get(values, 'fields', [])]
         newValue.splice(index, 1)
 
-        handleChange({ target: { name: 'sections', value: newValue } })
+        handleChange({ target: { name: 'fields', value: newValue } })
     }
 
-    const SectionUp = (index: number) => {
-        let newValue = [...get(values, 'sections', [])]
+    const FieldUp = (index: number) => {
+        let newValue = [...get(values, 'fields', [])]
         const temp = newValue[index]
         newValue[index] = newValue[index - 1]
         newValue[index - 1] = temp
 
-        handleChange({ target: { name: 'sections', value: newValue } })
+        handleChange({ target: { name: 'fields', value: newValue } })
     }
 
-    const SectionDown = (index: number) => {
-        let newValue = [...get(values, 'sections', [])]
+    const FieldDown = (index: number) => {
+        let newValue = [...get(values, 'fields', [])]
         const temp = newValue[index]
         newValue[index] = newValue[index + 1]
         newValue[index + 1] = temp
 
-        handleChange({ target: { name: 'sections', value: newValue } })
+        handleChange({ target: { name: 'fields', value: newValue } })
     }
 
-    const addMetadata = () => {
-        handleChange({
-            target: {
-                name: 'metadatas',
-                value: [...get(values, 'metadatas', []), { name: '', content: '' }],
-            },
-        })
-    }
-
-    const removeMetadata = (index: number) => {
-        let newValue = [...get(values, 'metadatas', [])]
-        newValue.splice(index, 1)
-
-        handleChange({ target: { name: 'metadatas', value: newValue } })
-    }
-
-    if (page.isLoading || !pid) {
+    if (form.isLoading || !pid) {
         return (
             <div
                 style={{
@@ -285,17 +205,39 @@ const Admin = () => {
                                             id="title"
                                             style={{ width: 240 }}
                                             value={get(values, 'title', '')}
-                                            onChange={(e) => {
+                                            onChange={(e) =>
                                                 onHandleChange('title', e.target.value)
-
-                                                if (pid === 'create') {
-                                                    onHandleChange(
-                                                        `slugEdit.${lastSlugIndex}`,
-                                                        kebabcase(e.target.value)
-                                                    )
-                                                }
-                                            }}
+                                            }
                                         />
+                                    </Space>
+
+                                    <Space direction="vertical">
+                                        <Text>
+                                            {'Send to:  '}
+                                            <Switch
+                                                size="small"
+                                                checked={values.sendMail}
+                                                onChange={(checked: boolean) => {
+                                                    onHandleChange('sendMail', checked)
+                                                    if (!checked) onHandleChange('sendTo', '')
+                                                }}
+                                            />
+                                        </Text>
+                                        <div style={{ height: 32 }}>
+                                            {values.sendMail && (
+                                                <Input
+                                                    id="sendTo"
+                                                    style={{ width: 240 }}
+                                                    value={get(values, 'sendTo', '')!}
+                                                    onChange={(e) =>
+                                                        onHandleChange(
+                                                            'sendTo',
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            )}
+                                        </div>
                                     </Space>
                                 </Space>
                             </Space>
@@ -305,33 +247,33 @@ const Admin = () => {
                             Fields
                         </Title>
                         <Space direction="vertical" style={{ width: '100%' }}>
-                            {get(values, 'sections', []).map((section, idx) => (
+                            {get(values, 'fields', []).map((field, idx) => (
                                 <div key={idx} style={{ display: 'flex', gap: 8 }}>
                                     <Space direction="vertical" size={1}>
                                         <Button
                                             disabled={idx === 0}
-                                            onClick={() => SectionUp(idx)}
+                                            onClick={() => FieldUp(idx)}
                                             type="primary"
                                             // shape="circle"
                                             icon={<CaretUpOutlined />}
                                         />
                                         <Button
                                             disabled={
-                                                idx === get(values, 'sections', []).length - 1
+                                                idx === get(values, 'fields', []).length - 1
                                             }
-                                            onClick={() => SectionDown(idx)}
+                                            onClick={() => FieldDown(idx)}
                                             type="primary"
                                             // shape="circle"
                                             icon={<CaretDownOutlined />}
                                         />
                                     </Space>
                                     <Card
-                                        bodyStyle={{ padding: 0 }}
+                                        // bodyStyle={{ padding: 0 }}
                                         title={`Field ${idx + 1}`}
                                         extra={
                                             <Button
                                                 type="primary"
-                                                onClick={() => removeSection(idx)}
+                                                onClick={() => removeField(idx)}
                                                 danger
                                                 // shape="circle"
                                                 icon={<CloseOutlined />}
@@ -339,21 +281,90 @@ const Admin = () => {
                                         }
                                         style={{ flex: 1 }}
                                     >
-                                        {!!section.type && (
-                                            <GetEditComponent
-                                                type={section.type}
-                                                defaultValues={section.content}
-                                                onChange={(e) =>
-                                                    onHandleChange(
-                                                        `sections.${idx}.content`,
-                                                        e
-                                                    )
-                                                }
-                                            />
-                                        )}
-                                        {!!section.elementId && (
-                                            <DisplayElementView id={section.elementId} />
-                                        )}
+                                        <Space direction="vertical" style={{ width: '100%' }}>
+                                            <Space size="large">
+                                                <Space direction="vertical">
+                                                    <Text>Type :</Text>
+                                                    <Select
+                                                        id="type"
+                                                        style={{ width: 240 }}
+                                                        value={field.type}
+                                                        onChange={(e) =>
+                                                            onHandleChange(
+                                                                `fields.${idx}.type`,
+                                                                e
+                                                            )
+                                                        }
+                                                    >
+                                                        <Select.Option value="input">
+                                                            Input
+                                                        </Select.Option>
+                                                        <Select.Option value="text-area">
+                                                            Textarea
+                                                        </Select.Option>
+                                                        <Select.Option value="number">
+                                                            Number
+                                                        </Select.Option>
+                                                        <Select.Option value="email">
+                                                            Email
+                                                        </Select.Option>
+                                                        <Select.Option value="select">
+                                                            Select
+                                                        </Select.Option>
+                                                        <Select.Option value="submit">
+                                                            Submit
+                                                        </Select.Option>
+                                                    </Select>
+                                                </Space>
+                                                <Space direction="vertical">
+                                                    <Text>Label :</Text>
+                                                    <Input
+                                                        id="label"
+                                                        style={{ width: 240 }}
+                                                        value={field.label}
+                                                        onChange={(e) =>
+                                                            onHandleChange(
+                                                                `fields.${idx}.label`,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                </Space>
+                                                <Space direction="vertical">
+                                                    <Text>Placeholder :</Text>
+                                                    <Input
+                                                        id="placeholder"
+                                                        style={{ width: 240 }}
+                                                        value={field.placeholder || ''}
+                                                        onChange={(e) =>
+                                                            onHandleChange(
+                                                                `fields.${idx}.placeholder`,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                </Space>
+                                                <Space direction="vertical">
+                                                    <Text>Required :</Text>
+                                                    <Radio.Group
+                                                        id="status"
+                                                        value={field.required}
+                                                        onChange={(e) =>
+                                                            onHandleChange(
+                                                                `fields.${idx}.required`,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    >
+                                                        <Radio value={true}>Required</Radio>
+                                                        <Radio value={false}>
+                                                            Not required
+                                                        </Radio>
+                                                    </Radio.Group>
+                                                </Space>
+                                            </Space>
+                                            <Divider />
+                                        </Space>
                                     </Card>
                                 </div>
                             ))}
@@ -368,13 +379,12 @@ const Admin = () => {
                                     // shape="round"
                                     icon={<PlusOutlined />}
                                     // size="small"
-                                    onClick={addSection}
+                                    onClick={addField}
                                 >
-                                    Add section
+                                    Add field
                                 </Button>
                             </div>
                         </Space>
-                        <Divider />
 
                         <Divider />
                         <Button loading={mutation.isLoading} type="primary" htmlType="submit">

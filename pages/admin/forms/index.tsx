@@ -4,7 +4,7 @@ import Link from 'next/link'
 import moment from 'moment'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
-import type { Form, Page } from '@prisma/client'
+import type { Form, FormField, Page } from '@prisma/client'
 import { useQuery, UseQueryResult } from 'react-query'
 import { PlusOutlined } from '@ant-design/icons'
 
@@ -79,6 +79,11 @@ const columns = [
     {
         title: 'Title',
         dataIndex: 'title',
+    },
+    {
+        title: 'Nb of fields',
+        dataIndex: 'fields',
+        render: (e: FormField[]) => e?.length || 0,
     },
     {
         title: 'Last updated',

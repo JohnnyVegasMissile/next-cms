@@ -147,7 +147,7 @@ const Admin = () => {
                 queryClient.invalidateQueries('pages')
                 router.push('/admin/pages')
             },
-            onError: (err) => {
+            onError: () => {
                 message.error('An error occured, while creating or updating the page')
                 queryClient.invalidateQueries('pages')
                 router.push('/admin/pages')

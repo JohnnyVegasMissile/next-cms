@@ -1,7 +1,7 @@
 import INSTANCE from './api'
 import type { Form } from '@prisma/client'
 
-import { FullArticleEdit, FullFormEdit } from '../types'
+import { FullFormEdit } from '../types'
 
 export const postForm = (data: FullFormEdit): Promise<Form> =>
     new Promise(async (resolve, reject) => {
@@ -17,7 +17,7 @@ export const postForm = (data: FullFormEdit): Promise<Form> =>
             .catch(reject)
     })
 
-export const editForm = (id: string, data: FullArticleEdit): Promise<Form> =>
+export const editForm = (id: string, data: FullFormEdit): Promise<Form> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',

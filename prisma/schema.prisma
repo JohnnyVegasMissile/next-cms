@@ -139,7 +139,7 @@ model Setting {
 model Form {
   id                String          @id @default(cuid())
   title             String          @unique
-  description       String?
+  sendMail          Boolean         @default(false)
   sendTo            String?
   messages          Message[]
   fields            FormField[]
@@ -150,7 +150,7 @@ model FormField {
   id                String          @id @default(cuid())
   formId            String
   form              Form            @relation(fields: [formId], references: [id])
-  name              String
+  // name              String
   type              String
   label             String
   placeholder       String?

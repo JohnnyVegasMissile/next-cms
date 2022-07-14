@@ -85,14 +85,14 @@ const DefaultSignInForm = () => {
                 <form onSubmit={handleSubmit}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         <Input
-                            name="email"
+                            id="email"
                             prefix={<UserOutlined />}
                             value={values.email}
                             onChange={(e) => onHandleChange('email', e.target.value)}
                             placeholder="Email"
                         />
                         <Input
-                            name="password"
+                            id="password"
                             prefix={<LockOutlined />}
                             value={values.password}
                             onChange={(e) => onHandleChange('password', e.target.value)}

@@ -51,9 +51,11 @@ const ListPages = ({ value, onChange, width = 240 }: CustomSelectProps) => {
 }
 
 const ListElements = ({
+    id,
     value,
     onChange,
 }: {
+    id?: string
     value?: string
     onChange(value: string | undefined): void
 }) => {
@@ -67,6 +69,7 @@ const ListElements = ({
 
     return (
         <Select
+            id={id}
             allowClear
             placeholder="Please select"
             value={value}

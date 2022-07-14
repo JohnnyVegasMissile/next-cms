@@ -135,3 +135,34 @@ model Setting {
   value             String
   updatedAt         DateTime        @updatedAt
 }
+
+model Form {
+  id                String          @id @default(cuid())
+  title             String          @unique
+  description       String?
+  sendTo            String?
+  messages          Message[]
+  fields            FormField[]
+  updatedAt         DateTime        @updatedAt
+}
+
+model FormField {
+  id                String          @id @default(cuid())
+  formId            String
+  form              Form            @relation(fields: [formId], references: [id])
+  name              String
+  type              String
+  label             String
+  placeholder       String?
+  position          Int
+  required          Boolean         @default(false)
+  updatedAt         DateTime        @updatedAt
+}
+
+model Message {
+  id                String          @id @default(cuid())
+  name              String          @unique
+  formId            String
+  form              Form            @relation(fields: [formId], references: [id])
+  value             String
+}

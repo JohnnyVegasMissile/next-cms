@@ -92,7 +92,7 @@ const AdminUsers = () => {
                     dataSource={get(users, 'data', [])}
                     columns={columns}
                     size="small"
-                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    scroll={{ y: 'calc(100vh - 155px)' }}
                     pagination={{
                         hideOnSinglePage: true,
                         pageSize: get(users, 'data', []).length,

@@ -71,7 +71,7 @@ const AdminArticles = () => {
                     dataSource={get(articles, 'data', [])}
                     columns={columns}
                     size="small"
-                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    scroll={{ y: 'calc(100vh - 155px)' }}
                     pagination={{
                         hideOnSinglePage: true,
                         pageSize: get(articles, 'data', []).length,

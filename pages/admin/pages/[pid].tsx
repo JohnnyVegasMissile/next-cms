@@ -282,6 +282,7 @@ const Admin = () => {
                                     <Space direction="vertical">
                                         <Text>Title :</Text>
                                         <Input
+                                            id="title"
                                             style={{ width: 240 }}
                                             value={get(values, 'title', '')}
                                             onChange={(e) => {
@@ -298,7 +299,11 @@ const Admin = () => {
                                     </Space>
                                     <Space direction="vertical">
                                         <Text>Type</Text>
-                                        <Radio.Group value={values.type} buttonStyle="solid">
+                                        <Radio.Group
+                                            id="type"
+                                            value={values.type}
+                                            buttonStyle="solid"
+                                        >
                                             <Radio.Button
                                                 value="page"
                                                 disabled={values.type !== 'page'}
@@ -334,6 +339,7 @@ const Admin = () => {
                                     <Space direction="vertical">
                                         <Text>Status</Text>
                                         <Radio.Group
+                                            id="status"
                                             value={values.published}
                                             onChange={(e) =>
                                                 onHandleChange('published', e.target.value)
@@ -345,13 +351,15 @@ const Admin = () => {
                                         </Radio.Group>
                                     </Space>
 
-                                    <Space direction="vertical">
-                                        <Text>Access</Text>
-                                        <PageAccessCheckboxes
-                                            value={values.accesses || []}
-                                            onChange={(e) => onHandleChange('accesses', e)}
-                                        />
-                                    </Space>
+                                    {!isLockedPage && (
+                                        <Space direction="vertical">
+                                            <Text>Access</Text>
+                                            <PageAccessCheckboxes
+                                                value={values.accesses || []}
+                                                onChange={(e) => onHandleChange('accesses', e)}
+                                            />
+                                        </Space>
+                                    )}
                                 </Space>
 
                                 {!isLockedPage && (
@@ -364,9 +372,11 @@ const Admin = () => {
                                                     {idx === lastSlugIndex && (
                                                         <>
                                                             <Button
+                                                                id="slug-minus"
                                                                 onClick={removeSlug}
                                                                 type="primary"
-                                                                shape="circle"
+                                                                // shape="circle"
+                                                                danger
                                                                 disabled={
                                                                     get(values, 'slugEdit', [])
                                                                         .length < 2
@@ -374,18 +384,20 @@ const Admin = () => {
                                                                 icon={<MinusOutlined />}
                                                             />
                                                             <Button
+                                                                id="slug-plus"
                                                                 onClick={addSlug}
                                                                 disabled={
                                                                     get(values, 'slugEdit', [])
                                                                         .length > 5
                                                                 }
                                                                 type="primary"
-                                                                shape="circle"
+                                                                // shape="circle"
                                                                 icon={<PlusOutlined />}
                                                             />
                                                         </>
                                                     )}
                                                     <Input
+                                                        id={`slug-${idx}`}
                                                         style={{
                                                             minWidth: 200,
                                                         }}
@@ -409,63 +421,75 @@ const Admin = () => {
                             </Space>
                         </Card>
 
-                        <Card title="Metadata">
+                        <Card title="Metadatas">
                             <Space direction="vertical">
                                 {get(values, 'metadatas', []).map(
-                                    (metadata: any, index: number) => (
-                                        <Space key={index}>
-                                            <Select
-                                                style={{ width: 240 }}
-                                                value={metadata.name}
-                                                onChange={(e) =>
-                                                    onHandleChange(
-                                                        `metadatas.${index}.name`,
-                                                        e
-                                                    )
-                                                }
-                                            >
-                                                <Select.Option value="application-name">
-                                                    Application name
-                                                </Select.Option>
-                                                <Select.Option value="author">
-                                                    Author
-                                                </Select.Option>
-                                                <Select.Option value="description">
-                                                    Description
-                                                </Select.Option>
-                                                <Select.Option value="generator">
-                                                    Generator
-                                                </Select.Option>
-                                                <Select.Option value="keywords">
-                                                    Keywords
-                                                </Select.Option>
-                                                <Select.Option value="viewport">
-                                                    Viewport
-                                                </Select.Option>
-                                            </Select>
-                                            <Input
-                                                style={{ width: 240 }}
-                                                value={metadata.content}
-                                                onChange={(e) =>
-                                                    onHandleChange(
-                                                        `metadatas.${index}.content`,
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
+                                    (metadata: any, idx: number) => (
+                                        <Space key={idx} align="end">
+                                            <Space direction="vertical">
+                                                <Text>Name</Text>
+                                                <Select
+                                                    id={`meta-name-${idx}`}
+                                                    style={{ width: 240 }}
+                                                    value={metadata.name}
+                                                    onChange={(e) =>
+                                                        onHandleChange(
+                                                            `metadatas.${idx}.name`,
+                                                            e
+                                                        )
+                                                    }
+                                                >
+                                                    <Select.Option value="application-name">
+                                                        Application name
+                                                    </Select.Option>
+                                                    <Select.Option value="author">
+                                                        Author
+                                                    </Select.Option>
+                                                    <Select.Option value="description">
+                                                        Description
+                                                    </Select.Option>
+                                                    <Select.Option value="generator">
+                                                        Generator
+                                                    </Select.Option>
+                                                    <Select.Option value="keywords">
+                                                        Keywords
+                                                    </Select.Option>
+                                                    <Select.Option value="viewport">
+                                                        Viewport
+                                                    </Select.Option>
+                                                </Select>
+                                            </Space>
+
+                                            <Space direction="vertical">
+                                                <Text>Content</Text>
+                                                <Input
+                                                    id={`meta-content-${idx}`}
+                                                    style={{ width: 240 }}
+                                                    value={metadata.content}
+                                                    onChange={(e) =>
+                                                        onHandleChange(
+                                                            `metadatas.${idx}.content`,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </Space>
                                             <Button
-                                                onClick={() => removeMetadata(index)}
+                                                id={`meta-minus-${idx}`}
+                                                onClick={() => removeMetadata(idx)}
                                                 type="primary"
-                                                shape="circle"
+                                                // shape="circle"
+                                                danger
                                                 icon={<MinusOutlined />}
                                             />
                                         </Space>
                                     )
                                 )}
                                 <Button
+                                    id={'meta-plus'}
                                     onClick={addMetadata}
                                     type="primary"
-                                    shape="circle"
+                                    // shape="circle"
                                     icon={<PlusOutlined />}
                                 />
                             </Space>
@@ -478,6 +502,7 @@ const Admin = () => {
                                         Header
                                     </Title>
                                     <CustomSelect.ListElements
+                                        id="header"
                                         value={values.headerId}
                                         onChange={(e) => onHandleChange('headerId', e)}
                                     />
@@ -494,12 +519,12 @@ const Admin = () => {
                         <Space direction="vertical" style={{ width: '100%' }}>
                             {get(values, 'sections', []).map((section, idx) => (
                                 <div key={idx} style={{ display: 'flex', gap: 8 }}>
-                                    <Space direction="vertical">
+                                    <Space direction="vertical" size={1}>
                                         <Button
                                             disabled={idx === 0}
                                             onClick={() => SectionUp(idx)}
                                             type="primary"
-                                            shape="circle"
+                                            // shape="circle"
                                             icon={<CaretUpOutlined />}
                                         />
                                         <Button
@@ -508,7 +533,7 @@ const Admin = () => {
                                             }
                                             onClick={() => SectionDown(idx)}
                                             type="primary"
-                                            shape="circle"
+                                            // shape="circle"
                                             icon={<CaretDownOutlined />}
                                         />
                                     </Space>
@@ -540,7 +565,7 @@ const Admin = () => {
                                                 type="primary"
                                                 onClick={() => removeSection(idx)}
                                                 danger
-                                                shape="circle"
+                                                // shape="circle"
                                                 icon={<CloseOutlined />}
                                             />
                                         }
@@ -572,7 +597,7 @@ const Admin = () => {
                             >
                                 <Button
                                     type="primary"
-                                    shape="round"
+                                    // shape="round"
                                     icon={<PlusOutlined />}
                                     // size="small"
                                     onClick={addSection}
@@ -590,6 +615,7 @@ const Admin = () => {
                                         Footer
                                     </Title>
                                     <CustomSelect.ListElements
+                                        id="footer"
                                         value={values.footerId}
                                         onChange={(e) => onHandleChange('footerId', e)}
                                     />
@@ -601,7 +627,7 @@ const Admin = () => {
                         </Card>
 
                         <Divider />
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={mutation.isLoading} type="primary" htmlType="submit">
                             Save
                         </Button>
                     </Space>
@@ -666,6 +692,7 @@ const PageTypeModal = ({
             cancelText={null}
         >
             <Radio.Group
+                id="access"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
                 buttonStyle="solid"

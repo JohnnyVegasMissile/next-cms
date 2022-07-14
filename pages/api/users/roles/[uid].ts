@@ -11,7 +11,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         where: { id },
     })
 
-    if (!role) return res.status(500).json({ error: 'User type not found' })
+    if (!role) return res.status(404).json({ error: 'Role not found' })
 
     return res.status(200).json(role)
 }

@@ -1,26 +1,23 @@
-import type { Element } from '@prisma/client'
-import { Space, Button, Table, Popconfirm, Input, Select } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { useState } from 'react'
+import { Space, Button, Table, Popconfirm, Input } from 'antd'
 import Link from 'next/link'
 import moment from 'moment'
-import { useQuery, UseQueryResult } from 'react-query'
-import { getElements, deleteElement } from '../../../network/elements'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
+import type { Form, Page } from '@prisma/client'
+import { useQuery, UseQueryResult } from 'react-query'
+import { PlusOutlined } from '@ant-design/icons'
+
 import useDebounce from '../../../hooks/useDebounce'
-import { useState } from 'react'
-import Blocks from '../../../blocks'
+import { getForms, deleteForm } from '../../../network/forms'
 import Head from 'next/head'
 
-const { Option } = Select
-
-const AdminElements = () => {
+const AdminPages = () => {
     const [q, setQ] = useState<string | undefined>()
-    const [type, setType] = useState<string | undefined>()
     const debouncedQ = useDebounce<string | undefined>(q, 750)
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
-        ['elements', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, type }],
-        () => getElements(type, trim(debouncedQ)?.toLocaleLowerCase()),
+    const forms: UseQueryResult<Form[], Error> = useQuery<Form[], Error>(
+        ['forms', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined }],
+        () => getForms(trim(debouncedQ)?.toLocaleLowerCase()),
         {
             refetchOnWindowFocus: false,
         }
@@ -29,7 +26,7 @@ const AdminElements = () => {
     return (
         <>
             <Head>
-                <title>Admin - Elements</title>
+                <title>Admin - Forms</title>
             </Head>
 
             <Space
@@ -47,25 +44,13 @@ const AdminElements = () => {
                         <Input
                             value={q}
                             allowClear
+                            id="search"
                             placeholder="Search"
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
                         />
-                        <Select
-                            allowClear
-                            value={type}
-                            onChange={setType}
-                            placeholder="Block"
-                            style={{ width: 180 }}
-                        >
-                            {Object.keys(Blocks).map((key) => (
-                                <Option key={key} value={key}>
-                                    {get(Blocks, `${key}.name`, '')}
-                                </Option>
-                            ))}
-                        </Select>
                     </Space>
-                    <Link href="/admin/elements/create">
+                    <Link href="/admin/forms/create">
                         <a>
                             <Button type="primary" icon={<PlusOutlined />}>
                                 Create
@@ -75,14 +60,14 @@ const AdminElements = () => {
                 </div>
                 <Table
                     bordered={false}
-                    loading={elements.isLoading}
-                    dataSource={get(elements, 'data', [])}
+                    loading={forms.isLoading}
+                    dataSource={get(forms, 'data', [])}
                     columns={columns}
                     size="small"
                     scroll={{ y: 'calc(100vh - 155px)' }}
                     pagination={{
                         hideOnSinglePage: true,
-                        pageSize: get(elements, 'data', []).length,
+                        pageSize: get(forms, 'data', []).length,
                     }}
                 />
             </Space>
@@ -95,7 +80,6 @@ const columns = [
         title: 'Title',
         dataIndex: 'title',
     },
-    { title: 'Block', dataIndex: 'type' },
     {
         title: 'Last updated',
         dataIndex: 'updatedAt',
@@ -103,10 +87,10 @@ const columns = [
     },
     {
         width: 155,
-        render: (e: Element) => (
+        render: (e: Page) => (
             <Space>
                 <Button type="primary">
-                    <Link href={`/admin/elements/${e.id}`}>
+                    <Link href={`/admin/forms/${e.id}`}>
                         <a>Edit</a>
                     </Link>
                 </Button>
@@ -114,7 +98,7 @@ const columns = [
                 <Popconfirm
                     placement="topRight"
                     title={'Are you sur to delete this page?'}
-                    onConfirm={() => deleteElement(e.id)}
+                    onConfirm={() => deleteForm(e.id)}
                     okText="Delete"
                     cancelText="Cancel"
                 >
@@ -125,6 +109,6 @@ const columns = [
     },
 ]
 
-AdminElements.requireAuth = true
+AdminPages.requireAuth = true
 
-export default AdminElements
+export default AdminPages

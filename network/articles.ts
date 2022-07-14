@@ -1,5 +1,4 @@
 import INSTANCE from './api'
-import { Prisma } from '@prisma/client'
 import type { Article } from '@prisma/client'
 
 import { FullArticle, FullArticleEdit } from '../types'

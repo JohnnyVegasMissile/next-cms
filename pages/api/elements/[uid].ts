@@ -11,7 +11,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         where: { id },
     })
 
-    if (!element) return res.status(500).json({ error: 'User not found' })
+    if (!element) return res.status(404).json({ error: 'User not found' })
 
     return res.status(200).json(element)
 }

@@ -57,7 +57,7 @@ const AdminRoles = () => {
                         style={{ width: 180 }}
                         onChange={(e) => setQ(e.target.value)}
                     />
-                    <Link href="/admin/users/types/create">
+                    <Link href="/admin/users/roles/create">
                         <a>
                             <Button type="primary" icon={<PlusOutlined />}>
                                 Create
@@ -71,7 +71,7 @@ const AdminRoles = () => {
                     dataSource={get(roles, 'data', [])}
                     columns={columns}
                     size="small"
-                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    scroll={{ y: 'calc(100vh - 155px)' }}
                     pagination={{
                         hideOnSinglePage: true,
                         pageSize: get(roles, 'data', []).length,
@@ -97,8 +97,8 @@ const columns = [
         width: 155,
         render: (e: Role) => (
             <Space>
-                <Button type="primary">
-                    <Link href={`/admin/users/types/${e.id}`}>
+                <Button type="primary" disabled={e.id === 'super-admin'}>
+                    <Link href={`/admin/users/roles/${e.id}`}>
                         <a>Edit</a>
                     </Link>
                 </Button>
@@ -106,12 +106,17 @@ const columns = [
                 <Popconfirm
                     placement="topRight"
                     title={'Are you sur to delete this page?'}
-                    disabled={e.id === 'super-admin' || e.id === 'admin'}
+                    disabled={e.id === 'super-admin' || e.id === 'admin' || e.id === 'user'}
                     onConfirm={() => {}} //deletePage(e.id)}
                     okText="Delete"
                     cancelText="Cancel"
                 >
-                    <Button danger disabled={e.id === 'super-admin' || e.id === 'admin'}>
+                    <Button
+                        danger
+                        disabled={
+                            e.id === 'super-admin' || e.id === 'admin' || e.id === 'user'
+                        }
+                    >
                         Delete
                     </Button>
                 </Popconfirm>

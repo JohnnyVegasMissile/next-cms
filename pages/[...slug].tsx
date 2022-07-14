@@ -13,6 +13,8 @@ import get from 'lodash.get'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useSsr from '../hooks/useSsr'
+// import { FormattedMessage, useIntl } from 'react-intl'
+// import Link from 'next/link'
 
 const Pages = (props: FullPage | FullArticle) => {
     const router = useRouter()
@@ -61,6 +63,12 @@ const Pages = (props: FullPage | FullArticle) => {
                         )}
                     </>
                 )}
+
+                {/* <link rel="alternate" href={`${process.env.SITE_URL}`} hrefLang="x-default" />
+                <link rel="alternate" href={`${process.env.SITE_URL}/en`} hrefLang="en" />
+                <link rel="alternate" href={`${process.env.SITE_URL}/fr`} hrefLang="fr" />
+                <link rel="alternate" href={`${process.env.SITE_URL}/es`} hrefLang="es" />
+                <link rel="alternate" href={`${process.env.SITE_URL}/zh`} hrefLang="zh" /> */}
             </Head>
 
             <EditPageButton
@@ -157,15 +165,19 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
             include: { page: true },
         })
 
-        const page = {
-            ...article?.page,
-            updatedAt: Math.floor((article?.page.updatedAt?.getMilliseconds() || 1) / 1000),
-        }
+        if (!!article && slug.join('/') === `${article.page.slug}/${article.slug}`) {
+            const artPage = {
+                ...article?.page,
+                updatedAt: Math.floor(
+                    (article?.page.updatedAt?.getMilliseconds() || 1) / 1000
+                ),
+            }
 
-        props = {
-            ...article,
-            page,
-            updatedAt: Math.floor((article?.updatedAt?.getMilliseconds() || 1) / 1000),
+            props = {
+                ...article,
+                page: artPage,
+                updatedAt: Math.floor((article?.updatedAt?.getMilliseconds() || 1) / 1000),
+            }
         }
     }
 

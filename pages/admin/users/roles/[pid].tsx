@@ -83,12 +83,12 @@ const UsersCreation = () => {
             onSuccess: (data: Role) => {
                 message.success(`User types ${data.name} saved`)
                 queryClient.invalidateQueries('roles')
-                router.push('/admin/users/types')
+                router.push('/admin/users/roles')
             },
             onError: (err) => {
                 message.error('An error occured, while creating or updating the user types')
                 queryClient.invalidateQueries('roles')
-                router.push('/admin/users/types')
+                router.push('/admin/users/roles')
             },
         }
     )
@@ -142,7 +142,7 @@ const UsersCreation = () => {
                         </Space>
                     </Card>
 
-                    <Button type="primary" htmlType="submit">
+                    <Button loading={mutation.isLoading} type="primary" htmlType="submit">
                         Save
                     </Button>
                 </Space>

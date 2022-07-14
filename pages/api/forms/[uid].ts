@@ -1,67 +1,67 @@
-import { FullArticleEdit } from '../../../types'
+// import { FullArticleEdit } from '../../../types'
 import type { NextApiRequest, NextApiResponse } from 'next'
 // import type { Page, Metadata, Section, Article } from '@prisma/client'
 // import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
-import { Prisma, Section } from '@prisma/client'
+import { FormField, Prisma, Section } from '@prisma/client'
 import get from 'lodash.get'
+import { FullFormEdit } from '../../../types'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const article = await prisma.article.findUnique({
+    const form = await prisma.form.findUnique({
         where: { id },
-        include: { sections: true },
+        include: { fields: true },
     })
 
-    if (!article) return res.status(404).json({ error: 'User not found' })
+    if (!form) return res.status(404).json({ error: 'Form not found' })
 
-    return res.status(200).json(article)
+    return res.status(200).json(form)
 }
 
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
-    const newArticleContent: FullArticleEdit = req.body
+    const newFormContent: FullFormEdit = req.body
 
     // delete existing sections
-    await prisma.section.deleteMany({
-        where: { articleId: id },
+    await prisma.formField.deleteMany({
+        where: { formId: id },
     })
 
     // create new sections
-    const newSections: Section[] = get(req, 'body.sections', [])
-    delete newArticleContent.sections
+    const newFields: FormField[] = get(req, 'body.fields', [])
+    delete newFormContent.fields
 
-    for (const section of newSections) {
-        await prisma.section.create({
+    for (const field of newFields) {
+        await prisma.formField.create({
             data: {
-                articleId: id,
-                type: section.type,
-                elementId: section.elementId,
-                position: section.position,
-                content: section.content,
+                formId: id,
+                name: field.name,
+                type: field.type,
+                label: field.label,
+                placeholder: field.placeholder,
+                required: true,
             },
         })
     }
 
-    const article = await prisma.article.update({
+    const form = await prisma.form.update({
         where: { id },
-        data: newArticleContent as Prisma.ArticleCreateInput,
-        include: { sections: true, page: true },
+        data: newFormContent as Prisma.FormFieldCreateInput,
+        include: { fields: true },
     })
 
-    res.status(200).json(article)
-
-    return res.unstable_revalidate(`/${article.page.slug}/${article.slug}`)
+    return res.status(200).json(form)
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const article = await prisma.article.delete({ where: { id } })
+    const form = await prisma.form.delete({ where: { id } })
 
-    return res.status(200).json(article)
+    return res.status(200).json(form)
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {

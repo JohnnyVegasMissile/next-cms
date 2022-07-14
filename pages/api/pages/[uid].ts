@@ -3,7 +3,7 @@ import type { Page, Metadata, Section, Prisma } from '@prisma/client'
 import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
-import { FullPageEdit } from 'types'
+import { FullPageEdit } from '../../../types'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string

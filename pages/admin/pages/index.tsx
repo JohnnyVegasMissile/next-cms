@@ -61,6 +61,7 @@ const AdminPages = () => {
                         <Input
                             value={q}
                             allowClear
+                            id="search"
                             placeholder="Search"
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
@@ -68,6 +69,7 @@ const AdminPages = () => {
                         <Select
                             allowClear
                             value={type}
+                            id="type"
                             onChange={setType}
                             placeholder="Type"
                             style={{ width: 180 }}
@@ -92,7 +94,7 @@ const AdminPages = () => {
                     dataSource={get(pages, 'data', [])}
                     columns={columns}
                     size="small"
-                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    scroll={{ y: 'calc(100vh - 155px)' }}
                     pagination={{
                         hideOnSinglePage: true,
                         pageSize: get(pages, 'data', []).length,

@@ -1,12 +1,13 @@
 import INSTANCE from './api'
-import { Prisma } from '@prisma/client'
-import type { Role } from '@prisma/client'
+import type { Form } from '@prisma/client'
 
-export const postRole = (data: Prisma.RoleCreateInput): Promise<Role> =>
+import { FullArticleEdit, FullFormEdit } from '../types'
+
+export const postForm = (data: FullFormEdit): Promise<Form> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
-            url: `/api/users/roles`,
+            url: `/api/forms`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -16,11 +17,11 @@ export const postRole = (data: Prisma.RoleCreateInput): Promise<Role> =>
             .catch(reject)
     })
 
-export const editRole = (id: string, data: Prisma.RoleCreateInput): Promise<Role> =>
+export const editForm = (id: string, data: FullArticleEdit): Promise<Form> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
-            url: `/api/users/roles/${id}`,
+            url: `/api/forms/${id}`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -30,32 +31,32 @@ export const editRole = (id: string, data: Prisma.RoleCreateInput): Promise<Role
             .catch(reject)
     })
 
-export const getRoles = (q?: string): Promise<Role[]> =>
+export const getForms = (q?: string): Promise<Form[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/users/roles`,
+            url: `/api/forms`,
             params: { q },
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const getRoleDetails = (id: string): Promise<Role> =>
+export const getFormDetails = (id: string): Promise<FullFormEdit> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/users/roles/${id}`,
+            url: `/api/forms/${id}`,
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const deleteRole = (id: string): Promise<void> =>
+export const deleteForm = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
-            url: `/api/users/roles/${id}`,
+            url: `/api/forms/${id}`,
         })
             .then(resolve)
             .catch(reject)

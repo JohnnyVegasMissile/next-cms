@@ -85,7 +85,7 @@ const MediaModal = ({ value, onMediaSelected }: Props) => {
                         pageSize: get(files, 'data', []).length,
                     }}
                     size="small"
-                    scroll={{ y: 'calc(100vh - 300px)' }}
+                    scroll={{ y: 'calc(100vh - 155px)' }}
                     rowKey="id"
                     rowSelection={{
                         type: 'radio',

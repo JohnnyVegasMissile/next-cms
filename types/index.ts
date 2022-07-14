@@ -7,6 +7,7 @@ import type {
     Article,
     Element,
     Role,
+    FormField,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
@@ -46,6 +47,10 @@ export type FullArticleEdit = ArticleCreateInput & {
     pageId?: string
     sections?: FullSection[] | null
     // page?: string | undefined
+}
+
+export type FullFormEdit = Prisma.FormCreateInput & {
+    fields?: FormField[] | null
 }
 
 export type FullPage = Page & {

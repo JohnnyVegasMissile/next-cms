@@ -160,7 +160,7 @@ const Admin = () => {
                             />
                         </Card>
 
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={mutation.isLoading} type="primary" htmlType="submit">
                             Save
                         </Button>
                     </Space>

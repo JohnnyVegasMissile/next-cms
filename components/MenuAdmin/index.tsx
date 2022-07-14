@@ -13,6 +13,8 @@ import {
     IdcardOutlined,
     LoadingOutlined,
     ReloadOutlined,
+    MailOutlined,
+    FormOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -108,7 +110,7 @@ function MenuAdmin() {
                     key: '1',
                     label: (
                         <Link href="/admin/elements/create">
-                            <a>Create an elements</a>
+                            <a>Create an element</a>
                         </Link>
                     ),
                     icon: <PlusCircleOutlined />,
@@ -124,7 +126,7 @@ function MenuAdmin() {
                     key: '1',
                     label: (
                         <Link href="/admin/users/create">
-                            <a>Create an users</a>
+                            <a>Create an user</a>
                         </Link>
                     ),
                     icon: <PlusCircleOutlined />,
@@ -132,11 +134,27 @@ function MenuAdmin() {
                 {
                     key: '2',
                     label: (
-                        <Link href="/admin/users/types">
-                            <a>User Types</a>
+                        <Link href="/admin/users/roles">
+                            <a>Roles</a>
                         </Link>
                     ),
                     icon: <IdcardOutlined />,
+                },
+            ]}
+        />
+    )
+
+    const FormsMenu = (
+        <Menu
+            items={[
+                {
+                    key: '1',
+                    label: (
+                        <Link href="/admin/forms/create">
+                            <a>Create an form</a>
+                        </Link>
+                    ),
+                    icon: <PlusCircleOutlined />,
                 },
             ]}
         />
@@ -224,11 +242,35 @@ function MenuAdmin() {
                     </Dropdown>
                     <Divider type="vertical" />
 
+                    <Dropdown overlay={FormsMenu}>
+                        <Space>
+                            <Link href="/admin/forms">
+                                <a>
+                                    <Text>
+                                        <FormOutlined style={{ marginRight: 4 }} />
+                                        Forms
+                                    </Text>
+                                </a>
+                            </Link>
+                        </Space>
+                    </Dropdown>
+                    <Divider type="vertical" />
+
                     <Link href="/admin/images">
                         <a>
                             <Text>
                                 <PictureOutlined style={{ marginRight: 4 }} />
                                 Images
+                            </Text>
+                        </a>
+                    </Link>
+                    <Divider type="vertical" />
+
+                    <Link href="/admin/messages">
+                        <a>
+                            <Text>
+                                <MailOutlined style={{ marginRight: 4 }} />
+                                Messages
                             </Text>
                         </a>
                     </Link>

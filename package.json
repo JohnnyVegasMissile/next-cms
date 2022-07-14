@@ -6,7 +6,7 @@
         "dev": "next dev -p 8080",
         "postbuild": "next-sitemap",
         "build": "next build",
-        "start": "next start",
+        "start": "next start -p 80",
         "lint": "next lint",
         "initdb": "prisma migrate dev",
         "studio": "prisma studio",
@@ -31,8 +31,9 @@
         "mv": "^2.1.1",
         "next": "12.1.6",
         "next-sitemap": "^3.0.5",
-        "react": "18.2.0",
+        "react": "^18.2.0",
         "react-dom": "18.2.0",
+        "react-intl": "^6.0.5",
         "react-query": "^3.39.1"
     },
     "devDependencies": {

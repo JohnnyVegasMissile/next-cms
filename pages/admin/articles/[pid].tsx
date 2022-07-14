@@ -333,12 +333,12 @@ const Admin = () => {
                         <Space direction="vertical" style={{ width: '100%' }}>
                             {get(values, 'sections', [])!.map((section, idx) => (
                                 <div key={idx} style={{ display: 'flex', gap: 8 }}>
-                                    <Space direction="vertical">
+                                    <Space direction="vertical" size={1}>
                                         <Button
                                             disabled={idx === 0}
                                             onClick={() => SectionUp(idx)}
                                             type="primary"
-                                            shape="circle"
+                                            // shape="circle"
                                             icon={<CaretUpOutlined />}
                                         />
                                         <Button
@@ -347,7 +347,7 @@ const Admin = () => {
                                             }
                                             onClick={() => SectionDown(idx)}
                                             type="primary"
-                                            shape="circle"
+                                            // shape="circle"
                                             icon={<CaretDownOutlined />}
                                         />
                                     </Space>
@@ -379,7 +379,7 @@ const Admin = () => {
                                                 type="primary"
                                                 onClick={() => removeSection(idx)}
                                                 danger
-                                                shape="circle"
+                                                // shape="circle"
                                                 icon={<CloseOutlined />}
                                             />
                                         }
@@ -411,7 +411,7 @@ const Admin = () => {
                             >
                                 <Button
                                     type="primary"
-                                    shape="round"
+                                    // shape="round"
                                     icon={<PlusOutlined />}
                                     onClick={addSection}
                                 >
@@ -421,7 +421,7 @@ const Admin = () => {
                         </Space>
                         <Divider />
 
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={mutation.isLoading} type="primary" htmlType="submit">
                             Save
                         </Button>
                     </Space>

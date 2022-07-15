@@ -75,7 +75,6 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         }
     }
 
-    console.log(URIs)
     await URIs.forEach((uri) => res.unstable_revalidate(uri))
 }
 

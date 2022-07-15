@@ -42,6 +42,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
                 type: field.type,
                 label: field.label,
                 placeholder: field.placeholder,
+                position: field.position,
                 required: true,
             },
         })
@@ -49,7 +50,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const form = await prisma.form.update({
         where: { id },
-        data: newFormContent as Prisma.FormFieldCreateInput,
+        data: newFormContent,
         include: { fields: true },
     })
 
@@ -58,6 +59,8 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
+
+    await prisma.formField.deleteMany({ where: { formId: id } })
 
     const form = await prisma.form.delete({ where: { id } })
 

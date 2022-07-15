@@ -112,6 +112,8 @@ interface NewGetStaticPathsContext extends GetStaticPathsContext {
     }
 }
 
+const sanitizeDate = (date: Date) => Math.floor((date?.getMilliseconds() || 1) / 1000)
+
 // export async function getServerSideProps(context: GetServerSidePropsContext) {
 export async function getStaticProps(context: NewGetStaticPathsContext) {
     const { slug } = context.params
@@ -121,7 +123,13 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
         include: {
             articles: true,
             metadatas: true,
-            sections: true,
+            sections: {
+                include: {
+                    form: {
+                        include: { fields: true },
+                    },
+                },
+            },
             header: true,
             footer: true,
             accesses: true,
@@ -131,52 +139,68 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
     if (!!page) {
         const articles = page.articles.map((article) => ({
             ...article,
-            updatedAt: Math.floor((article.updatedAt?.getMilliseconds() || 1) / 1000),
+            updatedAt: sanitizeDate(article.updatedAt),
         }))
 
         const header = page.header
             ? {
                   ...page.header,
-                  updatedAt: Math.floor(
-                      (page.header.updatedAt?.getMilliseconds() || 1) / 1000
-                  ),
+                  updatedAt: sanitizeDate(page.header.updatedAt),
               }
             : null
 
         const footer = page.footer
             ? {
                   ...page.footer,
-                  updatedAt: Math.floor(
-                      (page.footer.updatedAt?.getMilliseconds() || 1) / 1000
-                  ),
+                  updatedAt: sanitizeDate(page.footer.updatedAt),
               }
             : null
+
+        const sections = page.sections.map((section) => ({
+            ...section,
+            form: section.form
+                ? { ...section.form, updatedAt: sanitizeDate(section.form.updatedAt) }
+                : null,
+        }))
 
         props = {
             ...page,
             header,
+            sections,
             footer,
             articles,
-            updatedAt: Math.floor((page.updatedAt?.getMilliseconds() || 1) / 1000),
+            updatedAt: sanitizeDate(page.updatedAt),
         }
     } else {
         const article = await prisma.article.findUnique({
             where: { slug: slug[slug.length - 1] },
-            include: { page: true },
+            include: {
+                page: true,
+                sections: { include: { form: { include: { fields: true } } } },
+            },
         })
 
         if (!!article && slug.join('/') === `${article.page.slug}/${article.slug}`) {
             const artPage = {
                 ...article?.page,
-                updatedAt: Math.floor(
-                    (article?.page.updatedAt?.getMilliseconds() || 1) / 1000
-                ),
+                updatedAt: sanitizeDate(article?.page.updatedAt),
             }
+
+            const sections = article.sections.map((section) => ({
+                ...section,
+                form: section.form
+                    ? {
+                          ...section.form,
+                          updatedAt: sanitizeDate(section.form.updatedAt),
+                      }
+                    : null,
+            }))
 
             props = {
                 ...article,
                 page: artPage,
-                updatedAt: Math.floor((article?.updatedAt?.getMilliseconds() || 1) / 1000),
+                sections,
+                updatedAt: sanitizeDate(article?.updatedAt),
             }
         }
     }

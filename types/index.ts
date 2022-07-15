@@ -8,6 +8,8 @@ import type {
     Element,
     Role,
     FormField,
+    Form,
+    Message,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
@@ -69,6 +71,15 @@ export type FullPage = Page & {
 
 export type FullSection = Section & {
     element: Element | null
+    form: FullForm | null
+}
+
+export type FullMessage = Message & {
+    form: FullForm | null
+}
+
+export type FullForm = Form & {
+    fields: FormField[] | null
 }
 
 export type FullPageEdit = Prisma.PageCreateInput & {

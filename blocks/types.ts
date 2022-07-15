@@ -1,4 +1,4 @@
-import { FullPage, PageTypes } from '../types'
+import { FullPage, FullSection, PageTypes } from '../types'
 
 export interface Block {
     name: string
@@ -12,4 +12,5 @@ export interface Props {
     defaultValues: string
     onChange?: (values: string) => void
     page?: FullPage
+    section?: FullSection
 }

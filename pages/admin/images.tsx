@@ -15,11 +15,15 @@ import useDebounce from '../../hooks/useDebounce'
 import Head from 'next/head'
 
 const AdminImages = () => {
+    const queryClient = useQueryClient()
     const [q, setQ] = useState<string | undefined>()
     const debouncedQ = useDebounce<string | undefined>(q, 750)
-    const queryClient = useQueryClient()
+    const queryKeys = [
+        'medias',
+        { type: 'image', q: trim(debouncedQ)?.toLocaleLowerCase() || undefined },
+    ]
     const files: UseQueryResult<Media[], Error> = useQuery<Media[], Error>(
-        ['medias', { type: 'image', q: trim(debouncedQ)?.toLocaleLowerCase() || undefined }],
+        queryKeys,
         () => getImages(),
         {
             refetchOnWindowFocus: false,
@@ -27,7 +31,7 @@ const AdminImages = () => {
     )
 
     const addFile = (file: Media) => {
-        queryClient.setQueryData('images', (oldData: any) => {
+        queryClient.setQueryData(queryKeys, (oldData: any) => {
             // type error
             return [file, ...oldData]
         })
@@ -36,7 +40,7 @@ const AdminImages = () => {
     const deleteFile = async (id: string) => {
         deleteImage(id)
 
-        await queryClient.setQueryData('images', (oldData: any) => {
+        await queryClient.setQueryData(queryKeys, (oldData: any) => {
             // type error
             const index = oldData.findIndex((file: Media) => file.id === id)
 

@@ -1,12 +1,13 @@
 import { Cascader, Select, Typography } from 'antd'
 import { useQuery, UseQueryResult /*, useQueryClient*/ } from 'react-query'
-import type { Page, Role } from '@prisma/client'
+import type { Form, Page, Role } from '@prisma/client'
 import { getPages } from '../../network/pages'
 import get from 'lodash.get'
 import { getElements } from '../../network/elements'
 import type { Element } from '@prisma/client'
 import Blocks from '../../blocks'
 import { getRoles } from '../../network/roles'
+import { getForms } from '../../network/forms'
 
 const { Option } = Select
 const { Text } = Typography
@@ -79,6 +80,45 @@ const ListElements = ({
             loading={elements.isLoading}
         >
             {elements.data?.map((e) => (
+                <Select.Option key={e.id} value={e.id}>
+                    {e.title}
+                </Select.Option>
+            ))}
+        </Select>
+    )
+}
+
+const ListForms = ({
+    id,
+    value,
+    onChange,
+    width = 240,
+}: {
+    id?: string
+    value?: string | null
+    width?: number
+    onChange(value: string | undefined): void
+}) => {
+    const form: UseQueryResult<Form[], Error> = useQuery<Form[], Error>(
+        ['forms', {}],
+        () => getForms(),
+        {
+            refetchOnWindowFocus: false,
+        }
+    )
+
+    return (
+        <Select
+            id={id}
+            allowClear
+            placeholder="Please select"
+            value={value}
+            onChange={onChange}
+            style={{ width, fontWeight: 'normal' }}
+            status={form.isError ? 'error' : undefined}
+            loading={form.isLoading}
+        >
+            {form.data?.map((e) => (
                 <Select.Option key={e.id} value={e.id}>
                     {e.title}
                 </Select.Option>
@@ -204,5 +244,6 @@ CustomSelect.ListPages = ListPages
 CustomSelect.ListElements = ListElements
 CustomSelect.ListSections = SectionCascader
 CustomSelect.ListRoles = ListRoles
+CustomSelect.ListForms = ListForms
 
 export default CustomSelect

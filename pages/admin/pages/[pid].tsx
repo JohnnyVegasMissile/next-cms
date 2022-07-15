@@ -405,7 +405,7 @@ const Admin = () => {
                                                         onChange={(e) =>
                                                             onHandleChange(
                                                                 `slugEdit.${idx}`,
-                                                                e.target.value
+                                                                kebabcase(e.target.value)
                                                             )
                                                         }
                                                         status={
@@ -541,6 +541,14 @@ const Admin = () => {
                                         bodyStyle={{ padding: 0 }}
                                         title={
                                             <Space>
+                                                <Text
+                                                    style={{
+                                                        fontSize: 14,
+                                                        fontWeight: 'normal',
+                                                    }}
+                                                >
+                                                    Block:
+                                                </Text>
                                                 <CustomSelect.ListSections
                                                     page={values.type}
                                                     section={section.type || undefined}
@@ -554,6 +562,24 @@ const Admin = () => {
                                                     onElementChange={(e) =>
                                                         onHandleChange(
                                                             `sections.${idx}.elementId`,
+                                                            e
+                                                        )
+                                                    }
+                                                />
+                                                <Divider type="vertical" />
+                                                <Text
+                                                    style={{
+                                                        fontSize: 14,
+                                                        fontWeight: 'normal',
+                                                    }}
+                                                >
+                                                    Form:
+                                                </Text>
+                                                <CustomSelect.ListForms
+                                                    value={section.formId}
+                                                    onChange={(e) =>
+                                                        onHandleChange(
+                                                            `sections.${idx}.formId`,
                                                             e
                                                         )
                                                     }

@@ -239,9 +239,16 @@ const Admin = () => {
                                         <Input
                                             style={{ width: 240 }}
                                             value={get(values, 'title', '')}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 onHandleChange('title', e.target.value)
-                                            }
+
+                                                if (pid === 'create') {
+                                                    onHandleChange(
+                                                        'slug',
+                                                        kebabcase(e.target.value)
+                                                    )
+                                                }
+                                            }}
                                         />
                                     </Space>
 
@@ -251,7 +258,10 @@ const Admin = () => {
                                             style={{ width: 240 }}
                                             value={get(values, 'slug', '')}
                                             onChange={(e) =>
-                                                onHandleChange('slug', e.target.value)
+                                                onHandleChange(
+                                                    'slug',
+                                                    kebabcase(e.target.value)
+                                                )
                                             }
                                         />
                                     </Space>
@@ -434,3 +444,6 @@ const Admin = () => {
 Admin.requireAuth = true
 
 export default Admin
+function kebabcase(value: string): any {
+    throw new Error('Function not implemented.')
+}

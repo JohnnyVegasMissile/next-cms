@@ -46,6 +46,8 @@ model Metadata {
 model Section {
   id                String          @id @default(cuid())
   type              String?
+  formId            String?
+  form              Form?           @relation(fields: [formId], references: [id])
   pageId            String?
   page              Page?           @relation(fields: [pageId], references: [id])
   articleId         String?
@@ -124,7 +126,7 @@ model Article {
   slug              String          @unique
   sections          Section[]
   pageId            String
-  page              Page           @relation(fields: [pageId], references: [id])
+  page              Page            @relation(fields: [pageId], references: [id])
   published         Boolean         @default(true)
   updatedAt         DateTime        @updatedAt
 }
@@ -143,6 +145,7 @@ model Form {
   sendTo            String?
   messages          Message[]
   fields            FormField[]
+  sections          Section[]
   updatedAt         DateTime        @updatedAt
 }
 
@@ -150,19 +153,19 @@ model FormField {
   id                String          @id @default(cuid())
   formId            String
   form              Form            @relation(fields: [formId], references: [id])
-  // name              String
+  name              String?
   type              String
   label             String
   placeholder       String?
   position          Int
-  required          Boolean         @default(false)
-  updatedAt         DateTime        @updatedAt
+  required          Boolean?        @default(false)
 }
 
 model Message {
   id                String          @id @default(cuid())
-  name              String          @unique
+  read              Boolean         @default(false)
   formId            String
   form              Form            @relation(fields: [formId], references: [id])
   value             String
+  createdAt        DateTime           @default(now())
 }

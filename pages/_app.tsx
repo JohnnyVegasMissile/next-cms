@@ -32,8 +32,6 @@ function MyApp({ Component, pageProps }: any) {
     //     }
     // }
 
-    // console.log('pageProps', pageProps)
-
     return (
         <QueryClientProvider client={queryClient}>
             {/* <IntlProvider locale={locale || 'en'} messages={messages(locale)}> */}

@@ -20,8 +20,8 @@ import {
     CloseOutlined,
 } from '@ant-design/icons'
 import get from 'lodash.get'
-import kebabcase from 'lodash.kebabcase'
-import type { Form, FormField } from '@prisma/client'
+import camelcase from 'lodash.camelcase'
+import type { Form } from '@prisma/client'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import type { FormFieldCreateInput, FullFormEdit } from '../../../types'
 import Head from 'next/head'
@@ -30,7 +30,8 @@ import { editForm, getFormDetails, postForm } from '../../../network/forms'
 const { Title, Text } = Typography
 
 const initialField: FormFieldCreateInput = {
-    type: 'input',
+    name: '',
+    type: '',
     label: '',
     placeholder: '',
     position: 0,
@@ -127,9 +128,8 @@ const Admin = () => {
                 value: [
                     ...get(values, 'fields', []),
                     {
-                        type: undefined,
+                        ...initialField,
                         position: get(values, 'fields', []).length,
-                        content: initialField,
                     },
                 ],
             },
@@ -282,86 +282,113 @@ const Admin = () => {
                                         style={{ flex: 1 }}
                                     >
                                         <Space direction="vertical" style={{ width: '100%' }}>
+                                            <Space direction="vertical">
+                                                <Text>Type :</Text>
+                                                <Select
+                                                    id="type"
+                                                    style={{ width: 240 }}
+                                                    value={field.type}
+                                                    onChange={(e) =>
+                                                        onHandleChange(`fields.${idx}.type`, e)
+                                                    }
+                                                >
+                                                    <Select.Option value="input">
+                                                        Input
+                                                    </Select.Option>
+                                                    <Select.Option value="text-area">
+                                                        Textarea
+                                                    </Select.Option>
+                                                    <Select.Option value="number">
+                                                        Number
+                                                    </Select.Option>
+                                                    <Select.Option value="email">
+                                                        Email
+                                                    </Select.Option>
+                                                    <Select.Option value="select">
+                                                        Select
+                                                    </Select.Option>
+                                                    <Select.Option value="submit">
+                                                        Submit
+                                                    </Select.Option>
+                                                </Select>
+                                            </Space>
+                                            <Divider />
                                             <Space size="large">
-                                                <Space direction="vertical">
-                                                    <Text>Type :</Text>
-                                                    <Select
-                                                        id="type"
-                                                        style={{ width: 240 }}
-                                                        value={field.type}
-                                                        onChange={(e) =>
-                                                            onHandleChange(
-                                                                `fields.${idx}.type`,
-                                                                e
-                                                            )
-                                                        }
-                                                    >
-                                                        <Select.Option value="input">
-                                                            Input
-                                                        </Select.Option>
-                                                        <Select.Option value="text-area">
-                                                            Textarea
-                                                        </Select.Option>
-                                                        <Select.Option value="number">
-                                                            Number
-                                                        </Select.Option>
-                                                        <Select.Option value="email">
-                                                            Email
-                                                        </Select.Option>
-                                                        <Select.Option value="select">
-                                                            Select
-                                                        </Select.Option>
-                                                        <Select.Option value="submit">
-                                                            Submit
-                                                        </Select.Option>
-                                                    </Select>
-                                                </Space>
                                                 <Space direction="vertical">
                                                     <Text>Label :</Text>
                                                     <Input
                                                         id="label"
                                                         style={{ width: 240 }}
                                                         value={field.label}
-                                                        onChange={(e) =>
+                                                        onChange={(e) => {
                                                             onHandleChange(
                                                                 `fields.${idx}.label`,
                                                                 e.target.value
                                                             )
-                                                        }
+
+                                                            if (pid === 'create') {
+                                                                onHandleChange(
+                                                                    `fields.${idx}.name`,
+                                                                    camelcase(e.target.value)
+                                                                )
+                                                            }
+                                                        }}
                                                     />
                                                 </Space>
-                                                <Space direction="vertical">
-                                                    <Text>Placeholder :</Text>
-                                                    <Input
-                                                        id="placeholder"
-                                                        style={{ width: 240 }}
-                                                        value={field.placeholder || ''}
-                                                        onChange={(e) =>
-                                                            onHandleChange(
-                                                                `fields.${idx}.placeholder`,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                </Space>
-                                                <Space direction="vertical">
-                                                    <Text>Required :</Text>
-                                                    <Radio.Group
-                                                        id="status"
-                                                        value={field.required}
-                                                        onChange={(e) =>
-                                                            onHandleChange(
-                                                                `fields.${idx}.required`,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    >
-                                                        <Radio value={true}>Required</Radio>
-                                                        <Radio value={false}>
-                                                            Not required
-                                                        </Radio>
-                                                    </Radio.Group>
-                                                </Space>
+                                                {field.type !== 'submit' && (
+                                                    <Space direction="vertical">
+                                                        <Text>Name :</Text>
+                                                        <Input
+                                                            id="name"
+                                                            style={{ width: 240 }}
+                                                            value={field.name || ''}
+                                                            onChange={(e) =>
+                                                                onHandleChange(
+                                                                    `fields.${idx}.name`,
+                                                                    camelcase(e.target.value)
+                                                                )
+                                                            }
+                                                        />
+                                                    </Space>
+                                                )}
+                                                {field.type !== 'submit' && (
+                                                    <Space direction="vertical">
+                                                        <Text>Placeholder :</Text>
+                                                        <Input
+                                                            id="placeholder"
+                                                            style={{ width: 240 }}
+                                                            value={field.placeholder || ''}
+                                                            onChange={(e) =>
+                                                                onHandleChange(
+                                                                    `fields.${idx}.placeholder`,
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                        />
+                                                    </Space>
+                                                )}
+                                                {field.type !== 'submit' && (
+                                                    <Space direction="vertical">
+                                                        <Text>Required :</Text>
+                                                        <Radio.Group
+                                                            id="status"
+                                                            value={field.required}
+                                                            onChange={(e) =>
+                                                                onHandleChange(
+                                                                    `fields.${idx}.required`,
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                        >
+                                                            <Radio value={true}>
+                                                                Required
+                                                            </Radio>
+                                                            <Radio value={false}>
+                                                                Not required
+                                                            </Radio>
+                                                        </Radio.Group>
+                                                    </Space>
+                                                )}
                                             </Space>
                                             <Divider />
                                         </Space>

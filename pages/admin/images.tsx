@@ -22,12 +22,8 @@ const AdminImages = () => {
         'medias',
         { type: 'image', q: trim(debouncedQ)?.toLocaleLowerCase() || undefined },
     ]
-    const files: UseQueryResult<Media[], Error> = useQuery<Media[], Error>(
-        queryKeys,
-        () => getImages(),
-        {
-            refetchOnWindowFocus: false,
-        }
+    const files: UseQueryResult<Media[], Error> = useQuery<Media[], Error>(queryKeys, () =>
+        getImages()
     )
 
     const addFile = (file: Media) => {
@@ -127,7 +123,7 @@ const AdminImages = () => {
 
             <Space
                 direction="vertical"
-                size="large"
+                size="middle"
                 style={{
                     width: '100%',
                     padding: 15,
@@ -137,7 +133,7 @@ const AdminImages = () => {
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Input
-                        placeholder="Search"
+                        placeholder="Search by name"
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                         style={{ width: 180 }}
@@ -145,6 +141,7 @@ const AdminImages = () => {
                     <UploadButton onFileRecieved={addFile} />
                 </div>
                 <Table
+                    rowKey={(record) => record.id}
                     bordered={false}
                     loading={files.isLoading}
                     dataSource={get(files, 'data', [])}

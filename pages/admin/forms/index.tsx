@@ -17,10 +17,7 @@ const AdminPages = () => {
     const debouncedQ = useDebounce<string | undefined>(q, 750)
     const forms: UseQueryResult<Form[], Error> = useQuery<Form[], Error>(
         ['forms', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined }],
-        () => getForms(trim(debouncedQ)?.toLocaleLowerCase()),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getForms(trim(debouncedQ)?.toLocaleLowerCase())
     )
 
     return (
@@ -31,7 +28,7 @@ const AdminPages = () => {
 
             <Space
                 direction="vertical"
-                size="large"
+                size="middle"
                 style={{
                     width: '100%',
                     padding: 15,
@@ -45,7 +42,7 @@ const AdminPages = () => {
                             value={q}
                             allowClear
                             id="search"
-                            placeholder="Search"
+                            placeholder="Search by title"
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
                         />
@@ -59,6 +56,7 @@ const AdminPages = () => {
                     </Link>
                 </div>
                 <Table
+                    rowKey={(record) => record.id}
                     bordered={false}
                     loading={forms.isLoading}
                     dataSource={get(forms, 'data', [])}
@@ -81,9 +79,13 @@ const columns = [
         dataIndex: 'title',
     },
     {
+        title: 'Send Email To',
+        dataIndex: 'sendTo',
+    },
+    {
         title: 'Nb of fields',
-        dataIndex: 'fields',
-        render: (e: FormField[]) => e?.length || 0,
+        dataIndex: '_count',
+        render: (count: any) => get(count, 'fields', 0),
     },
     {
         title: 'Last updated',

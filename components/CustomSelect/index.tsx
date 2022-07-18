@@ -23,10 +23,7 @@ interface CustomSelectProps {
 const ListPages = ({ value, onChange, width = 240 }: CustomSelectProps) => {
     const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
         ['pages', { type: 'list' }],
-        () => getPages('list'),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getPages('list')
     )
 
     return (
@@ -37,7 +34,7 @@ const ListPages = ({ value, onChange, width = 240 }: CustomSelectProps) => {
             style={{
                 width,
             }}
-            placeholder="List"
+            placeholder="Select a page"
             loading={pages.isLoading}
         >
             {get(pages, 'data', [])
@@ -62,17 +59,14 @@ const ListElements = ({
 }) => {
     const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
         ['elements', {}],
-        () => getElements(),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getElements()
     )
 
     return (
         <Select
             id={id}
             allowClear
-            placeholder="Please select"
+            placeholder="Select an element"
             value={value}
             onChange={onChange}
             style={{ width: 240, fontWeight: 'normal' }}
@@ -99,19 +93,15 @@ const ListForms = ({
     width?: number
     onChange(value: string | undefined): void
 }) => {
-    const form: UseQueryResult<Form[], Error> = useQuery<Form[], Error>(
-        ['forms', {}],
-        () => getForms(),
-        {
-            refetchOnWindowFocus: false,
-        }
+    const form: UseQueryResult<Form[], Error> = useQuery<Form[], Error>(['forms', {}], () =>
+        getForms()
     )
 
     return (
         <Select
             id={id}
             allowClear
-            placeholder="Please select"
+            placeholder="Select a form"
             value={value}
             onChange={onChange}
             style={{ width, fontWeight: 'normal' }}
@@ -136,18 +126,14 @@ const ListRoles = ({
     onChange(value: string | undefined): void
     width?: number
 }) => {
-    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(
-        ['roles', {}],
-        () => getRoles(),
-        {
-            refetchOnWindowFocus: false,
-        }
+    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(['roles', {}], () =>
+        getRoles()
     )
 
     return (
         <Select
             allowClear
-            placeholder="Please select"
+            placeholder="Select a role"
             value={value}
             onChange={onChange}
             style={{ width, fontWeight: 'normal' }}
@@ -182,15 +168,12 @@ const SectionCascader = ({
 }: SectionCascaderProps) => {
     const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
         ['elements', {}],
-        () => getElements(),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getElements()
     )
 
     return (
         <Cascader
-            placeholder="Please select"
+            placeholder="Select a block/element"
             value={!!section ? [section] : !!element ? ['', element] : []}
             displayRender={(labels: string[]) => {
                 if (labels.length === 1) {

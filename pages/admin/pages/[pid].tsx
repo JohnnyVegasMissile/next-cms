@@ -119,7 +119,6 @@ const Admin = () => {
         ['pages', { id: pid }],
         () => getPageDetails(pid as string),
         {
-            refetchOnWindowFocus: false,
             enabled: !!pid && pid !== 'create',
             onSuccess: (data: FullPageEdit) => {
                 const sections = get(data, 'sections', []).sort(
@@ -674,12 +673,8 @@ const PageAccessCheckboxes = ({
     value: string[]
     onChange(e: CheckboxValueType[]): void
 }) => {
-    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(
-        ['roles', {}],
-        () => getRoles(),
-        {
-            refetchOnWindowFocus: false,
-        }
+    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(['roles', {}], () =>
+        getRoles()
     )
 
     return (

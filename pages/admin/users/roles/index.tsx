@@ -27,10 +27,7 @@ const AdminRoles = () => {
     const debouncedQ = useDebounce<string | undefined>(q, 750)
     const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(
         ['roles', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined }],
-        () => getRoles(trim(debouncedQ)?.toLocaleLowerCase()),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getRoles(trim(debouncedQ)?.toLocaleLowerCase())
     )
 
     return (
@@ -41,7 +38,7 @@ const AdminRoles = () => {
 
             <Space
                 direction="vertical"
-                size="large"
+                size="middle"
                 style={{
                     width: '100%',
                     padding: 15,
@@ -53,7 +50,7 @@ const AdminRoles = () => {
                     <Input
                         value={q}
                         allowClear
-                        placeholder="Search"
+                        placeholder="Search by name"
                         style={{ width: 180 }}
                         onChange={(e) => setQ(e.target.value)}
                     />
@@ -66,6 +63,7 @@ const AdminRoles = () => {
                     </Link>
                 </div>
                 <Table
+                    rowKey={(record) => record.id}
                     bordered={false}
                     loading={roles.isLoading}
                     dataSource={get(roles, 'data', [])}

@@ -1,5 +1,6 @@
 import '../styles/globals.css'
 import 'antd/dist/antd.css'
+import type { NextWebVitalsMetric } from 'next/app'
 // import type { AppProps } from 'next/app'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
@@ -7,11 +8,23 @@ import { ReactQueryDevtools } from 'react-query/devtools'
 // import { IntlProvider } from 'react-intl'
 // import { prisma } from '../utils/prisma'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+    defaultOptions: { queries: { refetchOnWindowFocus: false } },
+})
 
 import AuthGuard from '../components/AuthGuard'
 import MenuAdmin from '../components/MenuAdmin'
 import { ProvideAuth } from '../hooks/useAuth'
+import { useRouter } from 'next/router'
+
+export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
+    console.log('event', name, {
+        category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
+        value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
+        label: id, // id unique to current page load
+        // non_interaction: true, // avoids affecting bounce rate.
+    })
+}
 
 // function MyApp({ Component, pageProps }: AppProps) {
 function MyApp({ Component, pageProps }: any) {

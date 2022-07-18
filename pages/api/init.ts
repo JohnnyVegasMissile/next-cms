@@ -120,6 +120,19 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
+    await prisma.setting.upsert({
+        where: {
+            name: 'installed',
+        },
+        update: {
+            value: 'true',
+        },
+        create: {
+            name: 'installed',
+            value: 'true',
+        },
+    })
+
     return res.status(200).json({ message: 'all set up' })
 }
 

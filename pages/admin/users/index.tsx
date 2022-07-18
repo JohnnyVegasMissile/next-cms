@@ -30,10 +30,7 @@ const AdminUsers = () => {
     const debouncedQ = useDebounce<string | undefined>(q, 750)
     const users: UseQueryResult<User[], Error> = useQuery<User[], Error>(
         ['users', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, roleId }],
-        () => getUsers(roleId, trim(debouncedQ)?.toLocaleLowerCase()),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getUsers(roleId, trim(debouncedQ)?.toLocaleLowerCase())
     )
 
     return (
@@ -44,7 +41,7 @@ const AdminUsers = () => {
 
             <Space
                 direction="vertical"
-                size="large"
+                size="middle"
                 style={{
                     width: '100%',
                     padding: 15,
@@ -57,7 +54,7 @@ const AdminUsers = () => {
                         <Input
                             value={q}
                             allowClear
-                            placeholder="Search"
+                            placeholder="Search by name"
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
                         />
@@ -87,6 +84,7 @@ const AdminUsers = () => {
                     </Link>
                 </div>
                 <Table
+                    rowKey={(record) => record.id}
                     bordered={false}
                     loading={users.isLoading}
                     dataSource={get(users, 'data', [])}

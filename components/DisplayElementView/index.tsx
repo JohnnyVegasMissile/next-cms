@@ -10,10 +10,7 @@ const { Text } = Typography
 const DisplayElementView = ({ id }: { id: string }) => {
     const element: UseQueryResult<Element, Error> = useQuery<Element, Error>(
         ['elements', { id }],
-        () => getElementDetails(id),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getElementDetails(id)
     )
 
     if (element.isLoading) {

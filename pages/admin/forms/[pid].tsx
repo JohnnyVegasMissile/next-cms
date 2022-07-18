@@ -89,7 +89,6 @@ const Admin = () => {
         ['forms', { id: pid }],
         () => getFormDetails(pid as string),
         {
-            refetchOnWindowFocus: false,
             enabled: !!pid && pid !== 'create',
             onSuccess: (data: FullFormEdit) => {
                 const fields = get(data, 'fields', []).sort((a, b) => a.position - b.position)

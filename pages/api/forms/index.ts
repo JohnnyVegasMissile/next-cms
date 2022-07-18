@@ -28,7 +28,16 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         }
     }
 
-    const forms = await prisma.form.findMany({ ...search, include: { fields: true } })
+    const forms = await prisma.form.findMany({
+        ...search,
+        // include: { fields: true },
+        // _count: { fields: true },
+        include: {
+            _count: {
+                select: { fields: true },
+            },
+        },
+    })
 
     return res.status(200).json(forms)
 }

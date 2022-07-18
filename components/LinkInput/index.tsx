@@ -21,7 +21,6 @@ const LinkInput = ({ value, onChange, width = 300 }: Props) => {
         {
             // select: (data) => data.filter((e) => e.type !== 'error'),
             refetchOnMount: false,
-            refetchOnWindowFocus: false,
         }
     )
 
@@ -30,7 +29,6 @@ const LinkInput = ({ value, onChange, width = 300 }: Props) => {
         () => getArticles(),
         {
             refetchOnMount: false,
-            refetchOnWindowFocus: false,
         }
     )
 

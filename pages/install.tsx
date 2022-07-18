@@ -6,20 +6,13 @@ import Head from 'next/head'
 // import Image from 'next/image'
 import { initPages } from '../network/api'
 import { useQuery, UseQueryResult } from 'react-query'
+import { prisma } from '../utils/prisma'
 
 const Install: NextPage = () => {
-    // const [initialazing, setInitialazing] = useState<boolean>(true)
-    // useEffect(() => {
-    //     initPages()
-    //         .then(() => setInitialazing(false))
-    //         .catch(() => setInitialazing(false))
-    // }, [])
-
     const install: UseQueryResult<void, Error> = useQuery<void, Error>(
         ['install'],
         () => initPages(),
         {
-            refetchOnWindowFocus: false,
             refetchOnMount: false,
             refetchOnReconnect: false,
         }
@@ -79,6 +72,17 @@ const Install: NextPage = () => {
             <footer></footer>
         </div>
     )
+}
+
+export async function getStaticProps() {
+    const revalidate = await prisma.setting.findUnique({
+        where: { name: 'installed' },
+    })
+
+    return {
+        props: {},
+        notFound: revalidate?.value === 'true',
+    }
 }
 
 export default Install

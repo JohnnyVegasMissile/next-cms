@@ -7,4 +7,5 @@ npm run initdb
 npm run dev
 go to /install
 
-root/root
+user: root
+pwd: root

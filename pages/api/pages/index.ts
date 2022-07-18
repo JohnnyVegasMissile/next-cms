@@ -11,34 +11,40 @@ import { prisma } from '../../../utils/prisma'
 // }
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const type = req.query.type as PageTypes | undefined
+    const type = req.query.type as string | undefined
     const q = req.query.q as string | undefined
 
-    let search: any = { where: {} }
+    const AND = []
 
     if (!!type) {
-        search.where.type = type
+        if (type === 'special') {
+            AND.push({
+                OR: [{ type: 'home' }, { type: 'error' }, { type: 'signin' }],
+            })
+        } else {
+            AND.push({
+                type,
+            })
+        }
     }
 
     if (!!q) {
         const sliptedQ = q.split(' ')
 
         if (sliptedQ.length === 1) {
-            search.where.title = {
-                contains: q,
-            }
+            AND.push({ title: { contains: q } })
         } else {
-            let OR = sliptedQ.map((word) => ({
+            const OR = sliptedQ.map((word) => ({
                 title: {
                     contains: word,
                 },
             }))
 
-            search.where.OR = OR
+            AND.push({ OR })
         }
     }
 
-    const pages: Page[] = await prisma.page.findMany(search)
+    const pages = await prisma.page.findMany({ where: { AND } })
 
     return res.status(200).json(pages)
 }

@@ -74,7 +74,6 @@ const UsersCreation = () => {
         ['users', { id: pid }],
         () => getUser(pid as string),
         {
-            refetchOnWindowFocus: false,
             enabled: !!pid && pid !== 'create',
             onSuccess: (data: FullUser) =>
                 setValues({

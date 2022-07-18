@@ -100,7 +100,6 @@ const Admin = () => {
         ['articles', { id: pid }],
         () => getArticleDetails(pid as string),
         {
-            refetchOnWindowFocus: false,
             enabled: !!pid && pid !== 'create',
             onSuccess: (data: FullArticleEdit) => {
                 const sections = get(data, 'sections', [])!.sort(
@@ -117,7 +116,6 @@ const Admin = () => {
         ['medias', { id: values.coverId }],
         () => getImageDetail(values?.coverId!),
         {
-            refetchOnWindowFocus: false,
             enabled: !!values.coverId,
         }
     )

@@ -1,24 +1,41 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { parse } from 'path'
+import { MESSAGE_PAGE_SIZE } from '../../../utils/contants'
 // import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+    let page = 0
     const formId = req.query.formId as string
+    const read = req.query.read as string
 
-    let search = {}
+    let where: any = {}
 
-    if (!!formId) {
-        search = {
-            where: { formId },
-        }
+    if (!!req.query.page) {
+        page = parseInt(req.query.page as string)
     }
 
+    if (read !== undefined) {
+        where.read = read === 'true'
+    }
+
+    if (!!formId) {
+        where.formId = formId
+    }
+
+    const count = await prisma.message.count({ where })
+
     const messages = await prisma.message.findMany({
-        ...search,
+        skip: MESSAGE_PAGE_SIZE * page,
+        take: MESSAGE_PAGE_SIZE,
+        where,
+        orderBy: {
+            createdAt: 'desc',
+        },
         include: { form: { include: { fields: true } } },
     })
-    return res.status(200).json(messages)
+    return res.status(200).json({ messages, count })
 }
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {

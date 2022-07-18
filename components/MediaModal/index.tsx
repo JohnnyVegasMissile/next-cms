@@ -19,10 +19,7 @@ const MediaModal = ({ value, onMediaSelected }: Props) => {
     const [selected, setSelected] = useState<Media | null>(value || null)
     const files: UseQueryResult<Media[], Error> = useQuery<Media[], Error>(
         ['medias', { type: 'images' }],
-        () => getImages(),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getImages()
     )
 
     useEffect(() => {

@@ -20,10 +20,7 @@ const AdminArticles = () => {
     const debouncedQ = useDebounce<string | undefined>(q, 750)
     const articles: UseQueryResult<Article[], Error> = useQuery<Article[], Error>(
         ['articles', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, pageId }],
-        () => getArticles(pageId, trim(debouncedQ)?.toLocaleLowerCase()),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getArticles(pageId, trim(debouncedQ)?.toLocaleLowerCase())
     )
 
     return (
@@ -34,7 +31,7 @@ const AdminArticles = () => {
 
             <Space
                 direction="vertical"
-                size="large"
+                size="middle"
                 style={{
                     width: '100%',
                     padding: 15,
@@ -47,7 +44,7 @@ const AdminArticles = () => {
                         <Input
                             value={q}
                             allowClear
-                            placeholder="Search"
+                            placeholder="Search by title"
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
                         />
@@ -66,6 +63,7 @@ const AdminArticles = () => {
                     </Link>
                 </div>
                 <Table
+                    rowKey={(record) => record.id}
                     bordered={false}
                     loading={articles.isLoading}
                     dataSource={get(articles, 'data', [])}
@@ -82,23 +80,6 @@ const AdminArticles = () => {
     )
 }
 
-// const showDeleteConfirm = () => {
-//     confirm({
-//         title: 'Are you sure delete this task?',
-//         icon: <ExclamationCircleOutlined />,
-//         content: 'Some descriptions',
-//         okText: 'Yes',
-//         okType: 'danger',
-//         cancelText: 'No',
-//         onOk() {
-//             console.log('OK')
-//         },
-//         onCancel() {
-//             console.log('Cancel')
-//         },
-//     })
-// }
-
 const columns = [
     {
         title: 'Title',
@@ -107,10 +88,25 @@ const columns = [
     {
         title: 'URL',
         render: (e: FullArticle) => {
+            const isPublished = e.published && e.page.published
+
+            if (!isPublished) {
+                return (
+                    <Breadcrumb>
+                        <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
+                        {e.page.slug!.split('/').map((s: string, idx: number) => (
+                            <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
+                        ))}
+                        <Breadcrumb.Item>{e.slug}</Breadcrumb.Item>
+                    </Breadcrumb>
+                )
+            }
+
             return (
                 <Link href={`/${e.page.slug}/${e.slug}`}>
                     <a>
                         <Breadcrumb>
+                            <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
                             {e.page.slug!.split('/').map((s: string, idx: number) => (
                                 <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
                             ))}

@@ -69,7 +69,6 @@ const UsersCreation = () => {
         ['roles', { id: pid }],
         () => getRoleDetails(pid as string),
         {
-            refetchOnWindowFocus: false,
             enabled: !!pid && pid !== 'create',
             onSuccess: (data: Role) => setValues(data),
             onError: (err) => router.push('/admin/users'),

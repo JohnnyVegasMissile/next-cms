@@ -20,10 +20,7 @@ const AdminElements = () => {
     const debouncedQ = useDebounce<string | undefined>(q, 750)
     const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
         ['elements', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, type }],
-        () => getElements(type, trim(debouncedQ)?.toLocaleLowerCase()),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getElements(type, trim(debouncedQ)?.toLocaleLowerCase())
     )
 
     return (
@@ -34,7 +31,7 @@ const AdminElements = () => {
 
             <Space
                 direction="vertical"
-                size="large"
+                size="middle"
                 style={{
                     width: '100%',
                     padding: 15,
@@ -47,7 +44,7 @@ const AdminElements = () => {
                         <Input
                             value={q}
                             allowClear
-                            placeholder="Search"
+                            placeholder="Search by title"
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
                         />
@@ -55,7 +52,7 @@ const AdminElements = () => {
                             allowClear
                             value={type}
                             onChange={setType}
-                            placeholder="Block"
+                            placeholder="Select a block"
                             style={{ width: 180 }}
                         >
                             {Object.keys(Blocks).map((key) => (
@@ -74,6 +71,7 @@ const AdminElements = () => {
                     </Link>
                 </div>
                 <Table
+                    rowKey={(record) => record.id}
                     bordered={false}
                     loading={elements.isLoading}
                     dataSource={get(elements, 'data', [])}

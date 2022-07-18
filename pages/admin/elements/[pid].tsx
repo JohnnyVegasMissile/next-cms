@@ -55,7 +55,6 @@ const Admin = () => {
         Prisma.ElementCreateInput,
         Error
     >(['elements', { id: pid }], () => getElementDetails(pid as string), {
-        refetchOnWindowFocus: false,
         enabled: !!pid && pid !== 'create',
         onSuccess: (data: Prisma.ElementCreateInput) => setValues(data),
         onError: (err) => router.push('/admin/articles'),

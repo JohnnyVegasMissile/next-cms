@@ -18,7 +18,6 @@ const Admin = () => {
         ['setting'],
         () => getSettings(),
         {
-            refetchOnWindowFocus: false,
             onSuccess: (data: Setting[]) => {
                 const newSettings: any = {}
                 for (const sett of data) {

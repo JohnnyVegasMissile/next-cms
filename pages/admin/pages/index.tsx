@@ -34,10 +34,7 @@ const AdminPages = () => {
     const debouncedQ = useDebounce<string | undefined>(q, 750)
     const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
         ['pages', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, type }],
-        () => getPages(type, trim(debouncedQ)?.toLocaleLowerCase()),
-        {
-            refetchOnWindowFocus: false,
-        }
+        () => getPages(type, trim(debouncedQ)?.toLocaleLowerCase())
     )
 
     return (
@@ -48,7 +45,7 @@ const AdminPages = () => {
 
             <Space
                 direction="vertical"
-                size="large"
+                size="middle"
                 style={{
                     width: '100%',
                     padding: 15,
@@ -62,7 +59,7 @@ const AdminPages = () => {
                             value={q}
                             allowClear
                             id="search"
-                            placeholder="Search"
+                            placeholder="Search by title"
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
                         />
@@ -71,13 +68,12 @@ const AdminPages = () => {
                             value={type}
                             id="type"
                             onChange={setType}
-                            placeholder="Type"
+                            placeholder="Select a type"
                             style={{ width: 180 }}
                         >
+                            <Option value="special">Home / 404 / Sign In</Option>
                             <Option value="page">Page</Option>
                             <Option value="list">List</Option>
-                            <Option value="home">Homepage</Option>
-                            <Option value="error">Not found</Option>
                         </Select>
                     </Space>
                     <Link href="/admin/pages/create">
@@ -89,6 +85,7 @@ const AdminPages = () => {
                     </Link>
                 </div>
                 <Table
+                    rowKey={(record) => record.id}
                     bordered={false}
                     loading={pages.isLoading}
                     dataSource={get(pages, 'data', [])}
@@ -148,9 +145,23 @@ const columns = [
                 return (
                     <Link href="/">
                         <a>
-                            <Typography.Text>/</Typography.Text>
+                            <Breadcrumb>
+                                <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
+                                <Breadcrumb.Item>&nbsp;</Breadcrumb.Item>
+                            </Breadcrumb>
                         </a>
                     </Link>
+                )
+            }
+
+            if (!e.published) {
+                return (
+                    <Breadcrumb>
+                        <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
+                        {e.slug!.split('/').map((s: string, idx: number) => (
+                            <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
+                        ))}
+                    </Breadcrumb>
                 )
             }
 
@@ -158,6 +169,7 @@ const columns = [
                 <Link href={`/${e.slug}`}>
                     <a>
                         <Breadcrumb>
+                            <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
                             {e.slug!.split('/').map((s: string, idx: number) => (
                                 <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
                             ))}

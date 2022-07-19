@@ -1,37 +1,18 @@
 import { useState } from 'react'
 // import type { Page } from '@prisma/client'
-import {
-    Space,
-    Button,
-    Image,
-    Input,
-    Table,
-    Popconfirm,
-    Badge,
-    Typography,
-    Descriptions,
-    TableColumnsType,
-    Select,
-} from 'antd'
+import { Space, Table, Badge, TableColumnsType, Select } from 'antd'
 // import Link from 'next/link'
 // import moment from 'moment'
-import type { Media, Message, Form } from '@prisma/client'
+import type { Form } from '@prisma/client'
 import { useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import get from 'lodash.get'
-import trim from 'lodash.trim'
 
-import UploadButton from '../../components/UploadButton'
-import { getImages, deleteImage } from '../../network/images'
 import moment from 'moment'
-import useDebounce from '../../hooks/useDebounce'
 import Head from 'next/head'
-import Link from 'next/link'
 import CustomSelect from '../../components/CustomSelect'
 import { getMessages, readMessage } from '../../network/messages'
 import { FullMessage } from '@types'
 import { MESSAGE_PAGE_SIZE } from '../../utils/contants'
-
-const { Text } = Typography
 
 const AdminImages = () => {
     const queryClient = useQueryClient()

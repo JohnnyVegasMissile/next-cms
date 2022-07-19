@@ -21,6 +21,12 @@
     justify-content: center;
 }
 
+@media (max-width: 768px) {
+    .leftContainer {
+        background-color: green;
+    }
+}
+
 .rightContainer {
     flex: 2;
     background-color: blue;

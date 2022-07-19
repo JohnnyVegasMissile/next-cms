@@ -1,7 +1,7 @@
 import styles from './Example.module.css'
 
 import type { Props } from '../types'
-import CustomImage from '../../components/CustomImage'
+import CustomImage from '@components/CustomImage'
 import get from 'lodash.get'
 import Link from 'next/link'
 

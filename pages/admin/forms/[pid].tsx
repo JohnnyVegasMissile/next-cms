@@ -60,30 +60,31 @@ const Admin = () => {
     const { pid } = router.query
     const queryClient = useQueryClient()
 
-    const { values, errors, handleChange, handleSubmit, setValues } = useFormik<FullFormEdit>({
-        initialValues,
-        validate,
-        onSubmit: async (values) => {
-            let i = 0
-            const fields: FormFieldCreateInput[] = []
+    const { values, /*errors,*/ handleChange, handleSubmit, setValues } =
+        useFormik<FullFormEdit>({
+            initialValues,
+            validate,
+            onSubmit: async (values) => {
+                let i = 0
+                const fields: FormFieldCreateInput[] = []
 
-            if (!!values.fields) {
-                for (const field of values.fields) {
-                    fields.push({
-                        ...field,
-                        position: i,
-                    })
+                if (!!values.fields) {
+                    for (const field of values.fields) {
+                        fields.push({
+                            ...field,
+                            position: i,
+                        })
 
-                    i = i + 1
+                        i = i + 1
+                    }
                 }
-            }
 
-            mutation.mutate({
-                pid: pid as string,
-                values: { ...values, fields },
-            })
-        },
-    })
+                mutation.mutate({
+                    pid: pid as string,
+                    values: { ...values, fields },
+                })
+            },
+        })
 
     const form: UseQueryResult<FullFormEdit, Error> = useQuery<FullFormEdit, Error>(
         ['forms', { id: pid }],

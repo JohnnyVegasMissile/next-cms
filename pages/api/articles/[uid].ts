@@ -4,10 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 // import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
-import { Prisma, Section } from '@prisma/client'
+import { Article, Prisma, Section } from '@prisma/client'
 import get from 'lodash.get'
 
-const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+const GET = async (req: NextApiRequest, res: NextApiResponse<Article | {}>) => {
     const id = req.query.uid as string
 
     const article = await prisma.article.findUnique({
@@ -20,7 +20,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(200).json(article)
 }
 
-const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
+const PUT = async (req: NextApiRequest, res: NextApiResponse<Article | {}>) => {
     const id = req.query.uid as string
     const newArticleContent: FullArticleEdit = req.body
 
@@ -56,7 +56,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.unstable_revalidate(`/${article.page.slug}/${article.slug}`)
 }
 
-const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
+const DELETE = async (req: NextApiRequest, res: NextApiResponse<Article | {}>) => {
     const id = req.query.uid as string
 
     const article = await prisma.article.delete({ where: { id } })

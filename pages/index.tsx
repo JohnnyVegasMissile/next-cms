@@ -3,11 +3,11 @@ import Head from 'next/head'
 import type { Page } from '@prisma/client'
 // import Link from 'next/link'
 import get from 'lodash.get'
-import { FullPage } from 'types'
+import { FullPage } from '@types'
 
 import { prisma } from '../utils/prisma'
-import SectionBlock from '../components/SectionBlock'
-import EditPageButton from '../components/EditPageButton'
+import SectionBlock from '@components/SectionBlock'
+import EditPageButton from '@components/EditPageButton'
 
 const Home = (props: FullPage) => {
     const { id, title, metadatas, sections, header, footer } = props

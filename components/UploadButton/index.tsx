@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import type { Media } from '@prisma/client'
 import { Button, Space, Typography } from 'antd'
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons'
-import type { Media } from '@prisma/client'
 
 import { uploadImage, uploadFavicon } from '../../network/images'
 
@@ -69,11 +69,7 @@ const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
             {value && (
                 <>
                     <Typography.Text underline>{value?.name}</Typography.Text>
-                    <Button
-                        onClick={onDeleteValue}
-                        shape="circle"
-                        icon={<CloseOutlined />}
-                    />
+                    <Button onClick={onDeleteValue} shape="circle" icon={<CloseOutlined />} />
                 </>
             )}
         </Space>

@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 // import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
-import { FormField, Prisma, Section } from '@prisma/client'
+import { FormField } from '@prisma/client'
 import get from 'lodash.get'
 import { FullFormEdit } from '../../../types'
 

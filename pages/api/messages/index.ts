@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { parse } from 'path'
 import { MESSAGE_PAGE_SIZE } from '../../../utils/contants'
 // import get from 'lodash.get'
 

@@ -1,0 +1,51 @@
+.background {
+    height: 450px;
+    width: 100%;
+    background-image: url(https://images.unsplash.com/photo-1658143290270-5e58c837d9d3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.layer {
+    height: 100%;
+    width: 100%;
+    background-color: rgba(227, 181, 5, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.title {
+    /* put title to uppercase */
+    text-transform: uppercase;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+}
+
+.button {
+    /* pretty blue button */
+    background-color: rgb(16, 126, 125);
+    border-radius: 5px;
+    width: 200px;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #e3b505;
+}
+/* 610345
+E3B505
+044B7F */

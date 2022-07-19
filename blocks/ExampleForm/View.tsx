@@ -1,12 +1,9 @@
 import styles from './ExampleList.module.css'
 
 import type { Props } from '../types'
-import CustomImage from '../../components/CustomImage'
-import Link from 'next/link'
 import { useFormik } from 'formik'
 import { useMutation } from 'react-query'
 import get from 'lodash.get'
-import { sortBy } from 'lodash'
 import { sendMessage } from '../../network/messages'
 
 const View = ({ section }: Props) => {

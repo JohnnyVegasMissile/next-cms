@@ -1,33 +1,41 @@
 import '../styles/globals.css'
 import 'antd/dist/antd.css'
-import type { NextWebVitalsMetric } from 'next/app'
+// import type { NextWebVitalsMetric } from 'next/app'
 // import type { AppProps } from 'next/app'
+import type { NextComponentType } from 'next/types'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 // import { useRouter } from 'next/router'
 // import { IntlProvider } from 'react-intl'
 // import { prisma } from '../utils/prisma'
+import get from 'lodash.get'
+import { Access } from '@prisma/client'
+
+import AuthGuard from '../components/AuthGuard'
+import MenuAdmin from '../components/MenuAdmin'
+import { ProvideAuth } from '../hooks/useAuth'
+
+// export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
+//     console.log('event', name, {
+//         category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
+//         value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
+//         label: id, // id unique to current page load
+//         // non_interaction: true, // avoids affecting bounce rate.
+//     })
+// }
 
 const queryClient = new QueryClient({
     defaultOptions: { queries: { refetchOnWindowFocus: false } },
 })
 
-import AuthGuard from '../components/AuthGuard'
-import MenuAdmin from '../components/MenuAdmin'
-import { ProvideAuth } from '../hooks/useAuth'
-import { useRouter } from 'next/router'
-
-export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
-    console.log('event', name, {
-        category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
-        value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
-        label: id, // id unique to current page load
-        // non_interaction: true, // avoids affecting bounce rate.
-    })
-}
-
-// function MyApp({ Component, pageProps }: AppProps) {
-function MyApp({ Component, pageProps }: any) {
+function MyApp({
+    Component,
+    pageProps,
+}: {
+    Component: NextComponentType & { requireAuth: boolean }
+    pageProps: any
+}) {
+    // function MyApp({ Component, pageProps }: any) {
     // const { locale } = useRouter()
 
     // const messages = (locale: string | undefined) => {
@@ -45,20 +53,16 @@ function MyApp({ Component, pageProps }: any) {
     //     }
     // }
 
+    const accesses: Access[] = get(pageProps, 'accesses', [])
+
     return (
         <QueryClientProvider client={queryClient}>
             {/* <IntlProvider locale={locale || 'en'} messages={messages(locale)}> */}
             <ProvideAuth>
                 <MenuAdmin />
-                {/* if requireAuth property is present - protect the page */}
-                {Component.requireAuth ? (
-                    <AuthGuard>
-                        <Component {...pageProps} />
-                    </AuthGuard>
-                ) : (
-                    // public page
+                <AuthGuard requireAuth={Component.requireAuth} accesses={accesses}>
                     <Component {...pageProps} />
-                )}
+                </AuthGuard>
             </ProvideAuth>
             {/* </IntlProvider> */}
             <ReactQueryDevtools initialIsOpen={false} />

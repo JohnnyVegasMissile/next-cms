@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Page, Metadata, Section, Prisma } from '@prisma/client'
 import get from 'lodash.get'
-import { PageTypes, FullPageEdit } from '../../../types'
+import { FullPageEdit } from '../../../types'
 
 import { prisma } from '../../../utils/prisma'
 

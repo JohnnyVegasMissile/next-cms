@@ -2,49 +2,19 @@ import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 // import Router, { useRouter } from 'next/router'
 // import { PrismaClient } from '@prisma/client'
-import type { Access, Metadata } from '@prisma/client'
+import type { Metadata } from '@prisma/client'
 import { FullArticle, FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
-import { useAuth } from '../hooks/useAuth'
 import SectionBlock from '../components/SectionBlock'
 import EditPageButton from '../components/EditPageButton'
 import get from 'lodash.get'
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import useSsr from '../hooks/useSsr'
 // import { FormattedMessage, useIntl } from 'react-intl'
 // import Link from 'next/link'
 
 const Pages = (props: FullPage | FullArticle) => {
-    const router = useRouter()
     // const { id, title, metadatas, sections, type, header, footer } = props
-    const { isAuth, user, setRedirect } = useAuth()
-    const { isServer } = useSsr()
-
-    useEffect(() => {
-        const access: Access[] = get(props, 'accesses', get(props, 'page.accesses', []))
-
-        if (
-            !access.length ||
-            user?.role === 'super-admin' ||
-            user?.role === 'admin' ||
-            isServer
-        ) {
-            return
-        }
-
-        const flatAccess = access?.map((e) => e.roleId)
-
-        if (!isAuth) {
-            setRedirect(router.route)
-            router.push('/signin')
-        } else if (!user?.role || !flatAccess.includes(user?.role)) {
-            console.log('Redirection from Page')
-            router.push('/')
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user?.role])
+    // const { isAuth, user, setRedirect } = useAuth()
 
     return (
         <div>

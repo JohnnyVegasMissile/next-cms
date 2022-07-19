@@ -45,10 +45,12 @@
             "@components/*": ["components/*"],
             "@hooks/*": ["hooks/*"],
             "@blocks": ["blocks"],
+            "@blocks/*": ["blocks/*"],
             "@network/*": ["network/*"],
-            "@types": ["types"],
-            "@utils/*": ["utils/index.ts"],
-            "@utils": ["utils"]
+            "@types": ["types/index"],
+            "@types/*": ["types/*"],
+            "@utils": ["utils/index"],
+            "@utils/*": ["utils/*"]
         },
         // "rootDirs": [],
         // "typeRoots": [],

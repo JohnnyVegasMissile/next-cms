@@ -4,6 +4,10 @@ import ListStyle from './List.module.css'
 import FormStyle from './Form.module.css'
 import NavStyle from './Nav.module.css'
 import Link from 'next/link'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper'
+import 'swiper/css'
+import 'swiper/css/navigation'
 
 const Inte = () => {
     return (
@@ -28,12 +32,40 @@ const Inte = () => {
             </div>
 
             <section>
-                <div className={BannerStyle.background}>
-                    <div className={BannerStyle.layer}>
-                        <h1 className={BannerStyle.title}>This is a very important title</h1>
-                        <button className={BannerStyle.button}>Click me</button>
-                    </div>
-                </div>
+                <Swiper
+                    // install Swiper modules
+                    modules={[Navigation]}
+                    // spaceBetween={50}
+                    // slidesPerView={3}
+                    navigation
+                    pagination={{ clickable: true }}
+                    scrollbar={{ draggable: true }}
+                    autoplay
+                    loop
+                    onSwiper={(swiper) => console.log(swiper)}
+                    onSlideChange={() => console.log('slide change')}
+                >
+                    <SwiperSlide>
+                        <div className={BannerStyle.background}>
+                            <div className={BannerStyle.layer}>
+                                <h1 className={BannerStyle.title}>
+                                    This is a very important title
+                                </h1>
+                                <button className={BannerStyle.button}>Click me</button>
+                            </div>
+                        </div>
+                    </SwiperSlide>
+                    <SwiperSlide>
+                        <div className={BannerStyle.background}>
+                            <div className={BannerStyle.layer}>
+                                <h1 className={BannerStyle.title}>
+                                    This is a very important title
+                                </h1>
+                                <button className={BannerStyle.button}>Click me</button>
+                            </div>
+                        </div>
+                    </SwiperSlide>
+                </Swiper>
             </section>
 
             <section>

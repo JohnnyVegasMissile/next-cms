@@ -5,6 +5,7 @@ import { getArticles } from '../../network/articles'
 import type { Page } from '@prisma/client'
 import { useMemo } from 'react'
 import { FullArticle } from 'types'
+import get from 'lodash.get'
 
 const { Text } = Typography
 
@@ -59,8 +60,11 @@ const LinkInput = ({ value, onChange, width = 300 }: Props) => {
         return [...pagesOptions, ...articlesOptions]
     }, [pages, articles])
 
+    const isError = !!value && get(value, '0', '') !== '/' ? 'error' : ''
+
     return (
         <AutoComplete
+            status={isError}
             value={value}
             options={options}
             style={{ width }}

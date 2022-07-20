@@ -2,6 +2,9 @@ import Example from './Example'
 import ExampleList from './ExampleList'
 import ExampleForm from './ExampleForm'
 
-const blocks = { Example, ExampleList, ExampleForm }
+import Navigation from './Navigation'
+import Banner from './Banner'
+
+const blocks = { Example, ExampleList, ExampleForm, Navigation, Banner }
 
 export default blocks

@@ -18,6 +18,18 @@ const StyledInput = ({ value, onChange, className }: Props<string>) => (
     </div>
 )
 
+const A = ({ value, onChange, className }: Props<string>) => (
+    <span className={className}>
+        <input
+            placeholder="Lorem ipsum dolor sit amet"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={styles.input}
+            type="text"
+        />
+    </span>
+)
+
 const Span = ({ value, onChange, className }: Props<string>) => (
     <span className={className}>
         <textarea
@@ -123,5 +135,6 @@ StyledInput.h2 = H2
 StyledInput.h3 = H3
 StyledInput.h4 = H4
 StyledInput.button = Button
+StyledInput.a = A
 
 export default StyledInput

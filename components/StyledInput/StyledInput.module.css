@@ -1,5 +1,6 @@
 .input {
     all: inherit;
+    width: 100%;
 
     resize: none;
     padding: 0;

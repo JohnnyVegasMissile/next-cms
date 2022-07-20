@@ -14,7 +14,7 @@ import type {
 import { Prisma } from '@prisma/client'
 
 export type UserRoleTypes = 'super-admin' | 'admin' | 'user'
-export type PageTypes = 'home' | 'error' | 'list' | 'page'
+export type PageTypes = 'home' | 'error' | 'list' | 'page' | 'signin'
 
 export interface ContextUser {
     name: string

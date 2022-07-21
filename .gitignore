@@ -41,9 +41,7 @@ yarn-error.log*
 /prisma/migrations
 
 # public
-/public/uploads/files/*
-!/public/uploads/files/.gitkeep 
-/public/uploads/images/*
-!/public/uploads/images/.gitkeep
-/public/sitemap*
-/public/robot.txt
+/uploads/files/*
+!/uploads/files/.gitkeep 
+/uploads/images/*
+!/uploads/images/.gitkeep

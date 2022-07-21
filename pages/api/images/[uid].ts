@@ -26,7 +26,7 @@ const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!image) return res.status(500).json({ error: 'File does not exist' })
 
     try {
-        await fs.unlink(`./public${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`)
+        await fs.unlink(`./uploads/images/${image.uri}`)
     } catch (e) {
         return res.status(201).json({ message: `File does not exist` })
     }

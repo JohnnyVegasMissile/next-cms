@@ -46,11 +46,9 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!file) return res.status(400).json({ error: 'No file' })
 
         var oldPath = file.filepath
-        var newFileName = `FILE-${makeId(10)}-${makeId(10)}.${mime.extension(
-            file.mimetype
-        )}`
+        var newFileName = `FILE-${makeId(10)}-${makeId(10)}.${mime.extension(file.mimetype)}`
 
-        var newPath = `./public${process.env.UPLOADS_IMAGES_DIR}/${newFileName}`
+        var newPath = `./uploads/images/${newFileName}`
 
         mv(oldPath, newPath, function (err) {
             if (err) return res.status(500).json({ error: err })

@@ -12,7 +12,6 @@ module.exports = async (phase, { defaultConfig }) => {
     const nextConfig = {
         reactStrictMode: true,
         env: {
-            UPLOADS_IMAGES_DIR: '/uploads/images',
             SITE_URL: 'http://localhost:8080',
             // i18n: {
             //     locales: ['en', 'fr', 'es', 'zh'],

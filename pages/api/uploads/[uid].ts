@@ -6,7 +6,7 @@ import mime from 'mime-types'
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
     try {
-        const file = await fs.readFile(`./public${process.env.UPLOADS_IMAGES_DIR}/${id}`)
+        const file = await fs.readFile(`./uploads/images/${id}`)
 
         const ext = id.split('.')[1]
 

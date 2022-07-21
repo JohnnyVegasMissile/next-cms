@@ -4,16 +4,16 @@ import type { Props } from '../types'
 import CustomImage from '../../components/CustomImage'
 import Link from 'next/link'
 
-const parseDefaultValue = (values: string) => {
-    try {
-        return JSON.parse(values)
-    } catch (e) {
-        return {}
-    }
-}
+// const parseDefaultValue = (values: string) => {
+//     try {
+//         return JSON.parse(values)
+//     } catch (e) {
+//         return {}
+//     }
+// }
 
-const View = ({ defaultValues, page }: Props) => {
-    const values = parseDefaultValue(defaultValues)
+const View = ({ /* defaultValues, */ page }: Props) => {
+    // const values = parseDefaultValue(defaultValues)
 
     return (
         <section>

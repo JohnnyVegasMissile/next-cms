@@ -1,39 +1,33 @@
-import { useState } from 'react'
 import styles from './Article.module.css'
 
-import type { Props } from '../types'
-import CustomImage from '../../components/CustomImage'
-import { Card, Space } from 'antd'
-import get from 'lodash.get'
-import set from 'lodash.set'
-import MediaModal from '../../components/MediaModal'
+import { Card } from 'antd'
 
-const parseDefaultValue = (values: string) => {
-    try {
-        return JSON.parse(values)
-    } catch (e) {
-        return {}
-    }
-}
+// const parseDefaultValue = (values: string) => {
+//     try {
+//         return JSON.parse(values)
+//     } catch (e) {
+//         return {}
+//     }
+// }
 
-const Edit = ({ defaultValues, page, onChange }: Props) => {
-    const [values, setValues] = useState<any>(parseDefaultValue(defaultValues))
+const Edit = (/*{ defaultValues, page, onChange }: Props*/) => {
+    // const [values, setValues] = useState<any>(parseDefaultValue(defaultValues))
 
-    const handleChange = (name: string, value: any) => {
-        const newValue = { ...values }
+    // const handleChange = (name: string, value: any) => {
+    //     const newValue = { ...values }
 
-        set(newValue, name, value)
+    //     set(newValue, name, value)
 
-        setValues(newValue)
+    //     setValues(newValue)
 
-        try {
-            if (onChange) onChange(JSON.stringify(newValue))
-        } catch (e) {
-            console.log('Error on edit')
-        }
-    }
+    //     try {
+    //         if (onChange) onChange(JSON.stringify(newValue))
+    //     } catch (e) {
+    //         console.log('Error on edit')
+    //     }
+    // }
 
-    const arts = ['Lorem ipsum dolor', 'Lorem ipsum dolor', 'Lorem ipsum dolor']
+    // const arts = ['Lorem ipsum dolor', 'Lorem ipsum dolor', 'Lorem ipsum dolor']
 
     return (
         <EditPanel

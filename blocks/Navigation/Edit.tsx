@@ -2,15 +2,12 @@ import { Fragment, useState } from 'react'
 import styles from './Navigation.module.css'
 
 import type { Props } from '../types'
-import CustomImage from '../../components/CustomImage'
-import { Button, Card, Space, Switch } from 'antd'
+import { Button, Card, Space } from 'antd'
 import StyledInput from '../../components/StyledInput'
 import get from 'lodash.get'
 import set from 'lodash.set'
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons'
-import MediaModal from '../../components/MediaModal'
 import LinkInput from '../../components/LinkInput'
-import Link from 'next/link'
 
 const parseDefaultValue = (values: string) => {
     try {

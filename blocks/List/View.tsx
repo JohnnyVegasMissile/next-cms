@@ -2,8 +2,6 @@ import styles from './List.module.css'
 
 import type { Props } from '../types'
 import CustomImage from '@components/CustomImage'
-import get from 'lodash.get'
-import Link from 'next/link'
 
 const parseDefaultValue = (values: string) => {
     try {

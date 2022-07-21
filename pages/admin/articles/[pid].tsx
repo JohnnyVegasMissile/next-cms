@@ -31,6 +31,7 @@ import { Article, Media } from '@prisma/client'
 import { getImageDetail } from '../../../network/images'
 import MediaModal from '@components/MediaModal'
 import Head from 'next/head'
+import kebabcase from 'lodash.kebabcase'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -442,6 +443,3 @@ const Admin = () => {
 Admin.requireAuth = true
 
 export default Admin
-function kebabcase(value: string): any {
-    throw new Error('Function not implemented.')
-}

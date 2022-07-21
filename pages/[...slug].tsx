@@ -91,7 +91,7 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
     const page = await prisma.page.findUnique({
         where: { slug: slug.join('/') },
         include: {
-            articles: true,
+            articles: { include: { cover: true } },
             metadatas: true,
             sections: {
                 include: {
@@ -110,6 +110,9 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
         const articles = page.articles.map((article) => ({
             ...article,
             updatedAt: sanitizeDate(article.updatedAt),
+            cover: article.cover
+                ? { ...article.cover, uploadTime: sanitizeDate(article.cover.uploadTime) }
+                : undefined,
         }))
 
         const header = page.header
@@ -146,6 +149,7 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
             where: { slug: slug[slug.length - 1] },
             include: {
                 page: true,
+                cover: true,
                 sections: { include: { form: { include: { fields: true } } } },
             },
         })
@@ -179,6 +183,7 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
         where: { name: 'revalidate' },
     })
 
+    console.log(props)
     return {
         props,
         revalidate: revalidate ? parseInt(revalidate.value) : 60,

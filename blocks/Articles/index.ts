@@ -3,8 +3,8 @@ import Edit from './Edit'
 import type { Block } from '../types'
 
 const Example: Block = {
-    name: 'Example Form',
-    pages: ['page', 'list'],
+    name: 'Article',
+    pages: ['list'],
     preview: '',
     View,
     Edit,

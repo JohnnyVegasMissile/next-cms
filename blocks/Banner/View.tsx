@@ -1,9 +1,10 @@
 import styles from './Banner.module.css'
 
 import type { Props } from '../types'
-import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper'
+import { Navigation } from 'swiper'
+import CustomImage from '@components/CustomImage'
+import get from 'lodash.get'
 
 const parseDefaultValue = (values: string) => {
     try {
@@ -19,6 +20,7 @@ const View = ({ defaultValues /*, articles*/ }: Props) => {
     return (
         <section>
             <Swiper
+                cssMode={true}
                 // install Swiper modules
                 modules={[Navigation]}
                 // spaceBetween={50}
@@ -31,22 +33,23 @@ const View = ({ defaultValues /*, articles*/ }: Props) => {
                 onSwiper={(swiper) => console.log(swiper)}
                 onSlideChange={() => console.log('slide change')}
             >
-                <SwiperSlide>
-                    <div className={styles.background}>
-                        <div className={styles.layer}>
-                            <h1 className={styles.title}>This is a very important title</h1>
-                            <button className={styles.button}>Click me</button>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className={styles.background}>
-                        <div className={styles.layer}>
-                            <h1 className={styles.title}>This is a very important title</h1>
-                            <button className={styles.button}>Click me</button>
-                        </div>
-                    </div>
-                </SwiperSlide>
+                {list?.map((e: any, idx: number) => (
+                    <SwiperSlide key={idx}>
+                        <CustomImage.Background
+                            img={get(e, 'img', undefined)}
+                            className={styles.background}
+                        >
+                            <div className={styles.layer}>
+                                <h1 className={styles.title}>{e.label}</h1>
+                                {e.hasButton && (
+                                    <button className={styles.button}>
+                                        {e.button?.label}
+                                    </button>
+                                )}
+                            </div>
+                        </CustomImage.Background>
+                    </SwiperSlide>
+                ))}
             </Swiper>
         </section>
     )

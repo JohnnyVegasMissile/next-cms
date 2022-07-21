@@ -105,7 +105,19 @@ const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
         },
     })
 
+    await prisma.access.deleteMany({
+        where: {
+            pageId: id,
+        },
+    })
+
     await prisma.section.deleteMany({
+        where: {
+            pageId: id,
+        },
+    })
+
+    await prisma.article.deleteMany({
         where: {
             pageId: id,
         },

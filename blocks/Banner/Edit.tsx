@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './Banner.module.css'
 
 import type { Props } from '../types'
@@ -7,10 +7,9 @@ import { Button, Card, Space, Switch } from 'antd'
 import StyledInput from '../../components/StyledInput'
 import get from 'lodash.get'
 import set from 'lodash.set'
-import { CloseOutlined, PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined } from '@ant-design/icons'
 import MediaModal from '../../components/MediaModal'
 import LinkInput from '../../components/LinkInput'
-import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper'
 import 'swiper/css'
@@ -82,7 +81,7 @@ const Edit = ({ defaultValues, onChange }: Props) => {
                 //     </nav>
                 //     {/* </div> */}
                 // </div>
-                <div style={{ width: '100%', backgroundColor: 'red' }}>
+                <div style={{ width: '100%' }}>
                     <section style={{ maxWidth: '80vw' }}>
                         <Swiper
                             // install Swiper modules
@@ -99,7 +98,10 @@ const Edit = ({ defaultValues, onChange }: Props) => {
                         >
                             {get(values, 'list', []).map((e: any, idx: number) => (
                                 <SwiperSlide key={idx}>
-                                    <div className={styles.background}>
+                                    <CustomImage.Background
+                                        img={get(e, 'img', undefined)}
+                                        className={styles.background}
+                                    >
                                         <div className={styles.layer}>
                                             <StyledInput.h1
                                                 className={styles.title}
@@ -122,7 +124,7 @@ const Edit = ({ defaultValues, onChange }: Props) => {
                                                 />
                                             )}
                                         </div>
-                                    </div>
+                                    </CustomImage.Background>
                                 </SwiperSlide>
                             ))}
                         </Swiper>
@@ -140,6 +142,10 @@ const Edit = ({ defaultValues, onChange }: Props) => {
                         type="primary"
                         shape="circle"
                         icon={<PlusOutlined />}
+                    />
+                    <MediaModal
+                        value={get(values, `list.${page}.img`, undefined)}
+                        onMediaSelected={(e) => handleChange(`list.${page}.img`, e)}
                     />
                     <Switch
                         checked={get(values, `list.${page}.hasButton`, false)}

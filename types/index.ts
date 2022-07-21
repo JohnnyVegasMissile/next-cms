@@ -10,6 +10,7 @@ import type {
     FormField,
     Form,
     Message,
+    Media,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
@@ -38,6 +39,7 @@ export type UserCreation = Prisma.UserCreateInput & {
 
 export type FullArticle = Article & {
     coverId?: string
+    cover?: Media
     page: Page
     sections?: FullSection[] | null
 }
@@ -64,7 +66,7 @@ export type FullFormEdit = Prisma.FormCreateInput & {
 export type FullPage = Page & {
     metadatas?: Metadata[] | null
     sections?: FullSection[] | null
-    articles?: Article[] | null
+    articles?: FullArticle[] | null
     header?: Element | null
     footer?: Element | null
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import styles from './ExampleList.module.css'
+import styles from './Form.module.css'
 
 import type { Props } from '../types'
 import CustomImage from '../../components/CustomImage'
@@ -38,34 +38,24 @@ const Edit = ({ defaultValues, page, onChange }: Props) => {
     return (
         <EditPanel
             view={
-                <section className={styles.section}>
-                    <div className={styles.container}>
-                        <CustomImage.Background
-                            img={values.img}
-                            className={styles.leftContainer}
-                        />
-                        <div className={styles.rightContainer}>
-                            <h1 className={styles.listTitle}>{page?.title}</h1>
-                            <ul className={styles.listContainer}>
-                                {arts.map((article, idx) => (
-                                    <li key={idx} className={styles.listElement}>
-                                        {article}
-                                    </li>
-                                ))}
-                            </ul>
+                <section>
+                    <div className={styles.wrapper}>
+                        <h3 className={styles.title}>Contact</h3>
+                        <div className={styles.inputWrap}>
+                            <label className={styles.label}>Email</label>
+                            <input className={styles.input} />
                         </div>
+                        <div className={styles.inputWrap}>
+                            <label className={styles.label}>Subject</label>
+                            <input className={styles.input} />
+                        </div>
+                        <div className={styles.inputWrap}>
+                            <label className={styles.label}>Message</label>
+                            <textarea className={styles.input} />
+                        </div>
+                        <button className={styles.button}>Submit</button>
                     </div>
                 </section>
-            }
-            panel={
-                <>
-                    <Space direction="vertical">
-                        <MediaModal
-                            value={get(values, 'img', undefined)}
-                            onMediaSelected={(e) => handleChange('img', e)}
-                        />
-                    </Space>
-                </>
             }
         />
     )

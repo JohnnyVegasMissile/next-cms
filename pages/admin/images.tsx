@@ -58,23 +58,14 @@ const AdminImages = () => {
         {
             width: 75,
             render: (image: Media) => (
-                <Image
-                    width={50}
-                    height={50}
-                    src={`${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`}
-                    alt=""
-                />
+                <Image width={50} height={50} src={`/api/uploads/${image.uri}`} alt="" />
             ),
         },
         {
             title: 'Name',
             // dataIndex: 'name',
             render: (image: Media) => (
-                <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`${process.env.UPLOADS_IMAGES_DIR}/${image.uri}`}
-                >
+                <a target="_blank" rel="noreferrer" href={`/api/uploads/${image.uri}`}>
                     {image.name}
                 </a>
             ),

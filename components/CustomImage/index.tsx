@@ -12,7 +12,7 @@ interface Props {
 // }
 
 const CustomImage = ({ img, className }: Props) => {
-    const imageURL = `${process.env.UPLOADS_IMAGES_DIR}/${img?.uri}`
+    const imageURL = `/api/uploads/${img?.uri}`
 
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={imageURL} alt={img?.alt || ''} className={className} />
@@ -30,7 +30,7 @@ const CustomImage = ({ img, className }: Props) => {
 }
 
 const Background = ({ img, className, children }: Props) => {
-    const imageURL = `${process.env.UPLOADS_IMAGES_DIR}/${img?.uri}`
+    const imageURL = `/api/uploads/${img?.uri}`
 
     return (
         <>

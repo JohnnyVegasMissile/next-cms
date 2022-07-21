@@ -319,9 +319,7 @@ const Admin = () => {
                                             <Image
                                                 width={200}
                                                 height={200}
-                                                src={`${process.env.UPLOADS_IMAGES_DIR}/${
-                                                    cover.data?.uri || ''
-                                                }`}
+                                                src={`/api/uploads/${cover.data?.uri || ''}`}
                                                 alt={cover.data?.alt || ''}
                                             />
                                         )}

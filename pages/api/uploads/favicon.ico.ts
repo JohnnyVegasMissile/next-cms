@@ -6,13 +6,12 @@ import mime from 'mime-types'
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
     try {
-        const file = await fs.readFile(`./uploads/images/${id}`)
+        const file = await fs.readFile('./uploads/favicon.ico')
 
-        const ext = id.split('.')[1]
-
-        res.setHeader('Content-Type', mime.lookup(ext) || '')
+        res.setHeader('Content-Type', mime.lookup('ico') || '')
         return res.send(file)
     } catch (e) {
+        console.log('err', e)
         return res.status(201).json({ message: `File does not exist` })
     }
 }

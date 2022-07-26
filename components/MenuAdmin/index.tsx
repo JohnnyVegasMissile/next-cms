@@ -15,6 +15,8 @@ import {
     ReloadOutlined,
     MailOutlined,
     FormOutlined,
+    ContainerOutlined,
+    FileOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -103,6 +105,57 @@ function MenuAdmin() {
         />
     )
 
+    const containersMenu = (
+        <Menu
+            items={[
+                {
+                    key: '1',
+                    label: (
+                        <Link href="/admin/containers/create">
+                            <a>Create a container</a>
+                        </Link>
+                    ),
+                    icon: <PlusCircleOutlined />,
+                },
+                {
+                    type: 'divider',
+                },
+                {
+                    key: '2',
+                    type: 'group',
+                    label: 'Contents',
+                    children: [
+                        {
+                            key: '2-1',
+                            label: 'Pages',
+                            icon: <FileTextOutlined />,
+                            children: [
+                                {
+                                    key: '2-1-1',
+                                    label: (
+                                        <Link href="/admin/containers/create">
+                                            <a>All pages</a>
+                                        </Link>
+                                    ),
+                                    icon: <FileOutlined />,
+                                },
+                                {
+                                    key: '2-1-2',
+                                    label: (
+                                        <Link href="/admin/containers/create">
+                                            <a>Create a page</a>
+                                        </Link>
+                                    ),
+                                    icon: <PlusCircleOutlined />,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ]}
+        />
+    )
+
     const elementsMenu = (
         <Menu
             items={[
@@ -155,6 +208,18 @@ function MenuAdmin() {
                         </Link>
                     ),
                     icon: <PlusCircleOutlined />,
+                },
+                {
+                    type: 'divider',
+                },
+                {
+                    key: '2',
+                    label: (
+                        <Link href="messages">
+                            <a>Messages</a>
+                        </Link>
+                    ),
+                    icon: <MailOutlined />,
                 },
             ]}
         />
@@ -214,6 +279,20 @@ function MenuAdmin() {
                     </Dropdown>
                     <Divider type="vertical" />
 
+                    <Dropdown overlay={containersMenu}>
+                        <Space>
+                            <Link href="/admin/containers">
+                                <a>
+                                    <Text>
+                                        <ContainerOutlined style={{ marginRight: 4 }} />
+                                        Containers
+                                    </Text>
+                                </a>
+                            </Link>
+                        </Space>
+                    </Dropdown>
+                    <Divider type="vertical" />
+
                     <Dropdown overlay={elementsMenu}>
                         <Space>
                             <Link href="/admin/elements">
@@ -261,16 +340,6 @@ function MenuAdmin() {
                             <Text>
                                 <PictureOutlined style={{ marginRight: 4 }} />
                                 Images
-                            </Text>
-                        </a>
-                    </Link>
-                    <Divider type="vertical" />
-
-                    <Link href="/admin/messages">
-                        <a>
-                            <Text>
-                                <MailOutlined style={{ marginRight: 4 }} />
-                                Messages
                             </Text>
                         </a>
                     </Link>

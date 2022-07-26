@@ -121,13 +121,9 @@ const Admin = () => {
         {
             enabled: !!pid && pid !== 'create',
             onSuccess: (data: FullPageEdit) => {
-                const sections = get(data, 'sections', []).sort(
-                    (a, b) => a.position - b.position
-                )
+                const sections = get(data, 'sections', []).sort((a, b) => a.position - b.position)
 
-                const accesses = get(data, 'accesses', []).map((access) =>
-                    get(access, 'roleId', '')
-                )
+                const accesses = get(data, 'accesses', []).map((access) => get(access, 'roleId', ''))
 
                 const slugEdit = get(data, 'slug', '')!.split('/')
 
@@ -298,39 +294,20 @@ const Admin = () => {
                                     </Space>
                                     <Space direction="vertical">
                                         <Text>Type</Text>
-                                        <Radio.Group
-                                            id="type"
-                                            value={values.type}
-                                            buttonStyle="solid"
-                                        >
-                                            <Radio.Button
-                                                value="page"
-                                                disabled={values.type !== 'page'}
-                                            >
+                                        <Radio.Group id="type" value={values.type} buttonStyle="solid">
+                                            <Radio.Button value="page" disabled={values.type !== 'page'}>
                                                 Page
                                             </Radio.Button>
-                                            <Radio.Button
-                                                value="list"
-                                                disabled={values.type !== 'list'}
-                                            >
+                                            <Radio.Button value="list" disabled={values.type !== 'list'}>
                                                 List
                                             </Radio.Button>
-                                            <Radio.Button
-                                                value="error"
-                                                disabled={values.type !== 'error'}
-                                            >
+                                            <Radio.Button value="error" disabled={values.type !== 'error'}>
                                                 Not found
                                             </Radio.Button>
-                                            <Radio.Button
-                                                value="home"
-                                                disabled={values.type !== 'home'}
-                                            >
+                                            <Radio.Button value="home" disabled={values.type !== 'home'}>
                                                 Homepage
                                             </Radio.Button>
-                                            <Radio.Button
-                                                value="signin"
-                                                disabled={values.type !== 'signin'}
-                                            >
+                                            <Radio.Button value="signin" disabled={values.type !== 'signin'}>
                                                 Sign In
                                             </Radio.Button>
                                         </Radio.Group>
@@ -340,9 +317,7 @@ const Admin = () => {
                                         <Radio.Group
                                             id="status"
                                             value={values.published}
-                                            onChange={(e) =>
-                                                onHandleChange('published', e.target.value)
-                                            }
+                                            onChange={(e) => onHandleChange('published', e.target.value)}
                                             disabled={pid !== 'create' && isLockedPage}
                                         >
                                             <Radio value={true}>Published</Radio>
@@ -377,8 +352,7 @@ const Admin = () => {
                                                                 // shape="circle"
                                                                 danger
                                                                 disabled={
-                                                                    get(values, 'slugEdit', [])
-                                                                        .length < 2
+                                                                    get(values, 'slugEdit', []).length < 2
                                                                 }
                                                                 icon={<MinusOutlined />}
                                                             />
@@ -386,8 +360,7 @@ const Admin = () => {
                                                                 id="slug-plus"
                                                                 onClick={addSlug}
                                                                 disabled={
-                                                                    get(values, 'slugEdit', [])
-                                                                        .length > 5
+                                                                    get(values, 'slugEdit', []).length > 5
                                                                 }
                                                                 type="primary"
                                                                 // shape="circle"
@@ -407,9 +380,7 @@ const Admin = () => {
                                                                 kebabcase(e.target.value)
                                                             )
                                                         }
-                                                        status={
-                                                            errors.slug ? 'error' : undefined
-                                                        }
+                                                        status={errors.slug ? 'error' : undefined}
                                                     />
                                                     {lastSlugIndex !== idx && '/'}
                                                 </Fragment>
@@ -422,68 +393,48 @@ const Admin = () => {
 
                         <Card title="Metadatas">
                             <Space direction="vertical">
-                                {get(values, 'metadatas', []).map(
-                                    (metadata: any, idx: number) => (
-                                        <Space key={idx} align="end">
-                                            <Space direction="vertical">
-                                                <Text>Name</Text>
-                                                <Select
-                                                    id={`meta-name-${idx}`}
-                                                    style={{ width: 240 }}
-                                                    value={metadata.name}
-                                                    onChange={(e) =>
-                                                        onHandleChange(
-                                                            `metadatas.${idx}.name`,
-                                                            e
-                                                        )
-                                                    }
-                                                >
-                                                    <Select.Option value="application-name">
-                                                        Application name
-                                                    </Select.Option>
-                                                    <Select.Option value="author">
-                                                        Author
-                                                    </Select.Option>
-                                                    <Select.Option value="description">
-                                                        Description
-                                                    </Select.Option>
-                                                    <Select.Option value="generator">
-                                                        Generator
-                                                    </Select.Option>
-                                                    <Select.Option value="keywords">
-                                                        Keywords
-                                                    </Select.Option>
-                                                    <Select.Option value="viewport">
-                                                        Viewport
-                                                    </Select.Option>
-                                                </Select>
-                                            </Space>
+                                {get(values, 'metadatas', []).map((metadata: any, idx: number) => (
+                                    <Space key={idx} align="end">
+                                        <Space direction="vertical">
+                                            <Text>Name</Text>
+                                            <Select
+                                                id={`meta-name-${idx}`}
+                                                style={{ width: 240 }}
+                                                value={metadata.name}
+                                                onChange={(e) => onHandleChange(`metadatas.${idx}.name`, e)}
+                                            >
+                                                <Select.Option value="application-name">
+                                                    Application name
+                                                </Select.Option>
+                                                <Select.Option value="author">Author</Select.Option>
+                                                <Select.Option value="description">Description</Select.Option>
+                                                <Select.Option value="generator">Generator</Select.Option>
+                                                <Select.Option value="keywords">Keywords</Select.Option>
+                                                <Select.Option value="viewport">Viewport</Select.Option>
+                                            </Select>
+                                        </Space>
 
-                                            <Space direction="vertical">
-                                                <Text>Content</Text>
-                                                <Input
-                                                    id={`meta-content-${idx}`}
-                                                    style={{ width: 240 }}
-                                                    value={metadata.content}
-                                                    onChange={(e) =>
-                                                        onHandleChange(
-                                                            `metadatas.${idx}.content`,
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
-                                            </Space>
-                                            <Button
-                                                id={`meta-minus-${idx}`}
-                                                onClick={() => removeMetadata(idx)}
-                                                type="primary"
-                                                // shape="circle"
-                                                danger
-                                                icon={<MinusOutlined />}
+                                        <Space direction="vertical">
+                                            <Text>Content</Text>
+                                            <Input
+                                                id={`meta-content-${idx}`}
+                                                style={{ width: 240 }}
+                                                value={metadata.content}
+                                                onChange={(e) =>
+                                                    onHandleChange(`metadatas.${idx}.content`, e.target.value)
+                                                }
                                             />
                                         </Space>
-                                    )
-                                )}
+                                        <Button
+                                            id={`meta-minus-${idx}`}
+                                            onClick={() => removeMetadata(idx)}
+                                            type="primary"
+                                            // shape="circle"
+                                            danger
+                                            icon={<MinusOutlined />}
+                                        />
+                                    </Space>
+                                ))}
                                 <Button
                                     id={'meta-plus'}
                                     onClick={addMetadata}
@@ -527,9 +478,7 @@ const Admin = () => {
                                             icon={<CaretUpOutlined />}
                                         />
                                         <Button
-                                            disabled={
-                                                idx === get(values, 'sections', []).length - 1
-                                            }
+                                            disabled={idx === get(values, 'sections', []).length - 1}
                                             onClick={() => SectionDown(idx)}
                                             type="primary"
                                             // shape="circle"
@@ -549,20 +498,14 @@ const Admin = () => {
                                                     Block:
                                                 </Text>
                                                 <CustomSelect.ListSections
-                                                    page={values.type}
+                                                    // page={values.type}
                                                     section={section.type || undefined}
                                                     element={section.elementId || undefined}
                                                     onSectionChange={(e) =>
-                                                        onHandleChange(
-                                                            `sections.${idx}.type`,
-                                                            e
-                                                        )
+                                                        onHandleChange(`sections.${idx}.type`, e)
                                                     }
                                                     onElementChange={(e) =>
-                                                        onHandleChange(
-                                                            `sections.${idx}.elementId`,
-                                                            e
-                                                        )
+                                                        onHandleChange(`sections.${idx}.elementId`, e)
                                                     }
                                                 />
                                                 <Divider type="vertical" />
@@ -577,10 +520,7 @@ const Admin = () => {
                                                 <CustomSelect.ListForms
                                                     value={section.formId}
                                                     onChange={(e) =>
-                                                        onHandleChange(
-                                                            `sections.${idx}.formId`,
-                                                            e
-                                                        )
+                                                        onHandleChange(`sections.${idx}.formId`, e)
                                                     }
                                                 />
                                             </Space>
@@ -600,17 +540,10 @@ const Admin = () => {
                                             <GetEditComponent
                                                 type={section.type}
                                                 defaultValues={section.content}
-                                                onChange={(e) =>
-                                                    onHandleChange(
-                                                        `sections.${idx}.content`,
-                                                        e
-                                                    )
-                                                }
+                                                onChange={(e) => onHandleChange(`sections.${idx}.content`, e)}
                                             />
                                         )}
-                                        {!!section.elementId && (
-                                            <DisplayElementView id={section.elementId} />
-                                        )}
+                                        {!!section.elementId && <DisplayElementView id={section.elementId} />}
                                     </Card>
                                 </div>
                             ))}
@@ -673,9 +606,7 @@ const PageAccessCheckboxes = ({
     value: string[]
     onChange(e: CheckboxValueType[]): void
 }) => {
-    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(['roles', {}], () =>
-        getRoles()
-    )
+    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(['roles', {}], () => getRoles())
 
     return (
         <Checkbox.Group value={value} style={{ width: 350 }} onChange={onChange}>
@@ -692,13 +623,7 @@ const PageAccessCheckboxes = ({
     )
 }
 
-const PageTypeModal = ({
-    visible,
-    onSelect,
-}: {
-    visible: boolean
-    onSelect(e: 'page' | 'list'): void
-}) => {
+const PageTypeModal = ({ visible, onSelect }: { visible: boolean; onSelect(e: 'page' | 'list'): void }) => {
     const router = useRouter()
     const [type, setType] = useState<'page' | 'list' | undefined>()
 

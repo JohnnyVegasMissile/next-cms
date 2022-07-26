@@ -28,7 +28,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         var oldPath = file.filepath
-        var newPath = './public/favicon.ico'
+        var newPath = './uploads/favicon.ico'
 
         mv(oldPath, newPath, function (err) {
             if (err) return res.status(500).json({ error: err })

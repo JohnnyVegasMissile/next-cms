@@ -21,9 +21,8 @@ interface CustomSelectProps {
 }
 
 const ListPages = ({ value, onChange, width = 240 }: CustomSelectProps) => {
-    const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
-        ['pages', { type: 'list' }],
-        () => getPages('list')
+    const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(['pages', { type: 'list' }], () =>
+        getPages('list')
     )
 
     return (
@@ -57,9 +56,8 @@ const ListElements = ({
     value?: string
     onChange(value: string | undefined): void
 }) => {
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
-        ['elements', {}],
-        () => getElements()
+    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () =>
+        getElements()
     )
 
     return (
@@ -93,9 +91,7 @@ const ListForms = ({
     width?: number
     onChange(value: string | undefined): void
 }) => {
-    const form: UseQueryResult<Form[], Error> = useQuery<Form[], Error>(['forms', {}], () =>
-        getForms()
-    )
+    const form: UseQueryResult<Form[], Error> = useQuery<Form[], Error>(['forms', {}], () => getForms())
 
     return (
         <Select
@@ -126,9 +122,7 @@ const ListRoles = ({
     onChange(value: string | undefined): void
     width?: number
 }) => {
-    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(['roles', {}], () =>
-        getRoles()
-    )
+    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(['roles', {}], () => getRoles())
 
     return (
         <Select
@@ -152,7 +146,7 @@ const ListRoles = ({
 }
 
 interface SectionCascaderProps {
-    page?: string
+    // page?: string
     section?: string
     element?: string
     onSectionChange(type: string | undefined): void
@@ -160,15 +154,14 @@ interface SectionCascaderProps {
 }
 
 const SectionCascader = ({
-    page,
+    // page,
     section,
     element,
     onSectionChange,
     onElementChange,
 }: SectionCascaderProps) => {
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
-        ['elements', {}],
-        () => getElements()
+    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () =>
+        getElements()
     )
 
     return (
@@ -204,7 +197,7 @@ const SectionCascader = ({
                 ...Object.keys(Blocks).map((key) => ({
                     value: key,
                     label: get(Blocks, `${key}.name`, ''),
-                    disabled: !get(Blocks, `${key}.pages`, []).includes(page),
+                    // disabled: !get(Blocks, `${key}.pages`, []).includes(page),
                 })),
             ]}
             onChange={(e) => {

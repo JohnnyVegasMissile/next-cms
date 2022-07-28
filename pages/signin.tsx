@@ -3,18 +3,11 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Input, Card, Space } from 'antd'
 
 import type { GetStaticPathsContext } from 'next'
-import Head from 'next/head'
-import type { Page } from '@prisma/client'
-// import Link from 'next/link'
-import get from 'lodash.get'
 import { prisma } from '../utils/prisma'
 import { FullPage } from '../types'
-import SectionBlock from '@components/SectionBlock'
-import EditPageButton from '@components/EditPageButton'
 import { useFormik } from 'formik'
 
 const SignIn = (props: FullPage) => {
-    const { id, title, metadatas, sections, header, footer } = props
     // const { isAuth } = useAuth()
     // const router = useRouter()
 
@@ -27,7 +20,7 @@ const SignIn = (props: FullPage) => {
 
     return (
         <div>
-            <Head>
+            {/* <Head>
                 <title>{title}</title>
                 {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
@@ -46,7 +39,7 @@ const SignIn = (props: FullPage) => {
                 ))}
             </main>
 
-            <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer>
+            <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer> */}
         </div>
     )
 }
@@ -100,12 +93,7 @@ const DefaultSignInForm = () => {
                             placeholder="Password"
                         />
 
-                        <Button
-                            loading={signIn!.isLoading}
-                            style={{ width: '100%' }}
-                            type="primary"
-                            htmlType="submit"
-                        >
+                        <Button loading={signIn!.isLoading} style={{ width: '100%' }} type="primary" htmlType="submit">
                             Sign In
                         </Button>
                     </Space>
@@ -116,12 +104,12 @@ const DefaultSignInForm = () => {
 }
 
 export async function getStaticProps(context: GetStaticPathsContext) {
-    const allErrorPages = await prisma.page.findMany({
-        where: { type: 'signin' },
-        include: { metadatas: true, sections: true, header: true, footer: true },
-    })
+    // const allErrorPages = await prisma.page.findMany({
+    //     where: { type: 'signin' },
+    //     include: { metadatas: true, sections: true, header: true, footer: true },
+    // })
 
-    const page: Page = get(allErrorPages, '0', {})
+    // const page: Page = get(allErrorPages, '0', {})
 
     const revalidate = await prisma.setting.findUnique({
         where: { name: 'revalidate' },
@@ -129,8 +117,8 @@ export async function getStaticProps(context: GetStaticPathsContext) {
 
     return {
         props: {
-            ...page,
-            updatedAt: Math.floor((page?.updatedAt?.getMilliseconds() || 1) / 1000),
+            // ...page,
+            // updatedAt: Math.floor((page?.updatedAt?.getMilliseconds() || 1) / 1000),
         },
         revalidate: revalidate ? parseInt(revalidate.value) : 60,
     }

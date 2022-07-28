@@ -1,53 +1,27 @@
+import { Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
-import {
-    Input,
-    Space,
-    Button,
-    Typography,
-    Card,
-    Select,
-    message,
-    Spin,
-    Tabs,
-    Radio,
-    Divider,
-    Checkbox,
-    Row,
-    Col,
-} from 'antd'
-import { AndroidOutlined, AppleOutlined } from '@ant-design/icons'
-import get from 'lodash.get'
-import { editElement, getElementDetails, postElement } from '../../../network/elements'
-import { Prisma, Element, Role } from '@prisma/client'
-import Blocks from '../../../blocks'
-import GetEditComponent from '../../../components/GetEditComponent'
-import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
-import {
-    PlusOutlined,
-    MinusOutlined,
-    CaretUpOutlined,
-    CaretDownOutlined,
-    CloseOutlined,
-} from '@ant-design/icons'
+import { Input, Space, Button, Typography, Card, Select, message, Spin, Tabs, Radio, Divider, Switch } from 'antd'
 import Head from 'next/head'
-import { FullSection, FullSectionEdit } from '../../../types'
-import CustomSelect from '../../../components/CustomSelect'
-import DisplayElementView from '../../../components/DisplayElementView'
-import { editPage, getPageDetails, postPage } from '../../../network/pages'
-import { CheckboxValueType } from 'antd/lib/checkbox/Group'
-import { getRoles } from '../../../network/roles'
+import get from 'lodash.get'
 import set from 'lodash.set'
-import { Fragment } from 'react'
+import kebabcase from 'lodash.kebabcase'
+import { ContainerField } from '@prisma/client'
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
+import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
+
+import SectionManager from '../../../components/SectionManager'
+import AccessCheckboxes from '../../../components/AccessCheckboxes'
+import { FullContainerEdit, FullSection, FullSectionEdit } from '../../../types'
+import { editContainer, getContainerDetails, postContainer } from '../../../network/containers'
+import camelcase from 'lodash.camelcase'
 
 const { Text, Title } = Typography
 const { TabPane } = Tabs
 
-type MyType = any
+const initialValues: FullContainerEdit = { title: '', contentHasSections: false, slugEdit: [''] }
 
-const initialValues: MyType = { slugEdit: [''] }
-
-const validate = (values: MyType) => {
+const validate = (values: FullContainerEdit) => {
     let errors: any = {}
 
     // if (!values.title) {
@@ -74,44 +48,98 @@ const Admin = () => {
     const { pid } = router.query
     const queryClient = useQueryClient()
 
-    const { values, errors, handleSubmit, handleChange, setValues } = useFormik<MyType>({
+    const { values, errors, handleSubmit, handleChange, setValues } = useFormik<FullContainerEdit>({
         initialValues,
         validate,
-        onSubmit: async (values) => mutation.mutate({ pid: pid as string, values }),
+        onSubmit: async (values) => {
+            let i = 0
+            const sections: FullSection[] = []
+
+            if (!!values.sections) {
+                for (const section of values.sections) {
+                    if (!!section.type || !!section.elementId) {
+                        sections.push({
+                            ...section,
+                            position: i,
+                        })
+
+                        i = i + 1
+                    }
+                }
+            }
+
+            i = 0
+            const contentSections: FullSection[] = []
+
+            if (!!values.contentSections) {
+                for (const section of values.contentSections) {
+                    if (!!section.type || !!section.elementId) {
+                        contentSections.push({
+                            ...section,
+                            position: i,
+                        })
+
+                        i = i + 1
+                    }
+                }
+            }
+
+            const slug = get(values, 'slugEdit', []).join('/')
+
+            // console.log('values', values)
+            mutation.mutate({
+                pid: pid as string,
+                values: { ...values, sections, contentSections, slug, slugEdit: undefined },
+            })
+        },
     })
 
-    const element: UseQueryResult<MyType, Error> = useQuery<MyType, Error>(
+    const element: UseQueryResult<FullContainerEdit, Error> = useQuery<FullContainerEdit, Error>(
         ['elements', { id: pid }],
-        () => getElementDetails(pid as string),
+        () => getContainerDetails(pid as string),
         {
             enabled: !!pid && pid !== 'create',
-            onSuccess: (data: MyType) => setValues(data),
-            onError: (err) => router.push('/admin/articles'),
+            // onSuccess: (data: FullContainerEdit) => setValues(data),
+
+            onSuccess: (data: FullContainerEdit) => {
+                const sections = get(data, 'sections', []).sort((a, b) => a.position - b.position)
+
+                const contentSections = get(data, 'contentSections', []).sort((a, b) => a.position - b.position)
+
+                const accesses = get(data, 'accesses', []).map((access) => get(access, 'roleId', ''))
+
+                const slugEdit = get(data, 'slug', '')!.split('/')
+
+                setValues({ ...data, sections, contentSections, accesses, slugEdit })
+            },
+            onError: (err) => router.push('/admin/containers'),
         }
     )
 
     const mutation = useMutation(
-        (data: { pid: string; values: MyType }) =>
-            data.pid === 'create' ? postElement(data.values) : editElement(data.pid, data.values),
+        (data: { pid: string; values: FullContainerEdit }) =>
+            data.pid === 'create' ? postContainer(data.values) : editContainer(data.pid, data.values),
         {
-            onSuccess: (data: Element) => {
+            onSuccess: (data: any) => {
                 message.success(`Element ${data.title} saved`)
-                queryClient.invalidateQueries('elements')
-                router.push('/admin/elements')
+                queryClient.invalidateQueries('containers')
+                router.push('/admin/containers')
             },
             onError: (err) => {
-                message.error('An error occured, while creating or updating the element')
-                queryClient.invalidateQueries('elements')
-                router.push('/admin/elements')
+                message.error('An error occured, while creating or updating the container')
+                queryClient.invalidateQueries('containers')
+                router.push('/admin/containers')
             },
         }
     )
+
+    const isDefaultPage = values.id === 'page'
 
     const addField = () => {
         handleChange({
             target: {
                 name: 'fields',
-                value: [...get(values, 'fields', []), { name: '', content: '' }],
+                value: [...get(values, 'fields', []), { name: '' }],
             },
         })
     }
@@ -188,8 +216,9 @@ const Admin = () => {
                                                     <Text>Title :</Text>
                                                     <Input
                                                         id="title"
+                                                        disabled={isDefaultPage}
                                                         style={{ width: 240 }}
-                                                        value={get(values, 'title', '')}
+                                                        value={values.title}
                                                         onChange={(e) => {
                                                             onHandleChange('title', e.target.value)
 
@@ -207,200 +236,123 @@ const Admin = () => {
                                                     <Text>Status</Text>
                                                     <Radio.Group
                                                         id="status"
+                                                        disabled={isDefaultPage}
                                                         value={values.published}
-                                                        onChange={(e) =>
-                                                            onHandleChange('published', e.target.value)
-                                                        }
+                                                        onChange={(e) => onHandleChange('published', e.target.value)}
                                                     >
                                                         <Radio value={true}>Published</Radio>
                                                         <Radio value={false}>Unpublished</Radio>
                                                     </Radio.Group>
                                                 </Space>
 
-                                                <Space direction="vertical">
-                                                    <Text>Access</Text>
-                                                    <PageAccessCheckboxes
-                                                        value={values.accesses || []}
-                                                        onChange={(e) => onHandleChange('accesses', e)}
-                                                    />
-                                                </Space>
-                                            </Space>
-
-                                            <Divider />
-                                            <Title level={5}>Page URL</Title>
-                                            <Space style={{ width: '100%' }}>
-                                                {get(values, 'slugEdit', []).map(
-                                                    (slug: string, idx: number) => (
-                                                        <Fragment key={idx}>
-                                                            {idx === lastSlugIndex && (
-                                                                <>
-                                                                    <Button
-                                                                        id="slug-minus"
-                                                                        onClick={removeSlug}
-                                                                        type="primary"
-                                                                        // shape="circle"
-                                                                        danger
-                                                                        disabled={
-                                                                            get(values, 'slugEdit', [])
-                                                                                .length < 2
-                                                                        }
-                                                                        icon={<MinusOutlined />}
-                                                                    />
-                                                                    <Button
-                                                                        id="slug-plus"
-                                                                        onClick={addSlug}
-                                                                        disabled={
-                                                                            get(values, 'slugEdit', [])
-                                                                                .length > 5
-                                                                        }
-                                                                        type="primary"
-                                                                        // shape="circle"
-                                                                        icon={<PlusOutlined />}
-                                                                    />
-                                                                </>
-                                                            )}
-                                                            <Input
-                                                                id={`slug-${idx}`}
-                                                                style={{
-                                                                    minWidth: 200,
-                                                                }}
-                                                                value={slug}
-                                                                onChange={(e) =>
-                                                                    onHandleChange(
-                                                                        `slugEdit.${idx}`,
-                                                                        kebabcase(e.target.value)
-                                                                    )
-                                                                }
-                                                                status={errors.slug ? 'error' : undefined}
-                                                            />
-                                                            {lastSlugIndex !== idx && '/'}
-                                                        </Fragment>
-                                                    )
+                                                {!isDefaultPage && (
+                                                    <Space direction="vertical">
+                                                        <Text>Access</Text>
+                                                        <AccessCheckboxes
+                                                            value={values.accesses || []}
+                                                            onChange={(e) => onHandleChange('accesses', e)}
+                                                        />
+                                                    </Space>
                                                 )}
                                             </Space>
+
+                                            {!isDefaultPage && (
+                                                <>
+                                                    <Divider />
+                                                    <Title level={5}>Page URL</Title>
+                                                    <Space style={{ width: '100%' }}>
+                                                        {get(values, 'slugEdit', []).map((slug, idx) => (
+                                                            <Fragment key={idx}>
+                                                                {idx === lastSlugIndex && (
+                                                                    <>
+                                                                        <Button
+                                                                            id="slug-minus"
+                                                                            onClick={removeSlug}
+                                                                            type="primary"
+                                                                            // shape="circle"
+                                                                            danger
+                                                                            disabled={
+                                                                                get(values, 'slugEdit', []).length < 2
+                                                                            }
+                                                                            icon={<MinusOutlined />}
+                                                                        />
+                                                                        <Button
+                                                                            id="slug-plus"
+                                                                            onClick={addSlug}
+                                                                            disabled={
+                                                                                get(values, 'slugEdit', []).length > 5
+                                                                            }
+                                                                            type="primary"
+                                                                            // shape="circle"
+                                                                            icon={<PlusOutlined />}
+                                                                        />
+                                                                    </>
+                                                                )}
+                                                                <Input
+                                                                    id={`slug-${idx}`}
+                                                                    style={{
+                                                                        minWidth: 200,
+                                                                    }}
+                                                                    value={slug}
+                                                                    onChange={(e) =>
+                                                                        onHandleChange(
+                                                                            `slugEdit.${idx}`,
+                                                                            kebabcase(e.target.value)
+                                                                        )
+                                                                    }
+                                                                    status={errors.slug ? 'error' : undefined}
+                                                                />
+                                                                {lastSlugIndex !== idx && '/'}
+                                                            </Fragment>
+                                                        ))}
+                                                    </Space>
+                                                </>
+                                            )}
                                         </Space>
                                     </Card>
 
-                                    <Card title="Fields">
-                                        <Space direction="vertical">
-                                            {get(values, 'fields', []).map((field: any, idx: number) => (
-                                                <Space key={idx} align="end">
-                                                    <Space direction="vertical">
-                                                        <Text>Name</Text>
-                                                        <Input
-                                                            id={`field-name-${idx}`}
-                                                            style={{ width: 240 }}
-                                                            value={field.name}
-                                                            onChange={(e) =>
-                                                                onHandleChange(
-                                                                    `fields.${idx}.name`,
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                        />
-                                                    </Space>
-
-                                                    <Space direction="vertical">
-                                                        <Text>Type</Text>
-                                                        <Select
-                                                            id={`field-type-${idx}`}
-                                                            style={{ width: 240 }}
-                                                            value={field.type}
-                                                            onChange={(e) =>
-                                                                onHandleChange(`fields.${idx}.type`, e)
-                                                            }
-                                                        >
-                                                            <Select.Option value="string">Text</Select.Option>
-                                                            <Select.Option value="text">
-                                                                Paragraph
-                                                            </Select.Option>
-                                                            <Select.Option value="int">Number</Select.Option>
-                                                            <Select.Option value="boolean">
-                                                                Boolean
-                                                            </Select.Option>
-                                                            <Select.Option value="date">Date</Select.Option>
-                                                            <Select.Option value="image">Image</Select.Option>
-                                                            <Select.Option value="file" disabled>
-                                                                File
-                                                            </Select.Option>
-                                                            <Select.Option value="link">Link</Select.Option>
-                                                            <Select.Option value="wysiwyg" disabled>
-                                                                Wysiwyg
-                                                            </Select.Option>
-                                                            <Select.Option value="list" disabled>
-                                                                List
-                                                            </Select.Option>
-                                                        </Select>
-                                                    </Space>
-
-                                                    <Space direction="vertical">
-                                                        <Text>Content</Text>
-                                                        <Input
-                                                            id={`field-content-${idx}`}
-                                                            style={{ width: 240 }}
-                                                            value={field.content}
-                                                            onChange={(e) =>
-                                                                onHandleChange(
-                                                                    `fields.${idx}.content`,
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                        />
-                                                    </Space>
-
-                                                    <Space direction="vertical">
-                                                        <Text>Required</Text>
-                                                        <Radio.Group
-                                                            style={{
-                                                                height: 32,
-                                                                alignItems: 'center',
-                                                                display: 'flex',
-                                                            }}
-                                                            id={`required-${idx}`}
-                                                            value={field.required}
-                                                            onChange={(e) =>
-                                                                onHandleChange(
-                                                                    `fields.${idx}.required`,
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                        >
-                                                            <Radio value={true}>Published</Radio>
-                                                            <Radio value={false}>Unpublished</Radio>
-                                                        </Radio.Group>
-                                                    </Space>
-                                                    <Button
-                                                        id={`field-minus-${idx}`}
-                                                        onClick={() => removeField(idx)}
-                                                        type="primary"
-                                                        // shape="circle"
-                                                        danger
-                                                        icon={<MinusOutlined />}
-                                                    />
-                                                </Space>
-                                            ))}
-                                            <Button
-                                                id={'field-plus'}
-                                                onClick={addField}
-                                                type="primary"
-                                                // shape="circle"
-                                                icon={<PlusOutlined />}
+                                    {!isDefaultPage && (
+                                        <>
+                                            <MetadatasManager
+                                                values={get(values, 'metadatas', [])}
+                                                onChange={(e) => onHandleChange('metadatas', e)}
                                             />
-                                        </Space>
-                                    </Card>
-                                    <Divider orientation="left">Layout</Divider>
-                                    <SectionManager
-                                        values={get(values, 'sections', []) as FullSectionEdit[]}
-                                        onChange={(e) => onHandleChange('sections', e)}
-                                    />
+
+                                            <Divider orientation="left">Container Layout</Divider>
+
+                                            <SectionManager
+                                                values={get(values, 'sections', []) as FullSectionEdit[]}
+                                                onChange={(e) => onHandleChange('sections', e)}
+                                            />
+                                        </>
+                                    )}
                                 </Space>
                             </TabPane>
-                            <TabPane tab="Contents" key="2">
-                                <div style={{ height: 15 }} />
-                                <SectionManager
-                                    values={get(values, 'childsSections', []) as FullSectionEdit[]}
-                                    onChange={(e) => onHandleChange('childsSections', e)}
-                                />
+                            <TabPane tab="Contents" key="2" disabled={isDefaultPage}>
+                                <Space direction="vertical" style={{ width: '100%' }}>
+                                    <FieldsManager
+                                        values={get(values, 'fields', [])}
+                                        onChange={(e) => onHandleChange('fields', e)}
+                                    />
+
+                                    <Divider orientation="left">
+                                        <Space size="middle">
+                                            Contents Layout
+                                            <Switch
+                                                checked={values.contentHasSections}
+                                                onChange={(checked: boolean) =>
+                                                    onHandleChange('contentHasSections', checked)
+                                                }
+                                            />
+                                        </Space>
+                                    </Divider>
+                                    {!!values.contentHasSections && (
+                                        <SectionManager
+                                            values={get(values, 'contentSections', []) as FullSectionEdit[]}
+                                            onChange={(e) => onHandleChange('contentSections', e)}
+                                        />
+                                    )}
+                                </Space>
                             </TabPane>
                         </Tabs>
                     </div>
@@ -414,177 +366,210 @@ const Admin = () => {
     )
 }
 
-const PageAccessCheckboxes = ({
-    value,
-    onChange,
-}: {
-    value: string[]
-    onChange(e: CheckboxValueType[]): void
-}) => {
-    const roles: UseQueryResult<Role[], Error> = useQuery<Role[], Error>(['roles', {}], () => getRoles())
-
-    return (
-        <Checkbox.Group value={value} style={{ width: 350 }} onChange={onChange}>
-            <Row>
-                {roles?.data
-                    ?.filter((e) => e.id !== 'super-admin')
-                    ?.map((role) => (
-                        <Col key={role.id} span={8}>
-                            <Checkbox value={role.id}>{role.name}</Checkbox>
-                        </Col>
-                    ))}
-            </Row>
-        </Checkbox.Group>
-    )
+interface MetadatasManagerProps {
+    values: { name: string; content?: string; field?: string }[]
+    onChange(e: { name: string; content?: string; field?: string }[]): void
 }
 
-interface SectionManagerProps {
-    values: FullSectionEdit[]
-    onChange(value: FullSectionEdit[]): void
-}
-
-const SectionManager = ({ values, onChange }: SectionManagerProps) => {
-    const addSection = () => {
-        onChange([
-            ...values,
-            {
-                type: null,
-                position: values.length,
-                content: '{}',
-            },
-        ])
+const MetadatasManager = ({ values, onChange }: MetadatasManagerProps) => {
+    const addMetadata = () => {
+        onChange([...values, { name: '' }])
     }
 
-    const removeSection = (index: number) => {
+    const removeMetadata = (index: number) => {
         let newValue = [...values]
         newValue.splice(index, 1)
 
         onChange(newValue)
     }
 
-    const SectionUp = (index: number) => {
+    const modifyMetadata = (index: number, key: string, value: any) => {
         let newValue = [...values]
-        const temp = newValue[index]
-        newValue[index] = newValue[index - 1]
-        newValue[index - 1] = temp
-
-        onChange(newValue)
-    }
-
-    const SectionDown = (index: number) => {
-        let newValue = [...values]
-        const temp = newValue[index]
-        newValue[index] = newValue[index + 1]
-        newValue[index + 1] = temp
-
-        onChange(newValue)
-    }
-
-    const onHandleChange = (name: string, value: any) => {
-        let newValue = [...values]
-        set(newValue, name, value)
+        set(newValue, `${index}.${key}`, value)
 
         onChange(newValue)
     }
 
     return (
-        <Space direction="vertical" style={{ width: '100%' }}>
-            {values.map((section, idx) => (
-                <div key={idx} style={{ display: 'flex', gap: 8 }}>
-                    <Space direction="vertical" size={1}>
+        <Card title="Metadatas">
+            <Space direction="vertical">
+                {values.map((metadata: any, idx: number) => (
+                    <Space key={idx} align="end">
+                        <Space direction="vertical">
+                            <Text>Name</Text>
+                            <Select
+                                id={`meta-name-${idx}`}
+                                style={{ width: 240 }}
+                                value={metadata.name}
+                                onChange={(e) => modifyMetadata(idx, 'name', e)}
+                            >
+                                <Select.Option value="application-name">Application name</Select.Option>
+                                <Select.Option value="author">Author</Select.Option>
+                                <Select.Option value="description">Description</Select.Option>
+                                <Select.Option value="generator">Generator</Select.Option>
+                                <Select.Option value="keywords">Keywords</Select.Option>
+                                <Select.Option value="viewport">Viewport</Select.Option>
+                            </Select>
+                        </Space>
+
+                        <Space direction="vertical">
+                            <Text>Content</Text>
+                            <Input
+                                id={`meta-content-${idx}`}
+                                style={{ width: 240 }}
+                                value={metadata.content}
+                                onChange={(e) => modifyMetadata(idx, 'content', e.target.value)}
+                            />
+                        </Space>
+
                         <Button
-                            disabled={idx === 0}
-                            onClick={() => SectionUp(idx)}
+                            id={`meta-minus-${idx}`}
+                            onClick={() => removeMetadata(idx)}
                             type="primary"
                             // shape="circle"
-                            icon={<CaretUpOutlined />}
-                        />
-                        <Button
-                            disabled={idx === get(values, 'sections', []).length - 1}
-                            onClick={() => SectionDown(idx)}
-                            type="primary"
-                            // shape="circle"
-                            icon={<CaretDownOutlined />}
+                            danger
+                            icon={<MinusOutlined />}
                         />
                     </Space>
-                    <Card
-                        bodyStyle={{ padding: 0 }}
-                        title={
-                            <Space>
-                                <Text
-                                    style={{
-                                        fontSize: 14,
-                                        fontWeight: 'normal',
-                                    }}
-                                >
-                                    Block:
-                                </Text>
-                                <CustomSelect.ListSections
-                                    section={section.type || undefined}
-                                    element={section.elementId || undefined}
-                                    onSectionChange={(e) => onHandleChange(`${idx}.type`, e)}
-                                    onElementChange={(e) => onHandleChange(`${idx}.elementId`, e)}
-                                />
-                                <Divider type="vertical" />
-                                <Text
-                                    style={{
-                                        fontSize: 14,
-                                        fontWeight: 'normal',
-                                    }}
-                                >
-                                    Form:
-                                </Text>
-                                <CustomSelect.ListForms
-                                    value={section.formId}
-                                    onChange={(e) => onHandleChange(`${idx}.formId`, e)}
-                                />
-                            </Space>
-                        }
-                        extra={
-                            <Button
-                                type="primary"
-                                onClick={() => removeSection(idx)}
-                                danger
-                                // shape="circle"
-                                icon={<CloseOutlined />}
-                            />
-                        }
-                        style={{ flex: 1 }}
-                    >
-                        {!!section.type && (
-                            <GetEditComponent
-                                type={section.type}
-                                defaultValues={section.content}
-                                onChange={(e) => onHandleChange(`sections.${idx}.content`, e)}
-                            />
-                        )}
-                        {!!section.elementId && <DisplayElementView id={section.elementId} />}
-                    </Card>
-                </div>
-            ))}
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                }}
-            >
+                ))}
                 <Button
+                    id={'meta-plus'}
+                    onClick={addMetadata}
                     type="primary"
-                    // shape="round"
+                    // shape="circle"
                     icon={<PlusOutlined />}
-                    // size="small"
-                    onClick={addSection}
-                >
-                    Add section
-                </Button>
-            </div>
-        </Space>
+                />
+            </Space>
+        </Card>
+    )
+}
+
+interface FieldsManagerProps {
+    values: any[]
+    onChange(e: any[]): void
+}
+
+const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
+    const addField = () => {
+        onChange([...values, { name: '' }])
+    }
+
+    const removeField = (index: number) => {
+        let newValue = [...values]
+        newValue.splice(index, 1)
+
+        onChange(newValue)
+    }
+
+    const modifyField = (index: number, key: string, value: any) => {
+        let newValue = [...values]
+        set(newValue, `${index}.${key}`, value)
+
+        onChange(newValue)
+    }
+
+    return (
+        <Card title="Fields">
+            <Space direction="vertical">
+                {values.map((field: any, idx: number) => (
+                    <Space key={idx} align="end">
+                        <Space direction="vertical">
+                            <Text>Label</Text>
+                            <Input
+                                id={`field-label-${idx}`}
+                                style={{ width: 240 }}
+                                value={field.label}
+                                onChange={(e) => modifyField(idx, 'label', e.target.value)}
+                            />
+                        </Space>
+
+                        <Space direction="vertical">
+                            <Text>Name</Text>
+                            <Input
+                                id={`field-name-${idx}`}
+                                style={{ width: 240 }}
+                                value={field.name}
+                                onChange={(e) => modifyField(idx, 'name', camelcase(e.target.value))}
+                            />
+                        </Space>
+
+                        <Space direction="vertical">
+                            <Text>Type</Text>
+                            <Select
+                                id={`field-type-${idx}`}
+                                style={{ width: 240 }}
+                                value={field.type}
+                                onChange={(e) => modifyField(idx, 'type', e)}
+                            >
+                                <Select.Option value="string">Text</Select.Option>
+                                <Select.Option value="text">Paragraph</Select.Option>
+                                <Select.Option value="int">Number</Select.Option>
+                                <Select.Option value="boolean">Boolean</Select.Option>
+                                <Select.Option value="date">Date</Select.Option>
+                                <Select.Option value="image">Image</Select.Option>
+                                <Select.Option value="file" disabled>
+                                    File
+                                </Select.Option>
+                                <Select.Option value="link">Link</Select.Option>
+                                <Select.Option value="wysiwyg" disabled>
+                                    Wysiwyg
+                                </Select.Option>
+                                <Select.Option value="list" disabled>
+                                    List
+                                </Select.Option>
+                            </Select>
+                        </Space>
+
+                        <Space direction="vertical">
+                            <Text>Required</Text>
+                            <Radio.Group
+                                style={{
+                                    height: 32,
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                }}
+                                id={`required-${idx}`}
+                                value={field.required}
+                                onChange={(e) => modifyField(idx, 'required', e.target.value === 'true')}
+                            >
+                                <Radio value={true}>Required</Radio>
+                                <Radio value={false}>Not Required</Radio>
+                            </Radio.Group>
+                        </Space>
+
+                        <Space direction="vertical">
+                            <Text>Metadata</Text>
+                            <Select
+                                allowClear
+                                id={`meta-name-${idx}`}
+                                style={{ width: 240 }}
+                                value={field.metadata}
+                                onChange={(e) => modifyField(idx, 'metadata', e)}
+                            >
+                                <Select.Option value="application-name">Application name</Select.Option>
+                                <Select.Option value="author">Author</Select.Option>
+                                <Select.Option value="description">Description</Select.Option>
+                                <Select.Option value="generator">Generator</Select.Option>
+                                <Select.Option value="keywords">Keywords</Select.Option>
+                                <Select.Option value="viewport">Viewport</Select.Option>
+                            </Select>
+                        </Space>
+
+                        <Button
+                            id={`field-minus-${idx}`}
+                            onClick={() => removeField(idx)}
+                            type="primary"
+                            danger
+                            icon={<MinusOutlined />}
+                        />
+                    </Space>
+                ))}
+                <Button id={'field-plus'} onClick={addField} type="primary" icon={<PlusOutlined />} />
+            </Space>
+        </Card>
     )
 }
 
 Admin.requireAuth = true
 
 export default Admin
-function kebabcase(value: string): any {
-    throw new Error('Function not implemented.')
-}

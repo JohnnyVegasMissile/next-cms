@@ -1,13 +1,11 @@
 import INSTANCE from './api'
-import { Prisma } from '@prisma/client'
-import type { Page } from '@prisma/client'
-import { FullPageEdit, PageTypes } from '../types'
+import { Container, Prisma } from '@prisma/client'
 
-export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
+export const postContainer = (data: Prisma.ContainerCreateInput | any): Promise<Container> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
-            url: `/api/pages`,
+            url: `/api/containers`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -17,11 +15,11 @@ export const postPage = (data: Prisma.PageCreateInput): Promise<Page> =>
             .catch(reject)
     })
 
-export const editPage = (id: string, data: Prisma.PageCreateInput): Promise<Page> =>
+export const editContainer = (id: string, data: Prisma.ContainerCreateInput | any): Promise<Container> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
-            url: `/api/pages/${id}`,
+            url: `/api/containers/${id}`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -31,35 +29,35 @@ export const editPage = (id: string, data: Prisma.PageCreateInput): Promise<Page
             .catch(reject)
     })
 
-export const getPages = (type?: PageTypes, q?: string): Promise<Page[]> =>
+export const getContainers = (q?: string): Promise<Container[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/pages`,
+            url: `/api/containers`,
             headers: {
                 'Content-Type': 'application/json',
             },
-            params: { type, q },
+            params: { q },
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const deletePage = (id: string): Promise<void> =>
+export const deleteContainer = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
-            url: `/api/pages/${id}`,
+            url: `/api/containers/${id}`,
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const getPageDetails = (id: string): Promise<FullPageEdit> =>
+export const getContainerDetails = (id: string): Promise<any> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/pages/${id}`,
+            url: `/api/containers/${id}`,
         })
             .then(resolve)
             .catch(reject)

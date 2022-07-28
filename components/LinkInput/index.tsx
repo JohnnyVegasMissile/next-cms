@@ -1,10 +1,10 @@
 import { AutoComplete, Typography } from 'antd'
 import { useQuery, UseQueryResult } from 'react-query'
-import { getPages } from '../../network/pages'
+import { getContainers } from '../../network/containers'
 import { getArticles } from '../../network/articles'
-import type { Page } from '@prisma/client'
+import type { Container } from '@prisma/client'
 import { useMemo } from 'react'
-import { FullArticle } from 'types'
+// import { FullArticle } from 'types'
 import get from 'lodash.get'
 
 const { Text } = Typography
@@ -16,22 +16,22 @@ interface Props {
 }
 
 const LinkInput = ({ value, onChange, width = 300 }: Props) => {
-    const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(
-        ['pages'],
-        () => getPages(),
+    const pages: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(
+        ['containers'],
+        () => getContainers(),
         {
             // select: (data) => data.filter((e) => e.type !== 'error'),
             refetchOnMount: false,
         }
     )
 
-    const articles: UseQueryResult<FullArticle[], Error> = useQuery<FullArticle[], Error>(
-        ['acticles'],
-        () => getArticles(),
-        {
-            refetchOnMount: false,
-        }
-    )
+    // const articles: UseQueryResult<FullArticle[], Error> = useQuery<FullArticle[], Error>(
+    //     ['acticles'],
+    //     () => getArticles(),
+    //     {
+    //         refetchOnMount: false,
+    //     }
+    // )
 
     const options = useMemo(() => {
         const pagesOptions =
@@ -45,20 +45,20 @@ const LinkInput = ({ value, onChange, width = 300 }: Props) => {
                     </>
                 ),
             })) || []
-        const articlesOptions =
-            articles?.data?.map((article) => ({
-                value: `/${article.page.slug}/${article.slug}`,
-                searchLabel: `${article.title} ${article.page.title}`,
-                label: (
-                    <>
-                        <Text>{article.title}</Text>
-                        <Text type="secondary">{` (${article.page.title} article)`}</Text>
-                    </>
-                ),
-            })) || []
+        // const articlesOptions =
+        //     articles?.data?.map((article) => ({
+        //         value: `/${article.page.slug}/${article.slug}`,
+        //         searchLabel: `${article.title} ${article.page.title}`,
+        //         label: (
+        //             <>
+        //                 <Text>{article.title}</Text>
+        //                 <Text type="secondary">{` (${article.page.title} article)`}</Text>
+        //             </>
+        //         ),
+        //     })) || []
 
-        return [...pagesOptions, ...articlesOptions]
-    }, [pages, articles])
+        return [...pagesOptions]
+    }, [pages])
 
     const isError = !!value && get(value, '0', '') !== '/' ? 'error' : ''
 

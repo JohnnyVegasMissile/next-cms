@@ -1,16 +1,18 @@
 import type {
     User,
     Login,
-    Page,
+    // Page,
     Metadata,
     Section,
-    Article,
+    // Article,
     Element,
     Role,
     FormField,
     Form,
     Message,
     Media,
+    LinkedMetadata,
+    ContainerField,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
@@ -37,21 +39,21 @@ export type UserCreation = Prisma.UserCreateInput & {
     password?: string
 }
 
-export type FullArticle = Article & {
-    coverId?: string
-    cover?: Media
-    page: Page
-    sections?: FullSection[] | null
-}
+// export type FullArticle = Article & {
+//     coverId?: string
+//     cover?: Media
+//     page: Page
+//     sections?: FullSection[] | null
+// }
 
-interface ArticleCreateInput extends Omit<Prisma.ArticleCreateInput, 'page'> {}
+// interface ArticleCreateInput extends Omit<Prisma.ArticleCreateInput, 'page'> {}
 
-export type FullArticleEdit = ArticleCreateInput & {
-    coverId?: string
-    pageId?: string
-    sections?: FullSection[] | null
-    // page?: string | undefined
-}
+// export type FullArticleEdit = ArticleCreateInput & {
+//     coverId?: string
+//     pageId?: string
+//     sections?: FullSection[] | null
+//     // page?: string | undefined
+// }
 
 export interface FormFieldCreateInput extends Omit<Prisma.FormFieldCreateInput, 'form'> {}
 
@@ -63,13 +65,13 @@ export type FullFormEdit = Prisma.FormCreateInput & {
 //     fields?: FormField[] | null
 // }
 
-export type FullPage = Page & {
-    metadatas?: Metadata[] | null
-    sections?: FullSection[] | null
-    articles?: FullArticle[] | null
-    header?: Element | null
-    footer?: Element | null
-}
+// export type FullPage = Page & {
+//     metadatas?: Metadata[] | null
+//     sections?: FullSection[] | null
+//     articles?: FullArticle[] | null
+//     header?: Element | null
+//     footer?: Element | null
+// }
 
 export type FullSection = Section & {
     element: Element | null
@@ -89,12 +91,25 @@ export type FullForm = Form & {
     fields: FormField[] | null
 }
 
-export type FullPageEdit = Prisma.PageCreateInput & {
+// export type FullPageEdit = Prisma.PageCreateInput & {
+//     metadatas?: Metadata[] | null
+//     sections?: FullSection[] | null
+//     accesses?: string[] | null
+//     headerId?: string | undefined
+//     footerId?: string | undefined
+
+//     slugEdit?: (string | undefined)[]
+// }
+
+export type FullContainerEdit = Prisma.ContainerCreateInput & {
+    fields?: ContainerField[] | null
     metadatas?: Metadata[] | null
+    contentMetadatas?: Metadata[] | null
+    linkedMetadata?: LinkedMetadata[] | null
     sections?: FullSection[] | null
+    contentSections?: FullSection[] | null
+
     accesses?: string[] | null
-    headerId?: string | undefined
-    footerId?: string | undefined
 
     slugEdit?: (string | undefined)[]
 }

@@ -54,7 +54,7 @@ const Admin = () => {
                 }}
             >
                 <Space>
-                    <Avatar src="/favicon.ico" shape="square" size="large" />
+                    <Avatar src="api/uploads/favicon.ico" shape="square" size="large" />
                     <UploadButton.Favicon />
                 </Space>
                 <InputNumber

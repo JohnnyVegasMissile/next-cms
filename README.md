@@ -10,3 +10,5 @@ go to /install
 /signin
 user: root
 pwd: root
+
+https://github.com/ianstormtaylor/slate#readme

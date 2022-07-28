@@ -18,39 +18,26 @@ const Pages = (props: FullPage | FullArticle) => {
 
     return (
         <div>
-            <Head>
+            {/* <Head>
                 <title>{props.title}</title>
                 {get(props, 'metadatas', []).map((meta: Metadata) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))}
                 {!get(props, 'type', false) && (
                     <>
-                        {!!get(props, 'author', false) && (
-                            <meta name="author" content={get(props, 'author')} />
-                        )}
+                        {!!get(props, 'author', false) && <meta name="author" content={get(props, 'author')} />}
                         {!!get(props, 'description', false) && (
                             <meta name="description" content={get(props, 'description')} />
                         )}
                     </>
                 )}
 
-                {/* <link rel="alternate" href={`${process.env.SITE_URL}`} hrefLang="x-default" />
-                <link rel="alternate" href={`${process.env.SITE_URL}/en`} hrefLang="en" />
-                <link rel="alternate" href={`${process.env.SITE_URL}/fr`} hrefLang="fr" />
-                <link rel="alternate" href={`${process.env.SITE_URL}/es`} hrefLang="es" />
-                <link rel="alternate" href={`${process.env.SITE_URL}/zh`} hrefLang="zh" /> */}
             </Head>
 
-            <EditPageButton
-                redirectTo={`/admin/${!!get(props, 'type', false) ? 'pages' : 'articles'}/${
-                    props.id
-                }`}
-            />
+            <EditPageButton redirectTo={`/admin/${!!get(props, 'type', false) ? 'pages' : 'articles'}/${props.id}`} />
 
             <header>
-                {!!get(props, 'header', false) && (
-                    <SectionBlock section={get(props, 'header')} page={props} />
-                )}
+                {!!get(props, 'header', false) && <SectionBlock section={get(props, 'header')} page={props} />}
             </header>
 
             {!!get(props, 'type', false) ? (
@@ -68,10 +55,8 @@ const Pages = (props: FullPage | FullArticle) => {
             )}
 
             <footer>
-                {!!get(props, 'footer', false) && (
-                    <SectionBlock section={get(props, 'footer')} page={props} />
-                )}
-            </footer>
+                {!!get(props, 'footer', false) && <SectionBlock section={get(props, 'footer')} page={props} />}
+            </footer> */}
         </div>
     )
 }
@@ -87,144 +72,144 @@ const sanitizeDate = (date: Date) => Math.floor((date?.getMilliseconds() || 1) /
 // export async function getServerSideProps(context: GetServerSidePropsContext) {
 export async function getStaticProps(context: NewGetStaticPathsContext) {
     const { slug } = context.params
-    let props
-    const page = await prisma.page.findUnique({
-        where: { slug: slug.join('/') },
-        include: {
-            articles: { include: { cover: true } },
-            metadatas: true,
-            sections: {
-                include: {
-                    form: {
-                        include: { fields: true },
-                    },
-                },
-            },
-            header: true,
-            footer: true,
-            accesses: true,
-        },
-    })
+    // let props
+    // const page = await prisma.page.findUnique({
+    //     where: { slug: slug.join('/') },
+    //     include: {
+    //         articles: { include: { cover: true } },
+    //         metadatas: true,
+    //         sections: {
+    //             include: {
+    //                 form: {
+    //                     include: { fields: true },
+    //                 },
+    //             },
+    //         },
+    //         header: true,
+    //         footer: true,
+    //         accesses: true,
+    //     },
+    // })
 
-    if (!!page) {
-        const articles = page.articles.map((article) => ({
-            ...article,
-            updatedAt: sanitizeDate(article.updatedAt),
-            cover: article.cover
-                ? { ...article.cover, uploadTime: sanitizeDate(article.cover.uploadTime) }
-                : undefined,
-        }))
+    // if (!!page) {
+    //     const articles = page.articles.map((article) => ({
+    //         ...article,
+    //         updatedAt: sanitizeDate(article.updatedAt),
+    //         cover: article.cover
+    //             ? { ...article.cover, uploadTime: sanitizeDate(article.cover.uploadTime) }
+    //             : undefined,
+    //     }))
 
-        const header = page.header
-            ? {
-                  ...page.header,
-                  updatedAt: sanitizeDate(page.header.updatedAt),
-              }
-            : null
+    //     const header = page.header
+    //         ? {
+    //               ...page.header,
+    //               updatedAt: sanitizeDate(page.header.updatedAt),
+    //           }
+    //         : null
 
-        const footer = page.footer
-            ? {
-                  ...page.footer,
-                  updatedAt: sanitizeDate(page.footer.updatedAt),
-              }
-            : null
+    //     const footer = page.footer
+    //         ? {
+    //               ...page.footer,
+    //               updatedAt: sanitizeDate(page.footer.updatedAt),
+    //           }
+    //         : null
 
-        const sections = page.sections.map((section) => ({
-            ...section,
-            form: section.form
-                ? { ...section.form, updatedAt: sanitizeDate(section.form.updatedAt) }
-                : null,
-        }))
+    //     const sections = page.sections.map((section) => ({
+    //         ...section,
+    //         form: section.form
+    //             ? { ...section.form, updatedAt: sanitizeDate(section.form.updatedAt) }
+    //             : null,
+    //     }))
 
-        props = {
-            ...page,
-            header,
-            sections,
-            footer,
-            articles,
-            updatedAt: sanitizeDate(page.updatedAt),
-        }
-    } else {
-        const article = await prisma.article.findUnique({
-            where: { slug: slug[slug.length - 1] },
-            include: {
-                page: true,
-                cover: true,
-                sections: { include: { form: { include: { fields: true } } } },
-            },
-        })
+    //     props = {
+    //         ...page,
+    //         header,
+    //         sections,
+    //         footer,
+    //         articles,
+    //         updatedAt: sanitizeDate(page.updatedAt),
+    //     }
+    // } else {
+    //     const article = await prisma.article.findUnique({
+    //         where: { slug: slug[slug.length - 1] },
+    //         include: {
+    //             page: true,
+    //             cover: true,
+    //             sections: { include: { form: { include: { fields: true } } } },
+    //         },
+    //     })
 
-        if (!!article && slug.join('/') === `${article.page.slug}/${article.slug}`) {
-            const artPage = {
-                ...article?.page,
-                updatedAt: sanitizeDate(article?.page.updatedAt),
-            }
+    //     if (!!article && slug.join('/') === `${article.page.slug}/${article.slug}`) {
+    //         const artPage = {
+    //             ...article?.page,
+    //             updatedAt: sanitizeDate(article?.page.updatedAt),
+    //         }
 
-            const sections = article.sections.map((section) => ({
-                ...section,
-                form: section.form
-                    ? {
-                          ...section.form,
-                          updatedAt: sanitizeDate(section.form.updatedAt),
-                      }
-                    : null,
-            }))
+    //         const sections = article.sections.map((section) => ({
+    //             ...section,
+    //             form: section.form
+    //                 ? {
+    //                       ...section.form,
+    //                       updatedAt: sanitizeDate(section.form.updatedAt),
+    //                   }
+    //                 : null,
+    //         }))
 
-            props = {
-                ...article,
-                page: artPage,
-                sections,
-                updatedAt: sanitizeDate(article?.updatedAt),
-            }
-        }
-    }
+    //         props = {
+    //             ...article,
+    //             page: artPage,
+    //             sections,
+    //             updatedAt: sanitizeDate(article?.updatedAt),
+    //         }
+    //     }
+    // }
 
     const revalidate = await prisma.setting.findUnique({
         where: { name: 'revalidate' },
     })
 
-    console.log(props)
+    // console.log(props)
     return {
-        props,
+        // props,
         revalidate: revalidate ? parseInt(revalidate.value) : 60,
-        notFound: !props,
+        // notFound: !props,
     }
 }
 
 export async function getStaticPaths(context: GetStaticPathsContext) {
-    const pages = await prisma.page.findMany({
-        where: {
-            published: true,
-            OR: [{ type: 'page' }, { type: 'list' }],
-        },
-        include: { articles: true },
-    })
+    // const pages = await prisma.page.findMany({
+    //     where: {
+    //         published: true,
+    //         OR: [{ type: 'page' }, { type: 'list' }],
+    //     },
+    //     include: { articles: true },
+    // })
 
-    let paths = pages.map((page) => {
-        const slug = page.slug!.split('/')
+    // let paths = pages.map((page) => {
+    //     const slug = page.slug!.split('/')
 
-        let articlesSlugs: {
-            params: { slug: string[] }
-        }[] = []
+    //     let articlesSlugs: {
+    //         params: { slug: string[] }
+    //     }[] = []
 
-        if (page.articles) {
-            articlesSlugs = page.articles
-                ?.filter((article) => article.published)
-                ?.map((article) => ({
-                    params: { slug: [...slug, article.slug] },
-                }))
-        }
+    //     if (page.articles) {
+    //         articlesSlugs = page.articles
+    //             ?.filter((article) => article.published)
+    //             ?.map((article) => ({
+    //                 params: { slug: [...slug, article.slug] },
+    //             }))
+    //     }
 
-        return [
-            {
-                params: { slug },
-            },
-            ...articlesSlugs,
-        ]
-    })
+    //     return [
+    //         {
+    //             params: { slug },
+    //         },
+    //         ...articlesSlugs,
+    //     ]
+    // })
 
     return {
-        paths: paths.flat(),
+        // paths: paths.flat(),
         fallback: true, // false or 'blocking'
     }
 }

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Page, Metadata, Section, Prisma } from '@prisma/client'
+import type { Metadata, Section, Prisma, ContainerField } from '@prisma/client'
 import get from 'lodash.get'
-import { FullPageEdit } from '../../../types'
+import { FullContainerEdit } from '../../../types'
 
 import { prisma } from '../../../utils/prisma'
 
@@ -11,28 +11,16 @@ import { prisma } from '../../../utils/prisma'
 // }
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const type = req.query.type as string | undefined
+    // const type = req.query.type as string | undefined
     const q = req.query.q as string | undefined
 
-    const AND = []
-
-    if (!!type) {
-        if (type === 'special') {
-            AND.push({
-                OR: [{ type: 'home' }, { type: 'error' }, { type: 'signin' }],
-            })
-        } else {
-            AND.push({
-                type,
-            })
-        }
-    }
+    let where: any
 
     if (!!q) {
         const sliptedQ = q.split(' ')
 
         if (sliptedQ.length === 1) {
-            AND.push({ title: { contains: q } })
+            where = { title: { contains: q } }
         } else {
             const OR = sliptedQ.map((word) => ({
                 title: {
@@ -40,31 +28,36 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
                 },
             }))
 
-            AND.push({ OR })
+            where = { OR }
         }
     }
 
-    const pages = await prisma.page.findMany({ where: { AND } })
+    const pages = await prisma.container.findMany({ where })
 
     return res.status(200).json(pages)
 }
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
-    const newPageContent = req.body as FullPageEdit
+    const newPageContent = req.body as FullContainerEdit
 
+    const fields: ContainerField[] = get(req, 'body.fields', [])
+    delete newPageContent.fields
     const sections: Section[] = get(req, 'body.sections', [])
-    const metadatas: Metadata[] = get(req, 'body.metadatas', [])
-    const accesses: string[] = get(req, 'body.accesses', [])
     delete newPageContent.sections
+    const contentSections: Section[] = get(req, 'body.contentSections', [])
+    delete newPageContent.contentSections
+    const metadatas: Metadata[] = get(req, 'body.metadatas', [])
     delete newPageContent.metadatas
+    const accesses: string[] = get(req, 'body.accesses', [])
     delete newPageContent.accesses
-    // delete newPageContent.articles
 
-    const page: Page = await prisma.page.create({
+    const page = await prisma.container.create({
         data: {
-            ...(newPageContent as Prisma.PageCreateInput),
+            ...(newPageContent as Prisma.ContainerCreateInput),
+            fields: { create: fields },
             metadatas: { create: metadatas },
             sections: { create: sections },
+            contentSections: { create: contentSections },
             accesses: {
                 create: accesses.map((access) => ({ roleId: access })),
             },

@@ -1,5 +1,5 @@
-import type { Element } from '@prisma/client'
-import { Space, Button, Table, Popconfirm, Input, Select } from 'antd'
+import type { Container, Element } from '@prisma/client'
+import { Space, Button, Table, Popconfirm, Input, Select, Breadcrumb } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
@@ -11,16 +11,16 @@ import useDebounce from '../../../hooks/useDebounce'
 import { useState } from 'react'
 import Blocks from '../../../blocks'
 import Head from 'next/head'
+import { deleteContainer, getContainers } from '../../../network/containers'
 
 const { Option } = Select
 
 const AdminElements = () => {
     const [q, setQ] = useState<string | undefined>()
-    const [type, setType] = useState<string | undefined>()
     const debouncedQ = useDebounce<string | undefined>(q, 750)
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(
-        ['elements', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, type }],
-        () => getElements(type, trim(debouncedQ)?.toLocaleLowerCase())
+    const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(
+        ['containers', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined }],
+        () => getContainers(trim(debouncedQ)?.toLocaleLowerCase())
     )
 
     return (
@@ -48,19 +48,6 @@ const AdminElements = () => {
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
                         />
-                        <Select
-                            allowClear
-                            value={type}
-                            onChange={setType}
-                            placeholder="Select a block"
-                            style={{ width: 180 }}
-                        >
-                            {Object.keys(Blocks).map((key) => (
-                                <Option key={key} value={key}>
-                                    {get(Blocks, `${key}.name`, '')}
-                                </Option>
-                            ))}
-                        </Select>
                     </Space>
                     <Link href="/admin/elements/create">
                         <a>
@@ -73,14 +60,14 @@ const AdminElements = () => {
                 <Table
                     rowKey={(record) => record.id}
                     bordered={false}
-                    loading={elements.isLoading}
-                    dataSource={get(elements, 'data', [])}
+                    loading={containers.isLoading}
+                    dataSource={get(containers, 'data', [])}
                     columns={columns}
                     size="small"
                     scroll={{ y: 'calc(100vh - 155px)' }}
                     pagination={{
                         hideOnSinglePage: true,
-                        pageSize: get(elements, 'data', []).length,
+                        pageSize: get(containers, 'data', []).length,
                     }}
                 />
             </Space>
@@ -93,7 +80,23 @@ const columns = [
         title: 'Title',
         dataIndex: 'title',
     },
-    { title: 'Block', dataIndex: 'type' },
+    {
+        title: 'URL',
+        render: (e: Container) => {
+            return (
+                <Link href={`/${e.slug}`}>
+                    <a>
+                        <Breadcrumb>
+                            <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
+                            {e.slug!.split('/').map((s: string, idx: number) => (
+                                <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
+                            ))}
+                        </Breadcrumb>
+                    </a>
+                </Link>
+            )
+        },
+    },
     {
         title: 'Last updated',
         dataIndex: 'updatedAt',
@@ -104,15 +107,15 @@ const columns = [
         render: (e: Element) => (
             <Space>
                 <Button type="primary">
-                    <Link href={`/admin/elements/${e.id}`}>
+                    <Link href={`/admin/containers/${e.id}`}>
                         <a>Edit</a>
                     </Link>
                 </Button>
 
                 <Popconfirm
                     placement="topRight"
-                    title={'Are you sur to delete this page?'}
-                    onConfirm={() => deleteElement(e.id)}
+                    title={'Are you sur to delete this container?'}
+                    onConfirm={() => deleteContainer(e.id)}
                     okText="Delete"
                     cancelText="Cancel"
                 >

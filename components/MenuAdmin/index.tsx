@@ -22,13 +22,20 @@ import {
 import { useAuth } from '../../hooks/useAuth'
 import { revalidateAll } from '../../network/api'
 import Link from 'next/link'
-import { useMutation } from 'react-query'
+import { useMutation, useQuery, UseQueryResult } from 'react-query'
+import { Container } from '@prisma/client'
+import { getContainers } from '@network/containers'
+import get from 'lodash.get'
 // import { useRouter } from 'next/router'
 
 const { Text } = Typography
 
 function MenuAdmin() {
     const { isAuth, signOut, user } = useAuth()
+
+    const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(['containers', {}], () =>
+        getContainers()
+    )
 
     const mutation = useMutation(() => revalidateAll(), {
         onSuccess: () => {
@@ -73,38 +80,6 @@ function MenuAdmin() {
         />
     )
 
-    const pageMenu = (
-        <Menu
-            items={[
-                {
-                    key: '1',
-                    label: (
-                        <Link href="/admin/pages/create">
-                            <a>Create a page</a>
-                        </Link>
-                    ),
-                    icon: <PlusCircleOutlined />,
-                },
-            ]}
-        />
-    )
-
-    const articlesMenu = (
-        <Menu
-            items={[
-                {
-                    key: '1',
-                    label: (
-                        <Link href="/admin/articles/create">
-                            <a>Create an article</a>
-                        </Link>
-                    ),
-                    icon: <PlusCircleOutlined />,
-                },
-            ]}
-        />
-    )
-
     const containersMenu = (
         <Menu
             items={[
@@ -124,33 +99,31 @@ function MenuAdmin() {
                     key: '2',
                     type: 'group',
                     label: 'Contents',
-                    children: [
-                        {
-                            key: '2-1',
-                            label: 'Pages',
-                            icon: <FileTextOutlined />,
-                            children: [
-                                {
-                                    key: '2-1-1',
-                                    label: (
-                                        <Link href="/admin/containers/create">
-                                            <a>All pages</a>
-                                        </Link>
-                                    ),
-                                    icon: <FileOutlined />,
-                                },
-                                {
-                                    key: '2-1-2',
-                                    label: (
-                                        <Link href="/admin/containers/create">
-                                            <a>Create a page</a>
-                                        </Link>
-                                    ),
-                                    icon: <PlusCircleOutlined />,
-                                },
-                            ],
-                        },
-                    ],
+                    children: get(containers, 'data', []).map((container: Container, idx: number) => ({
+                        key: `2-${idx}`,
+                        label: container.title,
+                        icon: <FileTextOutlined />,
+                        children: [
+                            {
+                                key: `2-${idx}-1`,
+                                label: (
+                                    <Link href={`/admin/contents`}>
+                                        <a>All {container.title}</a>
+                                    </Link>
+                                ),
+                                icon: <FileOutlined />,
+                            },
+                            {
+                                key: `2-${idx}-2`,
+                                label: (
+                                    <Link href={`/admin/contents/create/${container.id}`}>
+                                        <a>Create a {container.title.toLocaleLowerCase()}</a>
+                                    </Link>
+                                ),
+                                icon: <PlusCircleOutlined />,
+                            },
+                        ],
+                    })),
                 },
             ]}
         />
@@ -249,34 +222,6 @@ function MenuAdmin() {
                             </a>
                         </Link>
                     </Space>
-                    <Divider type="vertical" />
-
-                    <Dropdown overlay={pageMenu}>
-                        <Space>
-                            <Link href="/admin/pages">
-                                <a>
-                                    <Text>
-                                        <FileImageOutlined style={{ marginRight: 4 }} />
-                                        Pages
-                                    </Text>
-                                </a>
-                            </Link>
-                        </Space>
-                    </Dropdown>
-                    <Divider type="vertical" />
-
-                    <Dropdown overlay={articlesMenu}>
-                        <Space>
-                            <Link href="/admin/articles">
-                                <a>
-                                    <Text>
-                                        <FileTextOutlined style={{ marginRight: 4 }} />
-                                        Articles
-                                    </Text>
-                                </a>
-                            </Link>
-                        </Space>
-                    </Dropdown>
                     <Divider type="vertical" />
 
                     <Dropdown overlay={containersMenu}>

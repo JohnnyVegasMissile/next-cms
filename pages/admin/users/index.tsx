@@ -1,30 +1,21 @@
-// import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { User, Login } from '@prisma/client'
-import {
-    Space,
-    Button,
-    Table,
-    // Breadcrumb,
-    // Badge,
-    Tag,
-    // Typography,
-    Popconfirm,
-    Input,
-} from 'antd'
+import { Tag, Space, Input, Table, Button, Popconfirm } from 'antd'
 import Link from 'next/link'
-// import moment from 'moment'
-import { useQuery, UseQueryResult } from 'react-query'
-import { getUsers } from '../../../network/users'
-import type { FullUser } from '../../../types'
+import Head from 'next/head'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
 import { PlusOutlined } from '@ant-design/icons'
-import { useState } from 'react'
+import { useQuery, UseQueryResult } from 'react-query'
+
+import { getUsers } from '../../../network/users'
+import type { FullUser } from '../../../types'
 import useDebounce from '../../../hooks/useDebounce'
-import CustomSelect from '@components/CustomSelect'
-import Head from 'next/head'
+import CustomSelect from '../../../components/CustomSelect'
 
 const AdminUsers = () => {
+    // const router = useRouter()
+    // const { search, role } = router.query
     const [q, setQ] = useState<string | undefined>()
     const [roleId, setTypeId] = useState<string | undefined>()
     const debouncedQ = useDebounce<string | undefined>(q, 750)
@@ -59,11 +50,7 @@ const AdminUsers = () => {
                             onChange={(e) => setQ(e.target.value)}
                         />
 
-                        <CustomSelect.ListRoles
-                            width={180}
-                            value={roleId}
-                            onChange={setTypeId}
-                        />
+                        <CustomSelect.ListRoles width={180} value={roleId} onChange={setTypeId} />
                         {/* <Select
                         allowClear
                         value={type}
@@ -111,8 +98,7 @@ const columns = [
         dataIndex: 'login',
         render: (e: Login) => {
             const type: string = get(e, 'role.id', '')
-            const color =
-                type === 'super-admin' ? 'magenta' : type === 'admin' ? 'red' : 'blue'
+            const color = type === 'super-admin' ? 'magenta' : type === 'admin' ? 'red' : 'blue'
 
             return <Tag color={color}>{get(e, 'role.name', '')}</Tag>
         },

@@ -1,7 +1,7 @@
 import { Cascader, Select, Typography } from 'antd'
 import { useQuery, UseQueryResult /*, useQueryClient*/ } from 'react-query'
-import type { Form, Page, Role } from '@prisma/client'
-import { getPages } from '../../network/pages'
+import type { Form, Role } from '@prisma/client'
+// import { getPages } from '../../network/pages'
 import get from 'lodash.get'
 import { getElements } from '../../network/elements'
 import type { Element } from '@prisma/client'
@@ -20,32 +20,32 @@ interface CustomSelectProps {
     width?: number
 }
 
-const ListPages = ({ value, onChange, width = 240 }: CustomSelectProps) => {
-    const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(['pages', { type: 'list' }], () =>
-        getPages('list')
-    )
+// const ListPages = ({ value, onChange, width = 240 }: CustomSelectProps) => {
+//     const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(['pages', { type: 'list' }], () =>
+//         getPages('list')
+//     )
 
-    return (
-        <Select
-            allowClear
-            value={value}
-            onChange={onChange}
-            style={{
-                width,
-            }}
-            placeholder="Select a page"
-            loading={pages.isLoading}
-        >
-            {get(pages, 'data', [])
-                .sort((a, b) => a.title.localeCompare(b.title))
-                .map((page) => (
-                    <Option key={page.id} value={page.id}>
-                        {page.title}
-                    </Option>
-                ))}
-        </Select>
-    )
-}
+//     return (
+//         <Select
+//             allowClear
+//             value={value}
+//             onChange={onChange}
+//             style={{
+//                 width,
+//             }}
+//             placeholder="Select a page"
+//             loading={pages.isLoading}
+//         >
+//             {get(pages, 'data', [])
+//                 .sort((a, b) => a.title.localeCompare(b.title))
+//                 .map((page) => (
+//                     <Option key={page.id} value={page.id}>
+//                         {page.title}
+//                     </Option>
+//                 ))}
+//         </Select>
+//     )
+// }
 
 const ListElements = ({
     id,
@@ -56,9 +56,7 @@ const ListElements = ({
     value?: string
     onChange(value: string | undefined): void
 }) => {
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () =>
-        getElements()
-    )
+    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () => getElements())
 
     return (
         <Select
@@ -160,9 +158,7 @@ const SectionCascader = ({
     onSectionChange,
     onElementChange,
 }: SectionCascaderProps) => {
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () =>
-        getElements()
-    )
+    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () => getElements())
 
     return (
         <Cascader
@@ -216,7 +212,7 @@ const SectionCascader = ({
     )
 }
 
-CustomSelect.ListPages = ListPages
+// CustomSelect.ListPages = ListPages
 CustomSelect.ListElements = ListElements
 CustomSelect.ListSections = SectionCascader
 CustomSelect.ListRoles = ListRoles

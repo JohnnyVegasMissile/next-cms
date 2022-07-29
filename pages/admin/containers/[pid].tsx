@@ -84,7 +84,8 @@ const Admin = () => {
                 }
             }
 
-            const slug = get(values, 'slugEdit', []).join('/')
+            let slug = get(values, 'slugEdit', []).join('/')
+            slug = encodeURI(slug)
 
             // console.log('values', values)
             mutation.mutate({
@@ -94,8 +95,8 @@ const Admin = () => {
         },
     })
 
-    const element: UseQueryResult<FullContainerEdit, Error> = useQuery<FullContainerEdit, Error>(
-        ['elements', { id: pid }],
+    const container: UseQueryResult<FullContainerEdit, Error> = useQuery<FullContainerEdit, Error>(
+        ['containers', { id: pid }],
         () => getContainerDetails(pid as string),
         {
             enabled: !!pid && pid !== 'create',
@@ -108,7 +109,8 @@ const Admin = () => {
 
                 const accesses = get(data, 'accesses', []).map((access) => get(access, 'roleId', ''))
 
-                const slugEdit = get(data, 'slug', '')!.split('/')
+                const slug = decodeURI(get(data, 'slug', '') || '')
+                const slugEdit = slug.split('/')
 
                 setValues({ ...data, sections, contentSections, accesses, slugEdit })
             },
@@ -135,22 +137,6 @@ const Admin = () => {
 
     const isDefaultPage = values.id === 'page'
 
-    const addField = () => {
-        handleChange({
-            target: {
-                name: 'fields',
-                value: [...get(values, 'fields', []), { name: '' }],
-            },
-        })
-    }
-
-    const removeField = (index: number) => {
-        let newValue = [...get(values, 'fields', [])]
-        newValue.splice(index, 1)
-
-        handleChange({ target: { name: 'fields', value: newValue } })
-    }
-
     const lastSlugIndex = get(values, 'slugEdit', []).length - 1
 
     const addSlug = () => {
@@ -171,7 +157,7 @@ const Admin = () => {
         handleChange({ target: { name, value } })
     }
 
-    if (element.isLoading || !pid) {
+    if (container.isLoading || !pid) {
         return (
             <div
                 style={{

@@ -5,41 +5,40 @@ import { GetServerSideProps } from 'next'
 import { prisma } from '../../utils/prisma'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    // const pages = await prisma.page.findMany({
-    //     where: {
-    //         published: true,
-    //         OR: [{ type: 'page' }, { type: 'list' }],
-    //     },
-    //     include: { articles: true },
-    // })
+    const containers = await prisma.container.findMany({
+        where: {
+            published: true,
+        },
+        include: { contents: true },
+    })
 
-    // const paths = pages.map((page) => {
-    //     const slug = page.slug
+    const paths = containers.map((container) => {
+        const slug = container.slug
 
-    //     let articlesSlugs: {
-    //         loc: string
-    //         lastmod: string
-    //     }[] = []
+        let contentsSlugs: {
+            loc: string
+            lastmod: string
+        }[] = []
 
-    //     if (page.articles) {
-    //         articlesSlugs = page.articles
-    //             ?.filter((article) => article.published)
-    //             ?.map((article) => ({
-    //                 loc: `${process.env.SITE_URL}/${slug}/${article.slug}`,
-    //                 lastmod: new Date().toISOString(),
-    //             }))
-    //     }
+        if (!!container.contents?.length) {
+            contentsSlugs = container.contents
+                ?.filter((content) => content.published && content.id !== 'notfound' && content.id !== 'home')
+                ?.map((content) => ({
+                    loc: `${process.env.SITE_URL}/${slug}/${content.slug}`,
+                    lastmod: new Date().toISOString(),
+                }))
+        }
 
-    //     return [
-    //         {
-    //             loc: `${process.env.SITE_URL}/${page.slug}`,
-    //             lastmod: new Date().toISOString(),
-    //         },
-    //         ...articlesSlugs,
-    //     ]
-    // })
+        return [
+            {
+                loc: `${process.env.SITE_URL}/${container.slug}`,
+                lastmod: new Date().toISOString(),
+            },
+            ...contentsSlugs,
+        ]
+    })
 
-    return getServerSideSitemap(ctx, []) //paths.flat())
+    return getServerSideSitemap(ctx, paths.flat())
 }
 
 export default function Sitemap() {}

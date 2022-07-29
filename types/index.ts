@@ -11,8 +11,9 @@ import type {
     Form,
     Message,
     Media,
-    LinkedMetadata,
     ContainerField,
+    Container,
+    Content,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
@@ -105,13 +106,16 @@ export type FullContainerEdit = Prisma.ContainerCreateInput & {
     fields?: ContainerField[] | null
     metadatas?: Metadata[] | null
     contentMetadatas?: Metadata[] | null
-    linkedMetadata?: LinkedMetadata[] | null
     sections?: FullSection[] | null
     contentSections?: FullSection[] | null
 
     accesses?: string[] | null
 
     slugEdit?: (string | undefined)[]
+}
+
+export type FullContent = Content & {
+    container: Container | null
 }
 
 export type AuthResponse = {

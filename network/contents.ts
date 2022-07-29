@@ -1,12 +1,11 @@
 import INSTANCE from './api'
-import { Container, Prisma } from '@prisma/client'
-import { FullContainerEdit } from '../types'
+import { Content, Prisma } from '@prisma/client'
 
-export const postContainer = (data: Prisma.ContainerCreateInput | any): Promise<Container> =>
+export const postContent = (data: Prisma.ContentCreateInput | any): Promise<Content> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
-            url: `/api/containers`,
+            url: `/api/contents`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -16,11 +15,11 @@ export const postContainer = (data: Prisma.ContainerCreateInput | any): Promise<
             .catch(reject)
     })
 
-export const editContainer = (id: string, data: Prisma.ContainerCreateInput | any): Promise<Container> =>
+export const editContent = (id: string, data: Prisma.ContentCreateInput | any): Promise<Content> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'PUT',
-            url: `/api/containers/${id}`,
+            url: `/api/contents/${id}`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -30,35 +29,35 @@ export const editContainer = (id: string, data: Prisma.ContainerCreateInput | an
             .catch(reject)
     })
 
-export const getContainers = (q?: string): Promise<Container[]> =>
+export const getContents = (container?: string, q?: string): Promise<Content[]> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/containers`,
+            url: `/api/contents`,
             headers: {
                 'Content-Type': 'application/json',
             },
-            params: { q },
+            params: { q, container },
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const deleteContainer = (id: string): Promise<void> =>
+export const deleteContent = (id: string): Promise<void> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'DELETE',
-            url: `/api/containers/${id}`,
+            url: `/api/contents/${id}`,
         })
             .then(resolve)
             .catch(reject)
     })
 
-export const getContainerDetails = (id: string): Promise<FullContainerEdit> =>
+export const getContentDetails = (id: string): Promise<any> =>
     new Promise((resolve, reject) => {
         INSTANCE({
             method: 'GET',
-            url: `/api/containers/${id}`,
+            url: `/api/contents/${id}`,
         })
             .then(resolve)
             .catch(reject)

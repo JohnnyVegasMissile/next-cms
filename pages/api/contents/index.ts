@@ -11,13 +11,13 @@ import { prisma } from '../../../utils/prisma'
 // }
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+    const container = req.query.container as string | undefined
     const q = req.query.q as string | undefined
 
-    let search: any = {
-        where: {},
-        include: {
-            contents: true,
-        },
+    let search: any = { where: {}, include: { container: true } }
+
+    if (!!container) {
+        search.where.containerId = container
     }
 
     if (!!q) {
@@ -38,46 +38,43 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         }
     }
 
-    const containers = await prisma.container.findMany(search)
+    const contents = await prisma.content.findMany(search)
 
-    return res.status(200).json(containers)
+    return res.status(200).json(contents)
 }
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
-    const newContainerContent = req.body as FullContainerEdit
+    const newContentContent = req.body
 
     const fields: ContainerField[] = get(req, 'body.fields', [])
-    delete newContainerContent.fields
+    delete newContentContent.fields
     const sections: Section[] = get(req, 'body.sections', [])
-    delete newContainerContent.sections
-    const contentSections: Section[] = get(req, 'body.contentSections', [])
-    delete newContainerContent.contentSections
+    delete newContentContent.sections
     const metadatas: Metadata[] = get(req, 'body.metadatas', [])
-    delete newContainerContent.metadatas
+    delete newContentContent.metadatas
     const accesses: string[] = get(req, 'body.accesses', [])
-    delete newContainerContent.accesses
+    delete newContentContent.accesses
 
-    const container = await prisma.container.create({
+    const content = await prisma.content.create({
         data: {
-            ...(newContainerContent as Prisma.ContainerCreateInput),
+            ...(newContentContent as Prisma.ContentCreateInput),
             fields: { create: fields },
             metadatas: { create: metadatas },
             sections: { create: sections },
-            contentSections: { create: contentSections },
             accesses: {
                 create: accesses.map((access) => ({ roleId: access })),
             },
         },
     })
 
-    return res.status(200).json(container)
+    return res.status(200).json(content)
 }
 
 const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ error: 'Method not allowed' })
 }
 
-const containers = async (req: NextApiRequest, res: NextApiResponse) => {
+const pages = async (req: NextApiRequest, res: NextApiResponse) => {
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)
@@ -93,4 +90,4 @@ const containers = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 }
 
-export default containers
+export default pages

@@ -1,48 +1,70 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import bcrypt from 'bcryptjs'
-import type { Page, Login, Role } from '@prisma/client'
+import type { Login, Role } from '@prisma/client'
 
 import { prisma } from '../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const homes: Page[] = await prisma.page.findMany({
-        where: { type: 'home' },
+    const defaultContainer = await prisma.container.findUnique({
+        where: { id: 'page' },
     })
 
-    if (!homes.length) {
-        await prisma.page.create({
+    if (!defaultContainer) {
+        await prisma.container.create({
             data: {
-                type: 'home',
+                id: 'page',
+                title: 'Default Page',
+                slug: '',
+                contentHasSections: false,
+                published: true,
+            },
+        })
+    }
+
+    const home = await prisma.content.findUnique({
+        where: { id: 'home' },
+    })
+
+    if (!home) {
+        await prisma.content.create({
+            data: {
+                id: 'home',
                 title: 'Home',
                 slug: '',
+                containerId: 'page',
+                published: true,
             },
         })
     }
 
-    const errors: Page[] = await prisma.page.findMany({
-        where: { type: 'error' },
+    const notfound = await prisma.content.findUnique({
+        where: { id: 'notfound' },
     })
 
-    if (!errors.length) {
-        await prisma.page.create({
+    if (!notfound) {
+        await prisma.content.create({
             data: {
-                type: 'error',
+                id: 'notfound',
                 title: 'Not Found',
                 slug: 'not-found',
+                containerId: 'page',
+                published: true,
             },
         })
     }
 
-    const signins: Page[] = await prisma.page.findMany({
-        where: { type: 'signin' },
+    const signin = await prisma.content.findUnique({
+        where: { id: 'signin' },
     })
 
-    if (!signins.length) {
-        await prisma.page.create({
+    if (!signin) {
+        await prisma.content.create({
             data: {
-                type: 'signin',
+                id: 'signin',
                 title: 'Sign In',
                 slug: 'signin',
+                containerId: 'page',
+                published: true,
             },
         })
     }
@@ -115,7 +137,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         await prisma.setting.create({
             data: {
                 name: 'revalidate',
-                value: '60',
+                value: '86400',
             },
         })
     }

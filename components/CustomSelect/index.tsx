@@ -1,7 +1,7 @@
 import { Cascader, Select, Typography } from 'antd'
 import { useQuery, UseQueryResult /*, useQueryClient*/ } from 'react-query'
-import type { Form, Role } from '@prisma/client'
-// import { getPages } from '../../network/pages'
+import type { Container, Form, Role } from '@prisma/client'
+import { getContainers } from '../../network/containers'
 import get from 'lodash.get'
 import { getElements } from '../../network/elements'
 import type { Element } from '@prisma/client'
@@ -18,34 +18,36 @@ interface CustomSelectProps {
     value: string | undefined
     onChange(value: string | undefined): void
     width?: number
+    disabled?: boolean
 }
 
-// const ListPages = ({ value, onChange, width = 240 }: CustomSelectProps) => {
-//     const pages: UseQueryResult<Page[], Error> = useQuery<Page[], Error>(['pages', { type: 'list' }], () =>
-//         getPages('list')
-//     )
+const ListContainers = ({ value, onChange, width = 240, disabled }: CustomSelectProps) => {
+    const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(['containers', {}], () =>
+        getContainers()
+    )
 
-//     return (
-//         <Select
-//             allowClear
-//             value={value}
-//             onChange={onChange}
-//             style={{
-//                 width,
-//             }}
-//             placeholder="Select a page"
-//             loading={pages.isLoading}
-//         >
-//             {get(pages, 'data', [])
-//                 .sort((a, b) => a.title.localeCompare(b.title))
-//                 .map((page) => (
-//                     <Option key={page.id} value={page.id}>
-//                         {page.title}
-//                     </Option>
-//                 ))}
-//         </Select>
-//     )
-// }
+    return (
+        <Select
+            allowClear
+            disabled={disabled}
+            value={value}
+            onChange={onChange}
+            style={{
+                width,
+            }}
+            placeholder="Select a container"
+            loading={containers.isLoading}
+        >
+            {get(containers, 'data', [])
+                .sort((a, b) => a.title.localeCompare(b.title))
+                .map((container) => (
+                    <Option key={container.id} value={container.id}>
+                        {container.title}
+                    </Option>
+                ))}
+        </Select>
+    )
+}
 
 const ListElements = ({
     id,
@@ -212,7 +214,7 @@ const SectionCascader = ({
     )
 }
 
-// CustomSelect.ListPages = ListPages
+CustomSelect.ListContainers = ListContainers
 CustomSelect.ListElements = ListElements
 CustomSelect.ListSections = SectionCascader
 CustomSelect.ListRoles = ListRoles

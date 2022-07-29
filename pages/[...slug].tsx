@@ -3,7 +3,6 @@ import Head from 'next/head'
 // import Router, { useRouter } from 'next/router'
 // import { PrismaClient } from '@prisma/client'
 import type { Metadata } from '@prisma/client'
-import { FullArticle, FullPage } from '../types'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
 import SectionBlock from '../components/SectionBlock'
@@ -12,7 +11,7 @@ import get from 'lodash.get'
 // import { FormattedMessage, useIntl } from 'react-intl'
 // import Link from 'next/link'
 
-const Pages = (props: FullPage | FullArticle) => {
+const Pages = (props: any) => {
     // const { id, title, metadatas, sections, type, header, footer } = props
     // const { isAuth, user, setRedirect } = useAuth()
 
@@ -72,7 +71,7 @@ const sanitizeDate = (date: Date) => Math.floor((date?.getMilliseconds() || 1) /
 // export async function getServerSideProps(context: GetServerSidePropsContext) {
 export async function getStaticProps(context: NewGetStaticPathsContext) {
     const { slug } = context.params
-    // let props
+
     // const page = await prisma.page.findUnique({
     //     where: { slug: slug.join('/') },
     //     include: {
@@ -177,39 +176,43 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
 }
 
 export async function getStaticPaths(context: GetStaticPathsContext) {
-    // const pages = await prisma.page.findMany({
-    //     where: {
-    //         published: true,
-    //         OR: [{ type: 'page' }, { type: 'list' }],
-    //     },
-    //     include: { articles: true },
-    // })
+    const containers = await prisma.container.findMany({
+        where: {
+            published: true,
+        },
+        include: { contents: true },
+    })
 
-    // let paths = pages.map((page) => {
-    //     const slug = page.slug!.split('/')
+    let paths = containers.map((container) => {
+        const slug = container.slug!.split('/')
+        let contentsSlugs: {
+            params: { slug: string[] }
+        }[] = []
 
-    //     let articlesSlugs: {
-    //         params: { slug: string[] }
-    //     }[] = []
+        if (!!container.contents?.length) {
+            contentsSlugs = container.contents
+                ?.filter(
+                    (content) =>
+                        content.published &&
+                        content.id !== 'notfound' &&
+                        content.id !== 'home' &&
+                        content.id !== 'signin'
+                )
+                ?.map((content) => ({
+                    params: { slug: [...slug, content.slug || ''] },
+                }))
+        }
 
-    //     if (page.articles) {
-    //         articlesSlugs = page.articles
-    //             ?.filter((article) => article.published)
-    //             ?.map((article) => ({
-    //                 params: { slug: [...slug, article.slug] },
-    //             }))
-    //     }
-
-    //     return [
-    //         {
-    //             params: { slug },
-    //         },
-    //         ...articlesSlugs,
-    //     ]
-    // })
+        return [
+            {
+                params: { slug },
+            },
+            ...contentsSlugs,
+        ]
+    })
 
     return {
-        // paths: paths.flat(),
+        paths: paths.flat(),
         fallback: true, // false or 'blocking'
     }
 }

@@ -11,185 +11,201 @@ datasource db {
 }
 
 model Access {
-  id                  String              @id @default(cuid())
-  containerId         String?
-  container           Container?          @relation(fields: [containerId], references: [id])
-  contentId           String?
-  content             Content?            @relation(fields: [contentId], references: [id])
-  roleId              String
-  role                Role                @relation(fields: [roleId], references: [id])
+  id          String     @id @default(cuid())
+  containerId String?
+  container   Container? @relation(fields: [containerId], references: [id])
+  contentId   String?
+  content     Content?   @relation(fields: [contentId], references: [id])
+  roleId      String
+  role        Role       @relation(fields: [roleId], references: [id])
 }
 
 model Metadata {
-  id                  String              @id @default(cuid())
-  name                String
-  content             String
-  containerId         String?
-  container           Container?          @relation(fields: [containerId], references: [id], name: "metadatas")
-  contentId           String?
-  contentLinked       Content?            @relation(fields: [contentId], references: [id])
+  id            String     @id @default(cuid())
+  name          String
+  content       String
+  containerId   String?
+  container     Container? @relation(fields: [containerId], references: [id], name: "metadatas")
+  contentId     String?
+  contentLinked Content?   @relation(fields: [contentId], references: [id])
 }
 
 model Section {
-  id                  String              @id @default(cuid())
-  type                String?
-  formId              String?
-  form                Form?               @relation(fields: [formId], references: [id])
-  containerId         String?
-  container           Container?          @relation(fields: [containerId], references: [id], name: "sections")
-  containerContentId  String?
-  containerContent    Container?          @relation(fields: [containerContentId], references: [id], name: "contentSections")
-  contentId           String?
-  contentLinked       Content?            @relation(fields: [contentId], references: [id])
-  elementId           String?
-  element             Element?            @relation(fields: [elementId], references: [id])
-  position            Int
-  content             String?
+  id                 String     @id @default(cuid())
+  type               String?
+  formId             String?
+  form               Form?      @relation(fields: [formId], references: [id])
+  containerId        String?
+  container          Container? @relation(fields: [containerId], references: [id], name: "sections")
+  containerContentId String?
+  containerContent   Container? @relation(fields: [containerContentId], references: [id], name: "contentSections")
+  contentId          String?
+  contentLinked      Content?   @relation(fields: [contentId], references: [id])
+  elementId          String?
+  element            Element?   @relation(fields: [elementId], references: [id])
+  position           Int
+  content            String?
 }
 
 model Element {
-  id                String                @id @default(cuid())
-  title             String                @unique
-  type              String
-  section           Section[]
-  content           String?
-  updatedAt         DateTime              @updatedAt
+  id        String    @id @default(cuid())
+  title     String    @unique
+  type      String
+  section   Section[]
+  content   String?
+  updatedAt DateTime  @updatedAt
 }
 
 model Media {
-  id                String                @id @default(cuid())
-  uri               String                @unique
-  mimeType          String
-  name              String
-  size              Int
-  alt               String?
-  article           ContentField[]
-  uploadTime        DateTime              @default(now())
+  id         String         @id @default(cuid())
+  uri        String         @unique
+  mimeType   String
+  name       String
+  size       Int
+  alt        String?
+  article    ContentField[]
+  uploadTime DateTime       @default(now())
 }
 
 model User {
-  id                String                @id @default(cuid())
-  name              String?
-  login             Login?
-  updatedAt         DateTime              @updatedAt
+  id        String   @id @default(cuid())
+  name      String?
+  login     Login?
+  updatedAt DateTime @updatedAt
 }
 
 model Login {
-  id                String                @id @default(cuid())
-  userId            String                @unique
-  user              User                  @relation(fields: [userId], references: [id])
-  sessions          Session[]
-  roleId            String                @default("user")
-  role              Role                  @relation(fields: [roleId], references: [id])
-  email             String                @unique
-  password          String
-  updatedAt         DateTime              @updatedAt
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  sessions  Session[]
+  roleId    String    @default("user")
+  role      Role      @relation(fields: [roleId], references: [id])
+  email     String    @unique
+  password  String
+  updatedAt DateTime  @updatedAt
 }
 
 model Role {
-  id                String                @id @default(cuid())
-  name              String
-  logins            Login[]
-  Accesses          Access[]
-  updatedAt         DateTime              @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  logins    Login[]
+  Accesses  Access[]
+  updatedAt DateTime @updatedAt
 }
 
 model Session {
-  id                String                @id @default(cuid())
-  token             String                @unique
-  loginId           String
-  login             Login                 @relation(fields: [loginId], references: [id])
-  expiresAt         DateTime
-  updatedAt         DateTime              @updatedAt
+  id        String   @id @default(cuid())
+  token     String   @unique
+  loginId   String
+  login     Login    @relation(fields: [loginId], references: [id])
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model Setting {
-  id                         String                  @id @default(cuid())
-  name                       String                  @unique
-  value                      String
-  updatedAt                  DateTime                @updatedAt
+  id        String   @id @default(cuid())
+  name      String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model Form {
-  id                         String                  @id @default(cuid())
-  title                      String                  @unique
-  sendMail                   Boolean                 @default(false)
-  sendTo                     String?
-  messages                   Message[]
-  fields                     FormField[]
-  sections                   Section[]
-  updatedAt                  DateTime                @updatedAt
+  id        String      @id @default(cuid())
+  title     String      @unique
+  sendMail  Boolean     @default(false)
+  sendTo    String?
+  messages  Message[]
+  fields    FormField[]
+  sections  Section[]
+  updatedAt DateTime    @updatedAt
 }
 
 model FormField {
-  id                         String                  @id @default(cuid())
-  formId                     String
-  form                       Form                    @relation(fields: [formId], references: [id])
-  name                       String?
-  type                       String
-  label                      String
-  placeholder                String?
-  position                   Int
-  required                   Boolean?                @default(false)
+  id          String   @id @default(cuid())
+  formId      String
+  form        Form     @relation(fields: [formId], references: [id])
+  name        String?
+  type        String
+  label       String
+  placeholder String?
+  position    Int
+  required    Boolean? @default(false)
 }
 
 model Message {
-  id                         String                  @id @default(cuid())
-  read                       Boolean                 @default(false)
-  formId                     String
-  form                       Form                    @relation(fields: [formId], references: [id])
-  value                      String
-  createdAt                  DateTime                @default(now())
+  id        String   @id @default(cuid())
+  read      Boolean  @default(false)
+  formId    String
+  form      Form     @relation(fields: [formId], references: [id])
+  value     String
+  createdAt DateTime @default(now())
 }
 
 model Container {
-  id                         String                  @id @default(cuid())
-  title                      String
-  metadatas                  Metadata[]              @relation(name: "metadatas")
-  slug                       String?                 @unique
-  accesses                   Access[]
-  sections                   Section[]               @relation(name: "sections") 
-  contentHasSections         Boolean
-  contentSections            Section[]               @relation(name: "contentSections") 
-  fields                     ContainerField[]
-  contents                   Content[]
-  published                  Boolean                 @default(true)
-  updatedAt                  DateTime                @updatedAt
+  id                 String           @id @default(cuid())
+  title              String
+  metadatas          Metadata[]       @relation(name: "metadatas")
+  // slug               String?          @unique
+  accesses           Access[]
+  sections           Section[]        @relation(name: "sections")
+  contentHasSections Boolean
+  contentSections    Section[]        @relation(name: "contentSections")
+  fields             ContainerField[]
+  contents           Content[]
+  published          Boolean          @default(true)
+  updatedAt          DateTime         @updatedAt
+  slugId             String           @unique
+  slug               Slug             @relation(fields: [slugId], references: [id])
 }
 
 model Content {
-  id                        String                   @id @default(cuid())
-  title                     String
-  metadatas                 Metadata[]
-  slug                      String?                  @unique
-  accesses                  Access[] 
-  fields                    ContentField[]
-
-  sections                  Section[]
-
-  containerId               String
-  container                 Container                @relation(fields: [containerId], references: [id])
-
-  published                 Boolean                  @default(true)
-  updatedAt                 DateTime                 @updatedAt
+  id          String         @id @default(cuid())
+  title       String
+  metadatas   Metadata[]
+  // slug        String?
+  accesses    Access[]
+  fields      ContentField[]
+  sections    Section[]
+  containerId String
+  container   Container      @relation(fields: [containerId], references: [id])
+  published   Boolean        @default(true)
+  updatedAt   DateTime       @updatedAt
+  slugId      String         @unique
+  slug        Slug           @relation(fields: [slugId], references: [id])
 }
 
 model ContainerField {
-  id                        String                   @id @default(cuid())
-  label                     String
-  name                      String
-  type                      String
-  containerId               String
-  container                 Container                @relation(fields: [containerId], references: [id])
-  metadata                  String?
-  required                  Boolean?                 @default(false)
+  id          String    @id @default(cuid())
+  label       String
+  name        String
+  type        String
+  containerId String
+  container   Container @relation(fields: [containerId], references: [id])
+  metadata    String?
+  required    Boolean?  @default(false)
 }
 
 model ContentField {
-  id                        String                   @id @default(cuid())
-  contentId                 String
-  content                   Content                  @relation(fields: [contentId], references: [id])
-  mediaId                   String?
-  media                     Media?                   @relation(fields: [mediaId], references: [id])
-  value                     String
+  id          String    @id @default(cuid())
+  name        String
+  type        String
+  contentId   String
+  content     Content   @relation(fields: [contentId], references: [id])
+  mediaId     String?
+  media       Media?    @relation(fields: [mediaId], references: [id])
+  textValue   String?
+  numberValue Int?
+  boolValue   Boolean?
+  dateValue   DateTime?
+}
+
+model Slug {
+  id        String     @id @default(cuid())
+  slug      String     @unique
+  parentId  String?
+  parent    Slug?      @relation(fields: [parentId], references: [id], name: "childs")
+  childs    Slug[]     @relation(name: "childs")
+  container Container?
+  content   Content?
 }

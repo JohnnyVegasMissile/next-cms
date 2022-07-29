@@ -17,6 +17,7 @@ import {
     FormOutlined,
     ContainerOutlined,
     FileOutlined,
+    UnorderedListOutlined,
 } from '@ant-design/icons'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -97,26 +98,45 @@ function MenuAdmin() {
                 },
                 {
                     key: '2',
+                    label: (
+                        <Link href="/admin/contents">
+                            <a>All contents</a>
+                        </Link>
+                    ),
+                    icon: <UnorderedListOutlined />,
+                },
+                {
+                    key: '3',
                     type: 'group',
                     label: 'Contents',
                     children: get(containers, 'data', []).map((container: Container, idx: number) => ({
-                        key: `2-${idx}`,
+                        key: `3-${idx}`,
                         label: container.title,
                         icon: <FileTextOutlined />,
                         children: [
                             {
-                                key: `2-${idx}-1`,
+                                key: `3-${idx}-1`,
                                 label: (
-                                    <Link href={`/admin/contents`}>
+                                    <Link
+                                        href={{
+                                            pathname: '/admin/contents',
+                                            query: { container: container.id },
+                                        }}
+                                    >
                                         <a>All {container.title}</a>
                                     </Link>
                                 ),
                                 icon: <FileOutlined />,
                             },
                             {
-                                key: `2-${idx}-2`,
+                                key: `3-${idx}-2`,
                                 label: (
-                                    <Link href={`/admin/contents/create/${container.id}`}>
+                                    <Link
+                                        href={{
+                                            pathname: '/admin/contents/create',
+                                            query: { container: container.id },
+                                        }}
+                                    >
                                         <a>Create a {container.title.toLocaleLowerCase()}</a>
                                     </Link>
                                 ),

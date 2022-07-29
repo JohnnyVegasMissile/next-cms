@@ -1,26 +1,26 @@
-import type { Container, Element } from '@prisma/client'
-import { Space, Button, Table, Popconfirm, Input, Select, Breadcrumb, Badge } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
-import Link from 'next/link'
+import { useState } from 'react'
 import moment from 'moment'
-import { useQuery, UseQueryResult } from 'react-query'
-import { getElements, deleteElement } from '../../../network/elements'
+import Head from 'next/head'
+import Link from 'next/link'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
-import useDebounce from '../../../hooks/useDebounce'
-import { useState } from 'react'
-import Blocks from '../../../blocks'
-import Head from 'next/head'
-import { deleteContainer, getContainers } from '../../../network/containers'
+import { PlusOutlined } from '@ant-design/icons'
+import { useQuery, UseQueryResult } from 'react-query'
+import type { Container, Content, Element } from '@prisma/client'
+import { Space, Button, Table, Popconfirm, Input, Breadcrumb, Badge } from 'antd'
 
-const { Option } = Select
+import useDebounce from '../../../hooks/useDebounce'
+import { deleteContent, getContents } from '../../../network/contents'
+import CustomSelect from '@components/CustomSelect'
+import { FullContent } from '@types'
 
 const AdminElements = () => {
     const [q, setQ] = useState<string | undefined>()
+    const [type, setType] = useState<string | undefined>()
     const debouncedQ = useDebounce<string | undefined>(q, 750)
-    const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(
-        ['containers', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined }],
-        () => getContainers(trim(debouncedQ)?.toLocaleLowerCase())
+    const contents: UseQueryResult<Content[], Error> = useQuery<Content[], Error>(
+        ['contents', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, type }],
+        () => getContents(type, trim(debouncedQ)?.toLocaleLowerCase())
     )
 
     return (
@@ -48,8 +48,10 @@ const AdminElements = () => {
                             style={{ width: 180 }}
                             onChange={(e) => setQ(e.target.value)}
                         />
+
+                        <CustomSelect.ListContainers width={180} value={type} onChange={setType} />
                     </Space>
-                    <Link href="/admin/elements/create">
+                    <Link href="/admin/contents/create">
                         <a>
                             <Button type="primary" icon={<PlusOutlined />}>
                                 Create
@@ -60,14 +62,14 @@ const AdminElements = () => {
                 <Table
                     rowKey={(record) => record.id}
                     bordered={false}
-                    loading={containers.isLoading}
-                    dataSource={get(containers, 'data', [])}
+                    loading={contents.isLoading}
+                    dataSource={get(contents, 'data', [])}
                     columns={columns}
                     size="small"
                     scroll={{ y: 'calc(100vh - 155px)' }}
                     pagination={{
                         hideOnSinglePage: true,
-                        pageSize: get(containers, 'data', []).length,
+                        pageSize: get(contents, 'data', []).length,
                     }}
                 />
             </Space>
@@ -79,19 +81,30 @@ const columns = [
     {
         title: 'Title',
         // dataIndex: 'title',
-        render: (e: Container) => (e.id === 'page' ? <Badge color="geekblue" text={e.title} /> : e.title),
+        render: (e: Content) =>
+            e.id === 'notfound' || e.id === 'signin' || e.id === 'home' ? (
+                <Badge color="geekblue" text={e.title} />
+            ) : (
+                e.title
+            ),
+    },
+    {
+        title: 'Title',
+        dataIndex: 'container',
+        render: (e: Container) => e.title,
     },
     {
         title: 'URL',
-        render: (e: Container) => {
+        render: (e: FullContent) => {
             return (
                 <Link href={`/${e.slug}`}>
                     <a>
                         <Breadcrumb>
                             <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                            {e.slug!.split('/').map((s: string, idx: number) => (
+                            {e.container?.slug?.split('/').map((s: string, idx: number) => (
                                 <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
                             ))}
+                            <Breadcrumb.Item>{e.slug || <>&#8203;</>}</Breadcrumb.Item>
                         </Breadcrumb>
                     </a>
                 </Link>
@@ -105,7 +118,7 @@ const columns = [
     },
     {
         width: 155,
-        render: (e: Element) => (
+        render: (e: Content) => (
             <Space>
                 <Button type="primary">
                     <Link href={`/admin/containers/${e.id}`}>
@@ -114,14 +127,14 @@ const columns = [
                 </Button>
 
                 <Popconfirm
-                    disabled={e.id === 'page'}
                     placement="topRight"
+                    disabled={e.id === 'notfound' || e.id === 'signin' || e.id === 'home'}
                     title={'Are you sur to delete this container?'}
-                    onConfirm={() => deleteContainer(e.id)}
+                    onConfirm={() => deleteContent(e.id)}
                     okText="Delete"
                     cancelText="Cancel"
                 >
-                    <Button danger disabled={e.id === 'page'}>
+                    <Button danger disabled={e.id === 'notfound' || e.id === 'signin' || e.id === 'home'}>
                         Delete
                     </Button>
                 </Popconfirm>

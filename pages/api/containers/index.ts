@@ -17,6 +17,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         where: {},
         include: {
             contents: true,
+            slug: true,
         },
     }
 

@@ -8,8 +8,8 @@ const sanitizeDate = (date: Date | string) =>
 
 const sanitizeAll = <T>(props: T) => {
     let newProps = {
-        container: { ...get(props, 'container', {}), updatedAt: sanitizeDate(get(props, 'container', undefined)) },
         ...props,
+        container: { ...get(props, 'container', {}), updatedAt: sanitizeDate(get(props, 'container', undefined)) },
     }
 
     return newProps as T

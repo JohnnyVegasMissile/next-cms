@@ -133,6 +133,7 @@ export type AuthResponse = {
 }
 
 export type PageProps = {
+    id: string
     type: 'container' | 'content'
     title: string
     accesses: Access[]

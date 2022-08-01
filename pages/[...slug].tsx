@@ -9,18 +9,19 @@ import SectionBlock from '../components/SectionBlock'
 import EditPageButton from '../components/EditPageButton'
 import get from 'lodash.get'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
+import { PageProps } from '../types'
 // import { FormattedMessage, useIntl } from 'react-intl'
 // import Link from 'next/link'
 
-const Pages = (props: any) => {
-    // const { id, title, metadatas, sections, type, header, footer } = props
+const Pages = (props: PageProps) => {
+    const { id, type, title } = props
     // const { isAuth, user, setRedirect } = useAuth()
 
     return (
         <div>
-            {/* <Head>
-                <title>{props.title}</title>
-                {get(props, 'metadatas', []).map((meta: Metadata) => (
+            <Head>
+                <title>{title}</title>
+                {/* {get(props, 'metadatas', []).map((meta: Metadata) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))}
                 {!get(props, 'type', false) && (
@@ -30,12 +31,11 @@ const Pages = (props: any) => {
                             <meta name="description" content={get(props, 'description')} />
                         )}
                     </>
-                )}
-
+                )} */}
             </Head>
 
-            <EditPageButton redirectTo={`/admin/${!!get(props, 'type', false) ? 'pages' : 'articles'}/${props.id}`} />
-
+            <EditPageButton redirectTo={`/admin/${type === 'container' ? 'containers' : 'contents'}/${id}`} />
+            {/* 
             <header>
                 {!!get(props, 'header', false) && <SectionBlock section={get(props, 'header')} page={props} />}
             </header>

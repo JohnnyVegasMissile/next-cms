@@ -6,7 +6,7 @@ import get from 'lodash.get'
 import trim from 'lodash.trim'
 import { PlusOutlined } from '@ant-design/icons'
 import { useQuery, UseQueryResult } from 'react-query'
-import type { Container, Content, Element } from '@prisma/client'
+import type { Container, Content, Element, Slug } from '@prisma/client'
 import { Space, Button, Table, Popconfirm, Input, Breadcrumb, Badge } from 'antd'
 
 import useDebounce from '../../../hooks/useDebounce'
@@ -91,16 +91,18 @@ const columns = [
     },
     {
         title: 'URL',
-        render: (e: FullContent) => {
+        dataIndex: 'slug',
+        render: (e: Slug[]) => {
+            const fullSlug = get(e, '0.fullSlug', '')
+
             return (
-                <Link href={`/${e.slug}`}>
+                <Link href={`/${fullSlug}`}>
                     <a>
                         <Breadcrumb>
                             <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                            {e.container?.slug?.split('/').map((s: string, idx: number) => (
-                                <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
+                            {fullSlug.split('/').map((s: string, idx: number) => (
+                                <Breadcrumb.Item key={idx}>{s || <>&#8203;</>}</Breadcrumb.Item>
                             ))}
-                            <Breadcrumb.Item>{e.slug || <>&#8203;</>}</Breadcrumb.Item>
                         </Breadcrumb>
                     </a>
                 </Link>

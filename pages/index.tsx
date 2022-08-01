@@ -1,24 +1,26 @@
-import getPagePropsFromUrl from '@utils/getPagePropsFromUrl'
+import EditPageButton from '../components/EditPageButton'
+import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 import get from 'lodash.get'
 import type { GetStaticPathsContext } from 'next'
+import Head from 'next/head'
 
 import { PageProps } from '../types'
 import { prisma } from '../utils/prisma'
 
 const Home = (props: PageProps) => {
-    // const { id, title, metadatas, sections, header, footer } = props
+    const { id, title } = props
 
     return (
         <div>
-            {/* <Head>
+            <Head>
                 <title>{title}</title>
-                {metadatas?.map((meta) => (
+                {/* {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
-                ))}
+                ))} */}
             </Head>
 
-            <EditPageButton redirectTo={`/admin/pages/${id}`} />
-
+            <EditPageButton redirectTo={`/admin/containers/${id}`} />
+            {/* 
             <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 
             <main>

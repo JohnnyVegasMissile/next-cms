@@ -8,8 +8,11 @@ import { useFormik } from 'formik'
 import get from 'lodash.get'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 import { PageProps } from '../types'
+import EditPageButton from '@components/EditPageButton'
+import Head from 'next/head'
 
 const SignIn = (props: PageProps) => {
+    const { id, title } = props
     // const { isAuth } = useAuth()
     // const router = useRouter()
 
@@ -22,15 +25,15 @@ const SignIn = (props: PageProps) => {
 
     return (
         <div>
-            {/* <Head>
+            <Head>
                 <title>{title}</title>
-                {metadatas?.map((meta) => (
+                {/* {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
-                ))}
+                ))} */}
             </Head>
 
-            <EditPageButton redirectTo={`/admin/pages/${id}`} />
-
+            <EditPageButton redirectTo={`/admin/contents/${id}`} />
+            {/* 
             <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 
             <main>

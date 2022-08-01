@@ -7,7 +7,7 @@ import get from 'lodash.get'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
 const NotFound = (props: PageProps) => {
-    const { title } = props
+    const { id, title } = props
 
     return (
         <div>
@@ -19,7 +19,7 @@ const NotFound = (props: PageProps) => {
                 ))} */}
             </Head>
 
-            <EditPageButton redirectTo={`/admin/pages/${'id'}`} />
+            <EditPageButton redirectTo={`/admin/contents/${id}`} />
 
             {/* <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 

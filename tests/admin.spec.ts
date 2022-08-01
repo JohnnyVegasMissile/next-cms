@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
     await expect(locator).toHaveText('Installation completed successfully')
 
     await page.goto(`${PAGE_URL}/admin`)
-    await expect(page).toHaveURL(`${PAGE_URL}/signin`)
+    await expect(page).toHaveURL(`${PAGE_URL}/sign-in`)
 
     // await page.type('input[id="email"]', 'root') //, { delay: 100 })
     // await page.type('input[id="password"]', 'root') //, { delay: 100 })

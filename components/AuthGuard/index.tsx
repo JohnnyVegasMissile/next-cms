@@ -33,7 +33,7 @@ function AuthGuard({ children, accesses, requireAuth }: Props) {
                 // remember the page that user tried to access
                 setRedirect(router.route)
                 // redirect
-                router.push('/signin')
+                router.push('/sign-in')
                 return
             } else if (!isAdmin && !hasAccess) {
                 console.log('Redirection from Auth Guard')

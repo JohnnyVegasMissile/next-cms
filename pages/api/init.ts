@@ -39,15 +39,12 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
                 title: 'Not Found',
                 containerId: 'page',
                 published: true,
-            },
-        })
-
-        await prisma.slug.create({
-            data: {
-                fullSlug: 'not-found',
-                slug: 'not-found',
-                contentId: 'notfound',
-                published: false,
+                slug: {
+                    create: {
+                        fullSlug: 'not-found',
+                        slug: 'not-found',
+                    },
+                },
             },
         })
     }
@@ -65,18 +62,10 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
                 published: true,
                 slug: {
                     create: {
-                        fullSlug: 'signin',
-                        slug: 'signin',
+                        fullSlug: 'sign-in',
+                        slug: 'sign-in',
                     },
                 },
-            },
-        })
-
-        await prisma.slug.create({
-            data: {
-                fullSlug: 'signin',
-                slug: 'signin',
-                contentId: 'signin',
             },
         })
     }

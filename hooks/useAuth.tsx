@@ -51,14 +51,13 @@ export const useProvideAuth = (): UseProvideAuthProps => {
     }, [])
 
     useEffect(() => {
-        if (router.route !== '/signin') {
+        if (router.route !== '/sign-in') {
             setRedirect(undefined)
         }
     }, [router.route])
 
     const signIn = useMutation(
-        (data: { email: string; password: string }) =>
-            signInRequest(data.email, data.password),
+        (data: { email: string; password: string }) => signInRequest(data.email, data.password),
         {
             onSuccess: (data: AuthResponse) => {
                 setUser({

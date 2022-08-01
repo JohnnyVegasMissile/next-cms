@@ -1,3 +1,5 @@
+import getPagePropsFromUrl from '@utils/getPagePropsFromUrl'
+import get from 'lodash.get'
 import type { GetStaticPathsContext } from 'next'
 
 import { PageProps } from '../types'
@@ -31,24 +33,7 @@ const Home = (props: PageProps) => {
 }
 
 export async function getStaticProps(context: GetStaticPathsContext) {
-    // const allHomepages = await prisma.page.findMany({
-    //     where: { type: 'home' },
-    //     include: { metadatas: true, sections: true, header: true, footer: true },
-    // })
-
-    // const page: Page = get(allHomepages, '0', {})
-    const pageSlug = prisma.slug.findUnique({ where: { fullSlug: '' }, include: { container: true } })
-
-    const revalidate = await prisma.setting.findUnique({
-        where: { name: 'revalidate' },
-    })
-
-    return {
-        props: {
-            type: 'container',
-        },
-        revalidate: revalidate ? parseInt(revalidate.value) : 60,
-    }
+    return await getPagePropsFromUrl('')
 }
 
 export default Home

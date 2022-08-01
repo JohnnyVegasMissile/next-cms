@@ -4,6 +4,7 @@ import { prisma } from '../utils/prisma'
 import EditPageButton from '../components/EditPageButton'
 import { PageProps } from 'types'
 import get from 'lodash.get'
+import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
 const NotFound = (props: PageProps) => {
     const { title } = props
@@ -33,44 +34,8 @@ const NotFound = (props: PageProps) => {
     )
 }
 
-const sanitizeDate = (date: Date) => (!!date ? Math.floor((date?.getMilliseconds() || 1) / 1000) : undefined)
-
 export async function getStaticProps(context: GetStaticPathsContext) {
-    const pageSlug = await prisma.slug.findUnique({
-        where: { fullSlug: 'not-found' },
-        include: {
-            content: {
-                include: {
-                    metadatas: true,
-                    accesses: true,
-                    sections: { include: { form: true } },
-                    fields: true,
-                    container: {
-                        include: {
-                            contentSections: {
-                                include: { form: true },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    })
-
-    const props = {
-        type: 'content',
-        ...get(pageSlug, 'content', {}),
-        updatedAt: sanitizeDate(get(pageSlug, 'content.updatedAt', undefined)),
-    }
-
-    const revalidate = await prisma.setting.findUnique({
-        where: { name: 'revalidate' },
-    })
-
-    return {
-        props,
-        revalidate: revalidate ? parseInt(revalidate.value) : 60,
-    }
+    return await getPagePropsFromUrl('not-found')
 }
 
 export default NotFound

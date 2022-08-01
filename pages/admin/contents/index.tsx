@@ -82,11 +82,7 @@ const columns = [
         title: 'Title',
         // dataIndex: 'title',
         render: (e: Content) =>
-            e.id === 'notfound' || e.id === 'signin' || e.id === 'home' ? (
-                <Badge color="geekblue" text={e.title} />
-            ) : (
-                e.title
-            ),
+            e.id === 'notfound' || e.id === 'signin' ? <Badge color="geekblue" text={e.title} /> : e.title,
     },
     {
         title: 'Title',
@@ -128,13 +124,13 @@ const columns = [
 
                 <Popconfirm
                     placement="topRight"
-                    disabled={e.id === 'notfound' || e.id === 'signin' || e.id === 'home'}
+                    disabled={e.id === 'notfound' || e.id === 'signin'}
                     title={'Are you sur to delete this container?'}
                     onConfirm={() => deleteContent(e.id)}
                     okText="Delete"
                     cancelText="Cancel"
                 >
-                    <Button danger disabled={e.id === 'notfound' || e.id === 'signin' || e.id === 'home'}>
+                    <Button danger disabled={e.id === 'notfound' || e.id === 'signin'}>
                         Delete
                     </Button>
                 </Popconfirm>

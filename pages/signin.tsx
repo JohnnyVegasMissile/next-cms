@@ -4,10 +4,12 @@ import { Button, Input, Card, Space } from 'antd'
 
 import type { GetStaticPathsContext } from 'next'
 import { prisma } from '../utils/prisma'
-import { FullPage } from '../types'
 import { useFormik } from 'formik'
+import get from 'lodash.get'
+import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
+import { PageProps } from '../types'
 
-const SignIn = (props: FullPage) => {
+const SignIn = (props: PageProps) => {
     // const { isAuth } = useAuth()
     // const router = useRouter()
 
@@ -104,24 +106,7 @@ const DefaultSignInForm = () => {
 }
 
 export async function getStaticProps(context: GetStaticPathsContext) {
-    // const allErrorPages = await prisma.page.findMany({
-    //     where: { type: 'signin' },
-    //     include: { metadatas: true, sections: true, header: true, footer: true },
-    // })
-
-    // const page: Page = get(allErrorPages, '0', {})
-
-    const revalidate = await prisma.setting.findUnique({
-        where: { name: 'revalidate' },
-    })
-
-    return {
-        props: {
-            // ...page,
-            // updatedAt: Math.floor((page?.updatedAt?.getMilliseconds() || 1) / 1000),
-        },
-        revalidate: revalidate ? parseInt(revalidate.value) : 60,
-    }
+    return await getPagePropsFromUrl('sign-in')
 }
 
 export default SignIn

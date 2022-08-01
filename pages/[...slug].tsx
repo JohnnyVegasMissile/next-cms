@@ -8,6 +8,7 @@ import { prisma } from '../utils/prisma'
 import SectionBlock from '../components/SectionBlock'
 import EditPageButton from '../components/EditPageButton'
 import get from 'lodash.get'
+import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 // import { FormattedMessage, useIntl } from 'react-intl'
 // import Link from 'next/link'
 
@@ -66,70 +67,11 @@ interface NewGetStaticPathsContext extends GetStaticPathsContext {
     }
 }
 
-const sanitizeDate = (date: Date) => (!!date ? Math.floor((date?.getMilliseconds() || 1) / 1000) : undefined)
-
 // export async function getServerSideProps(context: GetServerSidePropsContext) {
 export async function getStaticProps(context: NewGetStaticPathsContext) {
     const { slug } = context.params
 
-    const notFound = { notFound: true }
-
-    const releatedSlug = await prisma.slug.findUnique({
-        where: { fullSlug: slug.join('/') },
-        include: {
-            container: {
-                include: {
-                    metadatas: true,
-                    accesses: true,
-                    sections: { include: { form: true } },
-                    contents: {
-                        include: {
-                            fields: {
-                                include: { media: true },
-                            },
-                        },
-                    },
-                },
-            },
-            content: {
-                include: {
-                    metadatas: true,
-                    accesses: true,
-                    sections: { include: { form: true } },
-                    fields: true,
-                    container: {
-                        include: {
-                            contentSections: {
-                                include: { form: true },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    })
-
-    const props = {
-        type: !!releatedSlug?.container ? 'container' : 'content',
-        ...get(releatedSlug, 'container', {}),
-        ...get(releatedSlug, 'content', {}),
-        updatedAt: sanitizeDate(
-            get(releatedSlug, 'container.updatedAt', get(releatedSlug, 'content.updatedAt', undefined))
-        ),
-    }
-
-    if (!releatedSlug || !props.published) {
-        return notFound
-    }
-
-    const revalidate = await prisma.setting.findUnique({
-        where: { name: 'revalidate' },
-    })
-
-    return {
-        props,
-        revalidate: revalidate ? parseInt(revalidate.value) : 60,
-    }
+    return await getPagePropsFromUrl(slug.join('/'))
 }
 
 export async function getStaticPaths(context: GetStaticPathsContext) {

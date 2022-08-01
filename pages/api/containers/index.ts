@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Metadata, Section, Prisma, ContainerField } from '@prisma/client'
+import { Metadata, Section, Prisma, ContainerField } from '@prisma/client'
 import get from 'lodash.get'
 import { FullContainerEdit } from '../../../types'
 
@@ -57,6 +57,8 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     const accesses: string[] = get(req, 'body.accesses', [])
     delete newContainerContent.accesses
 
+    const slug: string = get(req, 'body.slugEdit', '').join('/')
+
     const container = await prisma.container.create({
         data: {
             ...(newContainerContent as Prisma.ContainerCreateInput),
@@ -67,6 +69,16 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             accesses: {
                 create: accesses.map((access) => ({ roleId: access })),
             },
+            slug: undefined,
+        },
+    })
+
+    await prisma.slug.create({
+        data: {
+            fullSlug: encodeURI(slug),
+            slug: encodeURI(slug),
+            containerId: container.id,
+            published: true,
         },
     })
 

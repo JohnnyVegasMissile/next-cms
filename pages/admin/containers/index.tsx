@@ -1,4 +1,4 @@
-import type { Container, Element } from '@prisma/client'
+import type { Container, Element, Slug } from '@prisma/client'
 import { Space, Button, Table, Popconfirm, Input, Select, Breadcrumb, Badge } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
@@ -83,14 +83,17 @@ const columns = [
     },
     {
         title: 'URL',
-        render: (e: Container) => {
+        dataIndex: 'slug',
+        render: (e: Slug[]) => {
+            const fullSlug = get(e, '0.fullSlug', '')
+
             return (
-                <Link href={`/${e.slug}`}>
+                <Link href={`/${fullSlug}`}>
                     <a>
                         <Breadcrumb>
                             <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                            {e.slug!.split('/').map((s: string, idx: number) => (
-                                <Breadcrumb.Item key={idx}>{s}</Breadcrumb.Item>
+                            {fullSlug.split('/').map((s: string, idx: number) => (
+                                <Breadcrumb.Item key={idx}>{s || <>&#8203;</>}</Breadcrumb.Item>
                             ))}
                         </Breadcrumb>
                     </a>

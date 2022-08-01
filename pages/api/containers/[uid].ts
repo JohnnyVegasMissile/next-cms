@@ -16,6 +16,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             sections: true,
             contentSections: true,
             fields: true,
+            slug: true,
         },
     })
 
@@ -142,12 +143,42 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
             contentSections: true,
             fields: true,
             contents: true,
+            slug: true,
         },
     })
 
-    res.status(200).json(container)
+    const newSlug = encodeURI(newContainerContent.slugEdit?.join('/') || '')
 
-    return res.unstable_revalidate('') //`/${page.slug}`)
+    if (container.slug[0].fullSlug === newSlug) {
+        res.status(200).json(container)
+
+        return res.unstable_revalidate(container.slug[0].fullSlug)
+    }
+
+    const slugs = await prisma.slug.findMany({
+        where: { OR: [{ containerId: id, parent: { containerId: id } }] },
+    })
+
+    for (const slug of slugs) {
+        const data =
+            slug.containerId === id
+                ? {
+                      fullSlug: `${newSlug}/${slug.slug}`,
+                  }
+                : {
+                      fullSlug: newSlug,
+                      slug: newSlug,
+                  }
+
+        await prisma.slug.update({
+            where: { id: slug.id },
+            data,
+        })
+
+        await res.unstable_revalidate(data.fullSlug)
+    }
+
+    res.status(200).json(container)
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

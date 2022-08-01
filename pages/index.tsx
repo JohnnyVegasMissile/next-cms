@@ -1,9 +1,9 @@
 import type { GetStaticPathsContext } from 'next'
-import { FullPage } from '@types'
 
+import { PageProps } from '../types'
 import { prisma } from '../utils/prisma'
 
-const Home = (props: FullPage) => {
+const Home = (props: PageProps) => {
     // const { id, title, metadatas, sections, header, footer } = props
 
     return (
@@ -37,6 +37,7 @@ export async function getStaticProps(context: GetStaticPathsContext) {
     // })
 
     // const page: Page = get(allHomepages, '0', {})
+    const pageSlug = prisma.slug.findUnique({ where: { fullSlug: '' }, include: { container: true } })
 
     const revalidate = await prisma.setting.findUnique({
         where: { name: 'revalidate' },
@@ -44,8 +45,7 @@ export async function getStaticProps(context: GetStaticPathsContext) {
 
     return {
         props: {
-            // ...page,
-            // updatedAt: Math.floor((page?.updatedAt?.getMilliseconds() || 1) / 1000),
+            type: 'container',
         },
         revalidate: revalidate ? parseInt(revalidate.value) : 60,
     }

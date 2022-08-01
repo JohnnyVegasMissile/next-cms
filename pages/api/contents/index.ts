@@ -55,6 +55,9 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     const accesses: string[] = get(req, 'body.accesses', [])
     delete newContentContent.accesses
 
+    const slug: string = get(req, 'body.slug', '')
+    const containerId: string = get(req, 'body.containerId', '')
+
     const content = await prisma.content.create({
         data: {
             ...(newContentContent as Prisma.ContentCreateInput),
@@ -64,6 +67,16 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             accesses: {
                 create: accesses.map((access) => ({ roleId: access })),
             },
+        },
+        include: { container: { include: { slug: true } } },
+    })
+
+    await prisma.slug.create({
+        data: {
+            fullSlug: `${content.container.slug[0].fullSlug}/${slug}`,
+            slug: slug,
+            containerId,
+            published: true,
         },
     })
 

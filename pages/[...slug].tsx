@@ -66,153 +66,85 @@ interface NewGetStaticPathsContext extends GetStaticPathsContext {
     }
 }
 
-const sanitizeDate = (date: Date) => Math.floor((date?.getMilliseconds() || 1) / 1000)
+const sanitizeDate = (date: Date) => (!!date ? Math.floor((date?.getMilliseconds() || 1) / 1000) : undefined)
 
 // export async function getServerSideProps(context: GetServerSidePropsContext) {
 export async function getStaticProps(context: NewGetStaticPathsContext) {
     const { slug } = context.params
 
-    // const page = await prisma.page.findUnique({
-    //     where: { slug: slug.join('/') },
-    //     include: {
-    //         articles: { include: { cover: true } },
-    //         metadatas: true,
-    //         sections: {
-    //             include: {
-    //                 form: {
-    //                     include: { fields: true },
-    //                 },
-    //             },
-    //         },
-    //         header: true,
-    //         footer: true,
-    //         accesses: true,
-    //     },
-    // })
+    const notFound = { notFound: true }
 
-    // if (!!page) {
-    //     const articles = page.articles.map((article) => ({
-    //         ...article,
-    //         updatedAt: sanitizeDate(article.updatedAt),
-    //         cover: article.cover
-    //             ? { ...article.cover, uploadTime: sanitizeDate(article.cover.uploadTime) }
-    //             : undefined,
-    //     }))
+    const releatedSlug = await prisma.slug.findUnique({
+        where: { fullSlug: slug.join('/') },
+        include: {
+            container: {
+                include: {
+                    metadatas: true,
+                    accesses: true,
+                    sections: { include: { form: true } },
+                    contents: {
+                        include: {
+                            fields: {
+                                include: { media: true },
+                            },
+                        },
+                    },
+                },
+            },
+            content: {
+                include: {
+                    metadatas: true,
+                    accesses: true,
+                    sections: { include: { form: true } },
+                    fields: true,
+                    container: {
+                        include: {
+                            contentSections: {
+                                include: { form: true },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    })
 
-    //     const header = page.header
-    //         ? {
-    //               ...page.header,
-    //               updatedAt: sanitizeDate(page.header.updatedAt),
-    //           }
-    //         : null
+    const props = {
+        type: !!releatedSlug?.container ? 'container' : 'content',
+        ...get(releatedSlug, 'container', {}),
+        ...get(releatedSlug, 'content', {}),
+        updatedAt: sanitizeDate(
+            get(releatedSlug, 'container.updatedAt', get(releatedSlug, 'content.updatedAt', undefined))
+        ),
+    }
 
-    //     const footer = page.footer
-    //         ? {
-    //               ...page.footer,
-    //               updatedAt: sanitizeDate(page.footer.updatedAt),
-    //           }
-    //         : null
-
-    //     const sections = page.sections.map((section) => ({
-    //         ...section,
-    //         form: section.form
-    //             ? { ...section.form, updatedAt: sanitizeDate(section.form.updatedAt) }
-    //             : null,
-    //     }))
-
-    //     props = {
-    //         ...page,
-    //         header,
-    //         sections,
-    //         footer,
-    //         articles,
-    //         updatedAt: sanitizeDate(page.updatedAt),
-    //     }
-    // } else {
-    //     const article = await prisma.article.findUnique({
-    //         where: { slug: slug[slug.length - 1] },
-    //         include: {
-    //             page: true,
-    //             cover: true,
-    //             sections: { include: { form: { include: { fields: true } } } },
-    //         },
-    //     })
-
-    //     if (!!article && slug.join('/') === `${article.page.slug}/${article.slug}`) {
-    //         const artPage = {
-    //             ...article?.page,
-    //             updatedAt: sanitizeDate(article?.page.updatedAt),
-    //         }
-
-    //         const sections = article.sections.map((section) => ({
-    //             ...section,
-    //             form: section.form
-    //                 ? {
-    //                       ...section.form,
-    //                       updatedAt: sanitizeDate(section.form.updatedAt),
-    //                   }
-    //                 : null,
-    //         }))
-
-    //         props = {
-    //             ...article,
-    //             page: artPage,
-    //             sections,
-    //             updatedAt: sanitizeDate(article?.updatedAt),
-    //         }
-    //     }
-    // }
+    if (!releatedSlug || !props.published) {
+        return notFound
+    }
 
     const revalidate = await prisma.setting.findUnique({
         where: { name: 'revalidate' },
     })
 
-    // console.log(props)
     return {
-        // props,
+        props,
         revalidate: revalidate ? parseInt(revalidate.value) : 60,
-        // notFound: !props,
     }
 }
 
 export async function getStaticPaths(context: GetStaticPathsContext) {
-    const containers = await prisma.container.findMany({
+    const slugs = await prisma.slug.findMany({
         where: {
             published: true,
         },
-        include: { contents: true },
     })
 
-    let paths = containers.map((container) => {
-        const slug = container.slug!.split('/')
-        let contentsSlugs: {
-            params: { slug: string[] }
-        }[] = []
-
-        if (!!container.contents?.length) {
-            contentsSlugs = container.contents
-                ?.filter(
-                    (content) =>
-                        content.published &&
-                        content.id !== 'notfound' &&
-                        content.id !== 'home' &&
-                        content.id !== 'signin'
-                )
-                ?.map((content) => ({
-                    params: { slug: [...slug, content.slug || ''] },
-                }))
-        }
-
-        return [
-            {
-                params: { slug },
-            },
-            ...contentsSlugs,
-        ]
-    })
+    const paths = slugs.map((slug) => ({
+        params: { slug: slug.fullSlug.split('/') },
+    }))
 
     return {
-        paths: paths.flat(),
+        paths,
         fallback: true, // false or 'blocking'
     }
 }

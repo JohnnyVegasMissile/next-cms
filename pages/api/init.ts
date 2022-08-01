@@ -14,25 +14,16 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             data: {
                 id: 'page',
                 title: 'Default Page',
-                slug: '',
                 contentHasSections: false,
                 published: true,
             },
         })
-    }
 
-    const home = await prisma.content.findUnique({
-        where: { id: 'home' },
-    })
-
-    if (!home) {
-        await prisma.content.create({
+        await prisma.slug.create({
             data: {
-                id: 'home',
-                title: 'Home',
+                fullSlug: '',
                 slug: '',
                 containerId: 'page',
-                published: true,
             },
         })
     }
@@ -46,9 +37,17 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             data: {
                 id: 'notfound',
                 title: 'Not Found',
-                slug: 'not-found',
                 containerId: 'page',
                 published: true,
+            },
+        })
+
+        await prisma.slug.create({
+            data: {
+                fullSlug: 'not-found',
+                slug: 'not-found',
+                contentId: 'notfound',
+                published: false,
             },
         })
     }
@@ -62,9 +61,22 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             data: {
                 id: 'signin',
                 title: 'Sign In',
-                slug: 'signin',
                 containerId: 'page',
                 published: true,
+                slug: {
+                    create: {
+                        fullSlug: 'signin',
+                        slug: 'signin',
+                    },
+                },
+            },
+        })
+
+        await prisma.slug.create({
+            data: {
+                fullSlug: 'signin',
+                slug: 'signin',
+                contentId: 'signin',
             },
         })
     }

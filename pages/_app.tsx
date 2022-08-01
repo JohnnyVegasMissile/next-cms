@@ -28,13 +28,7 @@ const queryClient = new QueryClient({
     defaultOptions: { queries: { refetchOnWindowFocus: false } },
 })
 
-function MyApp({
-    Component,
-    pageProps,
-}: {
-    Component: NextComponentType & { requireAuth: boolean }
-    pageProps: any
-}) {
+function MyApp({ Component, pageProps }: { Component: NextComponentType & { requireAuth: boolean }; pageProps: any }) {
     // function MyApp({ Component, pageProps }: any) {
     // const { locale } = useRouter()
 
@@ -53,7 +47,8 @@ function MyApp({
     //     }
     // }
 
-    const accesses: Access[] = get(pageProps, 'accesses', [])
+    // const accesses: Access[] = get(pageProps, 'accesses', [])
+    const { accesses, ...props } = pageProps
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -61,7 +56,7 @@ function MyApp({
             <ProvideAuth>
                 <MenuAdmin />
                 <AuthGuard requireAuth={Component.requireAuth} accesses={accesses}>
-                    <Component {...pageProps} />
+                    <Component {...props} />
                 </AuthGuard>
             </ProvideAuth>
             {/* </IntlProvider> */}

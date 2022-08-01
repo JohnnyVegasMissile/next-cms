@@ -1,15 +1,17 @@
 import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 import { prisma } from '../utils/prisma'
-import { FullPage } from '../types'
 import EditPageButton from '../components/EditPageButton'
+import { PageProps } from 'types'
+import get from 'lodash.get'
 
-const NotFound = (props: FullPage) => {
-    const {} = props
+const NotFound = (props: PageProps) => {
+    const { title } = props
 
     return (
         <div>
             <Head>
+                <title>{title}</title>
                 {/* <title>{title}</title>
                 {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
@@ -31,23 +33,42 @@ const NotFound = (props: FullPage) => {
     )
 }
 
-export async function getStaticProps(context: GetStaticPathsContext) {
-    // const allErrorPages = await prisma.page.findMany({
-    //     where: { type: 'error' },
-    //     include: { metadatas: true, sections: true, header: true, footer: true },
-    // })
+const sanitizeDate = (date: Date) => (!!date ? Math.floor((date?.getMilliseconds() || 1) / 1000) : undefined)
 
-    // const page: Page = get(allErrorPages, '0', {})
+export async function getStaticProps(context: GetStaticPathsContext) {
+    const pageSlug = await prisma.slug.findUnique({
+        where: { fullSlug: 'not-found' },
+        include: {
+            content: {
+                include: {
+                    metadatas: true,
+                    accesses: true,
+                    sections: { include: { form: true } },
+                    fields: true,
+                    container: {
+                        include: {
+                            contentSections: {
+                                include: { form: true },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    })
+
+    const props = {
+        type: 'content',
+        ...get(pageSlug, 'content', {}),
+        updatedAt: sanitizeDate(get(pageSlug, 'content.updatedAt', undefined)),
+    }
 
     const revalidate = await prisma.setting.findUnique({
         where: { name: 'revalidate' },
     })
 
     return {
-        props: {
-            // ...page,
-            // updatedAt: Math.floor((page?.updatedAt?.getMilliseconds() || 1) / 1000),
-        },
+        props,
         revalidate: revalidate ? parseInt(revalidate.value) : 60,
     }
 }

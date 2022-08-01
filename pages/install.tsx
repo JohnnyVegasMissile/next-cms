@@ -9,14 +9,10 @@ import { useQuery, UseQueryResult } from 'react-query'
 import { prisma } from '../utils/prisma'
 
 const Install: NextPage = () => {
-    const install: UseQueryResult<void, Error> = useQuery<void, Error>(
-        ['install'],
-        () => initPages(),
-        {
-            refetchOnMount: false,
-            refetchOnReconnect: false,
-        }
-    )
+    const install: UseQueryResult<void, Error> = useQuery<void, Error>(['install'], () => initPages(), {
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+    })
 
     return (
         <div>

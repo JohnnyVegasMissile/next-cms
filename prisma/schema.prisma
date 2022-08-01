@@ -155,8 +155,7 @@ model Container {
   contents           Content[]
   published          Boolean          @default(true)
   updatedAt          DateTime         @updatedAt
-  slugId             String           @unique
-  slug               Slug             @relation(fields: [slugId], references: [id])
+  slug               Slug[]
 }
 
 model Content {
@@ -171,8 +170,7 @@ model Content {
   container   Container      @relation(fields: [containerId], references: [id])
   published   Boolean        @default(true)
   updatedAt   DateTime       @updatedAt
-  slugId      String         @unique
-  slug        Slug           @relation(fields: [slugId], references: [id])
+  slug        Slug[]
 }
 
 model ContainerField {
@@ -201,11 +199,17 @@ model ContentField {
 }
 
 model Slug {
-  id        String     @id @default(cuid())
-  slug      String     @unique
-  parentId  String?
-  parent    Slug?      @relation(fields: [parentId], references: [id], name: "childs")
-  childs    Slug[]     @relation(name: "childs")
-  container Container?
-  content   Content?
+  id       String  @id @default(cuid())
+  fullSlug String  @unique
+  slug     String
+  parentId String?
+  parent   Slug?   @relation(fields: [parentId], references: [id], name: "childs")
+  childs   Slug[]  @relation(name: "childs")
+
+  containerId String?
+  container   Container? @relation(fields: [containerId], references: [id])
+  contentId   String?
+  content     Content?   @relation(fields: [contentId], references: [id])
+
+  published Boolean @default(true)
 }

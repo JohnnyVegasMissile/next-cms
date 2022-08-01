@@ -84,13 +84,10 @@ const Admin = () => {
                 }
             }
 
-            let slug = get(values, 'slugEdit', []).join('/')
-            slug = encodeURI(slug)
-
             // console.log('values', values)
             mutation.mutate({
                 pid: pid as string,
-                values: { ...values, sections, contentSections, slug, slugEdit: undefined },
+                values: { ...values, sections, contentSections, slugEdit: undefined },
             })
         },
     })
@@ -109,7 +106,7 @@ const Admin = () => {
 
                 const accesses = get(data, 'accesses', []).map((access) => get(access, 'roleId', ''))
 
-                const slug = decodeURI(get(data, 'slug', '') || '')
+                const slug = decodeURI(get(data, 'slug.0.slug', '') || '')
                 const slugEdit = slug.split('/')
 
                 setValues({ ...data, sections, contentSections, accesses, slugEdit })
@@ -297,21 +294,17 @@ const Admin = () => {
                                         </Space>
                                     </Card>
 
-                                    {!isDefaultPage && (
-                                        <>
-                                            <MetadatasManager
-                                                values={get(values, 'metadatas', [])}
-                                                onChange={(e) => onHandleChange('metadatas', e)}
-                                            />
+                                    <MetadatasManager
+                                        values={get(values, 'metadatas', [])}
+                                        onChange={(e) => onHandleChange('metadatas', e)}
+                                    />
 
-                                            <Divider orientation="left">Container Layout</Divider>
+                                    <Divider orientation="left">Container Layout</Divider>
 
-                                            <SectionManager
-                                                values={get(values, 'sections', []) as FullSectionEdit[]}
-                                                onChange={(e) => onHandleChange('sections', e)}
-                                            />
-                                        </>
-                                    )}
+                                    <SectionManager
+                                        values={get(values, 'sections', []) as FullSectionEdit[]}
+                                        onChange={(e) => onHandleChange('sections', e)}
+                                    />
                                 </Space>
                             </TabPane>
                             <TabPane tab="Contents" key="2" disabled={isDefaultPage}>

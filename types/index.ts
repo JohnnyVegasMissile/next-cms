@@ -14,6 +14,9 @@ import type {
     ContainerField,
     Container,
     Content,
+    Slug,
+    ContentField,
+    Access,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
@@ -108,6 +111,7 @@ export type FullContainerEdit = Prisma.ContainerCreateInput & {
     contentMetadatas?: Metadata[] | null
     sections?: FullSection[] | null
     contentSections?: FullSection[] | null
+    slug?: Slug | null
 
     accesses?: string[] | null
 
@@ -116,6 +120,7 @@ export type FullContainerEdit = Prisma.ContainerCreateInput & {
 
 export type FullContent = Content & {
     container: Container | null
+    fields?: ContentField | null
 }
 
 export type AuthResponse = {
@@ -125,6 +130,21 @@ export type AuthResponse = {
         role: string
         email: string
     }
+}
+
+export type PageProps = {
+    type: 'container' | 'content'
+    title: string
+    accesses: Access[]
+    metadatas: Metadata[]
+    sections: (Section & {
+        form: Form | null
+    })[]
+    contents: (Content & {
+        fields: (ContentField & {
+            media: Media | null
+        })[]
+    })[]
 }
 
 // export type AuthResponse = {

@@ -13,7 +13,7 @@ const { Text } = Typography
 
 const initialValues: Prisma.ElementCreateInput = {
     title: '',
-    type: '',
+    block: '',
     content: '{}',
 }
 
@@ -44,27 +44,25 @@ const Admin = () => {
     const { pid } = router.query
     const queryClient = useQueryClient()
 
-    const { values, /*errors,*/ handleSubmit, handleChange, setValues } =
-        useFormik<Prisma.ElementCreateInput>({
-            initialValues,
-            validate,
-            onSubmit: async (values) => mutation.mutate({ pid: pid as string, values }),
-        })
-
-    const element: UseQueryResult<Prisma.ElementCreateInput, Error> = useQuery<
-        Prisma.ElementCreateInput,
-        Error
-    >(['elements', { id: pid }], () => getElementDetails(pid as string), {
-        enabled: !!pid && pid !== 'create',
-        onSuccess: (data: Prisma.ElementCreateInput) => setValues(data),
-        onError: (err) => router.push('/admin/articles'),
+    const { values, /*errors,*/ handleSubmit, handleChange, setValues } = useFormik<Prisma.ElementCreateInput>({
+        initialValues,
+        validate,
+        onSubmit: async (values) => mutation.mutate({ pid: pid as string, values }),
     })
+
+    const element: UseQueryResult<Prisma.ElementCreateInput, Error> = useQuery<Prisma.ElementCreateInput, Error>(
+        ['elements', { id: pid }],
+        () => getElementDetails(pid as string),
+        {
+            enabled: !!pid && pid !== 'create',
+            onSuccess: (data: Prisma.ElementCreateInput) => setValues(data),
+            onError: (err) => router.push('/admin/articles'),
+        }
+    )
 
     const mutation = useMutation(
         (data: { pid: string; values: Prisma.ElementCreateInput }) =>
-            data.pid === 'create'
-                ? postElement(data.values)
-                : editElement(data.pid, data.values),
+            data.pid === 'create' ? postElement(data.values) : editElement(data.pid, data.values),
         {
             onSuccess: (data: Element) => {
                 message.success(`Element ${data.title} saved`)
@@ -125,9 +123,7 @@ const Admin = () => {
                                     <Input
                                         style={{ width: 240 }}
                                         value={get(values, 'title', '')}
-                                        onChange={(e) =>
-                                            onHandleChange('title', e.target.value)
-                                        }
+                                        onChange={(e) => onHandleChange('title', e.target.value)}
                                     />
                                 </Space>
                             </Space>
@@ -138,8 +134,8 @@ const Admin = () => {
                             title={
                                 <Space>
                                     <Select
-                                        value={values.type}
-                                        onChange={(e) => onHandleChange('type', e)}
+                                        value={values.block}
+                                        onChange={(e) => onHandleChange('block', e)}
                                         style={{ width: 240 }}
                                     >
                                         {Object.keys(Blocks).map((key) => (
@@ -153,7 +149,7 @@ const Admin = () => {
                             style={{ flex: 1 }}
                         >
                             <GetEditComponent
-                                type={values.type}
+                                block={values.block}
                                 defaultValues={values.content}
                                 onChange={(e) => onHandleChange('content', e)}
                             />

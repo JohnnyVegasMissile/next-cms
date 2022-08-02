@@ -4,7 +4,7 @@ import Link from 'next/link'
 import moment from 'moment'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
-import type { Form, Page } from '@prisma/client'
+import type { Form } from '@prisma/client'
 import { useQuery, UseQueryResult } from 'react-query'
 import { PlusOutlined } from '@ant-design/icons'
 
@@ -94,7 +94,7 @@ const columns = [
     },
     {
         width: 155,
-        render: (e: Page) => (
+        render: (e: Form) => (
             <Space>
                 <Button type="primary">
                     <Link href={`/admin/forms/${e.id}`}>

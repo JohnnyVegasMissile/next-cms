@@ -1,3 +1,5 @@
+import { LayoutProps } from '../types'
+
 const axios = require('axios')
 
 const INSTANCE = axios.create()
@@ -29,6 +31,30 @@ export const revalidateAll = (): Promise<string[]> =>
         INSTANCE({
             method: 'POST',
             url: `/api/revalidate/all`,
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const postLayout = (data: LayoutProps): Promise<LayoutProps> =>
+    new Promise(async (resolve, reject) => {
+        INSTANCE({
+            method: 'POST',
+            url: `/api/layout`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data,
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const getLayout = (): Promise<LayoutProps> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
+            url: `/api/layout`,
         })
             .then(resolve)
             .catch(reject)

@@ -32,7 +32,8 @@ model Metadata {
 
 model Section {
   id                 String     @id @default(cuid())
-  type               String?
+  type               String? // page header footer top-body bottom-body
+  block              String?
   formId             String?
   form               Form?      @relation(fields: [formId], references: [id])
   containerId        String?
@@ -50,7 +51,7 @@ model Section {
 model Element {
   id        String    @id @default(cuid())
   title     String    @unique
-  type      String
+  block     String
   section   Section[]
   content   String?
   updatedAt DateTime  @updatedAt
@@ -206,9 +207,9 @@ model Slug {
   parent   Slug?   @relation(fields: [parentId], references: [id], name: "childs")
   childs   Slug[]  @relation(name: "childs")
 
-  containerId String?
+  containerId String?    @unique
   container   Container? @relation(fields: [containerId], references: [id])
-  contentId   String?
+  contentId   String?    @unique
   content     Content?   @relation(fields: [contentId], references: [id])
 
   published Boolean @default(true)

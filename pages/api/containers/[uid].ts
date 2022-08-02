@@ -87,7 +87,8 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
             data: {
                 containerId: id,
                 formId: section.formId,
-                type: section.type,
+                type: 'page',
+                block: section.block,
                 elementId: section.elementId,
                 position: section.position,
                 content: section.content,
@@ -98,14 +99,14 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     if (newContainerContent.contentHasSections) {
         // create new sections
         const newContentSections: Section[] = get(req, 'body.contentSections', [])
-        delete newContainerContent.contentSections
 
         for (const section of newContentSections) {
             await prisma.section.create({
                 data: {
                     containerContentId: id,
                     formId: section.formId,
-                    type: section.type,
+                    type: 'page',
+                    block: section.block,
                     elementId: section.elementId,
                     position: section.position,
                     content: section.content,
@@ -118,6 +119,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
             where: { containerId: id },
         })
     }
+    delete newContainerContent.contentSections
 
     // create new access
     const newAccesses: string[] = get(req, 'body.accesses', [])
@@ -131,6 +133,10 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
             },
         })
     }
+
+    const newSlug = encodeURI(newContainerContent.slugEdit?.join('/') || '')
+    delete newContainerContent.slug
+    delete newContainerContent.slugEdit
 
     // update the page
     const container = await prisma.container.update({
@@ -147,35 +153,36 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         },
     })
 
-    const newSlug = encodeURI(newContainerContent.slugEdit?.join('/') || '')
-
     if (container.slug[0].fullSlug === newSlug) {
         res.status(200).json(container)
 
-        return res.unstable_revalidate(container.slug[0].fullSlug)
+        return res.unstable_revalidate(`/${container.slug[0].fullSlug}`)
     }
 
-    const slugs = await prisma.slug.findMany({
-        where: { OR: [{ containerId: id, parent: { containerId: id } }] },
+    const slugs = await prisma.slug.findUnique({
+        where: { containerId: id },
+        include: { childs: true },
     })
 
-    for (const slug of slugs) {
-        const data =
-            slug.containerId === id
-                ? {
-                      fullSlug: `${newSlug}/${slug.slug}`,
-                  }
-                : {
-                      fullSlug: newSlug,
-                      slug: newSlug,
-                  }
+    await prisma.slug.update({
+        where: { id: slugs?.id },
+        data: {
+            fullSlug: newSlug,
+            slug: newSlug,
+        },
+    })
+
+    await res.unstable_revalidate(`/${newSlug}`)
+
+    for (const child of slugs!.childs) {
+        const fullSlug = `${newSlug}/${child.slug}`
 
         await prisma.slug.update({
-            where: { id: slug.id },
-            data,
+            where: { id: child.id },
+            data: { fullSlug },
         })
 
-        await res.unstable_revalidate(data.fullSlug)
+        await res.unstable_revalidate(`/${fullSlug}`)
     }
 
     res.status(200).json(container)

@@ -1,5 +1,5 @@
 import UploadButton from '../../components/UploadButton'
-import { Space, Avatar, InputNumber } from 'antd'
+import { Space, Avatar, InputNumber, Input } from 'antd'
 import { useQuery /*, UseQueryResult*/ } from 'react-query'
 import { Media, Setting } from '@prisma/client'
 import { useEffect, useState } from 'react'
@@ -15,7 +15,7 @@ const Admin = () => {
     const [values, setValues] = useState('')
     const [picture, setPicture] = useState<Media | undefined>()
     /*const setting: UseQueryResult<Setting[], Error> =*/ useQuery<Setting[], Error>(
-        ['setting'],
+        ['settings'],
         () => getSettings(),
         {
             onSuccess: (data: Setting[]) => {
@@ -28,14 +28,22 @@ const Admin = () => {
         }
     )
 
-    const debouncedValue = useDebounce<string>(settings?.revalidate, 1500)
+    const debouncedRevalidate = useDebounce<string>(settings?.revalidate, 1500)
+    const debouncedAppName = useDebounce<string>(settings?.appName, 1500)
 
     useEffect(() => {
         const update = async () => editSetting('revalidate', settings?.revalidate.toString())
 
         if (settings?.revalidate) update()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedValue])
+    }, [debouncedRevalidate])
+
+    useEffect(() => {
+        const update = async () => editSetting('app_name', settings?.app_name.toString())
+
+        if (settings?.ap_name) update()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedAppName])
 
     return (
         <>
@@ -61,8 +69,13 @@ const Admin = () => {
                     value={get(settings, 'revalidate', undefined)}
                     onChange={(e) => setSettings((prev: any) => ({ ...prev, revalidate: e }))}
                 />
-                <MediaModal value={picture} onMediaSelected={setPicture} />
-                <LinkInput value={values} onChange={setValues} />
+
+                <Input
+                    value={get(settings, 'app_name', undefined)}
+                    onChange={(e) => setSettings((prev: any) => ({ ...prev, app_name: e.target.value }))}
+                />
+                {/* <MediaModal value={picture} onMediaSelected={setPicture} />
+                <LinkInput value={values} onChange={setValues} /> */}
             </Space>
         </>
     )

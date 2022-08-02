@@ -4,12 +4,10 @@ import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
 import { useQuery, UseQueryResult } from 'react-query'
-import { getElements, deleteElement } from '../../../network/elements'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
 import useDebounce from '../../../hooks/useDebounce'
 import { useState } from 'react'
-import Blocks from '../../../blocks'
 import Head from 'next/head'
 import { deleteContainer, getContainers } from '../../../network/containers'
 
@@ -49,7 +47,7 @@ const AdminElements = () => {
                             onChange={(e) => setQ(e.target.value)}
                         />
                     </Space>
-                    <Link href="/admin/elements/create">
+                    <Link href="/admin/containers/create">
                         <a>
                             <Button type="primary" icon={<PlusOutlined />}>
                                 Create

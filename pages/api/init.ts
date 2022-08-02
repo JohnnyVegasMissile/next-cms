@@ -3,29 +3,34 @@ import bcrypt from 'bcryptjs'
 import type { Login, Role } from '@prisma/client'
 
 import { prisma } from '../../utils/prisma'
+import get from 'lodash.get'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const defaultContainer = await prisma.container.findUnique({
         where: { id: 'page' },
+        include: { slug: true },
     })
 
+    let parentId = get(defaultContainer, 'slug.0.id', undefined)
+
     if (!defaultContainer) {
-        await prisma.container.create({
+        const newDefaultContainer = await prisma.container.create({
             data: {
                 id: 'page',
                 title: 'Default Page',
                 contentHasSections: false,
                 published: true,
+                slug: {
+                    create: {
+                        fullSlug: '',
+                        slug: '',
+                    },
+                },
             },
+            include: { slug: true },
         })
 
-        await prisma.slug.create({
-            data: {
-                fullSlug: '',
-                slug: '',
-                containerId: 'page',
-            },
-        })
+        parentId = get(newDefaultContainer, 'slug.0.id', undefined)
     }
 
     const notfound = await prisma.content.findUnique({
@@ -43,6 +48,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
                     create: {
                         fullSlug: 'not-found',
                         slug: 'not-found',
+                        parentId,
                     },
                 },
             },
@@ -64,6 +70,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
                     create: {
                         fullSlug: 'sign-in',
                         slug: 'sign-in',
+                        parentId,
                     },
                 },
             },
@@ -139,6 +146,19 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             data: {
                 name: 'revalidate',
                 value: '86400',
+            },
+        })
+    }
+
+    const appname = await prisma.setting.findUnique({
+        where: { name: 'app_name' },
+    })
+
+    if (!appname) {
+        await prisma.setting.create({
+            data: {
+                name: 'app_name',
+                value: '',
             },
         })
     }

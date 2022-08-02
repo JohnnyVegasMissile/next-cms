@@ -3,7 +3,7 @@ import {
     SettingOutlined,
     HomeOutlined,
     LogoutOutlined,
-    FileImageOutlined,
+    LayoutOutlined,
     PicCenterOutlined,
     PictureOutlined,
     UserOutlined,
@@ -232,16 +232,14 @@ function MenuAdmin() {
                 }}
             >
                 <Space size="small">
-                    <Space>
-                        <Link href="/">
-                            <a>
-                                <Text>
-                                    <HomeOutlined style={{ marginRight: 4 }} />
-                                    Home
-                                </Text>
-                            </a>
-                        </Link>
-                    </Space>
+                    <Link href="/">
+                        <a>
+                            <Text>
+                                <HomeOutlined style={{ marginRight: 4 }} />
+                                Home
+                            </Text>
+                        </a>
+                    </Link>
                     <Divider type="vertical" />
 
                     <Dropdown overlay={containersMenu}>
@@ -308,18 +306,24 @@ function MenuAdmin() {
                             </Text>
                         </a>
                     </Link>
+                    <Divider type="vertical" />
+
+                    <Link href="/admin/layout">
+                        <a>
+                            <Text>
+                                <LayoutOutlined style={{ marginRight: 4 }} />
+                                Layout
+                            </Text>
+                        </a>
+                    </Link>
                 </Space>
 
                 <Dropdown overlay={homeMenu}>
                     <Space>
-                        <Link href="/">
-                            <a>
-                                <Text className="logged-username">
-                                    <UserOutlined style={{ marginRight: 4 }} />
-                                    {`${user?.name}`}
-                                </Text>
-                            </a>
-                        </Link>
+                        <Text className="logged-username">
+                            <UserOutlined style={{ marginRight: 4 }} />
+                            {`${user?.name}`}
+                        </Text>
                     </Space>
                 </Dropdown>
             </div>

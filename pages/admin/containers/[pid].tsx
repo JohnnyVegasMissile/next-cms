@@ -57,7 +57,7 @@ const Admin = () => {
 
             if (!!values.sections) {
                 for (const section of values.sections) {
-                    if (!!section.type || !!section.elementId) {
+                    if (!!section.block || !!section.elementId) {
                         sections.push({
                             ...section,
                             position: i,
@@ -73,7 +73,7 @@ const Admin = () => {
 
             if (!!values.contentSections) {
                 for (const section of values.contentSections) {
-                    if (!!section.type || !!section.elementId) {
+                    if (!!section.block || !!section.elementId) {
                         contentSections.push({
                             ...section,
                             position: i,
@@ -84,10 +84,9 @@ const Admin = () => {
                 }
             }
 
-            // console.log('values', values)
             mutation.mutate({
                 pid: pid as string,
-                values: { ...values, sections, contentSections, slugEdit: undefined },
+                values: { ...values, sections, contentSections },
             })
         },
     })
@@ -122,12 +121,12 @@ const Admin = () => {
             onSuccess: (data: any) => {
                 message.success(`Element ${data.title} saved`)
                 queryClient.invalidateQueries('containers')
-                router.push('/admin/containers')
+                // router.push('/admin/containers')
             },
             onError: (err) => {
                 message.error('An error occured, while creating or updating the container')
                 queryClient.invalidateQueries('containers')
-                router.push('/admin/containers')
+                // router.push('/admin/containers')
             },
         }
     )
@@ -509,7 +508,7 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
                                 }}
                                 id={`required-${idx}`}
                                 value={field.required}
-                                onChange={(e) => modifyField(idx, 'required', e.target.value === 'true')}
+                                onChange={(e) => modifyField(idx, 'required', e.target.value)}
                             >
                                 <Radio value={true}>Required</Radio>
                                 <Radio value={false}>Not Required</Radio>

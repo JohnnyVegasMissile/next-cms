@@ -2,8 +2,8 @@ html,
 body {
     padding: 0;
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
-        Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
+        Helvetica Neue, sans-serif;
     white-space: pre-wrap;
 }
 
@@ -61,14 +61,14 @@ a {
 [data-theme='dark'] #components-tabs-demo-card-top .code-box-demo {
     background: #000;
 }
-[data-theme='dark']
-    .admin-card-container
-    > .ant-tabs-card
-    .ant-tabs-content
-    > .ant-tabs-tabpane {
+[data-theme='dark'] .admin-card-container > .ant-tabs-card .ant-tabs-content > .ant-tabs-tabpane {
     background: #141414;
 }
 [data-theme='dark'] .admin-card-container > .ant-tabs-card .ant-tabs-tab-active {
     background: #141414;
     border-color: #141414;
+}
+
+.ant-breadcrumb-separator {
+    margin: 0px 4px;
 }

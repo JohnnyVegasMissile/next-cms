@@ -86,7 +86,8 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
             data: {
                 containerId: id,
                 formId: section.formId,
-                type: section.type,
+                type: 'page',
+                block: section.block,
                 elementId: section.elementId,
                 position: section.position,
                 content: section.content,
@@ -104,7 +105,8 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
                 data: {
                     containerContentId: id,
                     formId: section.formId,
-                    type: section.type,
+                    type: 'page',
+                    block: section.block,
                     elementId: section.elementId,
                     position: section.position,
                     content: section.content,

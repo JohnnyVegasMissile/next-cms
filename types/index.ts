@@ -148,6 +148,13 @@ export type PageProps = {
     })[]
 }
 
+export type LayoutProps = {
+    header: FullSectionEdit[]
+    topBody: FullSectionEdit[]
+    bottomBody: FullSectionEdit[]
+    footer: FullSectionEdit[]
+}
+
 // export type AuthResponse = {
 //     title: string,
 //     // detail: 'Successfully validated login credentials',

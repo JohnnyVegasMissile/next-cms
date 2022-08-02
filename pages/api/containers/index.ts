@@ -59,6 +59,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     delete newContainerContent.accesses
 
     const slug: string = get(req, 'body.slugEdit', '').join('/')
+    delete newContainerContent.slugEdit
 
     const container = await prisma.container.create({
         data: {
@@ -70,16 +71,13 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             accesses: {
                 create: accesses.map((access) => ({ roleId: access })),
             },
-            slug: undefined,
-        },
-    })
-
-    await prisma.slug.create({
-        data: {
-            fullSlug: encodeURI(slug),
-            slug: encodeURI(slug),
-            containerId: container.id,
-            published: true,
+            slug: {
+                create: {
+                    fullSlug: encodeURI(slug),
+                    slug: encodeURI(slug),
+                    published: true,
+                },
+            },
         },
     })
 

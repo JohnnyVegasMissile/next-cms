@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Metadata, Section, Prisma, ContainerField } from '@prisma/client'
+import type { Metadata, Section, Prisma, ContainerField, ContentField } from '@prisma/client'
 import get from 'lodash.get'
 import { FullContainerEdit } from '../../../types'
 
@@ -46,7 +46,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     const newContentContent = req.body
 
-    const fields: ContainerField[] = get(req, 'body.fields', [])
+    const fields: ContentField[] = get(req, 'body.fields', [])
     delete newContentContent.fields
     const sections: Section[] = get(req, 'body.sections', [])
     delete newContentContent.sections
@@ -58,6 +58,12 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     const slug: string = get(req, 'body.slug', '')
     const containerId: string = get(req, 'body.containerId', '')
 
+    const parentSlug = await prisma.slug.findUnique({
+        where: {
+            containerId,
+        },
+    })
+
     const content = await prisma.content.create({
         data: {
             ...(newContentContent as Prisma.ContentCreateInput),
@@ -67,16 +73,14 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
             accesses: {
                 create: accesses.map((access) => ({ roleId: access })),
             },
-        },
-        include: { container: { include: { slug: true } } },
-    })
-
-    await prisma.slug.create({
-        data: {
-            fullSlug: `${content.container.slug[0].fullSlug}/${slug}`,
-            slug: slug,
-            containerId,
-            published: true,
+            slug: {
+                create: {
+                    parentId: parentSlug!.id,
+                    fullSlug: `${parentSlug!.slug}/${slug}`,
+                    slug: slug,
+                    published: true,
+                },
+            },
         },
     })
 

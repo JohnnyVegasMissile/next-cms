@@ -72,9 +72,10 @@ const Admin = () => {
             onSuccess: (data: FullContainerEdit) => {
                 const sections = get(data, 'sections', []).sort((a, b) => a.position - b.position)
 
-                const slug = decodeURI(get(data, 'slug', '') || '')
+                const slug = decodeURI(get(data, 'slug.0.slug', '') || '')
+                const slugEdit = slug.split('/')
 
-                setValues({ ...data, sections, slug })
+                setValues({ ...data, sections, slugEdit })
             },
             onError: (err) => router.push('/admin/contents'),
         }

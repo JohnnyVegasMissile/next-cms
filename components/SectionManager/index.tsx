@@ -91,7 +91,7 @@ const SectionManager = ({ values, onChange }: SectionManagerProps) => {
                                     Block:
                                 </Text>
                                 <CustomSelect.ListSections
-                                    section={section.type || undefined}
+                                    section={section.block || undefined}
                                     element={section.elementId || undefined}
                                     onSectionChange={(e) => onHandleChange(`${idx}.type`, e)}
                                     onElementChange={(e) => onHandleChange(`${idx}.elementId`, e)}
@@ -122,9 +122,9 @@ const SectionManager = ({ values, onChange }: SectionManagerProps) => {
                         }
                         style={{ flex: 1 }}
                     >
-                        {!!section.type && (
+                        {!!section.block && (
                             <GetEditComponent
-                                type={section.type}
+                                block={section.block}
                                 defaultValues={section.content}
                                 onChange={(e) => onHandleChange(`sections.${idx}.content`, e)}
                             />

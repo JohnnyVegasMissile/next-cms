@@ -14,13 +14,15 @@ import { PageProps } from '../types'
 // import Link from 'next/link'
 
 const Pages = (props: PageProps) => {
-    const { id, type, title } = props
+    const { id, type, title, appName } = props
     // const { isAuth, user, setRedirect } = useAuth()
 
     return (
         <div>
             <Head>
-                <title>{title}</title>
+                <title>
+                    {appName} | {title}
+                </title>
                 {/* {get(props, 'metadatas', []).map((meta: Metadata) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))}

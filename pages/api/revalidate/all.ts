@@ -1,29 +1,20 @@
+import checkAuth from '@utils/checkAuth'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../utils/prisma'
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
-    const pages = await prisma.page.findMany({
-        include: { articles: true },
-    })
+    const slugs = await prisma.slug.findMany()
 
     try {
         const urls: string[] = []
 
-        for (const page of pages) {
-            const slug = `/${page.slug}`
-
-            await res.unstable_revalidate(slug)
-            urls.push(slug)
-
-            for (const article of page.articles) {
-                const slugArticle = `${slug}/${article.slug}`
-
-                await res.unstable_revalidate(slugArticle)
-                urls.push(slugArticle)
-            }
+        for (const slug of slugs) {
+            const uri = `/${slug.fullSlug}`
+            await res.unstable_revalidate(uri)
+            urls.push(uri)
         }
 
-        return res.json({ revalidated: urls })
+        return res.status(200).json({ revalidated: urls })
     } catch (err) {
         // If there was an error, Next.js will continue
         // to show the last successfully generated page
@@ -36,6 +27,12 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const pages = async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuth = await checkAuth(req.headers)
+
+    if (!isAuth) {
+        return res.status(403).json({ error: 'Forbidden' })
+    }
+
     switch (req.method) {
         case 'POST': {
             return await POST(req, res)

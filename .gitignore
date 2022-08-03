@@ -42,6 +42,8 @@ yarn-error.log*
 
 # public
 /uploads/files/*
-!/uploads/files/.gitkeep 
+!/uploads/files/.gitkeep
 /uploads/images/*
 !/uploads/images/.gitkeep
+/uploads/videos/*
+!/uploads/videos/.gitkeep

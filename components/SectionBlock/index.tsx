@@ -7,7 +7,7 @@ interface Props {
 }
 
 const SectionBlock = ({ section }: Props) => {
-    const Component = get(Blocks, section.block || 'unknow', null)
+    const Component = get(Blocks, section.block || '___', null)
 
     if (!Component) {
         return null

@@ -33,9 +33,14 @@ const { Text } = Typography
 
 function MenuAdmin() {
     const { isAuth, signOut, user } = useAuth()
+    const isDisplayed = isAuth || user?.role === 'super-admin' || user?.role === 'admin'
 
-    const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(['containers', {}], () =>
-        getContainers()
+    const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(
+        ['containers', {}],
+        () => getContainers(),
+        {
+            enabled: isDisplayed,
+        }
     )
 
     const mutation = useMutation(() => revalidateAll(), {
@@ -47,7 +52,7 @@ function MenuAdmin() {
         },
     })
 
-    if (!isAuth || (user?.role !== 'super-admin' && user?.role !== 'admin')) return null
+    if (!isDisplayed) return null
 
     const homeMenu = (
         <Menu

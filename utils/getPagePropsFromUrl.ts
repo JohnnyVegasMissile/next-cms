@@ -25,7 +25,7 @@ const sanitizeAll = <T>(props: T) => {
         updatedAt: sanitizeDate(get(props, 'updatedAt', null)),
     }
 
-    console.log('props out', newProps)
+    // console.log('props out', newProps)
     return newProps as T
 }
 
@@ -67,7 +67,12 @@ const getPagePropsFromUrl = async (slug: string) => {
         },
     })
 
+    const appName = await prisma.setting.findUnique({
+        where: { name: 'app_name' },
+    })
+
     const props = sanitizeAll({
+        appName: appName?.value || '',
         type: !!releatedSlug?.container ? 'container' : 'content',
         ...get(releatedSlug, 'container', {}),
         ...get(releatedSlug, 'content', {}),

@@ -24,8 +24,6 @@ const Install: NextPage = () => {
         /> */}
             </Head>
 
-            <header></header>
-
             <main>
                 <div
                     style={{
@@ -64,8 +62,6 @@ const Install: NextPage = () => {
                     )}
                 </div>
             </main>
-
-            <footer></footer>
         </div>
     )
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, createContext } from 'react'
 // import { useRouter } from 'next/router'
 import type { AuthResponse, ContextUser } from '../types'
-import { signIn as signInRequest } from '../network/auth'
+import { getMe, signIn as signInRequest } from '../network/auth'
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query'
 import { useRouter } from 'next/router'
 
@@ -43,9 +43,24 @@ export const useProvideAuth = (): UseProvideAuthProps => {
     const queryClient = useQueryClient()
 
     useEffect(() => {
-        const user = localStorage.getItem('user')
         const token = localStorage.getItem('token')
-        if (!!user && token) setUser(JSON.parse(user))
+        if (!!token) {
+            getMe()
+                .then((res) => {
+                    setUser({
+                        name: res.user.name || '',
+                        email: res.user.email,
+                        role: res.user.role,
+                        expiresAt: res.expiresAt,
+                    })
+                    setInitializing(false)
+                })
+                .catch(() => {
+                    localStorage.removeItem('token')
+                    setInitializing(false)
+                })
+            return
+        }
 
         setInitializing(false)
     }, [])

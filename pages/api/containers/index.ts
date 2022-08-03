@@ -4,6 +4,8 @@ import get from 'lodash.get'
 import { FullContainerEdit } from '../../../types'
 
 import { prisma } from '../../../utils/prisma'
+import { IncomingHttpHeaders } from 'http'
+import checkAuth from '@utils/checkAuth'
 
 // interface FullPage extends Page {
 //     metadatas?: Metadata[]
@@ -89,6 +91,12 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const containers = async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuth = await checkAuth(req.headers)
+
+    if (!isAuth) {
+        return res.status(403).json({ error: 'Forbidden' })
+    }
+
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

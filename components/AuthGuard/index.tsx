@@ -46,7 +46,7 @@ function AuthGuard({ children, accesses, requireAuth }: Props) {
     }, [setRedirect, initializing, router, user?.role, accesses, requireAuth])
 
     /* show loading indicator while the auth provider is still initializing */
-    if (initializing) {
+    if (initializing && (accesses?.length || requireAuth)) {
         return (
             <div
                 style={{

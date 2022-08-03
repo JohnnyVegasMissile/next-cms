@@ -7,12 +7,14 @@ import get from 'lodash.get'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
 const NotFound = (props: PageProps) => {
-    const { id, title } = props
+    const { id, title, appName } = props
 
     return (
         <div>
             <Head>
-                <title>{title}</title>
+                <title>
+                    {appName} | {title}
+                </title>
                 {/* <title>{title}</title>
                 {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />

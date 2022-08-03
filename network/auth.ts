@@ -2,11 +2,7 @@ import { AuthResponse } from '../types'
 
 import INSTANCE from './api'
 
-export const signUp = (
-    email: string,
-    password: string,
-    name?: string
-): Promise<AuthResponse> =>
+export const signUp = (email: string, password: string, name?: string): Promise<AuthResponse> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',
@@ -30,6 +26,16 @@ export const signIn = (email: string, password: string): Promise<AuthResponse> =
                 email,
                 password,
             },
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const getMe = (): Promise<AuthResponse> =>
+    new Promise(async (resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
+            url: `/api/me`,
         })
             .then(resolve)
             .catch(reject)

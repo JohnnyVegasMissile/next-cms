@@ -1,5 +1,6 @@
 import { ContainerField, Metadata, Prisma, Section } from '@prisma/client'
 import { FullContainerEdit } from '@types'
+import checkAuth from '@utils/checkAuth'
 import get from 'lodash.get'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -96,6 +97,11 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
+    // delete existing sections
+    await prisma.section.deleteMany({
+        where: { containerContentId: id },
+    })
+
     if (newContainerContent.contentHasSections) {
         // create new sections
         const newContentSections: Section[] = get(req, 'body.contentSections', [])
@@ -113,13 +119,13 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
                 },
             })
         }
-
-        // delete existing access
-        await prisma.access.deleteMany({
-            where: { containerId: id },
-        })
     }
     delete newContainerContent.contentSections
+
+    // delete existing access
+    await prisma.access.deleteMany({
+        where: { containerId: id },
+    })
 
     // create new access
     const newAccesses: string[] = get(req, 'body.accesses', [])
@@ -231,6 +237,12 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const pages = async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuth = await checkAuth(req.headers)
+
+    if (!isAuth) {
+        return res.status(403).json({ error: 'Forbidden' })
+    }
+
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

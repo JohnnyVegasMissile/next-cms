@@ -10,9 +10,10 @@ import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 import { PageProps } from '../types'
 import EditPageButton from '@components/EditPageButton'
 import Head from 'next/head'
+import SectionBlock from '@components/SectionBlock'
 
 const SignIn = (props: PageProps) => {
-    const { id, title } = props
+    const { id, title, appName, sections } = props
     // const { isAuth } = useAuth()
     // const router = useRouter()
 
@@ -26,25 +27,27 @@ const SignIn = (props: PageProps) => {
     return (
         <div>
             <Head>
-                <title>{title}</title>
+                <title>
+                    {appName} | {title}
+                </title>
                 {/* {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))} */}
             </Head>
 
             <EditPageButton redirectTo={`/admin/contents/${id}`} />
-            {/* 
-            <header>{!!header && <SectionBlock section={header} page={props} />}</header>
+
+            <header></header>
 
             <main>
                 {(!sections || !sections.length) && <DefaultSignInForm />}
 
                 {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} />
+                    <SectionBlock key={section.id} section={section} />
                 ))}
             </main>
 
-            <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer> */}
+            <footer></footer>
         </div>
     )
 }

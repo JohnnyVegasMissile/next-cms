@@ -8,12 +8,12 @@ import { PageProps } from '../types'
 import { prisma } from '../utils/prisma'
 
 const Home = (props: PageProps) => {
-    const { id, title } = props
+    const { id, title, appName } = props
 
     return (
         <div>
             <Head>
-                <title>{title}</title>
+                <title>{appName}</title>
                 {/* {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))} */}

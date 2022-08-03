@@ -29,7 +29,7 @@ const Admin = () => {
     )
 
     const debouncedRevalidate = useDebounce<string>(settings?.revalidate, 1500)
-    const debouncedAppName = useDebounce<string>(settings?.appName, 1500)
+    const debouncedAppName = useDebounce<string>(settings?.app_name, 1500)
 
     useEffect(() => {
         const update = async () => editSetting('revalidate', settings?.revalidate.toString())
@@ -41,7 +41,7 @@ const Admin = () => {
     useEffect(() => {
         const update = async () => editSetting('app_name', settings?.app_name.toString())
 
-        if (settings?.ap_name) update()
+        if (settings?.app_name) update()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedAppName])
 

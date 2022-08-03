@@ -7,7 +7,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
-        await res.unstable_revalidate(req.body.url)
+        await res.revalidate(req.body.url)
         return res.json({ revalidated: req.body.url })
     } catch (err) {
         // If there was an error, Next.js will continue

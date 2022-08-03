@@ -119,7 +119,7 @@ const columns = [
         render: (e: Content) => (
             <Space>
                 <Button type="primary">
-                    <Link href={`/admin/containers/${e.id}`}>
+                    <Link href={`/admin/contents/${e.id}`}>
                         <a>Edit</a>
                     </Link>
                 </Button>

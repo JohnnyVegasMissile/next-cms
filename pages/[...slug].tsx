@@ -20,9 +20,7 @@ const Pages = (props: PageProps) => {
     return (
         <div>
             <Head>
-                <title>
-                    {appName} | {title}
-                </title>
+                <title>{`${appName} | ${title}`}</title>
                 {/* {get(props, 'metadatas', []).map((meta: Metadata) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))}

@@ -212,5 +212,6 @@ model Slug {
   contentId   String?    @unique
   content     Content?   @relation(fields: [contentId], references: [id])
 
-  published Boolean @default(true)
+  updatedAt DateTime @updatedAt
+  published Boolean  @default(true)
 }

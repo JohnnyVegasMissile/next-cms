@@ -119,14 +119,13 @@ const Admin = () => {
             data.pid === 'create' ? postContainer(data.values) : editContainer(data.pid, data.values),
         {
             onSuccess: (data: any) => {
-                message.success(`Element ${data.title} saved`)
+                message.success(`Containers ${data.title} saved`)
                 queryClient.invalidateQueries('containers')
-                // router.push('/admin/containers')
+                router.push('/admin/containers')
             },
             onError: (err) => {
                 message.error('An error occured, while creating or updating the container')
                 queryClient.invalidateQueries('containers')
-                // router.push('/admin/containers')
             },
         }
     )

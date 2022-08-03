@@ -1,22 +1,21 @@
-import { ContainerField, Metadata, Prisma, Section } from '@prisma/client'
-import { FullContainerEdit } from '@types'
-import checkAuth from '@utils/checkAuth'
 import get from 'lodash.get'
+import checkAuth from '@utils/checkAuth'
+import { FullContainerEdit } from '../../../types'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { ContainerField, Metadata, Prisma, Section } from '@prisma/client'
 
 import { prisma } from '../../../utils/prisma'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const container = await prisma.container.findUnique({
+    const container = await prisma.content.findUnique({
         where: { id },
         include: {
             metadatas: true,
             accesses: true,
             sections: true,
-            contentSections: true,
-            fields: true,
+            fields: { include: { media: true } },
         },
     })
 
@@ -150,7 +149,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
     res.status(200).json(container)
 
-    return res.unstable_revalidate('') //`/${page.slug}`)
+    return res.revalidate('') //`/${page.slug}`)
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

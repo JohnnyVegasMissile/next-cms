@@ -14,6 +14,7 @@ import MediaModal from '@components/MediaModal'
 import SectionManager from '@components/SectionManager'
 import set from 'lodash.set'
 import AccessCheckboxes from '@components/AccessCheckboxes'
+import moment from 'moment'
 
 const { Text } = Typography
 
@@ -72,6 +73,12 @@ const Admin = () => {
             onSuccess: (data: FullContainerEdit) => {
                 const sections = get(data, 'sections', []).sort((a, b) => a.position - b.position)
 
+                const fields = get(data, 'fields', []).map((field) => ({
+                    ...field,
+                    mediaId: get(field, 'media.id', null),
+                    media: undefined,
+                }))
+
                 const slug = decodeURI(get(data, 'slug.0.slug', '') || '')
                 const slugEdit = slug.split('/')
 
@@ -101,7 +108,7 @@ const Admin = () => {
                             textValue: value.textValue || undefined,
                             numberValue: !!value.numberValue || value.numberValue === 0 ? value.numberValue : undefined,
                             boolValue: value.boolValue || undefined,
-                            dateValue: value.dateValue || undefined,
+                            dateValue: moment(value.dateValue) || undefined,
                         }
 
                         set(fieldsValue, field.name, newValue)
@@ -375,8 +382,8 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                     {field.label} ({field.type})
                                 </Text>
                                 <MediaModal
-                                    value={get(values, `${field.name}.mediaId`, '')}
-                                    onMediaSelected={(e) => onHandleChange(field.name, field.type, e?.id)}
+                                    value={get(values, `${field.name}.media`, '')}
+                                    onMediaSelected={(e) => onHandleChange(field.name, field.type, e)}
                                 />
                             </Space>
                         )

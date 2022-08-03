@@ -162,7 +162,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     if (container.slug[0].fullSlug === newSlug) {
         res.status(200).json(container)
 
-        return res.unstable_revalidate(`/${container.slug[0].fullSlug}`)
+        return res.revalidate(`/${container.slug[0].fullSlug}`)
     }
 
     const slugs = await prisma.slug.findUnique({
@@ -178,7 +178,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         },
     })
 
-    await res.unstable_revalidate(`/${newSlug}`)
+    await res.revalidate(`/${newSlug}`)
 
     for (const child of slugs!.childs) {
         const fullSlug = `${newSlug}/${child.slug}`
@@ -188,7 +188,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
             data: { fullSlug },
         })
 
-        await res.unstable_revalidate(`/${fullSlug}`)
+        await res.revalidate(`/${fullSlug}`)
     }
 
     res.status(200).json(container)

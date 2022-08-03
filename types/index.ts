@@ -123,6 +123,10 @@ export type FullContent = Content & {
     fields?: ContentField | null
 }
 
+export type FullContentField = ContentField & {
+    media: Media | null
+}
+
 export type AuthResponse = {
     token: string
     expiresAt: Date

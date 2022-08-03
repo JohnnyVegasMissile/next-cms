@@ -1,9 +1,9 @@
-import { Content } from '@prisma/client'
+import { Content, ContentField } from '@prisma/client'
 import get from 'lodash.get'
 import moment from 'moment'
 import { prisma } from '../utils/prisma'
 
-const sanitizeDate = (date: Date | string) => (!!date ? moment(date).valueOf() : undefined)
+const sanitizeDate = (date: Date | string | undefined | null) => (!!date ? moment(date).valueOf() : null)
 
 const sanitizeAll = <T>(props: T) => {
     // console.log('props in', props)
@@ -17,15 +17,20 @@ const sanitizeAll = <T>(props: T) => {
         container: get(props, 'container', null)
             ? {
                   ...get(props, 'container', {}),
-                  updatedAt: sanitizeDate(get(props, 'container.updatedAt', null)),
+                  updatedAt: sanitizeDate(get(props, 'container.updatedAt')),
 
                   contentSections: null,
               }
             : null,
-        updatedAt: sanitizeDate(get(props, 'updatedAt', null)),
+        fields:
+            get(props, 'fields', null)?.map((field: ContentField) => ({
+                ...field,
+                dateValue: sanitizeDate(get(field, 'dateValue')),
+            })) || null,
+        updatedAt: sanitizeDate(get(props, 'updatedAt')),
     }
 
-    // console.log('props out', newProps)
+    console.log('props out', newProps)
     return newProps as T
 }
 

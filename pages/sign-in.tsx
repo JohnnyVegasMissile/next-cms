@@ -27,9 +27,7 @@ const SignIn = (props: PageProps) => {
     return (
         <div>
             <Head>
-                <title>
-                    {appName} | {title}
-                </title>
+                <title>{`${appName} | ${title}`}</title>
                 {/* {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))} */}

@@ -1,4 +1,5 @@
 import checkAuth from '@utils/checkAuth'
+import { includes } from 'lodash'
 import type { NextApiRequest, NextApiResponse } from 'next'
 // import type { Page, Metadata, Section, Article } from '@prisma/client'
 // import get from 'lodash.get'
@@ -27,56 +28,96 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
     res.status(200).json(element)
 
-    const URIs = new Set<string>()
+    // const sections = prisma.section.findMany({
+    //     where: { elementId: element.id },
+    //     include: {
+    //         container: { include: { slug: true } },
+    //         con
+    //         // content: { include: { slug: true } }
+    //     },
+    // })
 
-    const pagesReval = await prisma.page.findMany({
+    const slugs = await prisma.slug.findMany({
         where: {
             OR: [
-                { headerId: id },
-                { footerId: id },
                 {
-                    sections: {
-                        some: {
-                            elementId: id,
+                    container: {
+                        sections: {
+                            some: {
+                                elementId: id,
+                            },
+                        },
+                    },
+                },
+                {
+                    content: {
+                        sections: {
+                            some: {
+                                elementId: id,
+                            },
                         },
                     },
                 },
             ],
-            published: true,
         },
-        include: { articles: true },
     })
 
-    for (const page of pagesReval) {
-        const slug = `/${page.slug}`
-        URIs.add(slug)
+    // for (const slug of slugs) {
+    //     await res.revalidate(`/${slug.fullSlug}`)
+    // }
 
-        for (const article of page.articles) {
-            const slugArticle = `${slug}/${article.slug}`
+    return await slugs.forEach((slug) => res.revalidate(`/${slug.fullSlug}`))
 
-            await res.unstable_revalidate(slugArticle)
-            URIs.add(slugArticle)
-        }
-    }
+    // const URIs = new Set<string>()
 
-    const sectionsReval = await prisma.section.findMany({
-        where: {
-            elementId: id,
-        },
-        include: { page: true, article: { include: { page: true } } },
-    })
+    // const pagesReval = await prisma.page.findMany({
+    //     where: {
+    //         OR: [
+    //             { headerId: id },
+    //             { footerId: id },
+    //             {
+    //                 sections: {
+    //                     some: {
+    //                         elementId: id,
+    //                     },
+    //                 },
+    //             },
+    //         ],
+    //         published: true,
+    //     },
+    //     include: { articles: true },
+    // })
 
-    for (const section of sectionsReval) {
-        if (!!section.page) {
-            const slug = `/${section.page?.slug}`
-            URIs.add(slug)
-        } else if (!!section.article) {
-            const slug = `/${section.article?.page.slug}/${section.article?.slug}`
-            URIs.add(slug)
-        }
-    }
+    // for (const page of pagesReval) {
+    //     const slug = `/${page.slug}`
+    //     URIs.add(slug)
 
-    await URIs.forEach((uri) => res.unstable_revalidate(uri))
+    //     for (const article of page.articles) {
+    //         const slugArticle = `${slug}/${article.slug}`
+
+    //         await res.revalidate(slugArticle)
+    //         URIs.add(slugArticle)
+    //     }
+    // }
+
+    // const sectionsReval = await prisma.section.findMany({
+    //     where: {
+    //         elementId: id,
+    //     },
+    //     include: { page: true, article: { include: { page: true } } },
+    // })
+
+    // for (const section of sectionsReval) {
+    //     if (!!section.page) {
+    //         const slug = `/${section.page?.slug}`
+    //         URIs.add(slug)
+    //     } else if (!!section.article) {
+    //         const slug = `/${section.article?.page.slug}/${section.article?.slug}`
+    //         URIs.add(slug)
+    //     }
+    // }
+
+    // await URIs.forEach((uri) => res.revalidate(uri))
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

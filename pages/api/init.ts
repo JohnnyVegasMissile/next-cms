@@ -4,6 +4,7 @@ import type { Login, Role } from '@prisma/client'
 
 import { prisma } from '../../utils/prisma'
 import get from 'lodash.get'
+import checkAuth from '@utils/checkAuth'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const defaultContainer = await prisma.container.findUnique({
@@ -184,6 +185,12 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const init = async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuth = await checkAuth(req.headers)
+
+    if (!isAuth) {
+        return res.status(403).json({ error: 'Forbidden' })
+    }
+
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

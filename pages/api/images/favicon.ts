@@ -4,6 +4,7 @@ import { IncomingForm } from 'formidable'
 import mv from 'mv'
 import get from 'lodash.get'
 import mime from 'mime-types'
+import checkAuth from '@utils/checkAuth'
 
 export const config = {
     api: {
@@ -17,9 +18,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     await form.parse(req, (err, fields, files) => {
         if (err) return res.status(500).json({ error: 'err' })
 
-        const file: File | undefined | any = Array.isArray(files.file)
-            ? get(files, 'file.0', undefined)
-            : files.file
+        const file: File | undefined | any = Array.isArray(files.file) ? get(files, 'file.0', undefined) : files.file
 
         if (!file) return res.status(400).json({ error: 'No file' })
 
@@ -43,6 +42,12 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const upload = async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuth = await checkAuth(req.headers)
+
+    if (!isAuth) {
+        return res.status(403).json({ error: 'Forbidden' })
+    }
+
     switch (req.method) {
         case 'POST': {
             return await POST(req, res)

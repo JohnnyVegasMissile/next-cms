@@ -1,3 +1,4 @@
+import checkAuth from '@utils/checkAuth'
 import type { NextApiRequest, NextApiResponse } from 'next'
 // import type { Page, Metadata, Section, Article } from '@prisma/client'
 // import get from 'lodash.get'
@@ -40,6 +41,12 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const pages = async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuth = await checkAuth(req.headers)
+
+    if (!isAuth) {
+        return res.status(403).json({ error: 'Forbidden' })
+    }
+
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

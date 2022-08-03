@@ -9,6 +9,7 @@ import type { Media } from '@prisma/client'
 
 import { makeId } from '../../../utils'
 import { prisma } from '../../../utils/prisma'
+import checkAuth from '@utils/checkAuth'
 
 const mimeTypesImages = [
     'image/jpeg',
@@ -39,9 +40,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     await form.parse(req, async (err, fields, files) => {
         if (err) return res.status(500).json({ error: 'err' })
 
-        const file: Media | undefined | any = Array.isArray(files.file)
-            ? get(files, 'file.0', undefined)
-            : files.file
+        const file: Media | undefined | any = Array.isArray(files.file) ? get(files, 'file.0', undefined) : files.file
 
         if (!file) return res.status(400).json({ error: 'No file' })
 
@@ -77,6 +76,12 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const upload = async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuth = await checkAuth(req.headers)
+
+    if (!isAuth) {
+        return res.status(403).json({ error: 'Forbidden' })
+    }
+
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

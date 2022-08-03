@@ -3,6 +3,7 @@ import type { Media } from '@prisma/client'
 import { promises as fs } from 'fs'
 
 import { prisma } from '../../../utils/prisma'
+import checkAuth from '@utils/checkAuth'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
@@ -50,6 +51,12 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const pages = async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuth = await checkAuth(req.headers)
+
+    if (!isAuth) {
+        return res.status(403).json({ error: 'Forbidden' })
+    }
+
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

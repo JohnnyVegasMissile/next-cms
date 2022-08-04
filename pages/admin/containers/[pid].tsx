@@ -445,6 +445,17 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
         onChange(newValue)
     }
 
+    const canMeta = (type: string) => {
+        return (
+            type === 'string' ||
+            type === 'text' ||
+            type === 'int' ||
+            type === 'boolean' ||
+            type === 'date' ||
+            type === 'link'
+        )
+    }
+
     return (
         <Card title="Fields">
             <Space direction="vertical">
@@ -476,7 +487,12 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
                                 id={`field-type-${idx}`}
                                 style={{ width: 240 }}
                                 value={field.type}
-                                onChange={(e) => modifyField(idx, 'type', e)}
+                                onChange={(e) => {
+                                    modifyField(idx, 'type', e)
+                                    if (!canMeta(e)) {
+                                        modifyField(idx, 'metadata', undefined)
+                                    }
+                                }}
                             >
                                 <Select.Option value="string">Text</Select.Option>
                                 <Select.Option value="text">Paragraph</Select.Option>
@@ -518,6 +534,7 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
                             <Text>Metadata</Text>
                             <Select
                                 allowClear
+                                disabled={!canMeta(field.type)}
                                 id={`meta-name-${idx}`}
                                 style={{ width: 240 }}
                                 value={field.metadata}

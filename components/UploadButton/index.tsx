@@ -1,17 +1,18 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { Media } from '@prisma/client'
 import { Button, Space, Typography } from 'antd'
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons'
 
-import { uploadImage, uploadFavicon } from '../../network/images'
+import { uploadMedia, uploadFavicon } from '../../network/medias'
 
 interface Props {
     value?: Media
     onDeleteValue?(): void
     onFileRecieved(file: Media): void
+    type?: 'images' | 'videos' | 'files'
 }
 
-const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
+const UploadButton = ({ value, onDeleteValue, onFileRecieved, type = 'images' }: Props) => {
     const [loading, setLoading] = useState(false)
     // const [value, setValue] = useState<File | null>(null)
 
@@ -23,7 +24,7 @@ const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
         //     return
         // }
 
-        const res: Media = await uploadImage(file)
+        const res: Media = await uploadMedia(file)
 
         setLoading(false)
 
@@ -32,12 +33,7 @@ const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
 
     return (
         <Space>
-            <Button
-                type="primary"
-                icon={<UploadOutlined />}
-                style={{ position: 'relative' }}
-                loading={loading}
-            >
+            <Button type="primary" icon={<UploadOutlined />} style={{ position: 'relative' }} loading={loading}>
                 Upload
                 <input
                     style={{
@@ -55,12 +51,9 @@ const UploadButton = ({ value, onDeleteValue, onFileRecieved }: Props) => {
                     }}
                     type="file"
                     name="file"
-                    accept=".jpg,.jpeg,.png"
+                    // accept="image/*"
+                    // accept=".pdf,.xlsx,.xls,.csv,.doc,.docx|video/*|image/*"
                     onChange={handleFiles}
-                    // onChange={(e) => {
-                    //     toggleModal()
-                    //     handleFiles(e)
-                    // }}
                     onClick={(event: any) => {
                         event.target.value = null
                     }}
@@ -94,12 +87,7 @@ const Favicon = () => {
 
     return (
         <Space>
-            <Button
-                type="primary"
-                icon={<UploadOutlined />}
-                style={{ position: 'relative' }}
-                loading={loading}
-            >
+            <Button type="primary" icon={<UploadOutlined />} style={{ position: 'relative' }} loading={loading}>
                 Upload
                 <input
                     style={{

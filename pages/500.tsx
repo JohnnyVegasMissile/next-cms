@@ -12,6 +12,7 @@ const NotFound = (props: PageProps) => {
     return (
         <div>
             <Head>
+                <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{`${appName} | ${title}`}</title>
                 {/* <title>{title}</title>
                 {metadatas?.map((meta) => (

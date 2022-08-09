@@ -7,7 +7,7 @@ import { getContainerDetails } from '../../../network/containers'
 import { Prisma, Content, ContainerField, ContentField } from '@prisma/client'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import Head from 'next/head'
-import { FullContainerEdit, FullSectionEdit } from '@types'
+import { FullContainerEdit, FullContentField, FullSectionEdit } from '@types'
 import CustomSelect from '@components/CustomSelect'
 import LinkInput from '@components/LinkInput'
 import MediaModal from '@components/MediaModal'
@@ -56,12 +56,14 @@ const Admin = () => {
             const fields = Object.keys(values.fieldsValue).map((key: string) => ({
                 name: key,
                 ...values.fieldsValue[key],
+                mediaId: get(values, `fieldsValue.${key}.media.id`, null),
+                media: undefined,
             }))
-            delete values.fieldsValue
+            // delete values.fieldsValue
 
             const slug = encodeURI(get(values, 'slug', ''))
 
-            mutation.mutate({ pid: pid as string, values: { ...values, fields, slug } })
+            mutation.mutate({ pid: pid as string, values: { ...values, fields, slug, fieldsValue: undefined } })
         },
     })
 
@@ -73,16 +75,9 @@ const Admin = () => {
             onSuccess: (data: FullContainerEdit) => {
                 const sections = get(data, 'sections', []).sort((a, b) => a.position - b.position)
 
-                const fields = get(data, 'fields', []).map((field) => ({
-                    ...field,
-                    mediaId: get(field, 'media.id', null),
-                    media: undefined,
-                }))
-
                 const slug = decodeURI(get(data, 'slug.0.slug', '') || '')
-                const slugEdit = slug.split('/')
 
-                setValues({ ...data, sections, slugEdit })
+                setValues({ ...data, sections, slug })
             },
             onError: (err) => router.push('/admin/contents'),
         }
@@ -97,14 +92,15 @@ const Admin = () => {
                 let fieldsValue = {}
 
                 for (const field of get(data, 'fields', [])) {
-                    const value: ContentField | undefined = get(content, 'data.fields', []).find(
-                        (e: ContentField) => e.name === field.name
+                    const value: FullContentField | undefined = get(content, 'data.fields', []).find(
+                        (e: FullContentField) => e.name === field.name
                     )
 
                     if (!!value) {
                         const newValue = {
                             type: value.type,
                             mediaId: value.mediaId || undefined,
+                            media: value.media || undefined,
                             textValue: value.textValue || undefined,
                             numberValue: !!value.numberValue || value.numberValue === 0 ? value.numberValue : undefined,
                             boolValue: value.boolValue || undefined,
@@ -273,7 +269,6 @@ interface ContentFieldsManagerProps {
 }
 
 const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManagerProps) => {
-    console.log('val', values)
     const onHandleChange = (name: string, type: string, value: any) => {
         const newValue = { ...values }
         let field = 'textValue'
@@ -295,7 +290,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                 break
             case 'image':
             case 'file':
-                field = 'mediaId'
+                field = 'media'
                 break
         }
 
@@ -303,6 +298,8 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
 
         onChange(newValue)
     }
+
+    console.log(values)
 
     return (
         <Space direction="vertical">
@@ -342,7 +339,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                 </Text>
                                 <InputNumber
                                     style={{ width: 480 }}
-                                    value={get(values, `${field.name}.intValue`, undefined)}
+                                    value={get(values, `${field.name}.numberValue`, undefined)}
                                     onChange={(e) => onHandleChange(field.name, field.type, e)}
                                 />
                             </Space>

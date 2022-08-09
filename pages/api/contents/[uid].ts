@@ -2,7 +2,7 @@ import get from 'lodash.get'
 import checkAuth from '@utils/checkAuth'
 import { FullContainerEdit } from '../../../types'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ContainerField, Metadata, Prisma, Section } from '@prisma/client'
+import { ContainerField, ContentField, Metadata, Prisma, Section } from '@prisma/client'
 
 import { prisma } from '../../../utils/prisma'
 
@@ -15,6 +15,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             metadatas: true,
             accesses: true,
             sections: true,
+            slug: true,
             fields: { include: { media: true } },
         },
     })
@@ -29,43 +30,47 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
 
-    const newContainerContent: FullContainerEdit = req.body
+    const newContentContent: FullContainerEdit = req.body
 
     // delete existing fields
-    await prisma.containerField.deleteMany({
-        where: { containerId: id },
+    await prisma.contentField.deleteMany({
+        where: { contentId: id },
     })
 
     // put the fields separately
-    const newFields: ContainerField[] = get(req, 'body.fields', [])
-    delete newContainerContent.fields
+    const newFields: ContentField[] = get(req, 'body.fields', [])
+    delete newContentContent.fields
 
     for (const field of newFields) {
-        await prisma.containerField.create({
+        await prisma.contentField.create({
             data: {
-                containerId: id,
-                label: field.label,
+                contentId: id,
+
                 name: field.name,
                 type: field.type,
-                metadata: field.metadata,
-                required: field.required,
+
+                mediaId: field.mediaId,
+                textValue: field.textValue,
+                numberValue: field.numberValue,
+                boolValue: field.boolValue,
+                dateValue: field.dateValue,
             },
         })
     }
 
     // delete existing metadatas
     await prisma.metadata.deleteMany({
-        where: { containerId: id },
+        where: { contentId: id },
     })
 
     // put the metadatas separately
     const newMetadatas: Metadata[] = get(req, 'body.metadatas', [])
-    delete newContainerContent.metadatas
+    delete newContentContent.metadatas
 
     for (const metadata of newMetadatas) {
         await prisma.metadata.create({
             data: {
-                containerId: id,
+                contentId: id,
                 name: metadata.name,
                 content: metadata.content,
             },
@@ -74,17 +79,17 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // delete existing sections
     await prisma.section.deleteMany({
-        where: { containerId: id },
+        where: { contentId: id },
     })
 
     // create new sections
     const newSections: Section[] = get(req, 'body.sections', [])
-    delete newContainerContent.sections
+    delete newContentContent.sections
 
     for (const section of newSections) {
         await prisma.section.create({
             data: {
-                containerId: id,
+                contentId: id,
                 formId: section.formId,
                 type: 'page',
                 block: section.block,
@@ -95,61 +100,45 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
-    if (newContainerContent.contentHasSections) {
-        // create new sections
-        const newContentSections: Section[] = get(req, 'body.contentSections', [])
-        delete newContainerContent.contentSections
-
-        for (const section of newContentSections) {
-            await prisma.section.create({
-                data: {
-                    containerContentId: id,
-                    formId: section.formId,
-                    type: 'page',
-                    block: section.block,
-                    elementId: section.elementId,
-                    position: section.position,
-                    content: section.content,
-                },
-            })
-        }
-
-        // delete existing access
-        await prisma.access.deleteMany({
-            where: { containerId: id },
-        })
-    }
+    const newSlug = encodeURI(get(newContentContent, 'slug', '') as string)
+    delete newContentContent.slug
 
     // create new access
     const newAccesses: string[] = get(req, 'body.accesses', [])
-    delete newContainerContent.accesses
+    delete newContentContent.accesses
 
     for (const roleId of newAccesses) {
         await prisma.access.create({
             data: {
-                containerId: id,
+                contentId: id,
                 roleId,
             },
         })
     }
 
     // update the page
-    const container = await prisma.container.update({
+    const content = await prisma.content.update({
         where: { id },
-        data: newContainerContent as Prisma.ContainerCreateInput,
+        data: newContentContent,
         include: {
             metadatas: true,
             accesses: true,
             sections: true,
-            contentSections: true,
             fields: true,
-            contents: true,
+            slug: { include: { parent: true } },
         },
     })
 
-    res.status(200).json(container)
+    if (content.slug[0].slug !== newSlug) {
+        await prisma.slug.update({
+            where: { id: content.slug[0].id || '' },
+            data: { fullSlug: `${content.slug[0].parent?.fullSlug}/${newSlug}`, slug: newSlug },
+        })
+    }
 
-    return res.revalidate('') //`/${page.slug}`)
+    res.status(200).json(content)
+
+    return res.revalidate(`/${content.slug[0].fullSlug}`) //`/${page.slug}`)
 }
 
 const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {

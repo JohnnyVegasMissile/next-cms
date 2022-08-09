@@ -21,6 +21,9 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             contents: true,
             slug: true,
         },
+        orderBy: {
+            updatedAt: 'desc',
+        },
     }
 
     if (!!q) {

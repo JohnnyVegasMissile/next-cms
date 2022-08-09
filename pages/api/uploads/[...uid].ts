@@ -5,9 +5,14 @@ import mime from 'mime-types'
 import checkAuth from '@utils/checkAuth'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = req.query.uid as string
     try {
-        const file = await fs.readFile(`./uploads/images/${id}`)
+        const [folder, id] = req.query.uid as string[]
+
+        if (!folder || !id) {
+            throw new Error('Invalid uid')
+        }
+
+        const file = await fs.readFile(`./uploads/${folder}/${id}`)
 
         const ext = id.split('.')[1]
 
@@ -23,12 +28,6 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const uploads = async (req: NextApiRequest, res: NextApiResponse) => {
-    const isAuth = await checkAuth(req.headers)
-
-    if (!isAuth) {
-        return res.status(403).json({ error: 'Forbidden' })
-    }
-
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

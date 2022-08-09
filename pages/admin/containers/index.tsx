@@ -105,6 +105,13 @@ const columns = [
         render: (e: Date) => moment(e).fromNow(),
     },
     {
+        title: 'Last updated',
+        dataIndex: 'published',
+        render: (published: boolean) => (
+            <Badge status={published ? 'success' : 'error'} text={published ? 'Published' : 'Not published'} />
+        ),
+    },
+    {
         width: 155,
         render: (e: Element) => (
             <Space>

@@ -13,6 +13,11 @@ const sanitizeAll = <T>(props: T) => {
             get(props, 'contents', null)?.map((content: Content) => ({
                 ...content,
                 updatedAt: sanitizeDate(content.updatedAt),
+                fields: get(content, 'fields', [])?.map((field: ContentField) => ({
+                    ...field,
+                    dateValue: sanitizeDate(get(field, 'dateValue')),
+                    media: { ...get(field, 'media', {}), uploadTime: sanitizeDate(get(field, 'media.uploadTime')) },
+                })),
             })) || null,
         container: get(props, 'container', null)
             ? {
@@ -26,6 +31,7 @@ const sanitizeAll = <T>(props: T) => {
             get(props, 'fields', null)?.map((field: ContentField) => ({
                 ...field,
                 dateValue: sanitizeDate(get(field, 'dateValue')),
+                media: { ...get(field, 'media', {}), uploadTime: sanitizeDate(get(field, 'media.uploadTime')) },
             })) || null,
         updatedAt: sanitizeDate(get(props, 'updatedAt')),
     }
@@ -50,6 +56,7 @@ const getPagePropsFromUrl = async (slug: string) => {
                             fields: {
                                 include: { media: true },
                             },
+                            slug: true,
                         },
                     },
                 },
@@ -59,7 +66,7 @@ const getPagePropsFromUrl = async (slug: string) => {
                     metadatas: true,
                     accesses: true,
                     sections: { include: { form: true } },
-                    fields: true,
+                    fields: { include: { media: true } },
                     container: {
                         include: {
                             contentSections: {

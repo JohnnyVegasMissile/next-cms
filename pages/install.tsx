@@ -17,6 +17,7 @@ const Install: NextPage = () => {
     return (
         <div>
             <Head>
+                <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>Install</title>
                 {/* <meta
             name="description"

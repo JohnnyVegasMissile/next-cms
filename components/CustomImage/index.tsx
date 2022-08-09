@@ -2,8 +2,8 @@
 import type { Media } from '@prisma/client'
 
 interface Props {
-    img?: Media
-    className: string
+    img?: Media | null
+    className?: string
     children?: React.ReactNode
 }
 
@@ -30,7 +30,7 @@ const CustomImage = ({ img, className }: Props) => {
 }
 
 const Background = ({ img, className, children }: Props) => {
-    const imageURL = `/api/uploads/${img?.uri}`
+    const imageURL = `/api/uploads/images/${img?.uri}`
 
     return (
         <>

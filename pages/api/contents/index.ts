@@ -15,7 +15,13 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const container = req.query.container as string | undefined
     const q = req.query.q as string | undefined
 
-    let search: any = { where: {}, include: { container: true, slug: true } }
+    let search: any = {
+        where: {},
+        include: { container: true, slug: true },
+        orderBy: {
+            updatedAt: 'desc',
+        },
+    }
 
     if (!!container) {
         search.where.containerId = container

@@ -13,6 +13,7 @@ const Home = (props: PageProps) => {
     return (
         <div>
             <Head>
+                <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{appName}</title>
                 {/* {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />

@@ -143,10 +143,14 @@ export type PageProps = {
     title: string
     accesses: Access[]
     metadatas: Metadata[]
+    fields: (ContentField & {
+        media: Media | null
+    })[]
     sections: (Section & {
         form: Form | null
     })[]
-    contents: (Content & {
+    contents?: (Content & {
+        slug: Slug[] | null
         fields: (ContentField & {
             media: Media | null
         })[]

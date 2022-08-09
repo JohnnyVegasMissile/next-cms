@@ -303,11 +303,11 @@ function MenuAdmin() {
                     </Dropdown>
                     <Divider type="vertical" />
 
-                    <Link href="/admin/images">
+                    <Link href="/admin/medias">
                         <a>
                             <Text>
                                 <PictureOutlined style={{ marginRight: 4 }} />
-                                Images
+                                Medias
                             </Text>
                         </a>
                     </Link>

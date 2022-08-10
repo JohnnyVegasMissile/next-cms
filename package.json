@@ -4,8 +4,9 @@
     "private": true,
     "scripts": {
         "dev": "next dev -p 8080",
+        "prebuild": "prisma migrate dev --skip-seed --skip-generate",
+        "build": "next build",
         "postbuild": "next-sitemap",
-        "build": "prisma migrate dev --skip-seed --skip-generate; next build",
         "start": "next start -p 80",
         "lint": "next lint",
         "initdb": "prisma migrate dev",

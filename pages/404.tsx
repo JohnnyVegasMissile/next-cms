@@ -5,8 +5,11 @@ import EditPageButton from '../components/EditPageButton'
 import { PageProps } from 'types'
 // import get from 'lodash.get'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
+import MissingInstall from '@components/MissingInstall'
 
 const NotFound = (props: PageProps) => {
+    if (props.missingInstall) return <MissingInstall />
+
     const { id, title, appName } = props
 
     return (

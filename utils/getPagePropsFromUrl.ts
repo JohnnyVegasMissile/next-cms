@@ -48,12 +48,22 @@ const sanitizeAll = <T>(props: T) => {
         updatedAt: sanitizeDate(get(props, 'updatedAt')),
     }
 
-    // console.log('props out', newProps)
+    console.log('props out', newProps)
     return newProps as T
 }
 
 const getPagePropsFromUrl = async (slug: string) => {
     const notFound = { notFound: true }
+    const installed = await prisma.setting.findUnique({
+        where: { name: 'installed' },
+    })
+
+    if (installed?.value !== 'true') {
+        return {
+            props: { missingInstall: true },
+            revalidate: 60,
+        }
+    }
 
     const releatedSlug = await prisma.slug.findUnique({
         where: { fullSlug: slug },

@@ -137,6 +137,7 @@ export type AuthResponse = {
 }
 
 export type PageProps = {
+    missingInstall?: boolean
     id: string
     appName: string
     type: 'container' | 'content'

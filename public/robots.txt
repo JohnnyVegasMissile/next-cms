@@ -3,8 +3,8 @@ User-agent: *
 Allow: /
 
 # Host
-Host: http://localhost:80
+Host: https://next-cms-production.up.railway.app/
 
 # Sitemaps
-Sitemap: http://localhost:80/sitemap.xml
-Sitemap: http://localhost:80/server-sitemap-index.xml
+Sitemap: https://next-cms-production.up.railway.app/sitemap.xml
+Sitemap: https://next-cms-production.up.railway.app//server-sitemap-index.xml

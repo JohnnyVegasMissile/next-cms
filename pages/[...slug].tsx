@@ -13,10 +13,13 @@ import { FullContentField, PageProps } from '../types'
 import Link from 'next/link'
 import moment from 'moment'
 import CustomImage from '@components/CustomImage'
+import MissingInstall from '@components/MissingInstall'
 // import { FormattedMessage, useIntl } from 'react-intl'
 // import Link from 'next/link'
 
 const Pages = (props: PageProps) => {
+    if (props.missingInstall) return <MissingInstall />
+
     const { id, type, title, appName, contents, fields } = props
     // const { isAuth, user, setRedirect } = useAuth()
 

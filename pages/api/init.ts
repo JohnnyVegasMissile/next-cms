@@ -185,12 +185,6 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const init = async (req: NextApiRequest, res: NextApiResponse) => {
-    const isAuth = await checkAuth(req.headers)
-
-    if (!isAuth) {
-        return res.status(403).json({ error: 'Forbidden' })
-    }
-
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

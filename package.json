@@ -7,7 +7,7 @@
         "prebuild": "prisma migrate dev --skip-seed --skip-generate",
         "build": "next build",
         "postbuild": "next-sitemap",
-        "start": "next start",
+        "start": "next start -p ${PORT}",
         "lint": "next lint",
         "initdb": "prisma migrate dev",
         "studio": "prisma studio",

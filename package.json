@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "next dev -p 8080",
         "postbuild": "next-sitemap",
-        "build": "next build",
+        "build": "prisma migrate dev --skip-seed --skip-generate; next build",
         "start": "next start -p 80",
         "lint": "next lint",
         "initdb": "prisma migrate dev",

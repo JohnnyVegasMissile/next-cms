@@ -4,7 +4,6 @@ import type { Login, Role } from '@prisma/client'
 
 import { prisma } from '../../utils/prisma'
 import get from 'lodash.get'
-import checkAuth from '@utils/checkAuth'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const defaultContainer = await prisma.container.findUnique({

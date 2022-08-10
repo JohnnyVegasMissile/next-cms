@@ -4,7 +4,6 @@ import get from 'lodash.get'
 import { FullContainerEdit } from '../../../types'
 
 import { prisma } from '../../../utils/prisma'
-import { IncomingHttpHeaders } from 'http'
 import checkAuth from '@utils/checkAuth'
 
 // interface FullPage extends Page {

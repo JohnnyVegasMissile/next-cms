@@ -6,13 +6,12 @@ import get from 'lodash.get'
 import trim from 'lodash.trim'
 import { PlusOutlined } from '@ant-design/icons'
 import { useQuery, UseQueryResult } from 'react-query'
-import type { Container, Content, Element, Slug } from '@prisma/client'
+import type { Container, Content, Slug } from '@prisma/client'
 import { Space, Button, Table, Popconfirm, Input, Breadcrumb, Badge } from 'antd'
 
 import useDebounce from '../../../hooks/useDebounce'
 import { deleteContent, getContents } from '../../../network/contents'
 import CustomSelect from '@components/CustomSelect'
-import { FullContent } from '@types'
 
 const AdminElements = () => {
     const [q, setQ] = useState<string | undefined>()

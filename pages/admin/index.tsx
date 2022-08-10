@@ -1,19 +1,15 @@
 import UploadButton from '../../components/UploadButton'
 import { Space, Avatar, InputNumber, Input } from 'antd'
 import { useQuery /*, UseQueryResult*/ } from 'react-query'
-import { Media, Setting } from '@prisma/client'
+import { Setting } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { getSettings, editSetting } from '../../network/settings'
 import get from 'lodash.get'
 import useDebounce from '../../hooks/useDebounce'
-import MediaModal from '../../components/MediaModal'
-import LinkInput from '@components/LinkInput'
 import Head from 'next/head'
 
 const Admin = () => {
     const [settings, setSettings] = useState<any>()
-    const [values, setValues] = useState('')
-    const [picture, setPicture] = useState<Media | undefined>()
     /*const setting: UseQueryResult<Setting[], Error> =*/ useQuery<Setting[], Error>(
         ['settings'],
         () => getSettings(),

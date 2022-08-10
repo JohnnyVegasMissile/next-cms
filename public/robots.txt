@@ -3,8 +3,8 @@ User-agent: *
 Allow: /
 
 # Host
-Host: http://localhost:8080
+Host: http://localhost:80
 
 # Sitemaps
-Sitemap: http://localhost:8080/sitemap.xml
-Sitemap: http://localhost:8080/server-sitemap-index.xml
+Sitemap: http://localhost:80/sitemap.xml
+Sitemap: http://localhost:80/server-sitemap-index.xml

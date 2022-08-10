@@ -2,10 +2,10 @@ import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 // import Router, { useRouter } from 'next/router'
 // import { PrismaClient } from '@prisma/client'
-import type { Content, Metadata } from '@prisma/client'
+// import type { Content, Metadata } from '@prisma/client'
 // import { useEffect } from 'react'
 import { prisma } from '../utils/prisma'
-import SectionBlock from '../components/SectionBlock'
+// import SectionBlock from '../components/SectionBlock'
 import EditPageButton from '../components/EditPageButton'
 import get from 'lodash.get'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
@@ -127,7 +127,11 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
 }
 
 export async function getStaticPaths(context: GetStaticPathsContext) {
-    const slugs = await prisma.slug.findMany({ where: { published: true } })
+    const slugs = await prisma.slug.findMany({
+        where: {
+            AND: [{ published: true }, { NOT: { fullSlug: '' } }, { NOT: { fullSlug: 'sign-in' } }],
+        },
+    })
 
     const paths = slugs.map((slug) => ({
         params: { slug: slug.fullSlug.split('/') },

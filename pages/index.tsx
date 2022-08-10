@@ -1,14 +1,14 @@
 import EditPageButton from '../components/EditPageButton'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
-import get from 'lodash.get'
+// import get from 'lodash.get'
 import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 
 import { PageProps } from '../types'
-import { prisma } from '../utils/prisma'
+// import { prisma } from '../utils/prisma'
 
 const Home = (props: PageProps) => {
-    const { id, title, appName } = props
+    const { id, appName } = props
 
     return (
         <div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 // import type { Page } from '@prisma/client'
 import { Space, Button, Image, Input, Table, Popconfirm, Form, Radio } from 'antd'
 // import Link from 'next/link'
@@ -33,12 +33,13 @@ const AdminImages = () => {
         getMedias(type, trim(debouncedQ)?.toLocaleLowerCase())
     )
 
-    const addFile = (file: Media) => {
-        queryClient.setQueryData(queryKeys, (oldData: any) => {
-            // type error
-            return [file, ...oldData]
-        })
-    }
+    // const addFile = (file: Media) => {
+    //     queryClient.invalidateQueries('medias')
+    //     // queryClient.setQueryData(queryKeys, (oldData: any) => {
+    //     //     // type error
+    //     //     return [file, ...oldData]
+    //     // })
+    // }
 
     const deleteFile = async (id: string) => {
         deleteMedia(id)
@@ -224,13 +225,16 @@ const AdminImages = () => {
                                     value: 'files',
                                 },
                             ]}
-                            onChange={(e) => setType(e.target.value)}
+                            onChange={(e) => {
+                                setQ('')
+                                setType(e.target.value)
+                            }}
                             value={type}
                             optionType="button"
                             buttonStyle="solid"
                         />
                     </Space>
-                    <UploadButton onFileRecieved={addFile} />
+                    <UploadButton onFileRecieved={() => queryClient.invalidateQueries('medias')} />
                 </div>
                 <Table
                     rowKey={(record) => record.id}

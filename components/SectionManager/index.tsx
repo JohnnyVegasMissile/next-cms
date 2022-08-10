@@ -7,7 +7,7 @@ import CustomSelect from '../../components/CustomSelect'
 import DisplayElementView from '../../components/DisplayElementView'
 import set from 'lodash.set'
 
-const { Text, Title } = Typography
+const { Text } = Typography
 
 interface SectionManagerProps {
     values: FullSectionEdit[]

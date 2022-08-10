@@ -4,7 +4,7 @@ import { Input, Space, Button, Typography, Card, message, Spin, InputNumber, Rad
 import get from 'lodash.get'
 import { editContent, getContentDetails, postContent } from '../../../network/contents'
 import { getContainerDetails } from '../../../network/containers'
-import { Prisma, Content, ContainerField, ContentField } from '@prisma/client'
+import { Prisma, Content, ContainerField /*, ContentField*/ } from '@prisma/client'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import Head from 'next/head'
 import { FullContainerEdit, FullContentField, FullSectionEdit } from '@types'

@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import type { Element } from '@prisma/client'
 // import { PageTypes } from '../types'
 
-export const postElement = (data: Prisma.PageCreateInput): Promise<Element> =>
+export const postElement = (data: Prisma.ElementCreateInput): Promise<Element> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'POST',

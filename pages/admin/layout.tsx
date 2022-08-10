@@ -1,9 +1,8 @@
 import SectionManager from '../../components/SectionManager'
-import { FullSection, FullSectionEdit, LayoutProps } from '../../types'
+import { FullSectionEdit, LayoutProps } from '../../types'
 import { Card, Divider, message, Space, Spin, Typography } from 'antd'
 import { useFormik } from 'formik'
 import get from 'lodash.get'
-import { useState } from 'react'
 import { useMutation, useQuery, UseQueryResult } from 'react-query'
 import { getLayout, postLayout } from '@network/api'
 import Head from 'next/head'
@@ -11,7 +10,7 @@ import Head from 'next/head'
 const { Title } = Typography
 
 const Layout = () => {
-    const { values, errors, handleSubmit, handleChange, setValues } = useFormik<LayoutProps>({
+    const { values, /*errors, handleSubmit,*/ handleChange, setValues } = useFormik<LayoutProps>({
         initialValues: {
             header: [],
             topBody: [],

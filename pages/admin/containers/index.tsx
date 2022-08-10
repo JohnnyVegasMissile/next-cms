@@ -1,5 +1,5 @@
 import type { Container, Element, Slug } from '@prisma/client'
-import { Space, Button, Table, Popconfirm, Input, Select, Breadcrumb, Badge } from 'antd'
+import { Space, Button, Table, Popconfirm, Input, Breadcrumb, Badge } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import moment from 'moment'
@@ -10,8 +10,6 @@ import useDebounce from '../../../hooks/useDebounce'
 import { useState } from 'react'
 import Head from 'next/head'
 import { deleteContainer, getContainers } from '../../../network/containers'
-
-const { Option } = Select
 
 const AdminElements = () => {
     const [q, setQ] = useState<string | undefined>()

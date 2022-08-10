@@ -2,7 +2,7 @@ import get from 'lodash.get'
 import checkAuth from '@utils/checkAuth'
 import { FullContainerEdit } from '../../../types'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ContainerField, ContentField, Metadata, Prisma, Section } from '@prisma/client'
+import { ContentField, Metadata, Section } from '@prisma/client'
 
 import { prisma } from '../../../utils/prisma'
 

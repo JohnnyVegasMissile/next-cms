@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 // import get from 'lodash.get'
 import { promises as fs } from 'fs'
 import mime from 'mime-types'
-import checkAuth from '@utils/checkAuth'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     try {

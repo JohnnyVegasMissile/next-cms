@@ -5,7 +5,7 @@ import mime from 'mime-types'
 import checkAuth from '@utils/checkAuth'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-    const id = req.query.uid as string
+    // const id = req.query.uid as string
     try {
         const file = await fs.readFile('./uploads/favicon.ico')
 

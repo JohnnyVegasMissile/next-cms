@@ -13,10 +13,19 @@ const sanitizeAll = <T>(props: T) => {
             get(props, 'contents', null)?.map((content: Content) => ({
                 ...content,
                 updatedAt: sanitizeDate(content.updatedAt),
+                slug: [
+                    {
+                        ...get(content, 'slug.0', {}),
+                        updatedAt: sanitizeDate(get(content, 'slug.0.updatedAt', null)),
+                    },
+                ],
                 fields: get(content, 'fields', [])?.map((field: ContentField) => ({
                     ...field,
                     dateValue: sanitizeDate(get(field, 'dateValue')),
-                    media: { ...get(field, 'media', {}), uploadTime: sanitizeDate(get(field, 'media.uploadTime')) },
+                    media: {
+                        ...get(field, 'media', {}),
+                        uploadTime: sanitizeDate(get(field, 'media.uploadTime')),
+                    },
                 })),
             })) || null,
         container: get(props, 'container', null)
@@ -31,12 +40,15 @@ const sanitizeAll = <T>(props: T) => {
             get(props, 'fields', null)?.map((field: ContentField) => ({
                 ...field,
                 dateValue: sanitizeDate(get(field, 'dateValue')),
-                media: { ...get(field, 'media', {}), uploadTime: sanitizeDate(get(field, 'media.uploadTime')) },
+                media: {
+                    ...get(field, 'media', {}),
+                    uploadTime: sanitizeDate(get(field, 'media.uploadTime')),
+                },
             })) || null,
         updatedAt: sanitizeDate(get(props, 'updatedAt')),
     }
 
-    console.log('props out', newProps)
+    // console.log('props out', newProps)
     return newProps as T
 }
 

@@ -1,9 +1,9 @@
 import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
-import { prisma } from '../utils/prisma'
+// import { prisma } from '../utils/prisma'
 import EditPageButton from '../components/EditPageButton'
 import { PageProps } from 'types'
-import get from 'lodash.get'
+// import get from 'lodash.get'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
 const NotFound = (props: PageProps) => {

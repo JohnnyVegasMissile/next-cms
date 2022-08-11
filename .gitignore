@@ -40,10 +40,14 @@ yarn-error.log*
 *.db-journal
 /prisma/migrations
 
-# public
+# uplaods
 /uploads/files/*
 !/uploads/files/.gitkeep
 /uploads/images/*
 !/uploads/images/.gitkeep
 /uploads/videos/*
 !/uploads/videos/.gitkeep
+
+# public
+/public/robots.txt
+/public/sitemap*.xml

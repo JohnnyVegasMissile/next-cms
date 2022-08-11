@@ -1,11 +1,9 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import { Login, PrismaClient, Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import type { Login, Role } from '@prisma/client'
-
-import { prisma } from '../../utils/prisma'
 import get from 'lodash.get'
+const prisma = new PrismaClient()
 
-const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+async function main() {
     const defaultContainer = await prisma.container.findUnique({
         where: { id: 'page' },
         include: { slug: true },
@@ -162,37 +160,14 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             },
         })
     }
+}
 
-    await prisma.setting.upsert({
-        where: {
-            name: 'installed',
-        },
-        update: {
-            value: 'true',
-        },
-        create: {
-            name: 'installed',
-            value: 'true',
-        },
+main()
+    .then(async () => {
+        await prisma.$disconnect()
     })
-
-    return res.status(200).json({ message: 'all set up' })
-}
-
-const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
-    return res.status(405).json({ error: 'Method not allowed' })
-}
-
-const init = async (req: NextApiRequest, res: NextApiResponse) => {
-    switch (req.method) {
-        case 'GET': {
-            return await GET(req, res)
-        }
-
-        default: {
-            return await ERROR(req, res)
-        }
-    }
-}
-
-export default init
+    .catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })

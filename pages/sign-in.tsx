@@ -11,21 +11,9 @@ import { PageProps } from '../types'
 import EditPageButton from '@components/EditPageButton'
 import Head from 'next/head'
 import SectionBlock from '@components/SectionBlock'
-import MissingInstall from '@components/MissingInstall'
 
 const SignIn = (props: PageProps) => {
-    if (props.missingInstall) return <MissingInstall />
-
     const { id, title, appName, sections } = props
-    // const { isAuth } = useAuth()
-    // const router = useRouter()
-
-    // useEffect(() => {
-    //     if (isAuth) {
-    //         console.log('Redirection from Sign In', router.route)
-    //         router.push('/')
-    //     }
-    // }, [router.route])
 
     return (
         <div>

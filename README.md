@@ -5,7 +5,6 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 npm i
 npm run initdb
 npm run dev
-go to /install
 
 /signin
 user: root

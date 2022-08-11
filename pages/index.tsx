@@ -5,16 +5,12 @@ import type { GetStaticPathsContext } from 'next'
 import Head from 'next/head'
 
 import { PageProps } from '../types'
-import MissingInstall from '@components/MissingInstall'
 import { HomeOutlined } from '@ant-design/icons'
 import { Button, Result } from 'antd'
 import Link from 'next/link'
 // import { prisma } from '../utils/prisma'
 
 const Home = (props: PageProps) => {
-    console.log('props', props)
-    if (props.missingInstall) return <MissingInstall />
-
     const { id, appName, sections } = props
 
     return (

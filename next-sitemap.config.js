@@ -5,11 +5,9 @@ const config = {
     changefreq: 'daily',
     generateRobotsTxt: true,
     sitemapSize: 5000,
-    exclude: ['/admin*', '/install', '/api*', '/server-sitemap-index.xml'],
+    exclude: ['/admin*', '/api*', '/server-sitemap-index.xml'],
     robotsTxtOptions: {
-        additionalSitemaps: [
-            `${process.env.SITE_URL || 'http://localhost:8080'}/server-sitemap-index.xml`,
-        ],
+        additionalSitemaps: [`${process.env.SITE_URL || 'http://localhost:8080'}/server-sitemap-index.xml`],
     },
 }
 

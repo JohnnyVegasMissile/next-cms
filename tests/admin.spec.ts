@@ -4,13 +4,6 @@ import { test, expect } from '@playwright/test'
 const PAGE_URL = 'http://localhost:3000'
 
 test.beforeEach(async ({ page }) => {
-    await page.goto(`${PAGE_URL}/install`)
-
-    // await expect(page.$('.ant-result-title')).toContain('Installation completed successfully')
-
-    const locator = page.locator('.ant-result-title')
-    await expect(locator).toHaveText('Installation completed successfully')
-
     await page.goto(`${PAGE_URL}/admin`)
     await expect(page).toHaveURL(`${PAGE_URL}/sign-in`)
 

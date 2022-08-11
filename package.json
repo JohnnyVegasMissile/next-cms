@@ -3,11 +3,11 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev -p ${PORT-3000}",
+        "dev": "next dev -p 8080",
         "prebuild": "prisma migrate dev --skip-seed --skip-generate",
         "build": "next build",
         "postbuild": "next-sitemap",
-        "start": "next start --port ${PORT-3000}",
+        "start": "next start",
         "lint": "next lint",
         "initdb": "prisma migrate dev",
         "studio": "prisma studio",

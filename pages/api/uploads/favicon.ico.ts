@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 // import get from 'lodash.get'
 import { promises as fs } from 'fs'
 import mime from 'mime-types'
-import checkAuth from '@utils/checkAuth'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     // const id = req.query.uid as string
@@ -22,12 +21,6 @@ const ERROR = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const uploads = async (req: NextApiRequest, res: NextApiResponse) => {
-    const isAuth = await checkAuth(req.headers)
-
-    if (!isAuth) {
-        return res.status(403).json({ error: 'Forbidden' })
-    }
-
     switch (req.method) {
         case 'GET': {
             return await GET(req, res)

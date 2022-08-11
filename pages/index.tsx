@@ -6,12 +6,16 @@ import Head from 'next/head'
 
 import { PageProps } from '../types'
 import MissingInstall from '@components/MissingInstall'
+import { HomeOutlined } from '@ant-design/icons'
+import { Button, Result } from 'antd'
+import Link from 'next/link'
 // import { prisma } from '../utils/prisma'
 
 const Home = (props: PageProps) => {
+    console.log('props', props)
     if (props.missingInstall) return <MissingInstall />
 
-    const { id, appName } = props
+    const { id, appName, sections } = props
 
     return (
         <div>
@@ -25,15 +29,43 @@ const Home = (props: PageProps) => {
 
             <EditPageButton redirectTo={`/admin/containers/${id}`} />
             {/* 
-            <header>{!!header && <SectionBlock section={header} page={props} />}</header>
+            <header>{!!header && <SectionBlock section={header} page={props} />}</header> */}
 
             <main>
-                {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} />
-                ))}
-            </main>
+                {(!sections || !sections.length) && <DefaultHome />}
 
+                {/* {sections?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} />
+                ))} */}
+            </main>
+            {/* 
             <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer> */}
+        </div>
+    )
+}
+
+const DefaultHome = () => {
+    return (
+        <div
+            style={{
+                height: '100vh',
+                width: '100vw',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            <Result
+                icon={<HomeOutlined />}
+                title="Welcome to next cms! Login to start edit your website."
+                extra={
+                    <Link href="/">
+                        <a>
+                            <Button type="primary">Sign In</Button>
+                        </a>
+                    </Link>
+                }
+            />
         </div>
     )
 }

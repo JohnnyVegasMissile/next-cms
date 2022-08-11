@@ -6,11 +6,13 @@ import { PageProps } from 'types'
 // import get from 'lodash.get'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 import MissingInstall from '../components/MissingInstall'
+import { Button, Result } from 'antd'
+import Link from 'next/link'
 
 const NotFound = (props: PageProps) => {
     if (props.missingInstall) return <MissingInstall />
 
-    const { id, title, appName } = props
+    const { id, title, appName, sections } = props
 
     return (
         <div>
@@ -27,6 +29,17 @@ const NotFound = (props: PageProps) => {
 
             {/* <header>{!!header && <SectionBlock section={header} page={props} />}</header>
 
+            */}
+
+            <main>
+                {(!sections || !sections.length) && <Default500 />}
+
+                {/* {sections?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} />
+                ))} */}
+            </main>
+            {/* 
+
             <main>
                 {sections?.map((section) => (
                     <SectionBlock key={section.id} section={section} page={props} />
@@ -34,6 +47,33 @@ const NotFound = (props: PageProps) => {
             </main>
 
             <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer> */}
+        </div>
+    )
+}
+
+const Default500 = () => {
+    return (
+        <div
+            style={{
+                height: '100vh',
+                width: '100vw',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            <Result
+                status="500"
+                title="500"
+                subTitle="Sorry, something went wrong."
+                extra={
+                    <Link href="/">
+                        <a>
+                            <Button type="primary">Back Home</Button>
+                        </a>
+                    </Link>
+                }
+            />
         </div>
     )
 }

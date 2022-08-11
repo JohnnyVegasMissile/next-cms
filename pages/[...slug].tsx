@@ -130,16 +130,19 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
 }
 
 export async function getStaticPaths(context: GetStaticPathsContext) {
+    console.log('IS HERE 1')
     const slugs = await prisma.slug.findMany({
         where: {
             AND: [{ published: true }, { NOT: { fullSlug: '' } }, { NOT: { fullSlug: 'sign-in' } }],
         },
     })
 
+    console.log('IS HERE 2')
     const paths = slugs.map((slug) => ({
         params: { slug: slug.fullSlug.split('/') },
     }))
 
+    console.log('IS HERE 3')
     return {
         paths,
         fallback: true, // false or 'blocking'

@@ -10,13 +10,14 @@ const parseDefaultValue = (values: string) => {
     }
 }
 
-const View = ({ defaultValues, theme }: Props) => {
-    // const { primary, secondary, background } = theme
+const View = ({ defaultValues /*, articles*/ }: Props) => {
     const { title } = parseDefaultValue(defaultValues)
 
     return (
-        <section className={styles.title}>
-            <h1>{title}</h1>
+        <section>
+            <div className={styles.background}>
+                <h2 className={styles.title}>{title}</h2>
+            </div>
         </section>
     )
 }

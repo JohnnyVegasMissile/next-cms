@@ -14,8 +14,7 @@ const parseDefaultValue = (values: string) => {
     }
 }
 
-const Edit = ({ defaultValues, onChange, theme }: Props) => {
-    // const { background, primary, secondary } = theme
+const Edit = ({ defaultValues, onChange }: Props) => {
     const [values, setValues] = useState<any>(parseDefaultValue(defaultValues))
 
     const handleChange = (name: string, value: any) => {
@@ -35,16 +34,14 @@ const Edit = ({ defaultValues, onChange, theme }: Props) => {
     return (
         <EditPanel
             view={
-                <section className={styles.title}>
-                    <StyledInput.h1
-                        // style={{
-                        //     color: primary,
-                        //     textShadow: `0.025em 0.025em 0 ${background}, 0.05em 0.05em 0 ${secondary}, 0.075em 0.075em 0 ${background}, 0.1em 0.1em 0 ${secondary}`,
-                        // }}
-                        className={styles.title}
-                        value={values.title}
-                        onChange={(e) => handleChange('title', e)}
-                    />
+                <section>
+                    <div className={styles.background}>
+                        <StyledInput.a
+                            className={styles.title}
+                            value={values.title}
+                            onChange={(e) => handleChange('title', e)}
+                        />
+                    </div>
                 </section>
             }
         />

@@ -10,6 +10,11 @@ export interface Block {
 
 export interface Props {
     defaultValues: string
+    theme: {
+        background: string
+        primary: string
+        secondary: string
+    }
     onChange?: (values: string) => void
     section?: FullSection
 }

@@ -82,6 +82,13 @@ const Test = () => {
                 </p>
             </section>
             <section className="footer"></section>
+
+            <section className={styles.form}>
+                <form className={styles.container}>
+                    <input id="name" type="text" placeholder="name" />
+                    <button type="submit">Submit</button>
+                </form>
+            </section>
         </>
     )
 }

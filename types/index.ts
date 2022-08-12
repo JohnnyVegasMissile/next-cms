@@ -136,14 +136,16 @@ export type AuthResponse = {
     // }
 }
 
+export type Theme = {
+    background: string
+    primary: string
+    secondary: string
+}
+
 export type PageProps = {
     id: string
     appName: string
-    theme: {
-        background: string | null
-        primary: string | null
-        secondary: string | null
-    }
+    theme: Theme
     type: 'container' | 'content'
     title: string
     accesses: Access[]

@@ -1,4 +1,4 @@
-import { LayoutProps } from '../types'
+import { LayoutProps, Theme } from '../types'
 
 const axios = require('axios')
 
@@ -50,6 +50,16 @@ export const getLayout = (): Promise<LayoutProps> =>
         INSTANCE({
             method: 'GET',
             url: `/api/layout`,
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const getTheme = (): Promise<Theme> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
+            url: `/api/theme`,
         })
             .then(resolve)
             .catch(reject)

@@ -1,11 +1,13 @@
 import { Space, Button, Card, Divider, Typography } from 'antd'
-import get from 'lodash.get'
-import GetEditComponent from '../../components/GetEditComponent'
 import { PlusOutlined, CaretUpOutlined, CaretDownOutlined, CloseOutlined } from '@ant-design/icons'
-import { FullSectionEdit } from '../../types'
+import { FullSectionEdit, Theme } from '../../types'
 import CustomSelect from '../../components/CustomSelect'
+import GetEditComponent from '../../components/GetEditComponent'
 import DisplayElementView from '../../components/DisplayElementView'
 import set from 'lodash.set'
+import { useQuery, UseQueryResult } from 'react-query'
+import { getTheme } from '../../network/api'
+import get from 'lodash.get'
 
 const { Text } = Typography
 
@@ -15,11 +17,13 @@ interface SectionManagerProps {
 }
 
 const SectionManager = ({ values, onChange }: SectionManagerProps) => {
+    const theme: UseQueryResult<Theme, Error> = useQuery<Theme, Error>(['theme'], () => getTheme())
+
     const addSection = () => {
         onChange([
             ...values,
             {
-                type: null,
+                block: null,
                 position: values.length,
                 content: '{}',
             },
@@ -71,7 +75,7 @@ const SectionManager = ({ values, onChange }: SectionManagerProps) => {
                             icon={<CaretUpOutlined />}
                         />
                         <Button
-                            disabled={idx === get(values, 'sections', []).length - 1}
+                            disabled={idx === values?.length - 1}
                             onClick={() => SectionDown(idx)}
                             type="primary"
                             // shape="circle"
@@ -93,7 +97,7 @@ const SectionManager = ({ values, onChange }: SectionManagerProps) => {
                                 <CustomSelect.ListSections
                                     section={section.block || undefined}
                                     element={section.elementId || undefined}
-                                    onSectionChange={(e) => onHandleChange(`${idx}.type`, e)}
+                                    onSectionChange={(e) => onHandleChange(`${idx}.block`, e)}
                                     onElementChange={(e) => onHandleChange(`${idx}.elementId`, e)}
                                 />
                                 <Divider type="vertical" />
@@ -125,8 +129,9 @@ const SectionManager = ({ values, onChange }: SectionManagerProps) => {
                         {!!section.block && (
                             <GetEditComponent
                                 block={section.block}
+                                theme={get(theme, 'data', { background: '', primary: '', secondary: '' })}
                                 defaultValues={section.content}
-                                onChange={(e) => onHandleChange(`sections.${idx}.content`, e)}
+                                onChange={(e) => onHandleChange(`${idx}.content`, e)}
                             />
                         )}
                         {!!section.elementId && <DisplayElementView id={section.elementId} />}

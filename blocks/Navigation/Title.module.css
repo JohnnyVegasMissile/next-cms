@@ -1,0 +1,18 @@
+.background {
+    height: 150px;
+    width: 100%;
+    background-color: rgb(16, 126, 125);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    /* put title to uppercase */
+    text-transform: uppercase;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #e3b505;
+    text-align: center;
+    margin: 0;
+}

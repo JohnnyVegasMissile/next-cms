@@ -13,35 +13,28 @@ import { FullContentField, PageProps } from '../types'
 import Link from 'next/link'
 import moment from 'moment'
 import CustomImage from '@components/CustomImage'
+import SectionBlock from '@components/SectionBlock'
 // import { FormattedMessage, useIntl } from 'react-intl'
 // import Link from 'next/link'
 
 const Pages = (props: PageProps) => {
-    const { id, type, title, appName, contents, fields, theme } = props
+    const { id, type, title, appName, contents, fields, theme, sections, metadatas } = props
     // const { isAuth, user, setRedirect } = useAuth()
 
     return (
-        <div style={{ backgroundColor: theme?.background || undefined }}>
+        <div>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{`${appName} | ${title}`}</title>
-                {/* {get(props, 'metadatas', []).map((meta: Metadata) => (
+                {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
                 ))}
-                {!get(props, 'type', false) && (
-                    <>
-                        {!!get(props, 'author', false) && <meta name="author" content={get(props, 'author')} />}
-                        {!!get(props, 'description', false) && (
-                            <meta name="description" content={get(props, 'description')} />
-                        )}
-                    </>
-                )} */}
             </Head>
 
             <EditPageButton redirectTo={`/admin/${type === 'container' ? 'containers' : 'contents'}/${id}`} />
 
             <main>
-                {type === 'container' && (
+                {type === 'container' && !sections.length && (
                     <>
                         <h1>{title}</h1>
                         <ul>
@@ -56,26 +49,30 @@ const Pages = (props: PageProps) => {
                     </>
                 )}
 
-                {type === 'content' && (
+                {type === 'content' && !sections.length && (
                     <>
                         <h1>{title}</h1>
-                        {fields?.map((field: FullContentField) => {
+                        {fields?.map((field: FullContentField, idx: number) => {
                             switch (field.type) {
                                 case 'string':
-                                    return <span>{field.textValue}</span>
+                                    return <span key={idx}>{field.textValue}</span>
                                 case 'text':
-                                    return <p>{field.textValue}</p>
+                                    return <p key={idx}>{field.textValue}</p>
                                 case 'int':
-                                    return <p>{field.numberValue}</p>
+                                    return <p key={idx}>{field.numberValue}</p>
                                 case 'boolean':
-                                    return <p>{field.textValue ? 'Yes' : 'No'}</p>
+                                    return <p key={idx}>{field.textValue ? 'Yes' : 'No'}</p>
                                 case 'image':
-                                    return <CustomImage img={field?.media} />
+                                    return <CustomImage key={idx} img={field?.media} />
                                 case 'date':
-                                    return <span>{moment(field.dateValue).format('MMMM Do YYYY')}</span>
+                                    return (
+                                        <span key={idx}>
+                                            {moment(field.dateValue).format('MMMM Do YYYY')}
+                                        </span>
+                                    )
                                 case 'link':
                                     return (
-                                        <Link href={field.textValue || '#'}>
+                                        <Link key={idx} href={field.textValue || '#'}>
                                             <a>Link</a>
                                         </Link>
                                     )
@@ -86,6 +83,10 @@ const Pages = (props: PageProps) => {
                         })}
                     </>
                 )}
+
+                {sections?.map((section) => (
+                    <SectionBlock key={section.id} section={section} theme={theme} />
+                ))}
             </main>
             {/* 
             <header>
@@ -127,19 +128,16 @@ export async function getStaticProps(context: NewGetStaticPathsContext) {
 }
 
 export async function getStaticPaths(context: GetStaticPathsContext) {
-    console.log('IS HERE 1')
     const slugs = await prisma.slug.findMany({
         where: {
             AND: [{ published: true }, { NOT: { fullSlug: '' } }, { NOT: { fullSlug: 'sign-in' } }],
         },
     })
 
-    console.log('IS HERE 2')
     const paths = slugs.map((slug) => ({
         params: { slug: slug.fullSlug.split('/') },
     }))
 
-    console.log('IS HERE 3')
     return {
         paths,
         fallback: true, // false or 'blocking'

@@ -12,7 +12,7 @@ const NotFound = (props: PageProps) => {
     const { id, title, appName, sections, theme } = props
 
     return (
-        <div style={{ backgroundColor: theme?.background || undefined }}>
+        <div>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{`${appName} | ${title}`}</title>

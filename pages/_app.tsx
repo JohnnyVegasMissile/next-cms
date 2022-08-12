@@ -14,6 +14,7 @@ import { ReactQueryDevtools } from 'react-query/devtools'
 import AuthGuard from '../components/AuthGuard'
 import MenuAdmin from '../components/MenuAdmin'
 import { ProvideAuth } from '../hooks/useAuth'
+import get from 'lodash.get'
 
 // export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
 //     console.log('event', name, {
@@ -28,7 +29,13 @@ const queryClient = new QueryClient({
     defaultOptions: { queries: { refetchOnWindowFocus: false } },
 })
 
-function MyApp({ Component, pageProps }: { Component: NextComponentType & { requireAuth: boolean }; pageProps: any }) {
+function MyApp({
+    Component,
+    pageProps,
+}: {
+    Component: NextComponentType & { requireAuth: boolean }
+    pageProps: any
+}) {
     // function MyApp({ Component, pageProps }: any) {
     // const { locale } = useRouter()
 
@@ -51,17 +58,28 @@ function MyApp({ Component, pageProps }: { Component: NextComponentType & { requ
     const { accesses, ...props } = pageProps
 
     return (
-        <QueryClientProvider client={queryClient}>
-            {/* <IntlProvider locale={locale || 'en'} messages={messages(locale)}> */}
-            <ProvideAuth>
-                <MenuAdmin />
-                <AuthGuard requireAuth={Component.requireAuth} accesses={accesses}>
-                    <Component {...props} />
-                </AuthGuard>
-            </ProvideAuth>
-            {/* </IntlProvider> */}
-            <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        <>
+            <style jsx global>
+                {`
+                    :root {
+                        --background-color: ${get(props, 'theme.background', 'white')};
+                        --primary-color: ${get(props, 'theme.primary', 'blue')};
+                        --secondary-color: ${get(props, 'theme.secondary', 'orange')};
+                    }
+                `}
+            </style>
+            <QueryClientProvider client={queryClient}>
+                {/* <IntlProvider locale={locale || 'en'} messages={messages(locale)}> */}
+                <ProvideAuth>
+                    <MenuAdmin />
+                    <AuthGuard requireAuth={Component.requireAuth} accesses={accesses}>
+                        <Component {...props} />
+                    </AuthGuard>
+                </ProvideAuth>
+                {/* </IntlProvider> */}
+                <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+            </QueryClientProvider>
+        </>
     )
 }
 

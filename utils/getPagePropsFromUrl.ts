@@ -1,4 +1,4 @@
-import { Content, ContentField } from '@prisma/client'
+import { ContainerField, Content, ContentField } from '@prisma/client'
 import get from 'lodash.get'
 import moment from 'moment'
 import { prisma } from '../utils/prisma'
@@ -9,6 +9,38 @@ const sanitizeAll = <T>(props: T) => {
     // console.log('props in', props)
     let newProps = {
         ...props,
+        metadatas: [
+            ...get(props, 'metadatas'),
+            ...get(props, 'container.fields', [])
+                .filter((e: ContainerField) => !!e.metadata)
+                .map((field: ContainerField) => {
+                    const values = get(props, 'fields', []).find((e: ContentField) => e.name === field.name)
+                    let content = ''
+
+                    switch (values?.type) {
+                        case 'string':
+                        case 'text':
+                        case 'link':
+                            content = get(values, 'textValue', '')
+                            break
+                        case 'int':
+                            content = get(values, 'numberValue', '')
+                            break
+                        case 'boolean':
+                            content = get(values, 'boolValue', '')
+                            break
+                        case 'date':
+                            content = get(values, 'dateValue', '')
+                            break
+                    }
+
+                    return {
+                        id: field.id,
+                        name: field.metadata,
+                        content,
+                    }
+                }),
+        ],
         contents:
             get(props, 'contents', null)?.map((content: Content) => ({
                 ...content,
@@ -34,10 +66,11 @@ const sanitizeAll = <T>(props: T) => {
                   updatedAt: sanitizeDate(get(props, 'container.updatedAt')),
 
                   contentSections: null,
+                  fields: null,
               }
             : null,
         fields:
-            get(props, 'fields', null)?.map((field: ContentField) => ({
+            get(props, 'fields', undefined)?.map((field: ContentField) => ({
                 ...field,
                 dateValue: sanitizeDate(get(field, 'dateValue')),
                 media: {
@@ -84,6 +117,7 @@ const getPagePropsFromUrl = async (slug: string) => {
                             contentSections: {
                                 include: { form: true },
                             },
+                            fields: true,
                         },
                     },
                 },
@@ -117,9 +151,11 @@ const getPagePropsFromUrl = async (slug: string) => {
         type: !!releatedSlug?.container ? 'container' : 'content',
         ...get(releatedSlug, 'container', {}),
         ...get(releatedSlug, 'content', {}),
-        sections: releatedSlug?.content?.container?.contentHasSections
-            ? get(releatedSlug, 'container.contentSection', [])
-            : get(releatedSlug, 'content.section', []),
+        sections: !!releatedSlug?.container
+            ? get(releatedSlug, 'container.sections', {})
+            : releatedSlug?.content?.container?.contentHasSections
+            ? get(releatedSlug, 'container.contentSections', [])
+            : get(releatedSlug, 'content.sections', []),
     })
 
     if (!releatedSlug || !props.published) {

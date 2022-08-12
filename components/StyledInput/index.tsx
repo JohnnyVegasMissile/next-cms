@@ -4,10 +4,11 @@ interface Props<T> {
     value: T
     onChange: (value: T) => void
     className?: string
+    style?: React.CSSProperties
 }
 
-const StyledInput = ({ value, onChange, className }: Props<string>) => (
-    <div className={className}>
+const StyledInput = ({ value, onChange, className, style }: Props<string>) => (
+    <div className={className} style={style}>
         <textarea
             placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
             value={value}
@@ -18,8 +19,8 @@ const StyledInput = ({ value, onChange, className }: Props<string>) => (
     </div>
 )
 
-const A = ({ value, onChange, className }: Props<string>) => (
-    <span className={className}>
+const A = ({ value, onChange, className, style }: Props<string>) => (
+    <span className={className} style={style}>
         <input
             placeholder="Lorem ipsum dolor sit amet"
             value={value}
@@ -30,8 +31,8 @@ const A = ({ value, onChange, className }: Props<string>) => (
     </span>
 )
 
-const Span = ({ value, onChange, className }: Props<string>) => (
-    <span className={className}>
+const Span = ({ value, onChange, className, style }: Props<string>) => (
+    <span className={className} style={style}>
         <textarea
             placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
             value={value}
@@ -42,8 +43,8 @@ const Span = ({ value, onChange, className }: Props<string>) => (
     </span>
 )
 
-const P = ({ value, onChange, className }: Props<string>) => (
-    <p className={className}>
+const P = ({ value, onChange, className, style }: Props<string>) => (
+    <p className={className} style={style}>
         <textarea
             placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
             value={value}
@@ -54,8 +55,8 @@ const P = ({ value, onChange, className }: Props<string>) => (
     </p>
 )
 
-const Li = ({ value, onChange, className }: Props<string>) => (
-    <li className={className}>
+const Li = ({ value, onChange, className, style }: Props<string>) => (
+    <li className={className} style={style}>
         <input
             placeholder="Lorem ipsum dolor sit amet"
             value={value}
@@ -66,8 +67,8 @@ const Li = ({ value, onChange, className }: Props<string>) => (
     </li>
 )
 
-const H1 = ({ value, onChange, className }: Props<string>) => (
-    <h1 className={className}>
+const H1 = ({ value, onChange, className, style }: Props<string>) => (
+    <h1 className={className} style={style}>
         <input
             placeholder="Lorem ipsum dolor"
             value={value}
@@ -78,8 +79,8 @@ const H1 = ({ value, onChange, className }: Props<string>) => (
     </h1>
 )
 
-const H2 = ({ value, onChange, className }: Props<string>) => (
-    <h2 className={className}>
+const H2 = ({ value, onChange, className, style }: Props<string>) => (
+    <h2 className={className} style={style}>
         <input
             placeholder="Lorem ipsum dolor"
             value={value}
@@ -90,8 +91,8 @@ const H2 = ({ value, onChange, className }: Props<string>) => (
     </h2>
 )
 
-const H3 = ({ value, onChange, className }: Props<string>) => (
-    <h3 className={className}>
+const H3 = ({ value, onChange, className, style }: Props<string>) => (
+    <h3 className={className} style={style}>
         <input
             placeholder="Lorem ipsum dolor"
             value={value}
@@ -102,8 +103,8 @@ const H3 = ({ value, onChange, className }: Props<string>) => (
     </h3>
 )
 
-const H4 = ({ value, onChange, className }: Props<string>) => (
-    <h4 className={className}>
+const H4 = ({ value, onChange, className, style }: Props<string>) => (
+    <h4 className={className} style={style}>
         <input
             placeholder="Lorem ipsum dolor"
             value={value}
@@ -114,8 +115,8 @@ const H4 = ({ value, onChange, className }: Props<string>) => (
     </h4>
 )
 
-const Button = ({ value, onChange, className }: Props<string>) => (
-    <button className={className} onClick={(e) => e.preventDefault()}>
+const Button = ({ value, onChange, className, style }: Props<string>) => (
+    <button className={className} onClick={(e) => e.preventDefault()} style={style}>
         <input
             placeholder="Lorem ipsum"
             value={value}

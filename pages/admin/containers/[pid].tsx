@@ -1,7 +1,20 @@
 import { Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
-import { Input, Space, Button, Typography, Card, Select, message, Spin, Tabs, Radio, Divider, Switch } from 'antd'
+import {
+    Input,
+    Space,
+    Button,
+    Typography,
+    Card,
+    Select,
+    message,
+    Spin,
+    Tabs,
+    Radio,
+    Divider,
+    Switch,
+} from 'antd'
 import Head from 'next/head'
 import get from 'lodash.get'
 import set from 'lodash.set'
@@ -55,6 +68,7 @@ const Admin = () => {
             let i = 0
             const sections: FullSection[] = []
 
+            console.log('values', values)
             if (!!values.sections) {
                 for (const section of values.sections) {
                     if (!!section.block || !!section.elementId) {
@@ -91,29 +105,6 @@ const Admin = () => {
         },
     })
 
-    const container: UseQueryResult<FullContainerEdit, Error> = useQuery<FullContainerEdit, Error>(
-        ['containers', { id: pid }],
-        () => getContainerDetails(pid as string),
-        {
-            enabled: !!pid && pid !== 'create',
-            // onSuccess: (data: FullContainerEdit) => setValues(data),
-
-            onSuccess: (data: FullContainerEdit) => {
-                const sections = get(data, 'sections', []).sort((a, b) => a.position - b.position)
-
-                const contentSections = get(data, 'contentSections', []).sort((a, b) => a.position - b.position)
-
-                const accesses = get(data, 'accesses', []).map((access) => get(access, 'roleId', ''))
-
-                const slug = decodeURI(get(data, 'slug.0.slug', '') || '')
-                const slugEdit = slug.split('/')
-
-                setValues({ ...data, sections, contentSections, accesses, slugEdit })
-            },
-            onError: (err) => router.push('/admin/containers'),
-        }
-    )
-
     const mutation = useMutation(
         (data: { pid: string; values: FullContainerEdit }) =>
             data.pid === 'create' ? postContainer(data.values) : editContainer(data.pid, data.values),
@@ -127,6 +118,31 @@ const Admin = () => {
                 message.error('An error occured, while creating or updating the container')
                 queryClient.invalidateQueries('containers')
             },
+        }
+    )
+
+    const container: UseQueryResult<FullContainerEdit, Error> = useQuery<FullContainerEdit, Error>(
+        ['containers', { id: pid }],
+        () => getContainerDetails(pid as string),
+        {
+            enabled: !!pid && pid !== 'create' && !mutation.isLoading,
+            // onSuccess: (data: FullContainerEdit) => setValues(data),
+
+            onSuccess: (data: FullContainerEdit) => {
+                const sections = get(data, 'sections', []).sort((a, b) => a.position - b.position)
+
+                const contentSections = get(data, 'contentSections', []).sort(
+                    (a, b) => a.position - b.position
+                )
+
+                const accesses = get(data, 'accesses', []).map((access) => get(access, 'roleId', ''))
+
+                const slug = decodeURI(get(data, 'slug.0.slug', '') || '')
+                const slugEdit = slug.split('/')
+
+                setValues({ ...data, sections, contentSections, accesses, slugEdit })
+            },
+            onError: (err) => router.push('/admin/containers'),
         }
     )
 
@@ -219,7 +235,9 @@ const Admin = () => {
                                                         id="status"
                                                         disabled={isDefaultPage}
                                                         value={values.published}
-                                                        onChange={(e) => onHandleChange('published', e.target.value)}
+                                                        onChange={(e) =>
+                                                            onHandleChange('published', e.target.value)
+                                                        }
                                                     >
                                                         <Radio value={true}>Published</Radio>
                                                         <Radio value={false}>Unpublished</Radio>
@@ -253,7 +271,8 @@ const Admin = () => {
                                                                             // shape="circle"
                                                                             danger
                                                                             disabled={
-                                                                                get(values, 'slugEdit', []).length < 2
+                                                                                get(values, 'slugEdit', [])
+                                                                                    .length < 2
                                                                             }
                                                                             icon={<MinusOutlined />}
                                                                         />
@@ -261,7 +280,8 @@ const Admin = () => {
                                                                             id="slug-plus"
                                                                             onClick={addSlug}
                                                                             disabled={
-                                                                                get(values, 'slugEdit', []).length > 5
+                                                                                get(values, 'slugEdit', [])
+                                                                                    .length > 5
                                                                             }
                                                                             type="primary"
                                                                             // shape="circle"

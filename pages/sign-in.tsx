@@ -1,22 +1,20 @@
-import { useAuth } from '../hooks/useAuth'
-import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Input, Card, Space } from 'antd'
-
-import type { GetStaticPathsContext } from 'next'
-// import { prisma } from '../utils/prisma'
-import { useFormik } from 'formik'
-// import get from 'lodash.get'
-import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
-import { PageProps } from '../types'
-import EditPageButton from '@components/EditPageButton'
 import Head from 'next/head'
-import SectionBlock from '@components/SectionBlock'
+import { useFormik } from 'formik'
+import type { GetStaticPathsContext } from 'next'
+import { Button, Input, Card, Space } from 'antd'
+import { LockOutlined, UserOutlined } from '@ant-design/icons'
+
+import { PageProps } from '../types'
+import { useAuth } from '../hooks/useAuth'
+import SectionBlock from '../components/SectionBlock'
+import EditPageButton from '../components/EditPageButton'
+import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
 const SignIn = (props: PageProps) => {
     const { id, title, appName, sections, theme } = props
 
     return (
-        <div style={{ backgroundColor: theme?.background || undefined }}>
+        <div>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{`${appName} | ${title}`}</title>

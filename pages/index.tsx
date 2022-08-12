@@ -1,26 +1,25 @@
+import Head from 'next/head'
+import Link from 'next/link'
+import { Button, Result } from 'antd'
+import { HomeOutlined } from '@ant-design/icons'
+import type { GetStaticPathsContext } from 'next'
 import EditPageButton from '../components/EditPageButton'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
-// import get from 'lodash.get'
-import type { GetStaticPathsContext } from 'next'
-import Head from 'next/head'
 
 import { PageProps } from '../types'
-import { HomeOutlined } from '@ant-design/icons'
-import { Button, Result } from 'antd'
-import Link from 'next/link'
-// import { prisma } from '../utils/prisma'
+import SectionBlock from '../components/SectionBlock'
 
 const Home = (props: PageProps) => {
-    const { id, appName, sections, theme } = props
+    const { id, appName, sections, theme, metadatas } = props
 
     return (
-        <div style={{ backgroundColor: theme?.background || undefined }}>
+        <div>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{appName}</title>
-                {/* {metadatas?.map((meta) => (
+                {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
-                ))} */}
+                ))}
             </Head>
 
             <EditPageButton redirectTo={`/admin/containers/${id}`} />
@@ -30,9 +29,9 @@ const Home = (props: PageProps) => {
             <main>
                 {(!sections || !sections.length) && <DefaultHome />}
 
-                {/* {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} />
-                ))} */}
+                {sections?.map((section) => (
+                    <SectionBlock key={section.id} section={section} theme={theme} />
+                ))}
             </main>
             {/* 
             <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer> */}

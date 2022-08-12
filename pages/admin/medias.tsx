@@ -168,6 +168,7 @@ const AdminImages = () => {
             default:
                 return []
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type])
 
     return (
@@ -262,6 +263,7 @@ const AltInput = ({ id, value }: { id: string; value: string }) => {
 
     useEffect(() => {
         mutation.mutate(debouncedAlt)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedAlt])
 
     return (
@@ -270,7 +272,12 @@ const AltInput = ({ id, value }: { id: string; value: string }) => {
             hasFeedback
             validateStatus={mutation.isLoading ? 'validating' : mutation.isError ? 'warning' : 'success'}
         >
-            <Input placeholder="Alt" value={alt} onChange={(e) => setAlt(e.target.value)} style={{ width: '100%' }} />
+            <Input
+                placeholder="Alt"
+                value={alt}
+                onChange={(e) => setAlt(e.target.value)}
+                style={{ width: '100%' }}
+            />
         </Form.Item>
     )
 }

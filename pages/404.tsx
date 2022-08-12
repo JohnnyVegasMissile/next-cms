@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { Button, Result } from 'antd'
 
 const NotFound = (props: PageProps) => {
-    const { id, title, appName, sections, theme } = props
+    const { id, title, appName, sections } = props
 
     return (
         <div>

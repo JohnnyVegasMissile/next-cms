@@ -25,15 +25,17 @@ const Test = () => {
                     <div
                         className={styles.img}
                         style={{
-                            backgroundImage:
-                                'url(https://images.unsplash.com/photo-1654160924076-223411b36d75?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80)',
+                            backgroundImage: 'url(/default.png)',
                         }}
                     />
-                    <ul>
-                        {Array.from(Array(5).keys()).map((e, i) => (
-                            <li key={i}>my element</li>
-                        ))}
-                    </ul>
+                    <div>
+                        <h2>A small title</h2>
+                        <ul>
+                            {Array.from(Array(5).keys()).map((e, i) => (
+                                <li key={i}>my element</li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             </section>
             <section className={styles.grid}>
@@ -44,11 +46,11 @@ const Test = () => {
                             <div
                                 className={styles.img}
                                 style={{
-                                    backgroundImage:
-                                        'url(https://images.unsplash.com/photo-1654160924076-223411b36d75?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80)',
+                                    backgroundImage: 'url(/default.png)',
                                 }}
                             />
                             <h3>this is a title</h3>
+                            <span>18 Oct 2021</span>
                             <p>
                                 lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                                 incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
@@ -57,7 +59,6 @@ const Test = () => {
                                 eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
                                 in culpa qui officia deserunt mollit anim id est laborum
                             </p>
-                            <span>18 Oct 2021</span>
                         </div>
                     ))}
                 </div>
@@ -66,8 +67,7 @@ const Test = () => {
                 <div
                     className={styles.img}
                     style={{
-                        backgroundImage:
-                            'url(https://images.unsplash.com/photo-1654160924076-223411b36d75?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80)',
+                        backgroundImage: 'url(/default.png)',
                     }}
                 />
                 <h1>this is a title</h1>

@@ -11,7 +11,7 @@ import EditPageButton from '../components/EditPageButton'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
 const SignIn = (props: PageProps) => {
-    const { id, title, appName, sections, theme } = props
+    const { id, title, appName, sections } = props
 
     return (
         <div>

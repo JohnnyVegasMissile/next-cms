@@ -15,6 +15,7 @@
 }
 
 .navigation .container ul {
+    padding: 0;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -69,7 +70,7 @@
 
 .list ul {
     margin: 0;
-    padding: 15px 45px;
+    padding: 5px 45px;
 
     list-style: none;
 }
@@ -77,6 +78,7 @@
 .list .container {
     display: flex;
     flex-direction: row;
+    align-items: center;
 
     border-radius: 4px;
     overflow: hidden;
@@ -94,6 +96,13 @@
     background-repeat: no-repeat;
 }
 
+.list h2 {
+    padding: 10px 45px;
+    margin: 0;
+    color: #2196f3;
+    font-weight: bold;
+}
+
 .list li {
     margin-bottom: 0.5rem;
     position: relative;
@@ -105,7 +114,7 @@
     height: 0.3rem;
     width: 0.9rem;
     border-radius: 0.4rem;
-    background-color: #2196f3;
+    background-color: #ff9800;
 
     position: absolute;
     left: -22px;
@@ -140,11 +149,11 @@
 .grid .container {
     display: grid;
     grid-template-columns: 50% 50%;
-    grid-gap: 1rem;
+    grid-gap: 1.5rem;
 }
 
 .card {
-    width: 15rem;
+    /* width: 15rem; */
 
     border-radius: 4px;
     overflow: hidden;
@@ -153,33 +162,34 @@
         12.5px 12.5px 10px rgba(0, 0, 0, 0.035), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
         41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05), 100px 100px 80px rgba(0, 0, 0, 0.07);
 
-    margin: auto;
+    /* margin: auto; */
 }
 
 .card .img {
     height: 15rem;
-    width: 15rem;
+    width: 100%;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
 }
 
 .card h3 {
-    margin: 5px 0px 0px 5px;
+    margin: 10px 0px 0px 10px;
     text-transform: capitalize;
     color: #2196f3;
+    font-weight: bold;
 }
 
 .card p {
     height: 7rem;
-    margin: 5px;
+    margin: 10px;
     overflow: hidden;
 }
 
 .card span {
-    margin: 5px;
+    margin: 10px;
     font-style: italic;
-    color: #ccc;
+    color: #ff9800;
 }
 
 /*  */
@@ -209,7 +219,7 @@
 .display span {
     margin: 0px 15px;
     font-style: italic;
-    color: #ccc;
+    color: #ff9800;
 }
 
 /*  */
@@ -242,6 +252,9 @@
 .form button {
     background-color: #ff9800;
     border: none;
-    padding: 1rem 2.5rem;
+    padding: 0.5rem 2.5rem;
     border-radius: 3px;
+
+    color: #fff;
+    font-weight: bold;
 }

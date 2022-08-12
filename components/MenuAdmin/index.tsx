@@ -32,8 +32,8 @@ import get from 'lodash.get'
 const { Text } = Typography
 
 function MenuAdmin() {
-    const { isAuth, signOut, user } = useAuth()
-    const isDisplayed = isAuth || user?.role === 'super-admin' || user?.role === 'admin'
+    const { isAuth, signOut, me } = useAuth()
+    const isDisplayed = isAuth && (me?.role === 'super-admin' || me?.role === 'admin')
 
     const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(
         ['containers', {}],
@@ -324,10 +324,10 @@ function MenuAdmin() {
                 </Space>
 
                 <Dropdown overlay={homeMenu}>
-                    <Space>
+                    <Space style={{ cursor: 'default' }}>
                         <Text className="logged-username">
                             <UserOutlined style={{ marginRight: 4 }} />
-                            {`${user?.name}`}
+                            {`${me?.name}`}
                         </Text>
                     </Space>
                 </Dropdown>

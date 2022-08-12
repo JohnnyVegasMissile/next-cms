@@ -15,18 +15,18 @@ function AuthGuard({ children, accesses, requireAuth }: Props) {
     const { isBrowser } = useSsr()
     const router = useRouter()
     const [isChecking, setIsChecking] = useState(false)
-    const { isAuth, user, initializing, setRedirect } = useAuth()
+    const { isAuth, me, initializing, setRedirect } = useAuth()
 
     const hasAccess = useMemo(() => {
-        const index = accesses?.findIndex((e) => e.roleId === user?.role)
+        const index = accesses?.findIndex((e) => e.roleId === me?.role)
 
         return index !== -1
-    }, [accesses, user?.role])
+    }, [accesses, me?.role])
 
     useEffect(() => {
         setIsChecking(true)
         if (!initializing && isBrowser && (requireAuth || !!accesses?.length)) {
-            const isAdmin = user?.role === 'super-admin' || user?.role === 'admin'
+            const isAdmin = me?.role === 'super-admin' || me?.role === 'admin'
 
             //auth is initialized and there is no user
             if (!isAuth) {
@@ -43,7 +43,7 @@ function AuthGuard({ children, accesses, requireAuth }: Props) {
         }
         setIsChecking(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setRedirect, initializing, router, user?.role, accesses, requireAuth])
+    }, [setRedirect, initializing, router, me?.role, accesses, requireAuth])
 
     /* show loading indicator while the auth provider is still initializing */
     if (initializing && (accesses?.length || requireAuth)) {

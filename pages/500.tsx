@@ -9,10 +9,10 @@ import { Button, Result } from 'antd'
 import Link from 'next/link'
 
 const NotFound = (props: PageProps) => {
-    const { id, title, appName, sections } = props
+    const { id, title, appName, sections, theme } = props
 
     return (
-        <div>
+        <div style={{ backgroundColor: theme?.background || undefined }}>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{`${appName} | ${title}`}</title>

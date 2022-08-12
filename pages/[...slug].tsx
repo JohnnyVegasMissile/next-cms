@@ -17,11 +17,11 @@ import CustomImage from '@components/CustomImage'
 // import Link from 'next/link'
 
 const Pages = (props: PageProps) => {
-    const { id, type, title, appName, contents, fields } = props
+    const { id, type, title, appName, contents, fields, theme } = props
     // const { isAuth, user, setRedirect } = useAuth()
 
     return (
-        <div>
+        <div style={{ backgroundColor: theme?.background || undefined }}>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{`${appName} | ${title}`}</title>

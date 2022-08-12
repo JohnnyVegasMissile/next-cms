@@ -51,11 +51,11 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         // })
 
         return res.status(201).json({
-            title: 'Login Successful',
-            detail: 'Successfully validated login credentials',
+            // title: 'Login Successful',
+            // detail: 'Successfully validated login credentials',
             token: session.token,
             expiresAt: session.expiresAt,
-            user: { ...login.user, role: login.roleId, email: login.email },
+            // user: { ...login.user, role: login.roleId, email: login.email },
         })
     } catch (err) {
         res.status(401).json({ errors: err })

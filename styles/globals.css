@@ -2,8 +2,8 @@ html,
 body {
     padding: 0;
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
-        Helvetica Neue, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans,
+        Droid Sans, Helvetica Neue, sans-serif;
     white-space: pre-wrap;
 }
 
@@ -71,4 +71,16 @@ a {
 
 .ant-breadcrumb-separator {
     margin: 0px 4px;
+}
+
+.ant-popover-inner-content {
+    padding: 3px;
+}
+
+.chrome-picker {
+    box-shadow: none !important;
+}
+
+.ant-slider-rail {
+    background-color: #fff !important;
 }

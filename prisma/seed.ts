@@ -156,7 +156,46 @@ async function main() {
         await prisma.setting.create({
             data: {
                 name: 'app_name',
-                value: '',
+                value: 'NextJS App',
+            },
+        })
+    }
+
+    const bgcolor = await prisma.setting.findUnique({
+        where: { name: 'background_color' },
+    })
+
+    if (!bgcolor) {
+        await prisma.setting.create({
+            data: {
+                name: 'background_color',
+                value: '#f0f2f5',
+            },
+        })
+    }
+
+    const primarycolor = await prisma.setting.findUnique({
+        where: { name: 'primary_color' },
+    })
+
+    if (!primarycolor) {
+        await prisma.setting.create({
+            data: {
+                name: 'primary_color',
+                value: '#2196F3',
+            },
+        })
+    }
+
+    const secondarycolor = await prisma.setting.findUnique({
+        where: { name: 'secondary_color' },
+    })
+
+    if (!secondarycolor) {
+        await prisma.setting.create({
+            data: {
+                name: 'secondary_color',
+                value: '#FF9800',
             },
         })
     }

@@ -11,10 +11,10 @@ import Link from 'next/link'
 // import { prisma } from '../utils/prisma'
 
 const Home = (props: PageProps) => {
-    const { id, appName, sections } = props
+    const { id, appName, sections, theme } = props
 
     return (
-        <div>
+        <div style={{ backgroundColor: theme?.background || undefined }}>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{appName}</title>
@@ -55,7 +55,7 @@ const DefaultHome = () => {
                 icon={<HomeOutlined />}
                 title="Welcome to next cms! Login to start edit your website."
                 extra={
-                    <Link href="/">
+                    <Link href="/sign-in">
                         <a>
                             <Button type="primary">Sign In</Button>
                         </a>

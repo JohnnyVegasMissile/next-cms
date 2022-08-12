@@ -1,4 +1,4 @@
-import { AuthResponse } from '../types'
+import { AuthResponse, ContextUser } from '../types'
 
 import INSTANCE from './api'
 
@@ -31,7 +31,7 @@ export const signIn = (email: string, password: string): Promise<AuthResponse> =
             .catch(reject)
     })
 
-export const getMe = (): Promise<AuthResponse> =>
+export const getMe = (): Promise<ContextUser> =>
     new Promise(async (resolve, reject) => {
         INSTANCE({
             method: 'GET',

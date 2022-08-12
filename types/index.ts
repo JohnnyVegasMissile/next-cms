@@ -24,11 +24,11 @@ export type UserRoleTypes = 'super-admin' | 'admin' | 'user'
 export type PageTypes = 'home' | 'error' | 'list' | 'page' | 'signin'
 
 export interface ContextUser {
+    email: string
+    id: string
     name: string
-    email?: string
     role: string
-    expiresAt: Date
-    // type: 'super-admin' | 'admin' | 'user'
+    updatedAt: Date
 }
 
 export type FullUser = User & {
@@ -130,15 +130,20 @@ export type FullContentField = ContentField & {
 export type AuthResponse = {
     token: string
     expiresAt: Date
-    user: User & {
-        role: string
-        email: string
-    }
+    // user: User & {
+    //     role: string
+    //     email: string
+    // }
 }
 
 export type PageProps = {
     id: string
     appName: string
+    theme: {
+        background: string | null
+        primary: string | null
+        secondary: string | null
+    }
     type: 'container' | 'content'
     title: string
     accesses: Access[]

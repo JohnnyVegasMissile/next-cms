@@ -4,8 +4,6 @@ import type { Block } from '../types'
 
 const Title: Block = {
     name: 'Title',
-    pages: ['page', 'list', 'home', 'error', 'signin'],
-    preview: '',
     View,
     Edit,
 }

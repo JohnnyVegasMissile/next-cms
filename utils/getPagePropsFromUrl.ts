@@ -95,8 +95,25 @@ const getPagePropsFromUrl = async (slug: string) => {
         where: { name: 'app_name' },
     })
 
+    const background_color = await prisma.setting.findUnique({
+        where: { name: 'background_color' },
+    })
+
+    const primary_color = await prisma.setting.findUnique({
+        where: { name: 'primary_color' },
+    })
+
+    const secondary_color = await prisma.setting.findUnique({
+        where: { name: 'secondary_color' },
+    })
+
     const props = sanitizeAll({
         appName: appName?.value || '',
+        theme: {
+            background: background_color?.value || null,
+            primary: primary_color?.value || null,
+            secondary: secondary_color?.value || null,
+        },
         type: !!releatedSlug?.container ? 'container' : 'content',
         ...get(releatedSlug, 'container', {}),
         ...get(releatedSlug, 'content', {}),

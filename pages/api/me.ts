@@ -14,7 +14,7 @@ const me = async (req: NextApiRequest, res: NextApiResponse) => {
 
     switch (req.method) {
         case 'GET': {
-            return res.status(200).json(isAuth)
+            return res.status(200).json(isAuth.user)
         }
 
         default: {

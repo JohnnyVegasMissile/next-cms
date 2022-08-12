@@ -7,7 +7,7 @@ import { getSettings, editSetting } from '../../network/settings'
 import get from 'lodash.get'
 import useDebounce from '../../hooks/useDebounce'
 import Head from 'next/head'
-import { SketchPicker, ChromePicker } from 'react-color'
+import { ChromePicker } from 'react-color'
 import { BgColorsOutlined } from '@ant-design/icons'
 
 const { Text } = Typography

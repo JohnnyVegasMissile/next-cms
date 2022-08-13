@@ -20,7 +20,7 @@ const Layout = () => {
         validate: () => ({}),
         onSubmit: async (values) => {
             let i = 0
-            const header: FullSectionEdit[] = []
+            const header = []
 
             if (!!values.header) {
                 for (const section of values.header) {
@@ -36,7 +36,7 @@ const Layout = () => {
             }
 
             i = 0
-            const topBody: FullSectionEdit[] = []
+            const topBody = []
 
             if (!!values.topBody) {
                 for (const section of values.topBody) {
@@ -52,7 +52,7 @@ const Layout = () => {
             }
 
             i = 0
-            const bottomBody: FullSectionEdit[] = []
+            const bottomBody = []
 
             if (!!values.bottomBody) {
                 for (const section of values.bottomBody) {
@@ -68,7 +68,7 @@ const Layout = () => {
             }
 
             i = 0
-            const footer: FullSectionEdit[] = []
+            const footer = []
 
             if (!!values.footer) {
                 for (const section of values.footer) {

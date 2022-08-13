@@ -81,7 +81,7 @@ const sanitizeAll = <T>(props: T) => {
         updatedAt: sanitizeDate(get(props, 'updatedAt')),
     }
 
-    // console.log('props out', newProps)
+    console.log('props out', newProps)
     return newProps as T
 }
 

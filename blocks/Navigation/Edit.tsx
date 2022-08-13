@@ -5,12 +5,9 @@ import type { Props } from '../types'
 import { Button, Card, Space, Typography } from 'antd'
 import StyledInput from '../../components/StyledInput'
 import set from 'lodash.set'
-import Link from 'next/link'
 import get from 'lodash.get'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
-import { link } from 'fs'
-import CustomSelect from '@components/CustomSelect'
-import LinkInput from '@components/LinkInput'
+import LinkInput from '../../components/LinkInput'
 
 const { Text } = Typography
 

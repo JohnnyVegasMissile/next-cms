@@ -140,13 +140,15 @@ const MediaModal = ({ value, onMediaSelected, type = 'images' }: Props) => {
 const columns = [
     {
         width: 75,
-        render: (image: Media) => <Image width={50} height={50} src={`/api/uploads/${image.uri}`} alt="" />,
+        render: (image: Media) => (
+            <Image width={50} height={50} src={`/api/uploads/images/${image.uri}`} alt="" />
+        ),
     },
     {
         title: 'Name',
         // dataIndex: 'name',
         render: (image: Media) => (
-            <a target="_blank" rel="noreferrer" href={`/api/uploads/${image.uri}`}>
+            <a target="_blank" rel="noreferrer" href={`/api/uploads/images/${image.uri}`}>
                 {image.name}
             </a>
         ),

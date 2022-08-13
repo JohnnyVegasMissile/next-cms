@@ -22,7 +22,7 @@ const Pages = (props: PageProps) => {
     // const { isAuth, user, setRedirect } = useAuth()
 
     return (
-        <div>
+        <>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{`${appName} | ${title}`}</title>
@@ -106,7 +106,7 @@ const Pages = (props: PageProps) => {
                     <SectionBlock key={section.id} section={section} page={props} theme={theme} />
                 ))}
             </footer>
-        </div>
+        </>
     )
 }
 

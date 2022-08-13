@@ -1,63 +1,18 @@
-import type { GetStaticPathsContext } from 'next'
-import Head from 'next/head'
-// import { prisma } from '../utils/prisma'
-import EditPageButton from '../components/EditPageButton'
-import { PageProps } from 'types'
-// import get from 'lodash.get'
-import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 import Link from 'next/link'
+import { PageProps } from 'types'
 import { Button, Result } from 'antd'
-import SectionBlock from '../components/SectionBlock'
+import type { GetStaticPathsContext } from 'next'
 
-const NotFound = (props: PageProps) => {
-    const { id, title, appName, sections, theme, metadatas, layout } = props
+import PageDisplay from '../components/PageDisplay'
+import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
-    return (
-        <div>
-            <Head>
-                <link rel="icon" href="api/uploads/favicon.ico" />
-                <title>{`${appName} | ${title}`}</title>
-                {metadatas?.map((meta) => (
-                    <meta key={meta.id} name={meta.name} content={meta.content} />
-                ))}
-            </Head>
-
-            <EditPageButton redirectTo={`/admin/contents/${id}`} />
-
-            <header>
-                {layout?.header?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-            </header>
-
-            <main>
-                {(!sections || !sections.length) && <Default404 />}
-
-                {layout?.topBody?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-                {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-                {layout?.bottomBody?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-            </main>
-
-            <footer>
-                {layout?.footer?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-            </footer>
-        </div>
-    )
-}
+const NotFound = (props: PageProps) => <PageDisplay pageProps={props} onEmpty={<Default404 />} />
 
 const Default404 = () => {
     return (
         <div
             style={{
-                height: '100vh',
+                height: '80vh',
                 width: '100vw',
                 display: 'flex',
                 justifyContent: 'center',

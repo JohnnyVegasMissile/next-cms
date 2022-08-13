@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import { useFormik } from 'formik'
 import type { GetStaticPathsContext } from 'next'
 import { Button, Input, Card, Space } from 'antd'
@@ -6,53 +5,10 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons'
 
 import { PageProps } from '../types'
 import { useAuth } from '../hooks/useAuth'
-import SectionBlock from '../components/SectionBlock'
-import EditPageButton from '../components/EditPageButton'
+import PageDisplay from '../components/PageDisplay'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
-const SignIn = (props: PageProps) => {
-    const { id, title, appName, sections, theme, metadatas, layout } = props
-
-    return (
-        <div>
-            <Head>
-                <link rel="icon" href="api/uploads/favicon.ico" />
-                <title>{`${appName} | ${title}`}</title>
-                {metadatas?.map((meta) => (
-                    <meta key={meta.id} name={meta.name} content={meta.content} />
-                ))}
-            </Head>
-
-            <EditPageButton redirectTo={`/admin/contents/${id}`} />
-
-            <header>
-                {layout?.header?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-            </header>
-
-            <main>
-                {(!sections || !sections.length) && <DefaultSignInForm />}
-
-                {layout?.topBody?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-                {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-                {layout?.bottomBody?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-            </main>
-
-            <footer>
-                {layout?.footer?.map((section) => (
-                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
-                ))}
-            </footer>
-        </div>
-    )
-}
+const SignIn = (props: PageProps) => <PageDisplay pageProps={props} onEmpty={<DefaultSignInForm />} />
 
 const DefaultSignInForm = () => {
     const { signIn } = useAuth()

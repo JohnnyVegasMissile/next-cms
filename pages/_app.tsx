@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import 'antd/dist/antd.css'
-// import type { NextWebVitalsMetric } from 'next/app'
+import type { NextWebVitalsMetric } from 'next/app'
 // import type { AppProps } from 'next/app'
 import type { NextComponentType } from 'next/types'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -16,14 +16,14 @@ import MenuAdmin from '../components/MenuAdmin'
 import { ProvideAuth } from '../hooks/useAuth'
 import get from 'lodash.get'
 
-// export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
-//     console.log('event', name, {
-//         category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
-//         value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
-//         label: id, // id unique to current page load
-//         // non_interaction: true, // avoids affecting bounce rate.
-//     })
-// }
+export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
+    console.log('event', name, {
+        category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
+        value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
+        label: id, // id unique to current page load
+        // non_interaction: true, // avoids affecting bounce rate.
+    })
+}
 
 const queryClient = new QueryClient({
     defaultOptions: { queries: { refetchOnWindowFocus: false } },

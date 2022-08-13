@@ -10,7 +10,7 @@ const sanitizeAll = <T>(props: T) => {
     let newProps = {
         ...props,
         metadatas: [
-            ...get(props, 'metadatas'),
+            ...get(props, 'metadatas', []),
             ...get(props, 'container.fields', [])
                 .filter((e: ContainerField) => !!e.metadata)
                 .map((field: ContainerField) => {

@@ -71,6 +71,7 @@ export const useProvideAuth = (): UseProvideAuthProps => {
         {
             onSuccess: (data: AuthResponse) => {
                 localStorage.setItem('token', data.token)
+                setToken(data.token)
 
                 console.log('Redirection from Auth', redirect)
                 !!redirect ? router.push(redirect) : router.push('/')

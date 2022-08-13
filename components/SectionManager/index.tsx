@@ -8,15 +8,17 @@ import set from 'lodash.set'
 import { useQuery, UseQueryResult } from 'react-query'
 import { getTheme } from '../../network/api'
 import get from 'lodash.get'
+import { ContainerField } from '@prisma/client'
 
 const { Text } = Typography
 
 interface SectionManagerProps {
     values: FullSectionEdit[]
     onChange(value: FullSectionEdit[]): void
+    fields?: ContainerField[]
 }
 
-const SectionManager = ({ values, onChange }: SectionManagerProps) => {
+const SectionManager = ({ values, onChange, fields }: SectionManagerProps) => {
     const theme: UseQueryResult<Theme, Error> = useQuery<Theme, Error>(['theme'], () => getTheme())
 
     const addSection = () => {
@@ -132,6 +134,7 @@ const SectionManager = ({ values, onChange }: SectionManagerProps) => {
                                 theme={get(theme, 'data', { background: '', primary: '', secondary: '' })}
                                 defaultValues={section.content}
                                 onChange={(e) => onHandleChange(`${idx}.content`, e)}
+                                fields={fields}
                             />
                         )}
                         {!!section.elementId && <DisplayElementView id={section.elementId} />}

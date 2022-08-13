@@ -1,4 +1,5 @@
-import { FullSection } from '../types'
+import { ContainerField } from '@prisma/client'
+import { FullSection, PageProps } from '../types'
 
 export interface Block {
     name: string
@@ -17,4 +18,6 @@ export interface Props {
     }
     onChange?: (values: string) => void
     section?: FullSection
+    page?: PageProps
+    fields?: ContainerField[]
 }

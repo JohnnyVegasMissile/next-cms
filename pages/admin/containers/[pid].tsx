@@ -68,7 +68,6 @@ const Admin = () => {
             let i = 0
             const sections: FullSection[] = []
 
-            console.log('values', values)
             if (!!values.sections) {
                 for (const section of values.sections) {
                     if (!!section.block || !!section.elementId) {
@@ -322,6 +321,7 @@ const Admin = () => {
                                     <SectionManager
                                         values={get(values, 'sections', []) as FullSectionEdit[]}
                                         onChange={(e) => onHandleChange('sections', e)}
+                                        fields={get(values, 'fields', [])}
                                     />
                                 </Space>
                             </TabPane>
@@ -347,6 +347,7 @@ const Admin = () => {
                                         <SectionManager
                                             values={get(values, 'contentSections', []) as FullSectionEdit[]}
                                             onChange={(e) => onHandleChange('contentSections', e)}
+                                            fields={get(values, 'fields', [])}
                                         />
                                     )}
                                 </Space>

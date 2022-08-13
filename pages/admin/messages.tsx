@@ -69,39 +69,6 @@ const AdminImages = () => {
                     expandable={{
                         expandedRowRender: (message: FullMessage) => {
                             const values = JSON.parse(message.value)
-
-                            // return (
-                            //     <Descriptions
-                            //         bordered
-                            //         size="small"
-                            //         layout="vertical"
-                            //         title={get(message, 'form.title', '')}
-                            //         contentStyle={{ backgroundColor: 'white' }}
-                            //         // size={size}
-                            //     >
-                            //         {message.form?.fields?.map((field, idx) => {
-                            //             if (field.type !== 'submit') {
-                            //                 return (
-                            //                     // <Space>
-                            //                     //     <Text strong>{`${field.label} :`}</Text>
-                            //                     //     <Text>
-                            //                     //         {get(values, field.name || '', '')}
-                            //                     //     </Text>
-                            //                     // </Space>
-                            //                     <Descriptions.Item
-                            //                         key={idx}
-                            //                         label={field.label}
-                            //                     >
-                            //                         {get(values, field.name || '', '')}
-                            //                     </Descriptions.Item>
-                            //                 )
-                            //             }
-
-                            //             return null
-                            //         })}
-                            //     </Descriptions>
-                            // )
-
                             const cols: TableColumnsType<any> | undefined = []
 
                             message.form?.fields?.forEach((field, idx) =>
@@ -113,21 +80,13 @@ const AdminImages = () => {
                                       })
                             )
 
-                            console.log([values])
-
                             return (
                                 <>
-                                    <Table
-                                        columns={cols}
-                                        bordered
-                                        dataSource={[values]}
-                                        pagination={false}
-                                    />
+                                    <Table columns={cols} bordered dataSource={[values]} pagination={false} />
                                 </>
                             )
                         },
                         onExpand: (expanded: boolean, message: FullMessage) => {
-                            console.log(expanded, message.read)
                             if (message.read || !expanded) return
 
                             readMessage(message.id)
@@ -174,10 +133,7 @@ const columns = [
         // dataIndex: 'read',
         key: 'read',
         render: (message: FullMessage) => (
-            <Badge
-                status={message.read ? 'success' : 'error'}
-                text={message.read ? 'Read' : 'Unread'}
-            />
+            <Badge status={message.read ? 'success' : 'error'} text={message.read ? 'Read' : 'Unread'} />
         ),
     },
 ]

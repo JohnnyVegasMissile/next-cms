@@ -85,7 +85,7 @@ const Pages = (props: PageProps) => {
                 )}
 
                 {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} theme={theme} />
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
                 ))}
             </main>
             {/* 

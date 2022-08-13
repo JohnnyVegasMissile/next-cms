@@ -11,7 +11,6 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         res.setHeader('Content-Type', mime.lookup('ico') || '')
         return res.send(file)
     } catch (e) {
-        console.log('err', e)
         return res.status(201).json({ message: `File does not exist` })
     }
 }

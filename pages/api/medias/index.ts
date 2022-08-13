@@ -52,7 +52,10 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
         }
         case 'files': {
             mime = {
-                AND: [{ NOT: { mimeType: { startsWith: 'image/' } } }, { NOT: { mimeType: { startsWith: 'video/' } } }],
+                AND: [
+                    { NOT: { mimeType: { startsWith: 'image/' } } },
+                    { NOT: { mimeType: { startsWith: 'video/' } } },
+                ],
             }
             break
         }
@@ -82,10 +85,12 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     await form.parse(req, async (err, fields, files) => {
         if (err) return res.status(500).json({ error: 'err' })
 
-        const file: Media | undefined | any = Array.isArray(files.file) ? get(files, 'file.0', undefined) : files.file
+        const file: Media | undefined | any = Array.isArray(files.file)
+            ? get(files, 'file.0', undefined)
+            : files.file
 
         if (!file) return res.status(400).json({ error: 'No file' })
-        console.log('file', file?.duration)
+        // console.log('file', file?.duration)
 
         var oldPath = file.filepath
         var newFileName = `FILE-${makeId(10)}-${makeId(10)}.${mime.extension(file.mimetype)}`

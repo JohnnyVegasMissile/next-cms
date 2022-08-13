@@ -1,6 +1,18 @@
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
-import { Input, Space, Button, Typography, Card, message, Spin, InputNumber, Radio, DatePicker, Divider } from 'antd'
+import {
+    Input,
+    Space,
+    Button,
+    Typography,
+    Card,
+    message,
+    Spin,
+    InputNumber,
+    Radio,
+    DatePicker,
+    Divider,
+} from 'antd'
 import get from 'lodash.get'
 import { editContent, getContentDetails, postContent } from '../../../network/contents'
 import { getContainerDetails } from '../../../network/containers'
@@ -63,7 +75,10 @@ const Admin = () => {
 
             const slug = encodeURI(get(values, 'slug', ''))
 
-            mutation.mutate({ pid: pid as string, values: { ...values, fields, slug, fieldsValue: undefined } })
+            mutation.mutate({
+                pid: pid as string,
+                values: { ...values, fields, slug, fieldsValue: undefined },
+            })
         },
     })
 
@@ -102,7 +117,10 @@ const Admin = () => {
                             mediaId: value.mediaId || undefined,
                             media: value.media || undefined,
                             textValue: value.textValue || undefined,
-                            numberValue: !!value.numberValue || value.numberValue === 0 ? value.numberValue : undefined,
+                            numberValue:
+                                !!value.numberValue || value.numberValue === 0
+                                    ? value.numberValue
+                                    : undefined,
                             boolValue: value.boolValue || undefined,
                             dateValue: moment(value.dateValue) || undefined,
                         }
@@ -298,8 +316,6 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
 
         onChange(newValue)
     }
-
-    console.log(values)
 
     return (
         <Space direction="vertical">

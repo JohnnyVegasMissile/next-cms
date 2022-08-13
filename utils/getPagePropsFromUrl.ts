@@ -96,6 +96,7 @@ const getPagePropsFromUrl = async (slug: string) => {
                     metadatas: true,
                     accesses: true,
                     sections: { include: { form: true } },
+                    contentSections: { include: { form: true } },
                     contents: {
                         include: {
                             fields: {
@@ -154,7 +155,7 @@ const getPagePropsFromUrl = async (slug: string) => {
         sections: !!releatedSlug?.container
             ? get(releatedSlug, 'container.sections', {})
             : releatedSlug?.content?.container?.contentHasSections
-            ? get(releatedSlug, 'container.contentSections', [])
+            ? get(releatedSlug, 'content.container.contentSections', [])
             : get(releatedSlug, 'content.sections', []),
     })
 

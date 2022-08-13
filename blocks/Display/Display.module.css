@@ -1,0 +1,38 @@
+.container {
+    width: 100%;
+    max-width: 768px;
+    padding: 0px 5px;
+}
+
+.display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.display .img {
+    height: 35rem;
+    width: 100%;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.display h1 {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+    font-weight: bold;
+    margin: 15px 0px;
+    text-transform: uppercase;
+
+    color: var(--primary-color);
+}
+
+.display p {
+    margin: 5px 0px;
+}
+
+.display span {
+    font-style: italic;
+    color: var(--secondary-color);
+}

@@ -10,7 +10,7 @@ import { PageProps } from '../types'
 import SectionBlock from '../components/SectionBlock'
 
 const Home = (props: PageProps) => {
-    const { id, appName, sections, theme, metadatas } = props
+    const { id, appName, sections, theme, metadatas, layout } = props
 
     return (
         <div>
@@ -23,18 +23,32 @@ const Home = (props: PageProps) => {
             </Head>
 
             <EditPageButton redirectTo={`/admin/containers/${id}`} />
-            {/* 
-            <header>{!!header && <SectionBlock section={header} page={props} />}</header> */}
+
+            <header>
+                {layout?.header?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
+            </header>
 
             <main>
                 {(!sections || !sections.length) && <DefaultHome />}
 
+                {layout?.topBody?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
                 {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} theme={theme} />
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
+                {layout?.bottomBody?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
                 ))}
             </main>
-            {/* 
-            <footer>{!!footer && <SectionBlock section={footer} page={props} />}</footer> */}
+
+            <footer>
+                {layout?.footer?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
+            </footer>
         </div>
     )
 }

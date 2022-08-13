@@ -1,13 +1,16 @@
-import { AutoComplete /*, Typography*/ } from 'antd'
+import { Slug } from '@prisma/client'
+import { AutoComplete, Typography } from 'antd'
 // import { useQuery, UseQueryResult } from 'react-query'
 // import { getContainers } from '../../network/containers'
-// import { getArticles } from '../../network/articles'
+import { getSlugs } from '../../network/api'
 // import type { Container } from '@prisma/client'
 // import { useMemo } from 'react'
 // import { FullArticle } from 'types'
 import get from 'lodash.get'
+import { useQuery, UseQueryResult } from 'react-query'
+import { useMemo } from 'react'
 
-// const { Text } = Typography
+const { Text } = Typography
 
 interface Props {
     value: string
@@ -16,30 +19,25 @@ interface Props {
 }
 
 const LinkInput = ({ value, onChange, width = 300 }: Props) => {
-    // const pages: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(
-    //     ['containers'],
-    //     () => getContainers(),
-    //     {
-    //         // select: (data) => data.filter((e) => e.type !== 'error'),
-    //         refetchOnMount: false,
-    //     }
-    // )
+    const slugs: UseQueryResult<Slug[], Error> = useQuery<Slug[], Error>(['slugs'], () => getSlugs(), {
+        refetchOnMount: false,
+    })
 
-    // const options = useMemo(() => {
-    //     const pagesOptions =
-    //         pages?.data?.map((page) => ({
-    //             value: `/${page.slug}`,
-    //             searchLabel: page.title,
-    //             label: (
-    //                 <>
-    //                     <Text>{page.title}</Text>
-    //                     <Text type="secondary">{` (Page)`}</Text>
-    //                 </>
-    //             ),
-    //         })) || []
+    const options = useMemo(() => {
+        const pagesOptions =
+            slugs?.data?.map((slug: any) => ({
+                value: `/${slug.fullSlug}`,
+                searchLabel: slug?.content?.title || slug?.container?.title,
+                label: (
+                    <>
+                        <Text>{slug?.content?.title || slug?.container?.title}</Text>
+                        <Text type="secondary">{` (/${slug.fullSlug})`}</Text>
+                    </>
+                ),
+            })) || []
 
-    //     return [...pagesOptions]
-    // }, [pages])
+        return [...pagesOptions]
+    }, [slugs])
 
     const isError = !!value && get(value, '0', '') !== '/' ? 'error' : ''
 
@@ -47,7 +45,7 @@ const LinkInput = ({ value, onChange, width = 300 }: Props) => {
         <AutoComplete
             status={isError}
             value={value}
-            options={[]} //options}
+            options={options}
             style={{ width }}
             onSelect={(value: string) => onChange(value)}
             onChange={onChange}

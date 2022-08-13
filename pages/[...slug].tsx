@@ -18,7 +18,7 @@ import SectionBlock from '@components/SectionBlock'
 // import Link from 'next/link'
 
 const Pages = (props: PageProps) => {
-    const { id, type, title, appName, contents, fields, theme, sections, metadatas } = props
+    const { id, type, title, appName, contents, fields, theme, sections, metadatas, layout } = props
     // const { isAuth, user, setRedirect } = useAuth()
 
     return (
@@ -32,6 +32,12 @@ const Pages = (props: PageProps) => {
             </Head>
 
             <EditPageButton redirectTo={`/admin/${type === 'container' ? 'containers' : 'contents'}/${id}`} />
+
+            <header>
+                {layout?.header?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
+            </header>
 
             <main>
                 {type === 'container' && !sections.length && (
@@ -84,32 +90,22 @@ const Pages = (props: PageProps) => {
                     </>
                 )}
 
+                {layout?.topBody?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
                 {sections?.map((section) => (
                     <SectionBlock key={section.id} section={section} page={props} theme={theme} />
                 ))}
+                {layout?.bottomBody?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
             </main>
-            {/* 
-            <header>
-                {!!get(props, 'header', false) && <SectionBlock section={get(props, 'header')} page={props} />}
-            </header>
-
-            {!!get(props, 'type', false) ? (
-                <main>
-                    {get(props, 'sections', [])?.map((section) => (
-                        <SectionBlock key={section.id} section={section} page={props} />
-                    ))}
-                </main>
-            ) : (
-                <article>
-                    {get(props, 'sections', [])?.map((section) => (
-                        <SectionBlock key={section.id} section={section} page={props} />
-                    ))}
-                </article>
-            )}
 
             <footer>
-                {!!get(props, 'footer', false) && <SectionBlock section={get(props, 'footer')} page={props} />}
-            </footer> */}
+                {layout?.footer?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
+            </footer>
         </div>
     )
 }

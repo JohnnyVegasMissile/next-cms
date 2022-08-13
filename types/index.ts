@@ -145,6 +145,7 @@ export type Theme = {
 export type PageProps = {
     id: string
     appName: string
+    layout: LayoutProps
     theme: Theme
     type: 'container' | 'content'
     title: string
@@ -165,10 +166,18 @@ export type PageProps = {
 }
 
 export type LayoutProps = {
-    header: FullSectionEdit[]
-    topBody: FullSectionEdit[]
-    bottomBody: FullSectionEdit[]
-    footer: FullSectionEdit[]
+    header: (Section & {
+        form: Form | null
+    })[]
+    topBody: (Section & {
+        form: Form | null
+    })[]
+    bottomBody: (Section & {
+        form: Form | null
+    })[]
+    footer: (Section & {
+        form: Form | null
+    })[]
 }
 
 // export type AuthResponse = {

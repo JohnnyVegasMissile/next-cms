@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import styles from './Title.module.css'
 
 import type { Props } from '../types'
-import { Card } from 'antd'
+import { Button, Card, Space, Typography } from 'antd'
 import StyledInput from '../../components/StyledInput'
 import set from 'lodash.set'
+import Link from 'next/link'
+import get from 'lodash.get'
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import { link } from 'fs'
+import CustomSelect from '@components/CustomSelect'
+import LinkInput from '@components/LinkInput'
+
+const { Text } = Typography
 
 const parseDefaultValue = (values: string) => {
     try {
@@ -31,18 +39,73 @@ const Edit = ({ defaultValues, onChange }: Props) => {
         }
     }
 
+    const remove = (index: number) => {
+        const newValue = { ...values }
+
+        newValue.links.splice(index, 1)
+
+        setValues(newValue)
+
+        try {
+            if (onChange) onChange(JSON.stringify(newValue))
+        } catch (e) {
+            console.log('Error on edit')
+        }
+    }
+
     return (
         <EditPanel
             view={
-                <section>
-                    <div className={styles.background}>
-                        <StyledInput.a
-                            className={styles.title}
-                            value={values.title}
-                            onChange={(e) => handleChange('title', e)}
-                        />
+                <nav className={styles.navigation}>
+                    <div className={styles.container}>
+                        <ul>
+                            {get(values, 'links', []).map((e: any, i: number) => (
+                                <li key={i}>
+                                    <StyledInput.a
+                                        className={styles.title}
+                                        value={get(e, 'title', '')}
+                                        onChange={(e) => handleChange(`links.${i}.title`, e)}
+                                    />
+
+                                    <Button
+                                        onClick={() => remove(i)}
+                                        size="small"
+                                        shape="circle"
+                                        type="primary"
+                                        danger
+                                        style={{
+                                            position: 'absolute',
+                                            top: -1,
+                                        }}
+                                        icon={<MinusOutlined />}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
                     </div>
-                </section>
+                    <Button
+                        onClick={() => handleChange(`links.${get(values, 'links', []).length}`, {})}
+                        size="small"
+                        shape="circle"
+                        type="primary"
+                        style={{
+                            position: 'absolute',
+                            top: 4,
+                            right: 5,
+                        }}
+                        icon={<PlusOutlined />}
+                    />
+                </nav>
+            }
+            panel={
+                <Space direction="vertical" style={{ width: '100%' }}>
+                    {get(values, 'links', []).map((e: any, i: number) => (
+                        <Fragment key={i}>
+                            <Text>Link {e.title}</Text>
+                            <LinkInput value={e.link} onChange={(e) => handleChange(`links.${i}.link`, e)} />
+                        </Fragment>
+                    ))}
+                </Space>
             }
         />
     )

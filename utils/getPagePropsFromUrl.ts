@@ -142,6 +142,26 @@ const getPagePropsFromUrl = async (slug: string) => {
         where: { name: 'secondary_color' },
     })
 
+    const header = await prisma.section.findMany({
+        where: { type: 'header' },
+        include: { form: true },
+    })
+
+    const topBody = await prisma.section.findMany({
+        where: { type: 'top-body' },
+        include: { form: true },
+    })
+
+    const bottomBody = await prisma.section.findMany({
+        where: { type: 'bottom-body' },
+        include: { form: true },
+    })
+
+    const footer = await prisma.section.findMany({
+        where: { type: 'footer' },
+        include: { form: true },
+    })
+
     const props = sanitizeAll({
         appName: appName?.value || '',
         theme: {
@@ -149,6 +169,7 @@ const getPagePropsFromUrl = async (slug: string) => {
             primary: primary_color?.value || null,
             secondary: secondary_color?.value || null,
         },
+        layout: { header, topBody, bottomBody, footer },
         type: !!releatedSlug?.container ? 'container' : 'content',
         ...get(releatedSlug, 'container', {}),
         ...get(releatedSlug, 'content', {}),

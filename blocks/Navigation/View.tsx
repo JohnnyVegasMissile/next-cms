@@ -1,6 +1,7 @@
 import styles from './Title.module.css'
 
 import type { Props } from '../types'
+import Link from 'next/link'
 
 const parseDefaultValue = (values: string) => {
     try {
@@ -11,14 +12,22 @@ const parseDefaultValue = (values: string) => {
 }
 
 const View = ({ defaultValues /*, articles*/ }: Props) => {
-    const { title } = parseDefaultValue(defaultValues)
+    const { links } = parseDefaultValue(defaultValues)
 
     return (
-        <section>
-            <div className={styles.background}>
-                <h2 className={styles.title}>{title}</h2>
+        <nav className={styles.navigation}>
+            <div className={styles.container}>
+                <ul>
+                    {links?.map((e: any, i: number) => (
+                        <li key={i}>
+                            <Link href={e.link}>
+                                <a>{e.title}</a>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
             </div>
-        </section>
+        </nav>
     )
 }
 

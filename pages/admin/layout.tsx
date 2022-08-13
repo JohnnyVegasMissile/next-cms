@@ -1,6 +1,6 @@
 import SectionManager from '../../components/SectionManager'
 import { FullSectionEdit, LayoutProps } from '../../types'
-import { Card, Divider, message, Space, Spin, Typography } from 'antd'
+import { Button, Card, Divider, message, Space, Spin, Typography } from 'antd'
 import { useFormik } from 'formik'
 import get from 'lodash.get'
 import { useMutation, useQuery, UseQueryResult } from 'react-query'
@@ -10,7 +10,7 @@ import Head from 'next/head'
 const { Title } = Typography
 
 const Layout = () => {
-    const { values, /*errors, handleSubmit,*/ handleChange, setValues } = useFormik<LayoutProps>({
+    const { values, /*errors,*/ handleSubmit, handleChange, setValues } = useFormik<LayoutProps>({
         initialValues: {
             header: [],
             topBody: [],
@@ -92,21 +92,25 @@ const Layout = () => {
         },
     })
 
-    const layout: UseQueryResult<LayoutProps, Error> = useQuery<LayoutProps, Error>(['layout'], () => getLayout(), {
-        onSuccess: (data: LayoutProps) => {
-            const header = get(data, 'header', []).sort((a, b) => a.position - b.position)
-            const topBody = get(data, 'topBody', []).sort((a, b) => a.position - b.position)
-            const bottomBody = get(data, 'bottomBody', []).sort((a, b) => a.position - b.position)
-            const footer = get(data, 'footer', []).sort((a, b) => a.position - b.position)
+    const layout: UseQueryResult<LayoutProps, Error> = useQuery<LayoutProps, Error>(
+        ['layout'],
+        () => getLayout(),
+        {
+            onSuccess: (data: LayoutProps) => {
+                const header = get(data, 'header', []).sort((a, b) => a.position - b.position)
+                const topBody = get(data, 'topBody', []).sort((a, b) => a.position - b.position)
+                const bottomBody = get(data, 'bottomBody', []).sort((a, b) => a.position - b.position)
+                const footer = get(data, 'footer', []).sort((a, b) => a.position - b.position)
 
-            setValues({
-                header,
-                topBody,
-                bottomBody,
-                footer,
-            })
-        },
-    })
+                setValues({
+                    header,
+                    topBody,
+                    bottomBody,
+                    footer,
+                })
+            },
+        }
+    )
 
     const mutation = useMutation((values: LayoutProps) => postLayout(values), {
         onSuccess: (data: any) => {
@@ -148,44 +152,50 @@ const Layout = () => {
                 <title>Admin - Layout</title>
             </Head>
 
-            <Space
-                direction="vertical"
-                style={{ width: '100%', minHeight: '100vh', backgroundColor: '#f0f2f5', padding: 15 }}
-            >
-                <Divider orientation="left">Header</Divider>
+            <form onSubmit={handleSubmit}>
+                <Space
+                    direction="vertical"
+                    style={{ width: '100%', minHeight: '100vh', backgroundColor: '#f0f2f5', padding: 15 }}
+                >
+                    <Divider orientation="left">Header</Divider>
 
-                <SectionManager
-                    values={get(values, 'header', []) as FullSectionEdit[]}
-                    onChange={(e) => onHandleChange('header', e)}
-                />
+                    <SectionManager
+                        values={get(values, 'header', []) as FullSectionEdit[]}
+                        onChange={(e) => onHandleChange('header', e)}
+                    />
 
-                <Divider orientation="left">Top Body</Divider>
+                    <Divider orientation="left">Top Body</Divider>
 
-                <SectionManager
-                    values={get(values, 'topBody', []) as FullSectionEdit[]}
-                    onChange={(e) => onHandleChange('topBody', e)}
-                />
+                    <SectionManager
+                        values={get(values, 'topBody', []) as FullSectionEdit[]}
+                        onChange={(e) => onHandleChange('topBody', e)}
+                    />
 
-                <Card style={{ marginTop: 10 }}>
-                    <Title style={{ textAlign: 'center', margin: 0 }} level={2}>
-                        Pages content
-                    </Title>
-                </Card>
+                    <Card style={{ marginTop: 10 }}>
+                        <Title style={{ textAlign: 'center', margin: 0 }} level={2}>
+                            Pages content
+                        </Title>
+                    </Card>
 
-                <Divider orientation="left">Bottom Body</Divider>
+                    <Divider orientation="left">Bottom Body</Divider>
 
-                <SectionManager
-                    values={get(values, 'bottomBody', []) as FullSectionEdit[]}
-                    onChange={(e) => onHandleChange('bottomBody', e)}
-                />
+                    <SectionManager
+                        values={get(values, 'bottomBody', []) as FullSectionEdit[]}
+                        onChange={(e) => onHandleChange('bottomBody', e)}
+                    />
 
-                <Divider orientation="left">Footer</Divider>
+                    <Divider orientation="left">Footer</Divider>
 
-                <SectionManager
-                    values={get(values, 'footer', []) as FullSectionEdit[]}
-                    onChange={(e) => onHandleChange('footer', e)}
-                />
-            </Space>
+                    <SectionManager
+                        values={get(values, 'footer', []) as FullSectionEdit[]}
+                        onChange={(e) => onHandleChange('footer', e)}
+                    />
+
+                    <Button loading={mutation.isLoading} type="primary" htmlType="submit">
+                        Save
+                    </Button>
+                </Space>
+            </form>
         </>
     )
 }

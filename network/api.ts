@@ -1,3 +1,4 @@
+import { Slug } from '@prisma/client'
 import { LayoutProps, Theme } from '../types'
 
 const axios = require('axios')
@@ -60,6 +61,16 @@ export const getTheme = (): Promise<Theme> =>
         INSTANCE({
             method: 'GET',
             url: `/api/theme`,
+        })
+            .then(resolve)
+            .catch(reject)
+    })
+
+export const getSlugs = (): Promise<Slug[]> =>
+    new Promise((resolve, reject) => {
+        INSTANCE({
+            method: 'GET',
+            url: `/api/slugs`,
         })
             .then(resolve)
             .catch(reject)

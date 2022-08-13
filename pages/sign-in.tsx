@@ -11,31 +11,45 @@ import EditPageButton from '../components/EditPageButton'
 import getPagePropsFromUrl from '../utils/getPagePropsFromUrl'
 
 const SignIn = (props: PageProps) => {
-    const { id, title, appName, sections } = props
+    const { id, title, appName, sections, theme, metadatas, layout } = props
 
     return (
         <div>
             <Head>
                 <link rel="icon" href="api/uploads/favicon.ico" />
                 <title>{`${appName} | ${title}`}</title>
-                {/* {metadatas?.map((meta) => (
+                {metadatas?.map((meta) => (
                     <meta key={meta.id} name={meta.name} content={meta.content} />
-                ))} */}
+                ))}
             </Head>
 
             <EditPageButton redirectTo={`/admin/contents/${id}`} />
 
-            <header></header>
+            <header>
+                {layout?.header?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
+            </header>
 
             <main>
                 {(!sections || !sections.length) && <DefaultSignInForm />}
 
+                {layout?.topBody?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
                 {sections?.map((section) => (
-                    <SectionBlock key={section.id} section={section} />
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
+                {layout?.bottomBody?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
                 ))}
             </main>
 
-            <footer></footer>
+            <footer>
+                {layout?.footer?.map((section) => (
+                    <SectionBlock key={section.id} section={section} page={props} theme={theme} />
+                ))}
+            </footer>
         </div>
     )
 }

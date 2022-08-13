@@ -1,10 +1,10 @@
 import Blocks from '../../blocks'
 import get from 'lodash.get'
-import { Section, Element } from '@prisma/client'
+import { Section } from '@prisma/client'
 import { PageProps } from '../../types'
 
 interface Props {
-    section: Section | Element
+    section: Section
     theme?: {}
     page?: PageProps
 }

@@ -179,6 +179,7 @@ model ContainerField {
   label       String
   name        String
   type        String
+  multiple    Boolean   @default(false)
   containerId String
   container   Container @relation(fields: [containerId], references: [id])
   metadata    String?
@@ -186,17 +187,21 @@ model ContainerField {
 }
 
 model ContentField {
-  id          String    @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
   type        String
-  contentId   String
-  content     Content   @relation(fields: [contentId], references: [id])
+  contentId   String?
+  content     Content?       @relation(fields: [contentId], references: [id])
   mediaId     String?
-  media       Media?    @relation(fields: [mediaId], references: [id])
+  media       Media?         @relation(fields: [mediaId], references: [id])
   textValue   String?
   numberValue Int?
   boolValue   Boolean?
   dateValue   DateTime?
+  multiple    Boolean        @default(false)
+  listId      String?
+  list        ContentField?  @relation(fields: [listId], references: [id], name: "lists")
+  childs      ContentField[] @relation(name: "lists")
 }
 
 model Slug {

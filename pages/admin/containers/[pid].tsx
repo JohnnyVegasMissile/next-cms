@@ -110,8 +110,8 @@ const Admin = () => {
         {
             onSuccess: (data: any) => {
                 message.success(`Containers ${data.title} saved`)
-                queryClient.invalidateQueries('containers')
                 router.push('/admin/containers')
+                queryClient.invalidateQueries('containers')
             },
             onError: (err) => {
                 message.error('An error occured, while creating or updating the container')
@@ -449,7 +449,7 @@ interface FieldsManagerProps {
 
 const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
     const addField = () => {
-        onChange([...values, { name: '' }])
+        onChange([...values, { multiple: false, required: true }])
     }
 
     const removeField = (index: number) => {
@@ -535,8 +535,41 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
                         </Space>
 
                         <Space direction="vertical">
+                            <Text>Multiple</Text>
+                            <div
+                                style={{
+                                    height: 32,
+                                    width: 75,
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                }}
+                            >
+                                <Switch
+                                    checked={field.multiple}
+                                    onClick={(e) => modifyField(idx, 'multiple', e)}
+                                />
+                            </div>
+                        </Space>
+
+                        <Space direction="vertical">
                             <Text>Required</Text>
-                            <Radio.Group
+                            <div
+                                style={{
+                                    height: 32,
+                                    width: 75,
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                }}
+                            >
+                                <Switch
+                                    checked={field.required}
+                                    onClick={(e) => {
+                                        console.log('e', e)
+                                        modifyField(idx, 'required', e)
+                                    }}
+                                />
+                            </div>
+                            {/* <Radio.Group
                                 style={{
                                     height: 32,
                                     alignItems: 'center',
@@ -548,7 +581,7 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
                             >
                                 <Radio value={true}>Required</Radio>
                                 <Radio value={false}>Not Required</Radio>
-                            </Radio.Group>
+                            </Radio.Group> */}
                         </Space>
 
                         <Space direction="vertical">

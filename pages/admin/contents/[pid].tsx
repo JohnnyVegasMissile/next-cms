@@ -12,6 +12,9 @@ import {
     Radio,
     DatePicker,
     Divider,
+    Tag,
+    Tooltip,
+    InputRef,
 } from 'antd'
 import get from 'lodash.get'
 import { editContent, getContentDetails, postContent } from '../../../network/contents'
@@ -27,6 +30,9 @@ import SectionManager from '@components/SectionManager'
 import set from 'lodash.set'
 import AccessCheckboxes from '@components/AccessCheckboxes'
 import moment from 'moment'
+import { useEffect, useRef, useState } from 'react'
+import { PlusOutlined } from '@ant-design/icons'
+import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
 const { Text } = Typography
 
@@ -327,11 +333,17 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                 <Text>
                                     {field.label} ({field.type})
                                 </Text>
-                                <Input
-                                    style={{ width: 480 }}
-                                    value={get(values, `${field.name}.textValue`, '')}
-                                    onChange={(e) => onHandleChange(field.name, field.type, e.target.value)}
-                                />
+                                {field.multiple ? (
+                                    <MultipleInput />
+                                ) : (
+                                    <Input
+                                        style={{ width: 480 }}
+                                        value={get(values, `${field.name}.textValue`, '')}
+                                        onChange={(e) =>
+                                            onHandleChange(field.name, field.type, e.target.value)
+                                        }
+                                    />
+                                )}
                             </Space>
                         )
                     case 'text':
@@ -353,11 +365,15 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                 <Text>
                                     {field.label} ({field.type})
                                 </Text>
-                                <InputNumber
-                                    style={{ width: 480 }}
-                                    value={get(values, `${field.name}.numberValue`, undefined)}
-                                    onChange={(e) => onHandleChange(field.name, field.type, e)}
-                                />
+                                {field.multiple ? (
+                                    <MultipleInput isInt />
+                                ) : (
+                                    <InputNumber
+                                        style={{ width: 480 }}
+                                        value={get(values, `${field.name}.numberValue`, undefined)}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e)}
+                                    />
+                                )}
                             </Space>
                         )
                     case 'boolean':
@@ -419,6 +435,133 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                 }
             })}
         </Space>
+    )
+}
+
+const MultipleInput = ({ isInt = false }: { isInt?: boolean }) => {
+    const [value, setValue] = useState<string | number>('')
+    const [values, setValues] = useState<(string | number)[]>([])
+
+    const [inputVisible, setInputVisible] = useState(false)
+
+    const onEndEdit = () => {
+        if (!!value) {
+            setValues([...values, value])
+            setValue('')
+            setInputVisible(false)
+            return
+        }
+
+        setInputVisible(false)
+    }
+
+    const props = {
+        autoFocus: true,
+        type: 'text',
+        size: 'small' as SizeType,
+        style: { width: 85, marginRight: '7px', fontSize: '12px', height: '22px' },
+        value: value,
+        onBlur: onEndEdit,
+        onPressEnter: onEndEdit,
+    }
+
+    return (
+        <Space
+            size={0}
+            style={{
+                height: 32,
+                border: '1px solid #d9d9d9',
+                borderRadius: 2,
+                paddingLeft: 7,
+                minWidth: 480,
+            }}
+        >
+            {values.map((value, idx) => (
+                <UniqueInput
+                    isInt={isInt}
+                    key={idx}
+                    value={value}
+                    onChange={(e) => {
+                        const newValues = [...values]
+                        newValues[idx] = e
+                        setValues(newValues)
+                    }}
+                    onClose={() => {
+                        const newValues = [...values]
+                        newValues.splice(idx, 1)
+                        setValues(newValues)
+                    }}
+                />
+            ))}
+            {inputVisible ? (
+                isInt ? (
+                    <InputNumber {...props} onChange={(e) => setValue(e)} />
+                ) : (
+                    <Input {...props} onChange={(e) => setValue(e.target.value)} />
+                )
+            ) : (
+                <Tag onClick={() => setInputVisible(true)}>
+                    <PlusOutlined /> New Tag
+                </Tag>
+            )}
+        </Space>
+    )
+}
+
+const UniqueInput = ({
+    value,
+    onChange,
+    onClose,
+    isInt = false,
+}: {
+    value: string | number
+    onChange(value: string | number): void
+    onClose(): void
+    isInt?: boolean
+}) => {
+    const [inputVisible, setInputVisible] = useState(false)
+
+    const onEndEdit = () => {
+        if (!value) {
+            onClose()
+            return
+        }
+
+        setInputVisible(false)
+    }
+
+    const props = {
+        autoFocus: true,
+        type: 'text',
+        size: 'small' as SizeType,
+        style: { width: 85, marginRight: '7px', fontSize: '12px', height: '22px' },
+        value: value,
+        onBlur: onEndEdit,
+        onPressEnter: onEndEdit,
+    }
+
+    if (inputVisible) {
+        return isInt ? (
+            <InputNumber {...props} onChange={(e) => onChange(e)} />
+        ) : (
+            <Input {...props} onChange={(e) => onChange(e.target.value)} />
+        )
+    }
+
+    const isLongTag = typeof value === 'number' ? false : value.length > 20
+
+    return (
+        <Tag
+            closable={true}
+            onClose={(e) => {
+                onClose()
+                e.preventDefault()
+            }}
+        >
+            <span onClick={(e) => setInputVisible(true)}>
+                {isLongTag && typeof value === 'string' ? `${value.slice(0, 20)}...` : value}
+            </span>
+        </Tag>
     )
 }
 

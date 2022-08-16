@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { Button, Modal, Image, Space, Typography, Table, Input } from 'antd'
 import { useQuery, useQueryClient, UseQueryResult } from 'react-query'
 import { getMedias } from '../../network/medias'
@@ -9,6 +9,7 @@ import moment from 'moment'
 import UploadButton from '../../components/UploadButton'
 import useDebounce from '@hooks/useDebounce'
 import trim from 'lodash.trim'
+import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
 const { Text } = Typography
 
@@ -16,9 +17,21 @@ interface Props {
     value?: Media
     onMediaSelected: (media: Media | undefined) => void
     type?: 'images' | 'videos' | 'files'
+    size?: SizeType
+    label?: string
+    icon?: ReactNode
+    primary?: boolean
 }
 
-const MediaModal = ({ value, onMediaSelected, type = 'images' }: Props) => {
+const MediaModal = ({
+    value,
+    onMediaSelected,
+    type = 'images',
+    size = 'middle',
+    label = 'Choose a picture',
+    primary = true,
+    icon,
+}: Props) => {
     const [visible, setVisible] = useState(false)
     const [selected, setSelected] = useState<Media | null>(value || null)
 
@@ -60,16 +73,24 @@ const MediaModal = ({ value, onMediaSelected, type = 'images' }: Props) => {
         setSelected(null)
     }
 
+    const isLongTag = !!value?.name && value?.name?.length > 37
+
     return (
         <>
             <Space>
-                <Button type="primary" onClick={() => setVisible(true)}>
-                    Choose a picture
+                <Button
+                    icon={icon}
+                    size={size}
+                    type={primary ? 'primary' : undefined}
+                    onClick={() => setVisible(true)}
+                >
+                    {label}
                 </Button>
                 {value && (
                     <>
-                        <Text>{value?.name}</Text>
+                        <Text>{isLongTag ? `${value?.name.slice(0, 37)}...` : value?.name}</Text>
                         <Button
+                            size={size}
                             type="primary"
                             danger
                             onClick={() => onMediaSelected(undefined)}

@@ -13,13 +13,11 @@ import {
     DatePicker,
     Divider,
     Tag,
-    Tooltip,
-    InputRef,
 } from 'antd'
 import get from 'lodash.get'
 import { editContent, getContentDetails, postContent } from '../../../network/contents'
 import { getContainerDetails } from '../../../network/containers'
-import { Prisma, Content, ContainerField /*, ContentField*/ } from '@prisma/client'
+import { Prisma, Content, ContainerField /*, ContentField*/, Media } from '@prisma/client'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import Head from 'next/head'
 import { FullContainerEdit, FullContentField, FullSectionEdit } from '@types'
@@ -30,7 +28,7 @@ import SectionManager from '@components/SectionManager'
 import set from 'lodash.set'
 import AccessCheckboxes from '@components/AccessCheckboxes'
 import moment from 'moment'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
@@ -242,7 +240,7 @@ const Admin = () => {
                                     <Space direction="vertical">
                                         <Text>Container</Text>
                                         <CustomSelect.ListContainers
-                                            disabled={!pid || pid !== 'create'}
+                                            disabled={!pid || pid !== 'create' || values.containerId}
                                             value={values.containerId}
                                             onChange={(e) => onHandleChange('containerId', e)}
                                         />
@@ -366,7 +364,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                     {field.label} ({field.type})
                                 </Text>
                                 {field.multiple ? (
-                                    <MultipleInput isInt />
+                                    <MultipleInput type="string" />
                                 ) : (
                                     <InputNumber
                                         style={{ width: 480 }}
@@ -397,11 +395,15 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                 <Text>
                                     {field.label} ({field.type})
                                 </Text>
-                                <DatePicker
-                                    style={{ width: 480 }}
-                                    value={get(values, `${field.name}.dateValue`, undefined)}
-                                    onChange={(e) => onHandleChange(field.name, field.type, e)}
-                                />
+                                {field.multiple ? (
+                                    <MultipleInput type="date" />
+                                ) : (
+                                    <DatePicker
+                                        style={{ width: 480 }}
+                                        value={get(values, `${field.name}.dateValue`, undefined)}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e)}
+                                    />
+                                )}
                             </Space>
                         )
                     case 'image':
@@ -410,10 +412,15 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                 <Text>
                                     {field.label} ({field.type})
                                 </Text>
-                                <MediaModal
-                                    value={get(values, `${field.name}.media`, '')}
-                                    onMediaSelected={(e) => onHandleChange(field.name, field.type, e)}
-                                />
+                                {field.multiple ? (
+                                    <MultipleImages />
+                                ) : (
+                                    <MediaModal
+                                        size="small"
+                                        value={get(values, `${field.name}.media`, '')}
+                                        onMediaSelected={(e) => onHandleChange(field.name, field.type, e)}
+                                    />
+                                )}
                             </Space>
                         )
                     case 'link':
@@ -422,11 +429,15 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                 <Text>
                                     {field.label} ({field.type})
                                 </Text>
-                                <LinkInput
-                                    width={480}
-                                    value={get(values, `${field.name}.textValue`, '')}
-                                    onChange={(e) => onHandleChange(field.name, field.type, e)}
-                                />
+                                {field.multiple ? (
+                                    <MultipleInput type="link" />
+                                ) : (
+                                    <LinkInput
+                                        width={480}
+                                        value={get(values, `${field.name}.textValue`, '')}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e)}
+                                    />
+                                )}
                             </Space>
                         )
 
@@ -438,16 +449,56 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
     )
 }
 
-const MultipleInput = ({ isInt = false }: { isInt?: boolean }) => {
-    const [value, setValue] = useState<string | number>('')
-    const [values, setValues] = useState<(string | number)[]>([])
+const MultipleImages = () => {
+    const [values, setValues] = useState<(Media | undefined)[]>([])
+
+    return (
+        <Space className="multiple-input" size="small" direction="vertical">
+            {values.map((e, idx) => (
+                <MediaModal
+                    key={idx}
+                    size="small"
+                    value={e}
+                    onMediaSelected={(e) => {
+                        if (!e) {
+                            const newValues = [...values]
+                            newValues.splice(idx, 1)
+                            setValues(newValues)
+                            return
+                        }
+
+                        const newValues = [...values]
+                        newValues[idx] = e
+                        setValues(newValues)
+                    }}
+                />
+            ))}
+            <div>
+                <MediaModal
+                    primary={false}
+                    size="small"
+                    label="Add new"
+                    icon={<PlusOutlined />}
+                    onMediaSelected={(e) => {
+                        const newValues = [...values, e]
+                        setValues(newValues)
+                    }}
+                />
+            </div>
+        </Space>
+    )
+}
+
+const MultipleInput = ({ type = 'string' }: { type?: string }) => {
+    const [value, setValue] = useState<any>()
+    const [values, setValues] = useState<any[]>([])
 
     const [inputVisible, setInputVisible] = useState(false)
 
     const onEndEdit = () => {
         if (!!value) {
             setValues([...values, value])
-            setValue('')
+            setValue(undefined)
             setInputVisible(false)
             return
         }
@@ -457,28 +508,20 @@ const MultipleInput = ({ isInt = false }: { isInt?: boolean }) => {
 
     const props = {
         autoFocus: true,
+        allowClear: true,
         type: 'text',
         size: 'small' as SizeType,
-        style: { width: 85, marginRight: '7px', fontSize: '12px', height: '22px' },
+        placeholder: '',
         value: value,
         onBlur: onEndEdit,
         onPressEnter: onEndEdit,
     }
 
     return (
-        <Space
-            size={0}
-            style={{
-                height: 32,
-                border: '1px solid #d9d9d9',
-                borderRadius: 2,
-                paddingLeft: 7,
-                minWidth: 480,
-            }}
-        >
+        <Space className="multiple-input" size="small">
             {values.map((value, idx) => (
                 <UniqueInput
-                    isInt={isInt}
+                    type={type}
                     key={idx}
                     value={value}
                     onChange={(e) => {
@@ -494,14 +537,18 @@ const MultipleInput = ({ isInt = false }: { isInt?: boolean }) => {
                 />
             ))}
             {inputVisible ? (
-                isInt ? (
+                type === 'number' ? (
                     <InputNumber {...props} onChange={(e) => setValue(e)} />
+                ) : type === 'date' ? (
+                    <DatePicker {...props} format="DD/MM/YYYY" onChange={(e) => setValue(e)} />
+                ) : type === 'link' ? (
+                    <LinkInput {...props} onChange={(e) => setValue(e)} />
                 ) : (
                     <Input {...props} onChange={(e) => setValue(e.target.value)} />
                 )
             ) : (
                 <Tag onClick={() => setInputVisible(true)}>
-                    <PlusOutlined /> New Tag
+                    <PlusOutlined /> Add new
                 </Tag>
             )}
         </Space>
@@ -512,12 +559,12 @@ const UniqueInput = ({
     value,
     onChange,
     onClose,
-    isInt = false,
+    type = 'string',
 }: {
-    value: string | number
-    onChange(value: string | number): void
+    value: any
+    onChange(value: any): void
     onClose(): void
-    isInt?: boolean
+    type: string
 }) => {
     const [inputVisible, setInputVisible] = useState(false)
 
@@ -532,17 +579,22 @@ const UniqueInput = ({
 
     const props = {
         autoFocus: true,
+        allowClear: true,
         type: 'text',
         size: 'small' as SizeType,
-        style: { width: 85, marginRight: '7px', fontSize: '12px', height: '22px' },
+        placeholder: '',
         value: value,
         onBlur: onEndEdit,
         onPressEnter: onEndEdit,
     }
 
     if (inputVisible) {
-        return isInt ? (
+        return type === 'number' ? (
             <InputNumber {...props} onChange={(e) => onChange(e)} />
+        ) : type === 'date' ? (
+            <DatePicker {...props} format="DD/MM/YYYY" onChange={(e) => onChange(e)} />
+        ) : type === 'link' ? (
+            <LinkInput {...props} onChange={(e) => onChange(e)} />
         ) : (
             <Input {...props} onChange={(e) => onChange(e.target.value)} />
         )
@@ -559,7 +611,11 @@ const UniqueInput = ({
             }}
         >
             <span onClick={(e) => setInputVisible(true)}>
-                {isLongTag && typeof value === 'string' ? `${value.slice(0, 20)}...` : value}
+                {isLongTag && type === 'string'
+                    ? `${value.slice(0, 20)}...`
+                    : type === 'date'
+                    ? moment(value).format('DD/MM/YYYY')
+                    : value}
             </span>
         </Tag>
     )

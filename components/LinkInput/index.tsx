@@ -9,6 +9,7 @@ import { getSlugs } from '../../network/api'
 import get from 'lodash.get'
 import { useQuery, UseQueryResult } from 'react-query'
 import { useMemo } from 'react'
+import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
 const { Text } = Typography
 
@@ -16,9 +17,13 @@ interface Props {
     value: string
     width?: number | `${string}%`
     onChange: (value: string) => void
+    size?: SizeType
+    onBlur?: () => void
+    onPressEnter?: () => void
+    placeholder?: string
 }
 
-const LinkInput = ({ value, onChange, width = 300 }: Props) => {
+const LinkInput = ({ value, onChange, width = 300, ...rest }: Props) => {
     const slugs: UseQueryResult<Slug[], Error> = useQuery<Slug[], Error>(['slugs'], () => getSlugs(), {
         refetchOnMount: false,
     })
@@ -43,6 +48,7 @@ const LinkInput = ({ value, onChange, width = 300 }: Props) => {
 
     return (
         <AutoComplete
+            {...rest}
             status={isError}
             value={value}
             options={options}

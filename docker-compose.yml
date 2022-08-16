@@ -7,9 +7,9 @@ services:
             - '${PORT}:${PORT}'
     frontend:
         image: node:lts
-        volumes:
-            - myuploads:/app/uploads
-            - myuploads:/app/db
+        # volumes:
+        #     - myuploads:/app/uploads
+        #     - myuploads:/app/db
 
 volumes:
     myuploads:

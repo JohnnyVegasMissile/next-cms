@@ -12,7 +12,8 @@
         "initdb": "prisma migrate dev; npx prisma db seed",
         "studio": "prisma studio",
         "test": "playwright test",
-        "testheaded": "playwright test --headed"
+        "testheaded": "playwright test --headed",
+        "withdocker": "docker stop next-cms; docker rm next-cms; docker build -t next-cms .; docker run -d -p 3050:3050 --name next-cms next-cms;"
     },
     "prisma": {
         "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

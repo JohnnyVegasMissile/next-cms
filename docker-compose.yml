@@ -2,14 +2,35 @@ version: '3'
 
 services:
     production:
-        image: next-cms
-        ports:
-            - '${PORT}:${PORT}'
-    frontend:
-        image: node:lts
-        # volumes:
-        #     - myuploads:/app/uploads
-        #     - myuploads:/app/db
+        container_name: next_cms
+        volumes:
+            - files_upload:/app/uploads
+            - database_sqlite:/app/db
 
 volumes:
-    myuploads:
+    files_upload:
+    database_sqlite:
+# version: "2"
+# services:
+#   node_atelier_fusari:
+#     container_name: node_atelier_fusari_container
+#     restart: always
+#     build: .
+#     ports:
+#       - "8125:8125"
+#     links:
+#       - mongo_atelier_fusari
+#     volumes:
+#       - files_atelier_fusari:/app
+#     env_file:
+#       - ./.env
+#   mongo_atelier_fusari:
+#     container_name: mongo_atelier_fusari_container
+#     image: mongo
+#     volumes:
+#       - data_atelier_fusari:/data
+#     ports:
+#       - "28125:27017"
+# volumes:
+#   data_atelier_fusari:
+#   files_atelier_fusari:

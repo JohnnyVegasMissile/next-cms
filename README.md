@@ -37,3 +37,5 @@ or
 # See later
 
 https://github.com/ianstormtaylor/slate#readme
+
+https://github.com/nemanjam/nextjs-prisma-boilerplate/blob/main/Dockerfile.dev

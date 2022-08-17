@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev -p 8080",
-        "prebuild": "prisma migrate deploy; prisma generate; npx prisma db push; npx prisma db seed",
+        "prebuild": "prisma generate; prisma migrate deploy; npx prisma db push; npx prisma db seed",
         "build": "next build",
         "postbuild": "next-sitemap",
         "start": "next start",

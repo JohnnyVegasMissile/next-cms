@@ -41,9 +41,7 @@ USER nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js .
 COPY --from=builder /app/package.json .
-
-# COPY --from=builder /app/db ./db
-# COPY --from=builder /app/uploads ./uploads
+COPY --from=builder /app/uploads ./uploads
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing

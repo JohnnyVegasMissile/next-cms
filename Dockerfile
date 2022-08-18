@@ -15,16 +15,13 @@ RUN \
 
 
 COPY . .
-# COPY public ./public
-# COPY next.config.js .
-# COPY tsconfig.json .
 
 # Environment variables must be present at build time
 # https://github.com/vercel/next.js/discussions/14030
-# ARG ENV_VARIABLE
-# ENV ENV_VARIABLE=${ENV_VARIABLE}
-# ARG NEXT_PUBLIC_ENV_VARIABLE
-# ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
+ARG SITE_URL
+ENV SITE_URL=${SITE_URL}
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
 
 # Uncomment the following line to disable telemetry at build time
 ENV NEXT_TELEMETRY_DISABLED 1
@@ -46,7 +43,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js .
 COPY --from=builder /app/package.json .
 
-COPY --from=builder /app/db ./db
+# COPY --from=builder /app/db ./db
 # COPY --from=builder /app/uploads ./uploads
 
 # Automatically leverage output traces to reduce image size
@@ -55,10 +52,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Environment variables must be redefined at run time
-# ARG ENV_VARIABLE
-# ENV ENV_VARIABLE=${ENV_VARIABLE}
-# ARG NEXT_PUBLIC_ENV_VARIABLE
-# ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
+ARG SITE_URL
+ENV SITE_URL=${SITE_URL}
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
 
 # Uncomment the following line to disable telemetry at run time
 ENV NEXT_TELEMETRY_DISABLED 1

@@ -26,7 +26,6 @@ ENV DATABASE_URL=${DATABASE_URL}
 # Uncomment the following line to disable telemetry at build time
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# RUN yarn build
 RUN npm run build
 
 # Step 2. Production image, copy all the files and run next

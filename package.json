@@ -11,7 +11,7 @@
         "prisma:studio": "prisma studio",
         "prisma:dev": "npm run prisma:dev:migrate && npm run prisma:seed",
         "prisma:prod": "npm run prisma:genarate && npm run prisma:prod:migrate && npm run prisma:push && npm run prisma:seed",
-        "sitemap:": "next-sitemap",
+        "sitemap": "next-sitemap",
         "lint": "next lint",
         "test": "playwright test",
         "test:head": "playwright test --headed",

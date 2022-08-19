@@ -157,6 +157,7 @@ model Container {
   published          Boolean          @default(true)
   updatedAt          DateTime         @updatedAt
   slug               Slug[]
+  contentFields      ContainerField[] @relation(name: "linkedContentFields")
 }
 
 model Content {
@@ -175,15 +176,17 @@ model Content {
 }
 
 model ContainerField {
-  id          String    @id @default(cuid())
-  label       String
-  name        String
-  type        String
-  multiple    Boolean   @default(false)
-  containerId String
-  container   Container @relation(fields: [containerId], references: [id])
-  metadata    String?
-  required    Boolean?  @default(false)
+  id                String     @id @default(cuid())
+  label             String
+  name              String
+  type              String
+  multiple          Boolean    @default(false)
+  containerId       String
+  container         Container  @relation(fields: [containerId], references: [id])
+  linkedContainerId String?
+  linkedContainer   Container? @relation(fields: [linkedContainerId], references: [id], name: "linkedContentFields")
+  metadata          String?
+  required          Boolean?   @default(false)
 }
 
 model ContentField {

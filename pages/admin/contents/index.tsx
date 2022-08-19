@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import moment from 'moment'
 import Head from 'next/head'
 import Link from 'next/link'
 import get from 'lodash.get'
 import trim from 'lodash.trim'
+import { useRouter } from 'next/router'
 import { PlusOutlined } from '@ant-design/icons'
 import { useQuery, UseQueryResult } from 'react-query'
 import type { Container, Content, Slug } from '@prisma/client'
@@ -14,13 +15,32 @@ import { deleteContent, getContents } from '../../../network/contents'
 import CustomSelect from '@components/CustomSelect'
 
 const AdminElements = () => {
+    const router = useRouter()
     const [q, setQ] = useState<string | undefined>()
-    const [type, setType] = useState<string | undefined>()
+    const [type, setType] = useState<string | undefined>((router.query.container as string) || undefined)
     const debouncedQ = useDebounce<string | undefined>(q, 750)
     const contents: UseQueryResult<Content[], Error> = useQuery<Content[], Error>(
         ['contents', { q: trim(debouncedQ)?.toLocaleLowerCase() || undefined, type }],
         () => getContents(type, trim(debouncedQ)?.toLocaleLowerCase())
     )
+
+    useEffect(() => {
+        setType((router.query.container as string) || undefined)
+    }, [router.query.container])
+
+    useEffect(() => {
+        const search = []
+
+        if (debouncedQ) {
+            search.push(`q=${debouncedQ}`)
+        }
+
+        if (type) {
+            search.push(`container=${type || ''}`)
+        }
+
+        router.replace(!!search.length ? `?${search.join('&')}` : '')
+    }, [debouncedQ, type])
 
     return (
         <>

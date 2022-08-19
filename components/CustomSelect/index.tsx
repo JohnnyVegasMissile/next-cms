@@ -1,6 +1,6 @@
 import { Cascader, Select, Typography } from 'antd'
 import { useQuery, UseQueryResult /*, useQueryClient*/ } from 'react-query'
-import type { Container, Form, Role } from '@prisma/client'
+import type { Container, Content, Form, Role } from '@prisma/client'
 import { getContainers } from '../../network/containers'
 import get from 'lodash.get'
 import { getElements } from '../../network/elements'
@@ -8,6 +8,7 @@ import type { Element } from '@prisma/client'
 import Blocks from '../../blocks'
 import { getRoles } from '../../network/roles'
 import { getForms } from '../../network/forms'
+import { getContents } from '@network/contents'
 
 const { Option } = Select
 const { Text } = Typography
@@ -19,11 +20,15 @@ interface CustomSelectProps {
     onChange(value: string | undefined): void
     width?: number
     disabled?: boolean
+    size?: 'small' | 'middle' | 'large'
+    multi?: boolean
+    filterId?: string
 }
 
 const ListContainers = ({ value, onChange, width = 240, disabled }: CustomSelectProps) => {
-    const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(['containers', {}], () =>
-        getContainers()
+    const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(
+        ['containers', {}],
+        () => getContainers()
     )
 
     return (
@@ -49,6 +54,45 @@ const ListContainers = ({ value, onChange, width = 240, disabled }: CustomSelect
     )
 }
 
+const ListContents = ({
+    value,
+    onChange,
+    width = 240,
+    disabled,
+    size,
+    multi,
+    filterId,
+}: CustomSelectProps) => {
+    const contents: UseQueryResult<Content[], Error> = useQuery<Content[], Error>(
+        ['contents', { type: filterId }],
+        () => getContents(filterId)
+    )
+
+    return (
+        <Select
+            mode={multi ? 'multiple' : undefined}
+            size={size}
+            allowClear
+            disabled={disabled}
+            value={value}
+            onChange={onChange}
+            style={{
+                width,
+            }}
+            placeholder="Select a content"
+            loading={contents.isLoading}
+        >
+            {get(contents, 'data', [])
+                .sort((a, b) => a.title.localeCompare(b.title))
+                .map((content) => (
+                    <Option key={content.id} value={content.id}>
+                        {content.title}
+                    </Option>
+                ))}
+        </Select>
+    )
+}
+
 const ListElements = ({
     id,
     value,
@@ -58,7 +102,9 @@ const ListElements = ({
     value?: string
     onChange(value: string | undefined): void
 }) => {
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () => getElements())
+    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () =>
+        getElements()
+    )
 
     return (
         <Select
@@ -160,7 +206,9 @@ const SectionCascader = ({
     onSectionChange,
     onElementChange,
 }: SectionCascaderProps) => {
-    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () => getElements())
+    const elements: UseQueryResult<Element[], Error> = useQuery<Element[], Error>(['elements', {}], () =>
+        getElements()
+    )
 
     return (
         <Cascader
@@ -215,6 +263,7 @@ const SectionCascader = ({
 }
 
 CustomSelect.ListContainers = ListContainers
+CustomSelect.ListContents = ListContents
 CustomSelect.ListElements = ListElements
 CustomSelect.ListSections = SectionCascader
 CustomSelect.ListRoles = ListRoles

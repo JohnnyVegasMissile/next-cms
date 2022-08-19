@@ -28,6 +28,7 @@ import AccessCheckboxes from '../../../components/AccessCheckboxes'
 import { FullContainerEdit, FullSection, FullSectionEdit } from '../../../types'
 import { editContainer, getContainerDetails, postContainer } from '../../../network/containers'
 import camelcase from 'lodash.camelcase'
+import CustomSelect from '@components/CustomSelect'
 
 const { Text, Title } = Typography
 const { TabPane } = Tabs
@@ -477,6 +478,10 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
         )
     }
 
+    const canMultiple = (type: string) => {
+        return type !== 'boolean' && type !== 'wysiwyg'
+    }
+
     return (
         <Card title="Fields">
             <Space direction="vertical">
@@ -513,6 +518,10 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
                                     if (!canMeta(e)) {
                                         modifyField(idx, 'metadata', undefined)
                                     }
+                                    if (!canMultiple(e)) {
+                                        modifyField(idx, 'multiple', false)
+                                    }
+                                    modifyField(idx, 'containerId', undefined)
                                 }}
                             >
                                 <Select.Option value="string">Text</Select.Option>
@@ -531,8 +540,19 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
                                 <Select.Option value="list" disabled>
                                     List
                                 </Select.Option>
+                                <Select.Option value="content">Content</Select.Option>
                             </Select>
                         </Space>
+
+                        {field.type === 'content' && (
+                            <Space direction="vertical">
+                                <Text>Content from</Text>
+                                <CustomSelect.ListContainers
+                                    value={field.linkedContainerId}
+                                    onChange={(e: string) => modifyField(idx, 'linkedContainerId', e)}
+                                />
+                            </Space>
+                        )}
 
                         <Space direction="vertical">
                             <Text>Multiple</Text>
@@ -545,6 +565,7 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
                                 }}
                             >
                                 <Switch
+                                    disabled={!canMultiple(field.type)}
                                     checked={field.multiple}
                                     onClick={(e) => modifyField(idx, 'multiple', e)}
                                 />

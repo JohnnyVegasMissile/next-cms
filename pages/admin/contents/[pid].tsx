@@ -13,6 +13,7 @@ import {
     DatePicker,
     Divider,
     Tag,
+    Tooltip,
 } from 'antd'
 import get from 'lodash.get'
 import { editContent, getContentDetails, postContent } from '../../../network/contents'
@@ -29,14 +30,16 @@ import set from 'lodash.set'
 import AccessCheckboxes from '@components/AccessCheckboxes'
 import moment from 'moment'
 import { useState } from 'react'
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
 const { Text } = Typography
 
 type MyType = any
 
-const initialValues: MyType = {}
+const initialValues: MyType = {
+    published: true,
+}
 
 const validate = (values: MyType) => {
     let errors: any = {}
@@ -66,7 +69,7 @@ const Admin = () => {
     const queryClient = useQueryClient()
 
     const { values, /*errors,*/ handleSubmit, handleChange, setValues } = useFormik<MyType>({
-        initialValues,
+        initialValues: { ...initialValues, containerId: router.query.container },
         validate,
         onSubmit: async (values) => {
             const fields = Object.keys(values.fieldsValue).map((key: string) => ({
@@ -76,6 +79,9 @@ const Admin = () => {
                 media: undefined,
             }))
             // delete values.fieldsValue
+
+            console.log('fff', fields, values)
+            return
 
             const slug = encodeURI(get(values, 'slug', ''))
 
@@ -228,7 +234,12 @@ const Admin = () => {
                                     </Space>
 
                                     <Space direction="vertical">
-                                        <Text>Access</Text>
+                                        <Space>
+                                            <Text>Access</Text>
+                                            <Tooltip title="Select none to grand access to everybody. If all selected, not logged in users can't access it.">
+                                                <QuestionCircleOutlined />
+                                            </Tooltip>
+                                        </Space>
                                         <AccessCheckboxes
                                             value={values.accesses || []}
                                             onChange={(e) => onHandleChange('accesses', e)}
@@ -291,7 +302,7 @@ interface ContentFieldsManagerProps {
 }
 
 const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManagerProps) => {
-    const onHandleChange = (name: string, type: string, value: any) => {
+    const onHandleChange = (name: string, type: string, value: any, multi?: boolean) => {
         const newValue = { ...values }
         let field = 'textValue'
 
@@ -328,9 +339,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                     case 'string':
                         return (
                             <Space key={idx} direction="vertical">
-                                <Text>
-                                    {field.label} ({field.type})
-                                </Text>
+                                <Text>{field.label}</Text>
                                 {field.multiple ? (
                                     <MultipleInput />
                                 ) : (
@@ -347,9 +356,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                     case 'text':
                         return (
                             <Space key={idx} direction="vertical">
-                                <Text>
-                                    {field.label} ({field.type})
-                                </Text>
+                                <Text>{field.label}</Text>
                                 <Input.TextArea
                                     style={{ width: 480 }}
                                     value={get(values, `${field.name}.textValue`, '')}
@@ -360,9 +367,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                     case 'int':
                         return (
                             <Space key={idx} direction="vertical">
-                                <Text>
-                                    {field.label} ({field.type})
-                                </Text>
+                                <Text>{field.label}</Text>
                                 {field.multiple ? (
                                     <MultipleInput type="string" />
                                 ) : (
@@ -377,9 +382,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                     case 'boolean':
                         return (
                             <Space key={idx} direction="vertical">
-                                <Text>
-                                    {field.label} ({field.type})
-                                </Text>
+                                <Text>{field.label}</Text>
                                 <Radio.Group
                                     value={get(values, `${field.name}.boolValue`, undefined)}
                                     onChange={(e) => onHandleChange(field.name, field.type, e.target.value)}
@@ -392,9 +395,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                     case 'date':
                         return (
                             <Space key={idx} direction="vertical">
-                                <Text>
-                                    {field.label} ({field.type})
-                                </Text>
+                                <Text>{field.label}</Text>
                                 {field.multiple ? (
                                     <MultipleInput type="date" />
                                 ) : (
@@ -409,9 +410,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                     case 'image':
                         return (
                             <Space key={idx} direction="vertical">
-                                <Text>
-                                    {field.label} ({field.type})
-                                </Text>
+                                <Text>{field.label}</Text>
                                 {field.multiple ? (
                                     <MultipleImages />
                                 ) : (
@@ -426,14 +425,35 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                     case 'link':
                         return (
                             <Space key={idx} direction="vertical">
-                                <Text>
-                                    {field.label} ({field.type})
-                                </Text>
+                                <Text>{field.label}</Text>
                                 {field.multiple ? (
                                     <MultipleInput type="link" />
                                 ) : (
                                     <LinkInput
                                         width={480}
+                                        value={get(values, `${field.name}.textValue`, '')}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e)}
+                                    />
+                                )}
+                            </Space>
+                        )
+
+                    case 'content':
+                        return (
+                            <Space key={idx} direction="vertical">
+                                <Text>{field.label}</Text>
+                                {field.multiple ? (
+                                    <CustomSelect.ListContents
+                                        multi
+                                        width={480}
+                                        filterId={field.linkedContainerId || undefined}
+                                        value={get(values, `${field.name}.textValue`, [])}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e)}
+                                    />
+                                ) : (
+                                    <CustomSelect.ListContents
+                                        width={480}
+                                        filterId={field.linkedContainerId || undefined}
                                         value={get(values, `${field.name}.textValue`, '')}
                                         onChange={(e) => onHandleChange(field.name, field.type, e)}
                                     />

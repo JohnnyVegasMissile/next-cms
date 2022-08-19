@@ -20,7 +20,8 @@
         "build": "next build",
         "postbuild": "npm run sitemap",
         "start": "next start",
-        "dev": "next dev"
+        "predev": "npm run prisma:dev",
+        "dev": "next dev -p 8080"
     },
     "prisma": {
         "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -48,8 +49,7 @@
         "react-color": "^2.19.3",
         "react-dom": "18.2.0",
         "react-intl": "^6.0.5",
-        "react-query": "^3.39.2",
-        "swiper": "^8.3.2"
+        "react-query": "^3.39.2"
     },
     "devDependencies": {
         "@playwright/test": "^1.25.0",

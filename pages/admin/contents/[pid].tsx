@@ -327,7 +327,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                 break
         }
 
-        set(newValue, name, { type, [field]: value })
+        set(newValue, name, { type, [field]: value, multi: !!multi })
 
         onChange(newValue)
     }
@@ -341,7 +341,10 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleInput />
+                                    <MultipleInput
+                                        value={get(values, `${field.name}.textValue`, '')}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                    />
                                 ) : (
                                     <Input
                                         style={{ width: 480 }}
@@ -369,7 +372,11 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleInput type="string" />
+                                    <MultipleInput
+                                        type="number"
+                                        value={get(values, `${field.name}.numberValue`, '')}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                    />
                                 ) : (
                                     <InputNumber
                                         style={{ width: 480 }}
@@ -397,7 +404,11 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleInput type="date" />
+                                    <MultipleInput
+                                        type="date"
+                                        value={get(values, `${field.name}.dateValue`, '')}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                    />
                                 ) : (
                                     <DatePicker
                                         style={{ width: 480 }}
@@ -412,7 +423,10 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleImages />
+                                    <MultipleImages
+                                        value={get(values, `${field.name}.media`, [])}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                    />
                                 ) : (
                                     <MediaModal
                                         size="small"
@@ -427,7 +441,11 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleInput type="link" />
+                                    <MultipleInput
+                                        type="link"
+                                        value={get(values, `${field.name}.textValue`, [])}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                    />
                                 ) : (
                                     <LinkInput
                                         width={480}
@@ -448,7 +466,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                         width={480}
                                         filterId={field.linkedContainerId || undefined}
                                         value={get(values, `${field.name}.textValue`, [])}
-                                        onChange={(e) => onHandleChange(field.name, field.type, e)}
+                                        onChange={(e) => onHandleChange(field.name, field.type, e, true)}
                                     />
                                 ) : (
                                     <CustomSelect.ListContents
@@ -469,27 +487,31 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
     )
 }
 
-const MultipleImages = () => {
-    const [values, setValues] = useState<(Media | undefined)[]>([])
-
+const MultipleImages = ({
+    value,
+    onChange,
+}: {
+    value: (Media | undefined)[]
+    onChange(list: (Media | undefined)[]): void
+}) => {
     return (
         <Space className="multiple-input" size="small" direction="vertical">
-            {values.map((e, idx) => (
+            {get(value, '', []).map((e: Media, idx: number) => (
                 <MediaModal
                     key={idx}
                     size="small"
                     value={e}
                     onMediaSelected={(e) => {
                         if (!e) {
-                            const newValues = [...values]
+                            const newValues = [...value]
                             newValues.splice(idx, 1)
-                            setValues(newValues)
+                            onChange(newValues)
                             return
                         }
 
-                        const newValues = [...values]
+                        const newValues = [...value]
                         newValues[idx] = e
-                        setValues(newValues)
+                        onChange(newValues)
                     }}
                 />
             ))}
@@ -500,8 +522,8 @@ const MultipleImages = () => {
                     label="Add new"
                     icon={<PlusOutlined />}
                     onMediaSelected={(e) => {
-                        const newValues = [...values, e]
-                        setValues(newValues)
+                        const newValues = [...value, e]
+                        onChange(newValues)
                     }}
                 />
             </div>
@@ -509,16 +531,22 @@ const MultipleImages = () => {
     )
 }
 
-const MultipleInput = ({ type = 'string' }: { type?: string }) => {
-    const [value, setValue] = useState<any>()
-    const [values, setValues] = useState<any[]>([])
-
+const MultipleInput = ({
+    value,
+    onChange,
+    type = 'string',
+}: {
+    value: any[]
+    onChange(list: any[]): void
+    type?: string
+}) => {
+    const [tempValue, setTempValue] = useState<any>()
     const [inputVisible, setInputVisible] = useState(false)
 
     const onEndEdit = () => {
-        if (!!value) {
-            setValues([...values, value])
-            setValue(undefined)
+        if (!!tempValue) {
+            onChange([...value, tempValue])
+            setTempValue(undefined)
             setInputVisible(false)
             return
         }
@@ -532,39 +560,39 @@ const MultipleInput = ({ type = 'string' }: { type?: string }) => {
         type: 'text',
         size: 'small' as SizeType,
         placeholder: '',
-        value: value,
+        value: tempValue,
         onBlur: onEndEdit,
         onPressEnter: onEndEdit,
     }
 
     return (
         <Space className="multiple-input" size="small">
-            {values.map((value, idx) => (
+            {get(value, '', []).map((value: any, idx: number) => (
                 <UniqueInput
                     type={type}
                     key={idx}
                     value={value}
                     onChange={(e) => {
-                        const newValues = [...values]
+                        const newValues = [...value]
                         newValues[idx] = e
-                        setValues(newValues)
+                        onChange(newValues)
                     }}
                     onClose={() => {
-                        const newValues = [...values]
+                        const newValues = [...value]
                         newValues.splice(idx, 1)
-                        setValues(newValues)
+                        onChange(newValues)
                     }}
                 />
             ))}
             {inputVisible ? (
                 type === 'number' ? (
-                    <InputNumber {...props} onChange={(e) => setValue(e)} />
+                    <InputNumber {...props} onChange={(e) => setTempValue(e)} />
                 ) : type === 'date' ? (
-                    <DatePicker {...props} format="DD/MM/YYYY" onChange={(e) => setValue(e)} />
+                    <DatePicker {...props} format="DD/MM/YYYY" onChange={(e) => setTempValue(e)} />
                 ) : type === 'link' ? (
-                    <LinkInput {...props} onChange={(e) => setValue(e)} />
+                    <LinkInput {...props} onChange={(e) => setTempValue(e)} />
                 ) : (
-                    <Input {...props} onChange={(e) => setValue(e.target.value)} />
+                    <Input {...props} onChange={(e) => setTempValue(e.target.value)} />
                 )
             ) : (
                 <Tag onClick={() => setInputVisible(true)}>

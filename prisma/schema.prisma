@@ -166,13 +166,14 @@ model Content {
   metadatas   Metadata[]
   // slug        String?
   accesses    Access[]
-  fields      ContentField[]
+  fields      ContentField[] @relation(name: "contentLinked")
   sections    Section[]
   containerId String
   container   Container      @relation(fields: [containerId], references: [id])
   published   Boolean        @default(true)
   updatedAt   DateTime       @updatedAt
   slug        Slug[]
+  fieldsValue ContentField[] @relation(name: "contentValue")
 }
 
 model ContainerField {
@@ -190,21 +191,25 @@ model ContainerField {
 }
 
 model ContentField {
-  id          String         @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   type        String
   contentId   String?
-  content     Content?       @relation(fields: [contentId], references: [id])
+  content     Content?  @relation(fields: [contentId], references: [id], name: "contentLinked")
   mediaId     String?
-  media       Media?         @relation(fields: [mediaId], references: [id])
+  media       Media?    @relation(fields: [mediaId], references: [id])
   textValue   String?
   numberValue Int?
   boolValue   Boolean?
   dateValue   DateTime?
-  multiple    Boolean        @default(false)
-  listId      String?
-  list        ContentField?  @relation(fields: [listId], references: [id], name: "lists")
-  childs      ContentField[] @relation(name: "lists")
+
+  contentValueId String?
+  contentValue   Content? @relation(fields: [contentValueId], references: [id], name: "contentValue")
+
+  multiple Boolean        @default(false)
+  parentId String?
+  parent   ContentField?  @relation(fields: [parentId], references: [id], name: "list")
+  childs   ContentField[] @relation(name: "list")
 }
 
 model Slug {

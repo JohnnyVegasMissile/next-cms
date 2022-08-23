@@ -52,6 +52,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
                 metadata: field.metadata,
                 required: field.required,
                 multiple: field.multiple,
+                linkedContainerId: field.linkedContainerId,
             },
         })
     }

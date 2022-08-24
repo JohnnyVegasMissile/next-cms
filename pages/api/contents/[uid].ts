@@ -16,7 +16,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
             accesses: true,
             sections: true,
             slug: true,
-            fields: { include: { media: true } },
+            fields: { include: { media: true, childs: true } },
         },
     })
 

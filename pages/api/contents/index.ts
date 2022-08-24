@@ -4,6 +4,7 @@ import get from 'lodash.get'
 
 import { prisma } from '../../../utils/prisma'
 import checkAuth from '@utils/checkAuth'
+import getNameFieldFromType from '../../../utils/getNameFieldFromType'
 
 // interface FullPage extends Page {
 //     metadatas?: Metadata[]
@@ -70,10 +71,33 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         },
     })
 
+    const withMultiFields = fields.map((field, idx) => {
+        if (field.multiple) {
+            const valueName = getNameFieldFromType(field.type)
+            const values = get(field, valueName, [])
+
+            return {
+                ...field,
+                childs: {
+                    create: values?.map((e: any, i: number) => ({
+                        name: field.name,
+                        type: field.type,
+                        [valueName]: e,
+                    })),
+                },
+                [valueName]: undefined,
+            }
+        }
+
+        return field
+    })
+
+    console.log('withMultiFields', withMultiFields)
+
     const content = await prisma.content.create({
         data: {
             ...(newContentContent as Prisma.ContentCreateInput),
-            fields: { create: fields },
+            fields: { create: withMultiFields },
             metadatas: { create: metadatas },
             sections: { create: sections },
             accesses: {

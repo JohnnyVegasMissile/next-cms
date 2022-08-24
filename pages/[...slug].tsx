@@ -42,7 +42,7 @@ const DefaultSectionsHome = (props: PageProps) => {
                         return <span key={idx}>{field.textValue}</span>
                     case 'text':
                         return <p key={idx}>{field.textValue}</p>
-                    case 'int':
+                    case 'number':
                         return <p key={idx}>{field.numberValue}</p>
                     case 'boolean':
                         return <p key={idx}>{field.textValue ? 'Yes' : 'No'}</p>

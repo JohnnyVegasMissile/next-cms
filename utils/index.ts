@@ -40,5 +40,4 @@ export const initSession = async (loginId: string) => {
     return session
 }
 
-export const generateToken = (message: string) =>
-    CryptoJS.SHA3(message, { outputLength: 512 }).toString()
+export const generateToken = (message: string) => CryptoJS.SHA3(message, { outputLength: 512 }).toString()

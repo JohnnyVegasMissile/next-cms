@@ -471,7 +471,7 @@ const FieldsManager = ({ values, onChange }: FieldsManagerProps) => {
         return (
             type === 'string' ||
             type === 'text' ||
-            type === 'int' ||
+            type === 'number' ||
             type === 'boolean' ||
             type === 'date' ||
             type === 'link'

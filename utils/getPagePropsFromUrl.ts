@@ -2,6 +2,7 @@ import { ContainerField, Content, ContentField } from '@prisma/client'
 import get from 'lodash.get'
 import moment from 'moment'
 import { prisma } from '../utils/prisma'
+import getNameFieldFromType from './getNameFieldFromType'
 
 const sanitizeDate = (date: Date | string | undefined | null) => (!!date ? moment(date).valueOf() : null)
 
@@ -15,29 +16,12 @@ const sanitizeAll = <T>(props: T) => {
                 .filter((e: ContainerField) => !!e.metadata)
                 .map((field: ContainerField) => {
                     const values = get(props, 'fields', []).find((e: ContentField) => e.name === field.name)
-                    let content = ''
-
-                    switch (values?.type) {
-                        case 'string':
-                        case 'text':
-                        case 'link':
-                            content = get(values, 'textValue', '')
-                            break
-                        case 'int':
-                            content = get(values, 'numberValue', '')
-                            break
-                        case 'boolean':
-                            content = get(values, 'boolValue', '')
-                            break
-                        case 'date':
-                            content = get(values, 'dateValue', '')
-                            break
-                    }
+                    const valueName = getNameFieldFromType(values?.type)
 
                     return {
                         id: field.id,
                         name: field.metadata,
-                        content,
+                        content: get(values, valueName, undefined),
                     }
                 }),
         ],

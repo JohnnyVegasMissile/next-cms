@@ -18,7 +18,7 @@ import {
 import get from 'lodash.get'
 import { editContent, getContentDetails, postContent } from '../../../network/contents'
 import { getContainerDetails } from '../../../network/containers'
-import { Prisma, Content, ContainerField /*, ContentField*/, Media } from '@prisma/client'
+import { Prisma, Content, ContainerField /*, ContentField*/, Media, ContentField } from '@prisma/client'
 import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query'
 import Head from 'next/head'
 import { FullContainerEdit, FullContentField, FullSectionEdit } from '@types'
@@ -32,6 +32,7 @@ import moment from 'moment'
 import { useState } from 'react'
 import { PlusOutlined, QuestionCircleOutlined, CloseOutlined, CloseCircleFilled } from '@ant-design/icons'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'
+import getNameFieldFromType from '../../../utils/getNameFieldFromType'
 
 const { Text } = Typography
 
@@ -78,10 +79,7 @@ const Admin = () => {
                 mediaId: get(values, `fieldsValue.${key}.media.id`, null),
                 media: undefined,
             }))
-            // delete values.fieldsValue
-
-            console.log('fff', fields, values)
-            return
+            delete values.fieldsValue
 
             const slug = encodeURI(get(values, 'slug', ''))
 
@@ -102,7 +100,21 @@ const Admin = () => {
 
                 const slug = decodeURI(get(data, 'slug.0.slug', '') || '')
 
-                setValues({ ...data, sections, slug })
+                let fieldsValue: any = {}
+                get(data, 'fields', []).forEach((e: any, i: number) => {
+                    const valueName = getNameFieldFromType(e.type)
+
+                    fieldsValue[e.name] = {
+                        type: e.type,
+                        multiple: e.multiple,
+                        [valueName]: e.multiple
+                            ? get(e, `childs`, []).map((e: any) => get(e, valueName, ''))
+                            : e[valueName],
+                    }
+                })
+                console.log('fieldsValue', fieldsValue)
+
+                setValues({ ...data, sections, slug, fieldsValue })
             },
             onError: (err) => router.push('/admin/contents'),
         }
@@ -304,30 +316,9 @@ interface ContentFieldsManagerProps {
 const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManagerProps) => {
     const onHandleChange = (name: string, type: string, value: any, multi?: boolean) => {
         const newValue = { ...values }
-        let field = 'textValue'
+        const valueName = getNameFieldFromType(type)
 
-        switch (type) {
-            case 'string':
-            case 'text':
-            case 'link':
-                field = 'textValue'
-                break
-            case 'int':
-                field = 'numberValue'
-                break
-            case 'boolean':
-                field = 'boolValue'
-                break
-            case 'date':
-                field = 'dateValue'
-                break
-            case 'image':
-            case 'file':
-                field = 'media'
-                break
-        }
-
-        set(newValue, name, { type, [field]: value, multi: !!multi })
+        set(newValue, name, { type, [valueName]: value, multiple: !!multi })
 
         onChange(newValue)
     }
@@ -370,7 +361,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                 />
                             </Space>
                         )
-                    case 'int':
+                    case 'number':
                         return (
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
@@ -477,14 +468,14 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                         multi
                                         width={480}
                                         filterId={field.linkedContainerId || undefined}
-                                        value={get(values, `${field.name}.textValue`, [])}
+                                        value={get(values, `${field.name}.contentValueId`, [])}
                                         onChange={(e) => onHandleChange(field.name, field.type, e, true)}
                                     />
                                 ) : (
                                     <CustomSelect.ListContents
                                         width={480}
                                         filterId={field.linkedContainerId || undefined}
-                                        value={get(values, `${field.name}.textValue`, '')}
+                                        value={get(values, `${field.name}.contentValueId`, '')}
                                         onChange={(e) => onHandleChange(field.name, field.type, e)}
                                     />
                                 )}

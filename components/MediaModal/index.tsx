@@ -93,38 +93,27 @@ const MediaModal = ({
                     <>
                         <Text>{isLongTag ? `${value?.name.slice(0, 37)}...` : value?.name}</Text>
                         <Button
+                            danger
                             size={size}
                             type="primary"
-                            danger
-                            onClick={() => onMediaSelected(undefined)}
                             // shape="circle"
                             icon={<CloseOutlined />}
+                            onClick={() => onMediaSelected(undefined)}
                         />
                     </>
                 )}
             </Space>
             <Modal
-                title="Choose a picture"
                 centered
-                visible={visible}
                 onOk={handleOk}
+                visible={visible}
                 onCancel={handleCancel}
-                okButtonProps={{ disabled: !selected }}
+                title="Choose a picture"
                 width={'calc(100vw - 150px)'}
-                bodyStyle={{
-                    minHeight: 'calc(100vh - 155px)',
-                    // maxHeight: 'calc(100vh - 200px)',
-                    // overflowY: 'scroll',
-                    // overflowX: 'hidden',
-                }}
+                okButtonProps={{ disabled: !selected }}
+                bodyStyle={{ minHeight: 'calc(100vh - 155px)' }}
             >
-                <Space
-                    direction="vertical"
-                    size="middle"
-                    style={{
-                        width: '100%',
-                    }}
-                >
+                <Space size="middle" direction="vertical" style={{ width: '100%' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Input
                             allowClear

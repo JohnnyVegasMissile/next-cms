@@ -30,7 +30,7 @@ import set from 'lodash.set'
 import AccessCheckboxes from '@components/AccessCheckboxes'
 import moment from 'moment'
 import { useState } from 'react'
-import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { PlusOutlined, QuestionCircleOutlined, CloseOutlined, CloseCircleFilled } from '@ant-design/icons'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
 const { Text } = Typography
@@ -341,9 +341,12 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleInput
-                                        value={get(values, `${field.name}.textValue`, '')}
+                                    <CustomMultipleWrapper
+                                        values={get(values, `${field.name}.textValue`, [])}
                                         onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                        onClear={() =>
+                                            onHandleChange(field.name, field.type, undefined, true)
+                                        }
                                     />
                                 ) : (
                                     <Input
@@ -372,10 +375,13 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleInput
+                                    <CustomMultipleWrapper
                                         type="number"
-                                        value={get(values, `${field.name}.numberValue`, '')}
+                                        values={get(values, `${field.name}.numberValue`, [])}
                                         onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                        onClear={() =>
+                                            onHandleChange(field.name, field.type, undefined, true)
+                                        }
                                     />
                                 ) : (
                                     <InputNumber
@@ -404,10 +410,13 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleInput
+                                    <CustomMultipleWrapper
                                         type="date"
-                                        value={get(values, `${field.name}.dateValue`, '')}
+                                        values={get(values, `${field.name}.dateValue`, [])}
                                         onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                        onClear={() =>
+                                            onHandleChange(field.name, field.type, undefined, true)
+                                        }
                                     />
                                 ) : (
                                     <DatePicker
@@ -441,10 +450,13 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                             <Space key={idx} direction="vertical">
                                 <Text>{field.label}</Text>
                                 {field.multiple ? (
-                                    <MultipleInput
+                                    <CustomMultipleWrapper
                                         type="link"
-                                        value={get(values, `${field.name}.textValue`, [])}
+                                        values={get(values, `${field.name}.textValue`, [])}
                                         onChange={(e) => onHandleChange(field.name, field.type, e, true)}
+                                        onClear={() =>
+                                            onHandleChange(field.name, field.type, undefined, true)
+                                        }
                                     />
                                 ) : (
                                     <LinkInput
@@ -491,184 +503,296 @@ const MultipleImages = ({
     value,
     onChange,
 }: {
-    value: (Media | undefined)[]
-    onChange(list: (Media | undefined)[]): void
+    value: Media[]
+    onChange(list: (Media | undefined)[] | undefined): void
 }) => {
     return (
-        <Space className="multiple-input" size="small" direction="vertical">
-            {get(value, '', []).map((e: Media, idx: number) => (
-                <MediaModal
-                    key={idx}
-                    size="small"
-                    value={e}
-                    onMediaSelected={(e) => {
-                        if (!e) {
-                            const newValues = [...value]
-                            newValues.splice(idx, 1)
-                            onChange(newValues)
-                            return
-                        }
-
-                        const newValues = [...value]
-                        newValues[idx] = e
-                        onChange(newValues)
-                    }}
-                />
-            ))}
-            <div>
-                <MediaModal
-                    primary={false}
-                    size="small"
-                    label="Add new"
-                    icon={<PlusOutlined />}
-                    onMediaSelected={(e) => {
-                        const newValues = [...value, e]
-                        onChange(newValues)
-                    }}
-                />
-            </div>
-        </Space>
-    )
-}
-
-const MultipleInput = ({
-    value,
-    onChange,
-    type = 'string',
-}: {
-    value: any[]
-    onChange(list: any[]): void
-    type?: string
-}) => {
-    const [tempValue, setTempValue] = useState<any>()
-    const [inputVisible, setInputVisible] = useState(false)
-
-    const onEndEdit = () => {
-        if (!!tempValue) {
-            onChange([...value, tempValue])
-            setTempValue(undefined)
-            setInputVisible(false)
-            return
-        }
-
-        setInputVisible(false)
-    }
-
-    const props = {
-        autoFocus: true,
-        allowClear: true,
-        type: 'text',
-        size: 'small' as SizeType,
-        placeholder: '',
-        value: tempValue,
-        onBlur: onEndEdit,
-        onPressEnter: onEndEdit,
-    }
-
-    return (
-        <Space className="multiple-input" size="small">
-            {get(value, '', []).map((value: any, idx: number) => (
-                <UniqueInput
-                    type={type}
-                    key={idx}
-                    value={value}
-                    onChange={(e) => {
-                        const newValues = [...value]
-                        newValues[idx] = e
-                        onChange(newValues)
-                    }}
-                    onClose={() => {
-                        const newValues = [...value]
-                        newValues.splice(idx, 1)
-                        onChange(newValues)
-                    }}
-                />
-            ))}
-            {inputVisible ? (
-                type === 'number' ? (
-                    <InputNumber {...props} onChange={(e) => setTempValue(e)} />
-                ) : type === 'date' ? (
-                    <DatePicker {...props} format="DD/MM/YYYY" onChange={(e) => setTempValue(e)} />
-                ) : type === 'link' ? (
-                    <LinkInput {...props} onChange={(e) => setTempValue(e)} />
-                ) : (
-                    <Input {...props} onChange={(e) => setTempValue(e.target.value)} />
-                )
-            ) : (
-                <Tag onClick={() => setInputVisible(true)}>
-                    <PlusOutlined /> Add new
-                </Tag>
-            )}
-        </Space>
-    )
-}
-
-const UniqueInput = ({
-    value,
-    onChange,
-    onClose,
-    type = 'string',
-}: {
-    value: any
-    onChange(value: any): void
-    onClose(): void
-    type: string
-}) => {
-    const [inputVisible, setInputVisible] = useState(false)
-
-    const onEndEdit = () => {
-        if (!value) {
-            onClose()
-            return
-        }
-
-        setInputVisible(false)
-    }
-
-    const props = {
-        autoFocus: true,
-        allowClear: true,
-        type: 'text',
-        size: 'small' as SizeType,
-        placeholder: '',
-        value: value,
-        onBlur: onEndEdit,
-        onPressEnter: onEndEdit,
-    }
-
-    if (inputVisible) {
-        return type === 'number' ? (
-            <InputNumber {...props} onChange={(e) => onChange(e)} />
-        ) : type === 'date' ? (
-            <DatePicker {...props} format="DD/MM/YYYY" onChange={(e) => onChange(e)} />
-        ) : type === 'link' ? (
-            <LinkInput {...props} onChange={(e) => onChange(e)} />
-        ) : (
-            <Input {...props} onChange={(e) => onChange(e.target.value)} />
-        )
-    }
-
-    const isLongTag = typeof value === 'number' ? false : value.length > 20
-
-    return (
-        <Tag
-            closable={true}
-            onClose={(e) => {
-                onClose()
-                e.preventDefault()
-            }}
+        <div
+            className="ant-select ant-select-multiple ant-select-allow-clear ant-select-show-search"
+            style={{ width: 480 }}
         >
-            <span onClick={(e) => setInputVisible(true)}>
-                {isLongTag && type === 'string'
-                    ? `${value.slice(0, 20)}...`
-                    : type === 'date'
-                    ? moment(value).format('DD/MM/YYYY')
-                    : value}
-            </span>
-        </Tag>
+            <div className="ant-select-selector">
+                <div
+                    className="ant-select-selection-overflow"
+                    style={{ paddingTop: !value?.length ? undefined : 1.5 }}
+                >
+                    <Space size="small" direction="vertical">
+                        {value?.map((e, idx) => (
+                            <MediaModal
+                                key={idx}
+                                size="small"
+                                value={e}
+                                onMediaSelected={(e) => {
+                                    if (!e) {
+                                        const newValues = [...value]
+                                        newValues.splice(idx, 1)
+                                        onChange(newValues)
+                                        return
+                                    }
+
+                                    const newValues = [...value]
+                                    newValues[idx] = e
+                                    onChange(newValues)
+                                }}
+                            />
+                        ))}
+                        <MediaModal
+                            primary={false}
+                            size="small"
+                            label="Add new"
+                            icon={<PlusOutlined />}
+                            onMediaSelected={(e) => {
+                                const newValues = [...value, e]
+                                onChange(newValues)
+                            }}
+                        >
+                            <div className="ant-select-selection-overflow-item" style={{ opacity: 1 }}>
+                                <span
+                                    className="ant-select-selection-item"
+                                    title="Add new"
+                                    style={{ padding: '0px 0px 0px 6px' }}
+                                >
+                                    <span
+                                        className="ant-select-selection-item-remove"
+                                        unselectable="on"
+                                        aria-hidden="true"
+                                        style={{ userSelect: 'none' }}
+                                    >
+                                        <span role="img" aria-label="close" className="anticon anticon-close">
+                                            <PlusOutlined style={{ marginRight: 3, color: '#000' }} />
+                                        </span>
+                                    </span>
+                                    <span className="ant-select-selection-item-content">Add new</span>
+                                </span>
+                            </div>
+                        </MediaModal>
+                    </Space>
+                </div>
+            </div>
+            {!!value?.length && (
+                <span
+                    className="ant-select-clear"
+                    unselectable="on"
+                    aria-hidden="true"
+                    style={{ userSelect: 'none' }}
+                >
+                    <span role="img" aria-label="close-circle" className="anticon anticon-close-circle">
+                        <CloseCircleFilled onClick={() => onChange(undefined)} />
+                    </span>
+                </span>
+            )}
+        </div>
     )
 }
 
 Admin.requireAuth = true
 
 export default Admin
+
+const CustomMultipleWrapper = ({
+    values = [],
+    type,
+    onClear,
+    onChange,
+}: {
+    values: any[]
+    type?: string
+    onClear(): void
+    onChange(e: any): void
+}) => {
+    return (
+        <div
+            className="ant-select ant-select-multiple ant-select-allow-clear ant-select-show-search"
+            style={{ width: 480 }}
+        >
+            <div className="ant-select-selector">
+                <div className="ant-select-selection-overflow">
+                    {values.map((e, i) => (
+                        <CustomInputTag
+                            key={i}
+                            text={e}
+                            type={type}
+                            onClose={() => {
+                                const newValues = [...values]
+                                newValues.splice(i, 1)
+                                onChange(newValues)
+                            }}
+                            onChange={(e) => {
+                                const newValues = [...values]
+                                newValues[i] = e
+                                onChange(newValues)
+                            }}
+                        />
+                    ))}
+                    <AddInputTag type={type} onCreate={(e) => onChange([...values, e])} />
+                </div>
+            </div>
+            {!!values?.length && (
+                <span
+                    className="ant-select-clear"
+                    unselectable="on"
+                    aria-hidden="true"
+                    style={{ userSelect: 'none' }}
+                >
+                    <span role="img" aria-label="close-circle" className="anticon anticon-close-circle">
+                        <CloseCircleFilled onClick={onClear} />
+                    </span>
+                </span>
+            )}
+        </div>
+    )
+}
+
+const CustomInputTag = ({
+    text,
+    type,
+    onChange,
+    onClose,
+}: {
+    text: string
+    type?: string
+    onChange(e: string): void
+    onClose(): void
+}) => {
+    const [inputVisible, setInputVisible] = useState(false)
+    const [value, setValue] = useState<any>()
+
+    const onEdit = () => {
+        if (!value) {
+            onClose()
+            return
+        }
+
+        onChange(value)
+        setInputVisible(false)
+    }
+
+    const props = {
+        autoFocus: true,
+        type: 'text',
+        size: 'small' as SizeType,
+        placeholder: '',
+        value: value,
+        onBlur: onEdit,
+        onPressEnter: onEdit,
+        onChange: (e: any) => setValue(e.target.value),
+        style: { width: 125 },
+    }
+
+    if (inputVisible) {
+        return (
+            <div className="ant-select-selection-overflow-item" style={{ opacity: 1, marginRight: 5 }}>
+                {type === 'number' ? (
+                    <InputNumber {...props} onChange={(e) => setValue(e)} />
+                ) : type === 'date' ? (
+                    <DatePicker {...props} format="DD/MM/YYYY" onChange={(e) => setValue(e)} />
+                ) : type === 'link' ? (
+                    <LinkInput {...props} onChange={(e) => setValue(e)} />
+                ) : (
+                    <Input allowClear {...props} onChange={(e) => setValue(e.target.value)} />
+                )}
+            </div>
+        )
+    }
+
+    const isLongTag = typeof text === 'number' ? false : text?.length > 20
+
+    return (
+        <div
+            className="ant-select-selection-overflow-item"
+            style={{ opacity: 1 }}
+            onClick={() => {
+                setValue(text)
+                setInputVisible(true)
+            }}
+        >
+            <span className="ant-select-selection-item" title={text}>
+                <span className="ant-select-selection-item-content">
+                    {isLongTag && type === 'string'
+                        ? `${text.slice(0, 20)}...`
+                        : type === 'date'
+                        ? moment(text).format('DD/MM/YYYY')
+                        : text}
+                </span>
+                <span
+                    className="ant-select-selection-item-remove"
+                    unselectable="on"
+                    aria-hidden="true"
+                    style={{ userSelect: 'none' }}
+                >
+                    <span role="img" aria-label="close" className="anticon anticon-close">
+                        <CloseOutlined onClick={onClose} />
+                    </span>
+                </span>
+            </span>
+        </div>
+    )
+}
+
+const AddInputTag = ({ type, onCreate }: { type?: string; onCreate(value: any): void }) => {
+    const [inputVisible, setInputVisible] = useState(false)
+    const [value, setValue] = useState<any>()
+
+    const onEdit = () => {
+        if (!!value) {
+            onCreate(value)
+        }
+
+        setValue('')
+        setInputVisible(false)
+    }
+
+    const props = {
+        autoFocus: true,
+        type: 'text',
+        size: 'small' as SizeType,
+        placeholder: '+ Add new',
+        value: value,
+        onBlur: onEdit,
+        onPressEnter: onEdit,
+        // onChange: (e: any) => setValue(e.target.value),
+        style: { width: 125 },
+    }
+
+    if (inputVisible) {
+        return (
+            <div className="ant-select-selection-overflow-item" style={{ opacity: 1, marginRight: 5 }}>
+                {type === 'number' ? (
+                    <InputNumber {...props} onChange={(e) => setValue(e)} />
+                ) : type === 'date' ? (
+                    <DatePicker {...props} format="DD/MM/YYYY" onChange={(e) => setValue(e)} />
+                ) : type === 'link' ? (
+                    <LinkInput {...props} width={115} onChange={(e) => setValue(e)} />
+                ) : (
+                    <Input allowClear {...props} onChange={(e) => setValue(e.target.value)} />
+                )}
+            </div>
+        )
+    }
+
+    return (
+        <div
+            className="ant-select-selection-overflow-item"
+            style={{ opacity: 1 }}
+            onClick={() => setInputVisible(true)}
+        >
+            <span
+                className="ant-select-selection-item"
+                title="Add new"
+                style={{ padding: '0px 0px 0px 6px' }}
+            >
+                <span
+                    className="ant-select-selection-item-remove"
+                    unselectable="on"
+                    aria-hidden="true"
+                    style={{ userSelect: 'none' }}
+                >
+                    <span role="img" aria-label="close" className="anticon anticon-close">
+                        <PlusOutlined style={{ marginRight: 3, color: '#000' }} />
+                    </span>
+                </span>
+                <span className="ant-select-selection-item-content">Add new</span>
+            </span>
+        </div>
+    )
+}

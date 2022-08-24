@@ -21,6 +21,7 @@ interface Props {
     label?: string
     icon?: ReactNode
     primary?: boolean
+    children?: JSX.Element
 }
 
 const MediaModal = ({
@@ -31,6 +32,7 @@ const MediaModal = ({
     label = 'Choose a picture',
     primary = true,
     icon,
+    children,
 }: Props) => {
     const [visible, setVisible] = useState(false)
     const [selected, setSelected] = useState<Media | null>(value || null)
@@ -78,14 +80,15 @@ const MediaModal = ({
     return (
         <>
             <Space>
-                <Button
-                    icon={icon}
-                    size={size}
-                    type={primary ? 'primary' : undefined}
-                    onClick={() => setVisible(true)}
-                >
-                    {label}
-                </Button>
+                <div onClick={() => setVisible(true)}>
+                    {children ? (
+                        children
+                    ) : (
+                        <Button icon={icon} size={size} type={primary ? 'primary' : undefined}>
+                            {label}
+                        </Button>
+                    )}
+                </div>
                 {value && (
                     <>
                         <Text>{isLongTag ? `${value?.name.slice(0, 37)}...` : value?.name}</Text>

@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { ContentField, Metadata, Section } from '@prisma/client'
 
 import { prisma } from '../../../utils/prisma'
+import getNameFieldFromType from '@utils/getNameFieldFromType'
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.uid as string
@@ -34,34 +35,44 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // delete existing fields
     await prisma.contentField.deleteMany({
-        where: { contentId: id },
+        where: {
+            OR: [{ contentId: id }, { parent: { contentId: id } }],
+            contentId: id,
+        },
     })
 
     // put the fields separately
-    const newFields: ContentField[] = get(req, 'body.fields', [])
+    const fields: ContentField[] = get(req, 'body.fields', [])
     delete newContentContent.fields
 
-    for (const field of newFields) {
-        await prisma.contentField.create({
-            data: {
+    const withMultiFields = fields.map((field, idx) => {
+        if (field.multiple) {
+            const valueName = getNameFieldFromType(field.type)
+            const values = get(field, valueName, [])
+
+            return {
+                ...field,
                 contentId: id,
+                childs: {
+                    create: values?.map((e: any, i: number) => ({
+                        name: field.name,
+                        type: field.type,
+                        [valueName]: e,
+                    })),
+                },
+                [valueName]: undefined,
+            }
+        }
 
-                name: field.name,
-                type: field.type,
+        return field
+    })
 
-                mediaId: field.mediaId,
-                textValue: field.textValue,
-                numberValue: field.numberValue,
-                boolValue: field.boolValue,
-                dateValue: field.dateValue,
-            },
-        })
+    for (const field of withMultiFields) {
+        await prisma.contentField.create({ data: field })
     }
 
     // delete existing metadatas
-    await prisma.metadata.deleteMany({
-        where: { contentId: id },
-    })
+    await prisma.metadata.deleteMany({ where: { contentId: id } })
 
     // put the metadatas separately
     const newMetadatas: Metadata[] = get(req, 'body.metadatas', [])

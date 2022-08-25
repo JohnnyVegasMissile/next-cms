@@ -92,8 +92,6 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         return field
     })
 
-    console.log('withMultiFields', withMultiFields)
-
     const content = await prisma.content.create({
         data: {
             ...(newContentContent as Prisma.ContentCreateInput),

@@ -23,9 +23,10 @@ interface CustomSelectProps {
     size?: 'small' | 'middle' | 'large'
     multi?: boolean
     filterId?: string
+    status?: 'error' | undefined
 }
 
-const ListContainers = ({ value, onChange, width = 240, disabled }: CustomSelectProps) => {
+const ListContainers = ({ value, onChange, width = 240, disabled, status }: CustomSelectProps) => {
     const containers: UseQueryResult<Container[], Error> = useQuery<Container[], Error>(
         ['containers', {}],
         () => getContainers()
@@ -33,6 +34,7 @@ const ListContainers = ({ value, onChange, width = 240, disabled }: CustomSelect
 
     return (
         <Select
+            status={status}
             allowClear
             disabled={disabled}
             value={value}

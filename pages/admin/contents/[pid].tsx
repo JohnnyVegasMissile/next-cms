@@ -45,9 +45,17 @@ const initialValues: MyType = {
 const validate = (values: MyType) => {
     let errors: any = {}
 
-    // if (!values.title) {
-    //     errors.title = 'Required'
-    // }
+    if (!values.title) {
+        errors.title = 'Required'
+    }
+
+    if (!values.slug) {
+        errors.slug = 'Required'
+    }
+
+    if (!values.containerId) {
+        errors.containerId = 'Required'
+    }
 
     // const splittedSlug = values.slug.split('/')
     // for (const slug of splittedSlug) {
@@ -69,9 +77,11 @@ const Admin = () => {
     const { pid } = router.query
     const queryClient = useQueryClient()
 
-    const { values, /*errors,*/ handleSubmit, handleChange, setValues } = useFormik<MyType>({
+    const { values, errors, handleSubmit, handleChange, setValues } = useFormik<MyType>({
         initialValues: { ...initialValues, containerId: router.query.container },
         validate,
+        validateOnBlur: false,
+        validateOnChange: false,
         onSubmit: async (values) => {
             const fields = Object.keys(values.fieldsValue).map((key: string) => ({
                 name: key,
@@ -103,16 +113,16 @@ const Admin = () => {
                 let fieldsValue: any = {}
                 get(data, 'fields', []).forEach((e: any, i: number) => {
                     const valueName = getNameFieldFromType(e.type)
+                    const newValues = e.multiple
+                        ? get(e, `childs`, []).map((c: any) => c[valueName])
+                        : e[valueName]
 
                     fieldsValue[e.name] = {
                         type: e.type,
                         multiple: e.multiple,
-                        [valueName]: e.multiple
-                            ? get(e, `childs`, []).map((e: any) => get(e, valueName, ''))
-                            : e[valueName],
+                        [valueName]: newValues,
                     }
                 })
-                console.log('fieldsValue', fieldsValue)
 
                 setValues({ ...data, sections, slug, fieldsValue })
             },
@@ -125,34 +135,30 @@ const Admin = () => {
         () => getContainerDetails(values.containerId as string),
         {
             enabled: !!values.containerId,
-            onSuccess: (data: FullContainerEdit) => {
-                let fieldsValue = {}
-
-                for (const field of get(data, 'fields', [])) {
-                    const value: FullContentField | undefined = get(content, 'data.fields', []).find(
-                        (e: FullContentField) => e.name === field.name
-                    )
-
-                    if (!!value) {
-                        const newValue = {
-                            type: value.type,
-                            mediaId: value.mediaId || undefined,
-                            media: value.media || undefined,
-                            textValue: value.textValue || undefined,
-                            numberValue:
-                                !!value.numberValue || value.numberValue === 0
-                                    ? value.numberValue
-                                    : undefined,
-                            boolValue: value.boolValue || undefined,
-                            dateValue: moment(value.dateValue) || undefined,
-                        }
-
-                        set(fieldsValue, field.name, newValue)
-                    }
-                }
-
-                onHandleChange('fieldsValue', fieldsValue)
-            },
+            // onSuccess: (data: FullContainerEdit) => {
+            //     let fieldsValue = {}
+            //     for (const field of get(data, 'fields', [])) {
+            //         const value: FullContentField | undefined = get(content, 'data.fields', []).find(
+            //             (e: FullContentField) => e.name === field.name
+            //         )
+            //         if (!!value) {
+            //             const newValue = {
+            //                 type: value.type,
+            //                 mediaId: value.mediaId || undefined,
+            //                 media: value.media || undefined,
+            //                 textValue: value.textValue || undefined,
+            //                 numberValue:
+            //                     !!value.numberValue || value.numberValue === 0
+            //                         ? value.numberValue
+            //                         : undefined,
+            //                 boolValue: value.boolValue || undefined,
+            //                 dateValue: moment(value.dateValue) || undefined,
+            //             }
+            //             set(fieldsValue, field.name, newValue)
+            //         }
+            //     }
+            //     onHandleChange('fieldsValue', fieldsValue)
+            // },
         }
     )
 
@@ -218,6 +224,7 @@ const Admin = () => {
                                     <Space direction="vertical">
                                         <Text>Title</Text>
                                         <Input
+                                            status={errors.title ? 'error' : undefined}
                                             style={{ width: 240 }}
                                             value={get(values, 'title', '')}
                                             onChange={(e) => onHandleChange('title', e.target.value)}
@@ -227,6 +234,7 @@ const Admin = () => {
                                     <Space direction="vertical">
                                         <Text>Slug</Text>
                                         <Input
+                                            status={errors.slug ? 'error' : undefined}
                                             style={{ width: 240 }}
                                             value={get(values, 'slug', '')}
                                             onChange={(e) => onHandleChange('slug', e.target.value)}
@@ -263,6 +271,7 @@ const Admin = () => {
                                     <Space direction="vertical">
                                         <Text>Container</Text>
                                         <CustomSelect.ListContainers
+                                            status={errors.containerId ? 'error' : undefined}
                                             disabled={!pid || pid !== 'create' || values.containerId}
                                             value={values.containerId}
                                             onChange={(e) => onHandleChange('containerId', e)}
@@ -322,6 +331,8 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
 
         onChange(newValue)
     }
+
+    console.log('values 2', values)
 
     return (
         <Space direction="vertical">
@@ -475,7 +486,7 @@ const ContentFieldsManager = ({ values, fields, onChange }: ContentFieldsManager
                                     <CustomSelect.ListContents
                                         width={480}
                                         filterId={field.linkedContainerId || undefined}
-                                        value={get(values, `${field.name}.contentValueId`, '')}
+                                        value={get(values, `${field.name}.contentValueId`, undefined)}
                                         onChange={(e) => onHandleChange(field.name, field.type, e)}
                                     />
                                 )}

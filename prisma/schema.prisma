@@ -20,6 +20,15 @@ model Access {
   role        Role       @relation(fields: [roleId], references: [id])
 }
 
+enum MetadataType {
+  APPLICATION_NAME
+  AUTHOR
+  DESCRIPTION
+  GENERATOR
+  KEYWORDS
+  VIEWPORT
+}
+
 model Metadata {
   id            String     @id @default(cuid())
   name          String
@@ -190,6 +199,15 @@ model ContainerField {
   required          Boolean?   @default(false)
 }
 
+enum ContentFieldType {
+  STRING
+  NUMBER
+  DATE
+  IMAGE
+  LINK
+  CONTENT
+}
+
 model ContentField {
   id          String    @id @default(cuid())
   name        String
@@ -208,7 +226,7 @@ model ContentField {
 
   multiple Boolean        @default(false)
   parentId String?
-  parent   ContentField?  @relation(fields: [parentId], references: [id], name: "list")
+  parent   ContentField?  @relation(fields: [parentId], references: [id], name: "list", onDelete: Cascade)
   childs   ContentField[] @relation(name: "list")
 }
 

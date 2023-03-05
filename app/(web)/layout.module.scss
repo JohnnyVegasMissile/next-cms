@@ -1,0 +1,20 @@
+.aside {
+    display: var(--sidebar-display);
+    width: var(--sidebar-width);
+}
+
+.content-wrap {
+    display: flex;
+
+    &.left {
+        flex-direction: row;
+    }
+
+    &.right {
+        flex-direction: row-reverse;
+    }
+}
+
+.content {
+    flex: 1;
+}

@@ -1,0 +1,24 @@
+$width: 250px;
+
+.link-select {
+  &-cascader {
+    width: $width;
+
+    & > .ant-select-selector {
+      border-radius: 4px 0px 0px 4px !important;
+    }
+  }
+
+  &-select > .ant-select-selector {
+    border-radius: 0px 4px 4px 0px !important;
+    border-left-width: 0px !important;
+  }
+
+  &-input {
+    width: $width;
+
+    & .ant-input-affix-wrapper {
+      border-radius: 4px 0px 0px 4px;
+    }
+  }
+}

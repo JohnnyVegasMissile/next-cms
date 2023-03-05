@@ -1,0 +1,51 @@
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+}
+
+.line {
+  cursor: pointer;
+  border-color: #d9d9d9;
+  background-color: rgba(0, 0, 0, 0.02);
+
+  &:hover {
+    background-color: #e6f4ff;
+  }
+
+  &.selected {
+    border-color: #1677ff;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+  }
+
+  &.default {
+    flex: 1;
+
+    & .body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      & .icon {
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  &.add {
+    border-style: dashed;
+
+    & .body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      & .icon {
+        margin-right: 1rem;
+      }
+    }
+  }
+}

@@ -1,0 +1,343 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// AUTH
+
+model User {
+  id Int @id @default(autoincrement())
+
+  name  String?
+  login Login?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Login {
+  id Int @id @default(autoincrement())
+
+  userId   Int       @unique
+  user     User      @relation(fields: [userId], references: [id])
+  sessions Session[]
+  roleId   Int
+  role     Role      @relation(fields: [roleId], references: [id])
+
+  email    String @unique
+  password String
+}
+
+model Session {
+  id Int @id @default(autoincrement())
+
+  token String @unique @default(cuid())
+
+  loginId   Int
+  login     Login    @relation(fields: [loginId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// RIGHTS & ACCESS
+
+model Role {
+  id Int @id @default(autoincrement())
+
+  name   String
+  logins Login[]
+  rights RightType[]
+
+  limitImageUpload Int?
+  limitFileUpload  Int?
+  limitVideoUpload Int?
+
+  superUser Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RightType {
+  VIEW_PAGE
+  CREATE_PAGE
+  UPDATE_PAGE
+  DELETE_PAGE
+  UPDATE_PAGE_SECTION
+
+  VIEW_CONTAINER
+  CREATE_CONTAINER
+  UPDATE_CONTAINER
+  DELETE_CONTAINER
+  UPDATE_CONTAINER_SECTION
+  UPDATE_CONTAINER_TEMPLATE_SECTION
+
+  VIEW_CONTENT
+  CREATE_CONTENT
+  UPDATE_CONTENT
+  DELETE_CONTENT
+  UPDATE_CONTENT_SECTION
+
+  VIEW_MEDIA
+  UPLOAD_MEDIA
+  UPDATE_MEDIA
+  DELETE_MEDIA
+
+  VIEW_FORM
+  CREATE_FORM
+  UPDATE_FORM
+  DELETE_FORM
+
+  VIEW_MESSAGE
+  READ_MESSAGE
+  DELETE_MESSAGE
+
+  VIEW_USER
+  CREATE_USER
+  UPDATE_USER
+  DELETE_USER
+
+  VIEW_ROLE
+  CREATE_ROLE
+  UPDATE_ROLE
+  DELETE_ROLE
+
+  VIEW_LAYOUT
+  UPDATE_LAYOUT
+
+  VIEW_SETTING
+  UPDATE_GENERAL
+  UPDATE_THEME
+  UPDATE_SMTP
+
+  REVALIDATE
+}
+
+// model Right {
+//   id Int @id @default(autoincrement())
+
+//   roleId    Int
+//   role      Role      @relation(fields: [roleId], references: [id])
+//   rightType RightType
+// }
+
+// FORM
+
+model Form {
+  id Int @id @default(autoincrement())
+
+  name           String  @unique
+  redirectMail   Boolean @default(false)
+  mailToRedirect String?
+  successMessage String?
+  errorMessage   String?
+  extraData      Json
+
+  messages     Message[]
+  fields       FormField[]
+  // sections       Section[]
+  // elements       Element[]
+  discontinued Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+enum FormFieldType {
+  TEXT
+  NUMBER
+  EMAIL
+  PASSWORD
+  PARAGRAPH
+  OPTION
+  CHECKBOX
+  RADIO
+  BUTTON
+  TITLE
+}
+
+model FormField {
+  id Int @id @default(autoincrement())
+
+  formId      Int
+  form        Form          @relation(fields: [formId], references: [id])
+  name        String?
+  type        FormFieldType
+  label       String
+  placeholder String?
+
+  position Int
+  line     Int
+
+  messageFields MessageField[]
+
+  options Json?
+
+  min Float?
+  max Float?
+
+  defaultText     String?
+  defaultNumber   Float?
+  defaultMultiple Json?
+
+  required Boolean? @default(false)
+
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+
+  marked Boolean        @default(false)
+  read   Boolean        @default(false)
+  fields MessageField[]
+
+  formId Int
+  form   Form @relation(fields: [formId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model MessageField {
+  id Int @id @default(autoincrement())
+
+  messageId Int
+  message   Message @relation(fields: [messageId], references: [id])
+
+  formFieldId Int
+  formField   FormField @relation(fields: [formFieldId], references: [id])
+
+  valueText    String?
+  valueNumber  Int?
+  valueBoolean Boolean?
+}
+
+// SETTINGS
+
+enum SettingType {
+  REVALIDATE_DELAY
+  APP_NAME
+  BACKGROUND_COLOR
+  PRIMARY_COLOR
+  SECONDARY_COLOR
+  PRIMARY_TEXT_COLOR
+  SECONDARY_TEXT_COLOR
+  DARK_COLOR
+  LIGHT_COLOR
+  EXTRA_COLOR
+  MAIL_HOST
+  MAIL_PORT
+  MAIL_USER
+  MAIL_PASS
+  SIDEBAR_IS_ACTIVE
+  SIDEBAR_WIDTH
+  SIDEBAR_UNIT
+  SIDEBAR_POSITION
+  MAINTENANCE_MODE
+}
+
+model Setting {
+  id Int @id @default(autoincrement())
+
+  type    SettingType @unique
+  value   String
+  visible Boolean     @default(true)
+
+  updatedAt DateTime @updatedAt
+}
+
+// SLUG
+
+model Slug {
+  id Int @id @default(autoincrement())
+
+  full  String @unique
+  basic String
+
+  // parentId Int?
+  // parent   Slug?  @relation(fields: [parentId], references: [id], name: "childs")
+  // childs   Slug[] @relation(name: "childs")
+
+  pageId Int?  @unique
+  page   Page? @relation(fields: [pageId], references: [id])
+  // containerId String?    @unique
+  // container   Container? @relation(fields: [containerId], references: [id])
+  // contentId   String?    @unique
+  // content     Content?   @relation(fields: [contentId], references: [id])
+
+  updatedAt DateTime @updatedAt
+}
+
+model Metadata {
+  id Int @id @default(autoincrement())
+
+  name    String
+  content String
+
+  pageId Int?
+  page   Page? @relation(fields: [pageId], references: [id])
+  // containerId   String?
+  // container     Container? @relation(fields: [containerId], references: [id], name: "metadatas", onDelete: Cascade)
+  // contentId     String?
+  // contentLinked Content?   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+}
+
+// PAGE
+
+enum PageType {
+  PAGE
+  HOMEPAGE
+  SIGNIN
+  NOTFOUND
+  ERROR
+  MAINTENANCE
+}
+
+model Page {
+  id Int @id @default(autoincrement())
+
+  name String
+  type PageType @default(PAGE)
+
+  slug Slug?
+
+  metadatas Metadata[]
+
+  published Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// CONTAINER
+
+enum ContainerFieldType {
+  STRING
+  NUMBER
+  DATE
+  BOOLEAN
+  LINK
+  PARAGRAPH
+  IMAGE
+  FILE
+  VIDEO
+  CONTENT
+  OPTION
+  RICHTEXT
+  COLOR
+  LOCATION
+}
+
+model ContainerField {
+  id Int @id @default(autoincrement())
+
+  type ContainerFieldType
+}

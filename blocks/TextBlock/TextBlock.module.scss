@@ -1,0 +1,77 @@
+.section {
+    padding: 1rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+
+    &.switch {
+        flex-direction: row-reverse;
+    }
+
+    & img {
+        width: 300px;
+    }
+
+    & .infos {
+        flex: 1;
+
+        & h1 {
+            position: relative;
+        }
+
+        & h1::after {
+            content: '';
+
+            position: absolute;
+            height: 0.25rem;
+            width: 4rem;
+            background-color: var(--primary-color);
+            bottom: -0.5rem;
+            left: 0;
+        }
+
+        & h3 {
+            color: var(--secondary-text-color);
+        }
+
+        & p {
+            line-height: 1.5rem;
+
+            & strong {
+                color: var(--primary-color);
+            }
+        }
+
+        & .wrap-button {
+            display: flex;
+            gap: 1rem;
+
+            & .button {
+                background-color: var(--primary-color);
+                padding: 0.5rem 1rem;
+                min-width: 3rem;
+                text-align: center;
+                font-weight: bold;
+                cursor: pointer;
+
+                & > a {
+                    color: var(--light-color);
+                    text-decoration: none !important;
+
+                    & > span::after {
+                        content: '>';
+                        margin-left: 0.5rem;
+                    }
+                }
+
+                &:hover {
+                    opacity: 0.5;
+                }
+
+                &.secondary {
+                    background-color: var(--secondary-color);
+                }
+            }
+        }
+    }
+}

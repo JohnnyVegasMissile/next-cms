@@ -1,0 +1,77 @@
+{
+    "compilerOptions": {
+        "resolveJsonModule": true,
+        // "incremental": true,
+        "target": "es5",
+        "module": "esnext",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": false,
+        // "checkJs": true,
+        "jsx": "preserve",
+        // "declaration": true,
+        // "declarationMap": true,
+        // "sourceMap": true,
+        // "outFile": "./",
+        // "outDir": "./",
+        // "rootDir": "./",
+        // "composite": true,
+        // "tsBuildInfoFile": "./",
+        // "removeComments": true,
+        "noEmit": true,
+        // "importHelpers": true,
+        // "downlevelIteration": true,
+        "isolatedModules": true,
+        /* Strict Type-Checking Options */
+        "strict": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": true,
+        "alwaysStrict": true,
+        /* Additional Checks */
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        /* Module Resolution Options */
+        "moduleResolution": "node",
+
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "~/*": ["./*"]
+        },
+        // "rootDirs": [],
+        // "typeRoots": [],
+        // "types": [],
+        // "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        // "preserveSymlinks": true,
+        // "allowUmdGlobalAccess": true,
+        // "declaration": true,
+        // "declarationDir": "./types",
+        /* Source Map Options */
+        // "sourceRoot": "",
+        // "mapRoot": "",
+        // "inlineSourceMap": true,
+        // "inlineSources": true,
+        /* Experimental Options */
+        // "experimentalDecorators": true,
+        // "emitDecoratorMetadata": true,
+        /* Advanced Options */
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "incremental": true
+    },
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "exclude": ["node_modules"]
+}

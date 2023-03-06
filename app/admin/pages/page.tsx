@@ -15,25 +15,22 @@ import {
     Tooltip,
 } from 'antd'
 import {
-    UnorderedListOutlined,
     CopyOutlined,
-    FileAddOutlined,
     EditOutlined,
     DeleteOutlined,
     PicCenterOutlined,
-    PicLeftOutlined,
     SearchOutlined,
     PlusOutlined,
 } from '@ant-design/icons'
-import type { ColumnsType, TablePaginationConfig, TableProps } from 'antd/es/table'
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useQuery } from '@tanstack/react-query'
 import { getPages } from '~/network/pages'
 import { Page, PageType, Slug } from '@prisma/client'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useEffect, useState } from 'react'
-import { FilterValue, SorterResult, TableCurrentDataSource } from 'antd/es/table/interface'
+import { useState } from 'react'
+import { SorterResult } from 'antd/es/table/interface'
 import { PAGE_PAGE_SIZE } from '~/utilities/constants'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -295,12 +292,12 @@ const Pages = () => {
                         pageSize: PAGE_PAGE_SIZE,
                         showSizeChanger: false,
                         current: page,
-                        showTotal: (total, range) =>
+                        showTotal: (total) =>
                             `${(page - 1) * PAGE_PAGE_SIZE}-${
                                 (page - 1) * PAGE_PAGE_SIZE + (pages.data?.pages.length || 0)
                             } of ${total} pages`,
                     }}
-                    scroll={{ y: 300 }}
+                    // scroll={{ y: 300 }}
                 />
             </Card>
         </>

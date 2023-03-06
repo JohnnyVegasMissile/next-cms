@@ -9,7 +9,6 @@ import {
     InputNumber,
     List,
     Row,
-    Slider,
     Image,
     Space,
     Typography,
@@ -20,7 +19,7 @@ import {
 } from 'antd'
 import { UploadOutlined, CheckOutlined, ReloadOutlined } from '@ant-design/icons'
 import ColorPicker from '~/components/ColorPicker'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useFormik } from 'formik'
 import { useMutation } from '@tanstack/react-query'
 import { getSettings, updateSettings } from '~/network/settings'
@@ -29,7 +28,7 @@ import { Setting, SettingType } from '@prisma/client'
 
 const { Text } = Typography
 
-const validate = (values: SettingsCreation) => {
+const validate = (_: SettingsCreation) => {
     const errors = {}
 
     return errors
@@ -60,11 +59,22 @@ const cleanDetails = (settings: Setting[]): SettingsCreation => {
             case SettingType.DARK_COLOR:
             case SettingType.LIGHT_COLOR:
             case SettingType.EXTRA_COLOR:
+
+            case SettingType.SIDEBAR_COLOR:
                 cleanValues[setting.type] = setting.value as `#${string}`
                 break
 
             case SettingType.SIDEBAR_POSITION:
                 cleanValues[setting.type] = setting.value as 'left' | 'right'
+                break
+
+            case SettingType.SIDEBAR_BREAKPOINT_SIZE:
+                cleanValues[setting.type] = setting.value as
+                    | 'extra-small'
+                    | 'small'
+                    | 'medium'
+                    | 'large'
+                    | 'extra-large'
                 break
 
             case SettingType.SIDEBAR_UNIT:
@@ -155,58 +165,6 @@ const Settings = () => {
                     <Button icon={<UploadOutlined />} size="small" type="primary">
                         Upload
                     </Button>
-                </Space>
-            ),
-        },
-        {
-            key: '6',
-            title: 'Sidebar',
-            element: (
-                <Space>
-                    <Switch
-                        size="small"
-                        unCheckedChildren="Hide"
-                        checkedChildren="Show"
-                        checked={formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
-                        onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_IS_ACTIVE, e)}
-                    />
-                    <InputNumber
-                        size="small"
-                        disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
-                        value={formik.values[SettingType.SIDEBAR_WIDTH]}
-                        onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_WIDTH, e)}
-                        addonBefore={
-                            <Select
-                                disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
-                                value={formik.values[SettingType.SIDEBAR_POSITION]}
-                                onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_POSITION, e)}
-                                size="small"
-                                placeholder="Position"
-                                style={{ width: 75 }}
-                                options={[
-                                    { label: 'Left', value: 'left' },
-                                    { label: 'Right', value: 'right' },
-                                ]}
-                            />
-                        }
-                        addonAfter={
-                            <Select
-                                disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
-                                value={formik.values[SettingType.SIDEBAR_UNIT]}
-                                onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_UNIT, e)}
-                                size="small"
-                                placeholder="Type"
-                                style={{ width: 75 }}
-                                options={[
-                                    { label: '%', value: '%' },
-                                    { label: 'px', value: 'px' },
-                                    { label: 'em', value: 'em' },
-                                    { label: 'rem', value: 'rem' },
-                                    { label: 'wv', value: 'wv' },
-                                ]}
-                            />
-                        }
-                    />
                 </Space>
             ),
         },
@@ -327,6 +285,99 @@ const Settings = () => {
         },
     ]
 
+    const sidebar = [
+        {
+            key: '1',
+            title: 'Sidebar',
+            element: (
+                <Switch
+                    size="small"
+                    unCheckedChildren="Hide"
+                    checkedChildren="Show"
+                    checked={formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                    onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_IS_ACTIVE, e)}
+                />
+            ),
+        },
+        {
+            key: '2',
+            title: 'Orientation',
+            element: (
+                <Select
+                    disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                    value={formik.values[SettingType.SIDEBAR_POSITION]}
+                    onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_POSITION, e)}
+                    size="small"
+                    placeholder="Position"
+                    style={{ width: 200 }}
+                    options={[
+                        { label: 'Left', value: 'left' },
+                        { label: 'Right', value: 'right' },
+                    ]}
+                />
+            ),
+        },
+        {
+            key: '2',
+            title: 'Width',
+            element: (
+                <InputNumber
+                    size="small"
+                    disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                    value={formik.values[SettingType.SIDEBAR_WIDTH]}
+                    onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_WIDTH, e)}
+                    style={{ width: 200 }}
+                    addonAfter={
+                        <Select
+                            disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                            value={formik.values[SettingType.SIDEBAR_UNIT]}
+                            onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_UNIT, e)}
+                            size="small"
+                            style={{ width: 65 }}
+                            options={[
+                                { label: '%', value: '%' },
+                                { label: 'px', value: 'px' },
+                                { label: 'em', value: 'em' },
+                                { label: 'rem', value: 'rem' },
+                                { label: 'vw', value: 'vw' },
+                            ]}
+                        />
+                    }
+                />
+            ),
+        },
+        {
+            key: '3',
+            title: 'Background color',
+            element: (
+                <ColorPicker
+                    value={formik.values[SettingType.SIDEBAR_COLOR]}
+                    onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_COLOR, e)}
+                />
+            ),
+        },
+        {
+            key: '2',
+            title: 'Breakpoint',
+            element: (
+                <Select
+                    size="small"
+                    disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                    value={formik.values[SettingType.SIDEBAR_BREAKPOINT_SIZE]}
+                    onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_BREAKPOINT_SIZE, e)}
+                    style={{ width: 200 }}
+                    options={[
+                        { label: 'Extra small (480px)', value: 'extra-small' },
+                        { label: 'Small (640px)', value: 'small' },
+                        { label: 'Medium (768px)', value: 'medium' },
+                        { label: 'Large (1024px)', value: 'large' },
+                        { label: 'Extra large (1280px)', value: 'extra-large' },
+                    ]}
+                />
+            ),
+        },
+    ]
+
     if (details.isLoading) {
         return <Spin />
     }
@@ -407,6 +458,22 @@ const Settings = () => {
                     </Card>
                 </Col>
 
+                <Col span={12}>
+                    <Card size="small" title="Sidebar" bordered={false}>
+                        <List
+                            size="small"
+                            itemLayout="horizontal"
+                            dataSource={sidebar}
+                            renderItem={(item) => (
+                                <List.Item key={item.key} style={{ padding: 16 }}>
+                                    <Text strong>{item.title} :</Text>
+                                    {item.element}
+                                </List.Item>
+                            )}
+                        />
+                    </Card>
+                </Col>
+
                 {/* <Col span={12}>
           <Card></Card>
         </Col> */}
@@ -415,44 +482,45 @@ const Settings = () => {
     )
 }
 
-function secondsToDhms(seconds: number | undefined) {
-    if (!seconds) return 'Unlimited'
+// function secondsToDhms(seconds: number | undefined) {
+//     if (!seconds) return 'Unlimited'
 
-    seconds = Number(seconds)
-    var d = Math.floor(seconds / (3600 * 24))
-    var h = Math.floor((seconds % (3600 * 24)) / 3600)
+//     seconds = Number(seconds)
+//     var d = Math.floor(seconds / (3600 * 24))
+//     var h = Math.floor((seconds % (3600 * 24)) / 3600)
 
-    const res = []
-    if (d > 0) {
-        res.push(d + (d == 1 ? ' day, ' : ' days '))
-    }
+//     const res = []
+//     if (d > 0) {
+//         res.push(d + (d == 1 ? ' day, ' : ' days '))
+//     }
 
-    if (h > 0) {
-        res.push(h + (h == 1 ? ' hour' : ' hours'))
-    }
+//     if (h > 0) {
+//         res.push(h + (h == 1 ? ' hour' : ' hours'))
+//     }
 
-    return d === 365 ? '1 Year.' : `${res.join(', ')}.`
-}
+//     return d === 365 ? '1 Year.' : `${res.join(', ')}.`
+// }
 
-const RevalidateSlider = () => {
-    const [value, setValue] = useState(0)
+// const RevalidateSlider = () => {
+//     const [value, setValue] = useState(0)
 
-    // const val = secondsToDhms(value);
+//     // const val = secondsToDhms(value);
 
-    return (
-        <Space direction="vertical" align="end">
-            {/* {val} */}
-            <Slider
-                tooltip={{ formatter: (e) => secondsToDhms(e) }}
-                value={value}
-                onChange={setValue}
-                style={{ width: 200 }}
-                min={0}
-                max={31536000}
-                step={3600}
-            />
-        </Space>
-    )
-}
+//     return (
+//         <Space direction="vertical" align="end">
+//             {/* {val} */}
+//             <Slider
+//                 tooltip={{ formatter: (e) => secondsToDhms(e) }}
+//                 value={value}
+//                 onChange={setValue}
+//                 style={{ width: 200 }}
+//                 min={0}
+//                 max={31536000}
+//                 step={3600}
+//             />
+//         </Space>
+//     )
+// }
 
+export const dynamic = 'force-dynamic'
 export default Settings

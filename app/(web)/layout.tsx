@@ -22,7 +22,15 @@ export async function generateMetadata() {
 
 const getSettings = async () => {
     return await prisma.setting.findMany({
-        where: { type: { in: [SettingType.MAINTENANCE_MODE, SettingType.SIDEBAR_POSITION] } },
+        where: {
+            type: {
+                in: [
+                    SettingType.MAINTENANCE_MODE,
+                    SettingType.SIDEBAR_POSITION,
+                    SettingType.SIDEBAR_BREAKPOINT_SIZE,
+                ],
+            },
+        },
     })
 }
 
@@ -31,6 +39,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 
     const maintenance = settings.find((e) => e.type === SettingType.MAINTENANCE_MODE)?.value === 'true'
     const position = settings.find((e) => e.type === SettingType.SIDEBAR_POSITION)?.value
+    const brSize = settings.find((e) => e.type === SettingType.SIDEBAR_BREAKPOINT_SIZE)?.value
 
     if (maintenance) return <p>Maintenance</p>
 
@@ -87,12 +96,12 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 
             <header>Header</header>
             <div
-                className={classNames(styles['content-wrap'], {
+                className={classNames(styles['content-wrap'], styles[brSize!], {
                     [styles['left']!]: position === 'left',
                     [styles['right']!]: position === 'right',
                 })}
             >
-                <aside className={styles['aside']}></aside>
+                <aside className={styles['aside']}>side</aside>
                 <div className={styles['content']}>{children}</div>
             </div>
             <footer>Footer</footer>

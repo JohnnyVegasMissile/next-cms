@@ -1,2 +1,0 @@
--- AlterEnum
-ALTER TYPE "SettingType" ADD VALUE 'SIDEBAR_POSITION';

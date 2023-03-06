@@ -25,6 +25,9 @@ type SettingsCreation = {
     [SettingType.SIDEBAR_WIDTH]?: number
     [SettingType.SIDEBAR_UNIT]?: '%' | 'px' | 'em' | 'rem' | 'vw'
     [SettingType.SIDEBAR_POSITION]?: 'left' | 'right'
+
+    [SettingType.SIDEBAR_COLOR]?: `#${string}`
+    [SettingType.SIDEBAR_BREAKPOINT_SIZE]?: 'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
 }
 
 export default SettingsCreation

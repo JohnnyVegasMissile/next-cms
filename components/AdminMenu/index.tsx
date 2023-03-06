@@ -1,6 +1,6 @@
 'use client'
 
-import React, { Fragment } from 'react'
+import { Fragment } from 'react'
 import { Affix, Badge, Button, Dropdown, Space } from 'antd'
 import {
     HomeOutlined,

@@ -65,6 +65,8 @@ async function main() {
         { type: SettingType.SIDEBAR_WIDTH, value: '25' },
         { type: SettingType.SIDEBAR_UNIT, value: '%' },
         { type: SettingType.SIDEBAR_POSITION, value: 'left' },
+        { type: SettingType.SIDEBAR_COLOR, value: '#ef476f' },
+        { type: SettingType.SIDEBAR_BREAKPOINT_SIZE, value: 'medium' },
         { type: SettingType.MAINTENANCE_MODE, value: 'false' },
     ]
 

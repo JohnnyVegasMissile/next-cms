@@ -51,10 +51,10 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
     const extraColor = themeSettings.find((e) => e.type === SettingType.EXTRA_COLOR)?.value || '#ef476f'
 
     const sidebar = sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_IS_ACTIVE)?.value === 'true'
-    const sidebarValue = parseInt(
-        sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_WIDTH)?.value || '0'
-    )
+    const sidebarValue = sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_WIDTH)?.value || '0'
     const sidebarUnit = sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_UNIT)?.value || 'rem'
+
+    const sidebarColor = sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_COLOR)?.value || '#ef476f'
 
     return (
         <html>
@@ -75,6 +75,8 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 
     --sidebar-display: ${sidebar ? 'block' : 'none'};
     --sidebar-width: ${sidebarValue}${sidebarUnit};
+
+    --sidebar-background-color: ${sidebarColor};
 }
                     `,
                     }}

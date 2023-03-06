@@ -1,5 +1,6 @@
 import { PageType } from '@prisma/client'
 import TextBlock from '~/blocks/TextBlock'
+import ImageBlock from '~/blocks/ImageBlock'
 import QuickEditButton from '~/components/QuickEditButton'
 import { prisma } from '~/utilities/prisma'
 
@@ -42,6 +43,13 @@ const Home = async () => {
                         text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum <strong>dolore eu fugiat nulla pariatur.</strong> Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
                         image: imageSrc,
                         switched: true,
+                    }}
+                />
+                <ImageBlock
+                    content={{
+                        title: 'Title',
+                        image: imageSrc,
+                        button: { label: 'Button', link: 'www.google.com' },
                     }}
                 />
             </div>

@@ -10,6 +10,7 @@
 
     & img {
         width: 300px;
+        object-fit: cover;
     }
 
     & .infos {
@@ -17,6 +18,7 @@
 
         & h1 {
             position: relative;
+            width: fit-content;
         }
 
         & h1::after {
@@ -24,7 +26,7 @@
 
             position: absolute;
             height: 0.25rem;
-            width: 4rem;
+            width: 100%;
             background-color: var(--primary-color);
             bottom: -0.5rem;
             left: 0;

@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { HexColorPicker } from 'react-colorful'
-import { Button, Card, Col, Input, Popover, Row, Space } from 'antd'
+import { Button, Input, Popover, Space } from 'antd'
 import { BgColorsOutlined } from '@ant-design/icons'
 
 function padZero(str: number, len?: number) {

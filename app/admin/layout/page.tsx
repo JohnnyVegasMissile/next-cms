@@ -28,7 +28,7 @@ const Settings = () => {
                                         { label: 'px', value: 'px' },
                                         { label: 'em', value: 'em' },
                                         { label: 'rem', value: 'rem' },
-                                        { label: 'wv', value: 'wv' },
+                                        { label: 'vw', value: 'vw' },
                                     ]}
                                     // value={type}
                                     // onChange={(e) => setType(e)}

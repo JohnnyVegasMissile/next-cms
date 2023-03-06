@@ -3,7 +3,7 @@ import { ObjectId } from '~/types'
 import PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 
-export async function GET(request: NextRequest, context: any) {
+export async function GET(_: NextRequest, context: any) {
     const { pageId } = context.params
 
     const page = await prisma.page.findUnique({

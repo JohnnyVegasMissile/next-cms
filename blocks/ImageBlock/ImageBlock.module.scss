@@ -1,0 +1,54 @@
+.section {
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-direction: column;
+
+    & h1 {
+        position: relative;
+    }
+
+    & img {
+        width: 600px;
+        object-fit: cover;
+    }
+
+    & h1::after {
+        content: '';
+
+        position: absolute;
+        height: 0.25rem;
+        width: 100%;
+        background-color: var(--primary-color);
+        bottom: -0.5rem;
+        left: 0;
+    }
+
+    & .button {
+        background-color: var(--primary-color);
+        padding: 0.5rem 1rem;
+        min-width: 3rem;
+        text-align: center;
+        font-weight: bold;
+        cursor: pointer;
+
+        & > a {
+            color: var(--light-color);
+            text-decoration: none !important;
+
+            & > span::after {
+                content: '>';
+                margin-left: 0.5rem;
+            }
+        }
+
+        &:hover {
+            opacity: 0.5;
+        }
+
+        &.secondary {
+            background-color: var(--secondary-color);
+        }
+    }
+}

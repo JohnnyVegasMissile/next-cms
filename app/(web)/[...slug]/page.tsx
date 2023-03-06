@@ -1,6 +1,5 @@
 import { prisma } from '~/utilities/prisma'
 import { notFound } from 'next/navigation'
-import TextBlock from '~/blocks/TextBlock'
 
 const getProps = async (slug: string) => {
     return await prisma.page.findFirst({
@@ -21,11 +20,7 @@ const Page = async ({ params }: { params: { slug: string } }) => {
 
     if (!page) notFound()
 
-    return (
-        <div>
-            {Array.isArray(params.slug) ? params.slug.join('/') : params.slug} <TextBlock />
-        </div>
-    )
+    return <div>{Array.isArray(params.slug) ? params.slug.join('/') : params.slug}</div>
 }
 
 export const revalidate = 'force-cache'

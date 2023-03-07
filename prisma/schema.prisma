@@ -122,14 +122,6 @@ enum RightType {
   REVALIDATE
 }
 
-// model Right {
-//   id Int @id @default(autoincrement())
-
-//   roleId    Int
-//   role      Role      @relation(fields: [roleId], references: [id])
-//   rightType RightType
-// }
-
 // FORM
 
 model Form {
@@ -342,4 +334,27 @@ model ContainerField {
   id Int @id @default(autoincrement())
 
   type ContainerFieldType
+}
+
+// MEDIAS
+
+model Media {
+  id Int @id @default(autoincrement())
+
+  type MediaType
+
+  uri      String  @unique
+  mimeType String
+  name     String
+  size     Int
+  alt      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  FILE
 }

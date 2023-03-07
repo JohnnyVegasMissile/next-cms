@@ -1,3 +1,4 @@
+// eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextResponse, NextRequest } from 'next/server'
 import type PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'

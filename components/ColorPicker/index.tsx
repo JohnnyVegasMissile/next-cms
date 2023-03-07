@@ -38,9 +38,10 @@ function invertColor(hex: string, bw: boolean = true) {
 interface ColorPickerProps {
     value: string | undefined
     onChange(color: string): void
+    disabled?: boolean
 }
 
-const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
+const ColorPicker = ({ value, onChange, disabled }: ColorPickerProps) => {
     // const [color, setColor] = useState('#aabbcc')
 
     const labelColor = useMemo(() => {
@@ -48,6 +49,13 @@ const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
 
         return invertColor(value)
     }, [value])
+
+    if (disabled)
+        return (
+            <Button disabled={disabled} size="small" icon={<BgColorsOutlined />}>
+                Choose color
+            </Button>
+        )
 
     return (
         <Popover

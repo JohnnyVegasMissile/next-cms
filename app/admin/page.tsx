@@ -170,7 +170,7 @@ const Settings = () => {
         },
     ]
 
-    const theme = [
+    const themeLeft = [
         {
             key: '1',
             title: 'Primary color',
@@ -201,9 +201,21 @@ const Settings = () => {
                 />
             ),
         },
-        //
         {
             key: '4',
+            title: 'Extra color',
+            element: (
+                <ColorPicker
+                    value={formik.values[SettingType.EXTRA_COLOR]}
+                    onChange={(e) => formik.setFieldValue(SettingType.EXTRA_COLOR, e)}
+                />
+            ),
+        },
+    ]
+
+    const themeRight = [
+        {
+            key: '1',
             title: 'Primary text color',
             element: (
                 <ColorPicker
@@ -213,7 +225,7 @@ const Settings = () => {
             ),
         },
         {
-            key: '5',
+            key: '2',
             title: 'Secondary text color',
             element: (
                 <ColorPicker
@@ -223,7 +235,7 @@ const Settings = () => {
             ),
         },
         {
-            key: '6',
+            key: '3',
             title: 'Dark color',
             element: (
                 <ColorPicker
@@ -233,22 +245,12 @@ const Settings = () => {
             ),
         },
         {
-            key: '7',
+            key: '4',
             title: 'Light color',
             element: (
                 <ColorPicker
                     value={formik.values[SettingType.LIGHT_COLOR]}
                     onChange={(e) => formik.setFieldValue(SettingType.LIGHT_COLOR, e)}
-                />
-            ),
-        },
-        {
-            key: '8',
-            title: 'Extra color',
-            element: (
-                <ColorPicker
-                    value={formik.values[SettingType.EXTRA_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.EXTRA_COLOR, e)}
                 />
             ),
         },
@@ -351,6 +353,7 @@ const Settings = () => {
             title: 'Background color',
             element: (
                 <ColorPicker
+                    disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
                     value={formik.values[SettingType.SIDEBAR_COLOR]}
                     onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_COLOR, e)}
                 />
@@ -367,11 +370,38 @@ const Settings = () => {
                     onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_BREAKPOINT_SIZE, e)}
                     style={{ width: 200 }}
                     options={[
-                        { label: 'Extra small (480px)', value: 'extra-small' },
-                        { label: 'Small (640px)', value: 'small' },
-                        { label: 'Medium (768px)', value: 'medium' },
-                        { label: 'Large (1024px)', value: 'large' },
-                        { label: 'Extra large (1280px)', value: 'extra-large' },
+                        {
+                            label: (
+                                <Text>
+                                    Extra small <Text type="secondary">(480px)</Text>
+                                </Text>
+                            ),
+                            value: 'extra-small',
+                        },
+                        {
+                            label: (
+                                <Text>
+                                    Medium <Text type="secondary">(768px)</Text>{' '}
+                                </Text>
+                            ),
+                            value: 'medium',
+                        },
+                        {
+                            label: (
+                                <Text>
+                                    Large <Text type="secondary">(1024px)</Text>
+                                </Text>
+                            ),
+                            value: 'large',
+                        },
+                        {
+                            label: (
+                                <Text>
+                                    Extra large <Text type="secondary">(1280px)</Text>
+                                </Text>
+                            ),
+                            value: 'extra-large',
+                        },
                     ]}
                 />
             ),
@@ -427,11 +457,24 @@ const Settings = () => {
                 </Col>
 
                 <Col span={12}>
-                    <Card size="small" title="Theme" bordered={false}>
+                    <Card size="small" title="Theme" bordered={false} bodyStyle={{ display: 'flex' }}>
                         <List
+                            style={{ flex: 1, marginRight: 16 }}
                             size="small"
                             itemLayout="horizontal"
-                            dataSource={theme}
+                            dataSource={themeLeft}
+                            renderItem={(item) => (
+                                <List.Item key={item.key} style={{ padding: 16 }}>
+                                    <Text strong>{item.title} :</Text>
+                                    {item.element}
+                                </List.Item>
+                            )}
+                        />
+                        <List
+                            style={{ flex: 1 }}
+                            size="small"
+                            itemLayout="horizontal"
+                            dataSource={themeRight}
                             renderItem={(item) => (
                                 <List.Item key={item.key} style={{ padding: 16 }}>
                                     <Text strong>{item.title} :</Text>

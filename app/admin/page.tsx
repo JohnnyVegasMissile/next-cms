@@ -19,12 +19,13 @@ import {
 } from 'antd'
 import { UploadOutlined, CheckOutlined, ReloadOutlined } from '@ant-design/icons'
 import ColorPicker from '~/components/ColorPicker'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import { useMutation } from '@tanstack/react-query'
 import { getSettings, updateSettings } from '~/network/settings'
 import SettingsCreation from '~/types/settingsCreation'
 import { Setting, SettingType } from '@prisma/client'
+import LinkSelect, { LinkValue } from '~/components/LinkSelect'
 
 const { Text } = Typography
 
@@ -408,12 +409,18 @@ const Settings = () => {
         },
     ]
 
+    const [link, setLink] = useState<LinkValue>({
+        type: 'IN',
+    })
+
     if (details.isLoading) {
         return <Spin />
     }
 
     return (
         <>
+            {JSON.stringify(link, null, 2)}
+            <LinkSelect value={link} onChange={setLink} />
             <Card size="small">
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Text strong>Settings</Text>

@@ -2,19 +2,14 @@ import classNames from 'classnames'
 import styles from './TextBlock.module.scss'
 import Image from 'next/image'
 import Link from 'next/link'
+import useSection from '~/hooks/useSection'
 
 interface TextBlockProps {
-    content: {
-        title?: string
-        subtitle?: string
-        text?: string
-        buttons?: { label: string; link: string; type?: 'secondary' | 'primary' }[]
-        image?: string
-        switched?: boolean
-    }
+    position: number
 }
 
-const TextBlock = ({ content }: TextBlockProps) => {
+const TextBlock = ({ position }: TextBlockProps) => {
+    const { content, setFieldValue, medias, addMedia } = useSection(position)
     const { title, subtitle, text, buttons, image, switched } = content
 
     return (
@@ -26,7 +21,7 @@ const TextBlock = ({ content }: TextBlockProps) => {
 
                 {!!buttons?.length && (
                     <div className={classNames(styles['wrap-button'])}>
-                        {buttons.map((btn, idx) => (
+                        {buttons.map((btn: any, idx: any) => (
                             <div
                                 key={idx}
                                 className={classNames(styles['button'], {
@@ -46,11 +41,13 @@ const TextBlock = ({ content }: TextBlockProps) => {
     )
 }
 
-export default TextBlock
-
 export const PropsEx = {
-    View: <></>,
-    Edit: <></>,
+    View: TextBlock,
+    Edit: TextBlock,
+    title: 'Text',
     position: ['HEADER', 'FOOTER', 'SIDEBAR', 'CONTENT'],
     availableIn: ['LAYOUT', 'PAGE', 'CONTAINER', 'TEMPLATE', 'CONTENT', 'ELEMENT'],
+    default: {},
 }
+
+export default TextBlock

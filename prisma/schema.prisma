@@ -122,7 +122,7 @@ enum RightType {
   REVALIDATE
 }
 
-// FORM
+// FORMS
 
 model Form {
   id Int @id @default(autoincrement())
@@ -141,6 +141,8 @@ model Form {
   discontinued Boolean     @default(false)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+
+  usedInSection LinkedToSection[]
 }
 
 enum FormFieldType {
@@ -248,7 +250,7 @@ model Setting {
   updatedAt DateTime @updatedAt
 }
 
-// SLUG
+// SLUGS
 
 model Slug {
   id Int @id @default(autoincrement())
@@ -270,6 +272,8 @@ model Slug {
   updatedAt DateTime @updatedAt
 }
 
+// METADATAS
+
 model Metadata {
   id Int @id @default(autoincrement())
 
@@ -284,7 +288,57 @@ model Metadata {
   // contentLinked Content?   @relation(fields: [contentId], references: [id], onDelete: Cascade)
 }
 
-// PAGE
+// SECTIONS
+
+enum SectionType {
+  PAGE
+  PAGE_SIDEBAR
+
+  CONTAINER
+  CONTAINER_SIDEBAR
+
+  TEMPLATE
+  TEMPLATE_SIDEBAR
+
+  LAYOUT_HEADER
+  LAYOUT_FOOTER
+  LAYOUT_CONTENT_TOP
+  LAYOUT_CONTENT_BOTTOM
+  LAYOUT_SIDEBAR_TOP
+  LAYOUT_SIDEBAR_BOTTOM
+}
+
+model Section {
+  id Int @id @default(autoincrement())
+
+  type     SectionType
+  block    String
+  position Int
+
+  content Json
+
+  // Element releated
+  pageId     Int?
+  pageLinked Page? @relation(fields: [pageId], references: [id])
+
+  // Linked data
+  medias LinkedToSection[]
+}
+
+model LinkedToSection {
+  id Int @id @default(autoincrement())
+
+  sectionId Int
+  section   Section @relation(fields: [sectionId], references: [id])
+  mediaId   Int?
+  media     Media?  @relation(fields: [mediaId], references: [id])
+  formId    Int?
+  form      Form?   @relation(fields: [formId], references: [id])
+
+  @@unique([sectionId, mediaId])
+}
+
+// PAGES
 
 enum PageType {
   PAGE
@@ -304,6 +358,7 @@ model Page {
   slug Slug?
 
   metadatas Metadata[]
+  Section   Section[]
 
   published Boolean @default(true)
 
@@ -311,7 +366,7 @@ model Page {
   updatedAt DateTime @updatedAt
 }
 
-// CONTAINER
+// CONTAINERS
 
 enum ContainerFieldType {
   STRING
@@ -338,6 +393,12 @@ model ContainerField {
 
 // MEDIAS
 
+enum MediaType {
+  IMAGE
+  VIDEO
+  FILE
+}
+
 model Media {
   id Int @id @default(autoincrement())
 
@@ -351,10 +412,6 @@ model Media {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
-enum MediaType {
-  IMAGE
-  VIDEO
-  FILE
+  usedInSections LinkedToSection[]
 }

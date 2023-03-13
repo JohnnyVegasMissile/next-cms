@@ -1,6 +1,6 @@
 import PageCreation from '~/types/pageCreation'
 import INSTANCE from './api'
-import { Metadata, Page, PageType, Slug } from '@prisma/client'
+import { Metadata, Page, PageType, Section, Slug } from '@prisma/client'
 import { ObjectId } from '~/types'
 
 type PageResponse = Page & {
@@ -11,10 +11,10 @@ type PageResponse = Page & {
 export const getPages = (
     page: number,
     q: string,
-    type: PageType | undefined,
-    sort: `${string},${'asc' | 'desc'}` | undefined
+    sort: `${string},${'asc' | 'desc'}` | undefined,
+    others: { type: PageType | undefined }
 ): Promise<{
-    pages: PageResponse[]
+    results: PageResponse[]
     count: number
 }> =>
     INSTANCE({
@@ -23,13 +23,22 @@ export const getPages = (
         headers: {
             'Content-Type': 'application/json',
         },
-        params: { page, q, type, sort },
+        params: { page, q, sort, ...others },
     })
 
 export const getPage = (id: ObjectId): Promise<PageResponse> =>
     INSTANCE({
         method: 'GET',
         url: `/api/pages/${id}`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+export const getPageSections = (id: ObjectId): Promise<Section[]> =>
+    INSTANCE({
+        method: 'GET',
+        url: `/api/pages/${id}/sections`,
         headers: {
             'Content-Type': 'application/json',
         },

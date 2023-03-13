@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-server-import-in-page */
 import { NextResponse, NextRequest } from 'next/server'
 import { ObjectId } from '~/types'
 import PageCreation from '~/types/pageCreation'

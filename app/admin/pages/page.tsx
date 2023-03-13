@@ -1,38 +1,14 @@
 'use client'
 
-import {
-    Badge,
-    Breadcrumb,
-    Button,
-    Card,
-    Divider,
-    Input,
-    Popconfirm,
-    Select,
-    Space,
-    Table,
-    Tag,
-    Tooltip,
-} from 'antd'
-import {
-    CopyOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    PicCenterOutlined,
-    SearchOutlined,
-    PlusOutlined,
-} from '@ant-design/icons'
-import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
-import { useQuery } from '@tanstack/react-query'
+import { Badge, Breadcrumb, Button, Divider, Popconfirm, Space, Tag, Tooltip } from 'antd'
+import { CopyOutlined, EditOutlined, DeleteOutlined, PicCenterOutlined } from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
 import { getPages } from '~/network/pages'
 import { Page, PageType, Slug } from '@prisma/client'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useState } from 'react'
-import { SorterResult } from 'antd/es/table/interface'
-import { PAGE_PAGE_SIZE } from '~/utilities/constants'
-import { useRouter, useSearchParams } from 'next/navigation'
+import AdminTable from '~/components/AdminTable'
 
 dayjs.extend(relativeTime)
 
@@ -188,119 +164,26 @@ const columns: ColumnsType<DataType> = [
 ]
 
 const Pages = () => {
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const [page, setPage] = useState(1)
-    const [q, setQ] = useState<string>(searchParams.has('q') ? searchParams.get('q')! : '')
-    const [type, setType] = useState<PageType | undefined>(
-        searchParams.has('type') ? (searchParams.get('type') as PageType) : undefined
-    )
-    const [sort, setSort] = useState<`${string},${'asc' | 'desc'}`>()
-    const pages = useQuery(['pages', { page, q, type, sort }], () => getPages(page, q, type, sort))
-
-    const onQChange = (value: string) => {
-        setQ(value)
-        const params = new URLSearchParams(searchParams)
-        if (!!value) {
-            params.set('q', value)
-        } else {
-            params.delete('q')
-        }
-        router.push(`/admin/pages?${params.toString()}`)
-    }
-
-    const onTypeChange = (value: PageType) => {
-        setType(value)
-        const params = new URLSearchParams(searchParams)
-        if (!!value) {
-            params.set('type', value)
-        } else {
-            params.delete('type')
-        }
-        router.push(`/admin/pages?${params.toString()}`)
-    }
-
-    const handleTableChange = (
-        pagination: TablePaginationConfig,
-        _: any,
-        sorter: SorterResult<DataType> | SorterResult<any>[]
-    ) => {
-        const params = new URLSearchParams(searchParams)
-
-        if (!Array.isArray(sorter) && !!sorter.columnKey && !!sorter.order) {
-            setSort(`${sorter.columnKey},${sorter.order === 'ascend' ? 'asc' : 'desc'}`)
-            params.set('sort', `${sorter.columnKey},${sorter.order === 'ascend' ? 'asc' : 'desc'}`)
-        } else {
-            setSort(undefined)
-            params.delete('sort')
-        }
-
-        params.set('page', `${pagination.current || 1}`)
-        setPage(pagination.current || 1)
-
-        router.push(`/admin/pages?${params.toString()}`)
-    }
-
     return (
-        <>
-            <Card size="small">
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Space>
-                        <Input
-                            allowClear
-                            size="small"
-                            prefix={<SearchOutlined />}
-                            placeholder="Search by name"
-                            style={{ width: 190 }}
-                            value={q}
-                            onChange={(e) => onQChange(e.target.value)}
-                        />
-                        <Select
-                            size="small"
-                            placeholder="Type"
-                            style={{ width: 190 }}
-                            allowClear
-                            options={[
-                                { label: 'Page', value: PageType.PAGE },
-                                { label: 'Homepage', value: PageType.HOMEPAGE },
-                                { label: 'Not found', value: PageType.NOTFOUND },
-                                { label: 'Error', value: PageType.ERROR },
-                                { label: 'Sign in', value: PageType.SIGNIN },
-                            ]}
-                            value={type}
-                            onChange={(e) => onTypeChange(e)}
-                        />
-                    </Space>
-
-                    <Link href={`/pages/create`} prefetch={false}>
-                        <Button type="primary" icon={<PlusOutlined />} size="small">
-                            Create new
-                        </Button>
-                    </Link>
-                </div>
-            </Card>
-            <Card size="small" style={{ flex: 1 }}>
-                <Table
-                    onChange={handleTableChange}
-                    rowKey="id"
-                    size="small"
-                    loading={pages.isLoading}
-                    columns={columns}
-                    dataSource={pages.data?.pages}
-                    pagination={{
-                        total: pages.data?.count,
-                        pageSize: PAGE_PAGE_SIZE,
-                        showSizeChanger: false,
-                        current: page,
-                        showTotal: (total) =>
-                            `${(page - 1) * PAGE_PAGE_SIZE}-${
-                                (page - 1) * PAGE_PAGE_SIZE + (pages.data?.pages.length || 0)
-                            } of ${total} pages`,
-                    }}
-                    // scroll={{ y: 300 }}
-                />
-            </Card>
-        </>
+        <AdminTable
+            name="pages"
+            columns={columns}
+            request={getPages}
+            filters={[
+                {
+                    type: 'select',
+                    key: 'type',
+                    options: [
+                        { label: 'Page', value: PageType.PAGE },
+                        { label: 'Homepage', value: PageType.HOMEPAGE },
+                        { label: 'Error', value: PageType.ERROR },
+                        { label: 'Maintenance', value: PageType.MAINTENANCE },
+                        { label: 'Not found', value: PageType.NOTFOUND },
+                        { label: 'Sign in', value: PageType.SIGNIN },
+                    ],
+                },
+            ]}
+        />
     )
 }
 

@@ -1,15 +1,17 @@
 import { /*useMemo,*/ useMemo, useState } from 'react'
 import { Media, MediaType } from '@prisma/client'
-import { Button, Space, Typography, message } from 'antd'
+import { Button, Space, Typography, Upload, message } from 'antd'
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons'
 import styles from './UploadButton.module.scss'
 
 import { uploadMedia, uploadFavicon } from '../../network/medias'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { RcFile } from 'antd/es/upload'
 
 interface Props {
     value?: Media
     onDeleteValue?(): void
-    onFileRecieved(file: Media): void
+    onFileRecieved?(file: Media): void
     type?: MediaType
     children?: string
 }
@@ -21,22 +23,15 @@ const UploadButton = ({
     type = MediaType.IMAGE,
     children = 'Upload',
 }: Props) => {
-    const [loading, setLoading] = useState(false)
-
-    const handleFiles = async (event: any) => {
-        setLoading(true)
-        const file = event.target.files[0]
-        if (!file) return message.error('Missing file')
-        // if (file.size >= fileSize * 1024 * 1024) {
-        //     return
-        // }
-
-        const res: Media = await uploadMedia(file)
-
-        setLoading(false)
-
-        if (res) onFileRecieved(res)
-    }
+    const queryClient = useQueryClient()
+    const mutation = useMutation((file: RcFile) => uploadMedia(file), {
+        onSuccess: (data) => {
+            onFileRecieved && onFileRecieved(data)
+            message.success(`${data.name} uploaded with success!`)
+            queryClient.invalidateQueries({ queryKey: ['medias'] })
+        },
+        onError: (_, file) => message.success(`Error uplaoding ${file.name}`),
+    })
 
     const accept = useMemo(() => {
         switch (type) {
@@ -50,33 +45,36 @@ const UploadButton = ({
     }, [type])
 
     return (
-        <Space>
-            <Button
-                size="small"
-                type="primary"
-                icon={<UploadOutlined />}
-                style={{ position: 'relative' }}
-                loading={loading}
-            >
-                {children}
-                <input
-                    className={styles['hidden-input']}
-                    type="file"
-                    name="file"
+        <>
+            <Space>
+                <Upload
                     accept={accept}
-                    onChange={handleFiles}
-                    onClick={(event: any) => {
-                        event.target.value = null
+                    fileList={[]}
+                    disabled={mutation.isLoading}
+                    beforeUpload={(file) => {
+                        console.log('e', file)
+                        mutation.mutate(file)
+
+                        return false
                     }}
-                />
-            </Button>
-            {value && (
-                <>
-                    <Typography.Text underline>{value?.name}</Typography.Text>
-                    <Button onClick={onDeleteValue} shape="circle" icon={<CloseOutlined />} />
-                </>
-            )}
-        </Space>
+                >
+                    <Button
+                        loading={mutation.isLoading}
+                        size="small"
+                        type="primary"
+                        icon={<UploadOutlined />}
+                    >
+                        {children}
+                    </Button>
+                </Upload>
+                {value && (
+                    <>
+                        <Typography.Text underline>{value?.name}</Typography.Text>
+                        <Button onClick={onDeleteValue} shape="circle" icon={<CloseOutlined />} />
+                    </>
+                )}
+            </Space>
+        </>
     )
 }
 

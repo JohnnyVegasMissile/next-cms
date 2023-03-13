@@ -8,6 +8,7 @@ import { MediaType, Prisma } from '@prisma/client'
 import type { Media } from '@prisma/client'
 
 import { prisma } from '~/utilities/prisma'
+import { PAGE_SIZE } from '~/utilities/constants'
 // import checkAuth from '@utils/checkAuth'
 
 export function makeId(length: number) {
@@ -22,45 +23,82 @@ export function makeId(length: number) {
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const q = req.query['q'] as string | undefined
-    const type = req.query['type'] as string | undefined
+    const page = req.query['page'] as string | undefined
+    const type = req.query['type'] as MediaType | undefined
+    const sort = req.query['sort'] as string | undefined
 
-    let where: any = {
-        type: MediaType.IMAGE,
+    let skip = 0
+    if (typeof page === 'string' && page !== '0' && page !== '1') {
+        skip = (parseInt(page) - 1) * PAGE_SIZE
     }
 
-    if (type === MediaType.VIDEO) {
-        where.type = MediaType.VIDEO
-    } else if (type === MediaType.FILE) {
-        where.type = MediaType.FILE
+    const where: any = {}
+    let orderBy: any = {}
+
+    if (!!q) where.name = { contains: q }
+    if (!!type) where.type = type
+    if (!!sort) {
+        const parsedSort = sort.split(',')
+        orderBy = { [`${parsedSort[0]}`]: parsedSort[1] }
     }
 
-    if (!!q) {
-        const sliptedQ = q.split(' ')
-
-        if (sliptedQ.length === 1) {
-            where.name = {
-                contains: q,
-            }
-        } else {
-            let OR = sliptedQ.map((word) => ({
-                name: {
-                    contains: word,
-                },
-            }))
-
-            where.OR = OR
-        }
-    }
-
-    const files: Media[] = await prisma.media.findMany({
+    const count = await prisma.media.count({ where })
+    const medias = await prisma.media.findMany({
         where,
-        orderBy: {
-            createdAt: 'desc',
+        orderBy,
+        take: PAGE_SIZE,
+        skip,
+        include: {
+            _count: {
+                select: { usedInSections: true },
+            },
         },
     })
 
-    return res.status(200).json(files)
+    return res.status(200).json({ results: medias, count })
 }
+
+// const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+//     const q = req.query['q'] as string | undefined
+//     const type = req.query['type'] as string | undefined
+
+//     let where: any = {
+//         type: MediaType.IMAGE,
+//     }
+
+//     if (type === MediaType.VIDEO) {
+//         where.type = MediaType.VIDEO
+//     } else if (type === MediaType.FILE) {
+//         where.type = MediaType.FILE
+//     }
+
+//     if (!!q) {
+//         const sliptedQ = q.split(' ')
+
+//         if (sliptedQ.length === 1) {
+//             where.name = {
+//                 contains: q,
+//             }
+//         } else {
+//             let OR = sliptedQ.map((word) => ({
+//                 name: {
+//                     contains: word,
+//                 },
+//             }))
+
+//             where.OR = OR
+//         }
+//     }
+
+//     const files: Media[] = await prisma.media.findMany({
+//         where,
+//         orderBy: {
+//             createdAt: 'desc',
+//         },
+//     })
+
+//     return res.status(200).json(files)
+// }
 
 export const config = {
     api: {
@@ -98,7 +136,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const fileInfos: Prisma.MediaCreateInput = {
             uri: newFileName,
-            type: 'IMAGE',
+            type: fileSpecs.type,
             mimeType: file.mimetype,
             name: file.originalFilename,
             size: file.size,
@@ -111,7 +149,6 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         return res.status(200).json(createdFile)
-        // .catch((err) => )
     })
 }
 

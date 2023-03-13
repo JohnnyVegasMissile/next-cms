@@ -1,49 +1,196 @@
 'use client'
 
-import { Button, Card, Input, Radio, Space } from 'antd'
+import { Button, Form, Image, Input, Popconfirm, Space, Tag, Tooltip, Typography } from 'antd'
 import {
+    DeleteOutlined,
     PictureOutlined,
     VideoCameraOutlined,
     FilePdfOutlined,
-    SearchOutlined,
-    UploadOutlined,
+    CloseOutlined,
+    CheckOutlined,
+    WarningOutlined,
 } from '@ant-design/icons'
+import { Media, MediaType, PageType } from '@prisma/client'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import AdminTable from '~/components/AdminTable'
+import { editImageAlt, getMedias } from '~/network/medias'
+import { useState } from 'react'
+import Link from 'next/link'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { ObjectId } from '~/types'
 import UploadButton from '~/components/UploadButton'
+
+const { Text } = Typography
+
+dayjs.extend(relativeTime)
+
+const columns = [
+    {
+        sorter: true,
+        title: 'Name',
+        key: 'name',
+        render: (
+            media: Media & {
+                _count: {
+                    usedInSections: number
+                }
+            }
+        ) => (
+            <div>
+                <Space align="center" size="large">
+                    {media.type === MediaType.IMAGE && (
+                        <Image
+                            width={35}
+                            style={{ height: 35, width: 35, objectFit: 'contain', objectPosition: 'center' }}
+                            src={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
+                            alt={media.alt || ''}
+                        />
+                    )}
+                    {media.type === MediaType.VIDEO && (
+                        <VideoCameraOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
+                    )}
+                    {media.type === MediaType.FILE && (
+                        <FilePdfOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
+                    )}
+                    <Text>
+                        <Link
+                            href={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
+                            target="_blank"
+                        >
+                            {media?.name}
+                        </Link>
+                    </Text>
+                    {!media._count.usedInSections && (
+                        <Tooltip title="This media is not used anywhere">
+                            <Tag color="red" icon={<WarningOutlined />}>
+                                Unused
+                            </Tag>
+                        </Tooltip>
+                    )}
+                </Space>
+            </div>
+        ),
+    },
+    {
+        sorter: true,
+        title: 'Alt',
+        key: 'alt',
+        render: (media: Media) => <EditAlt id={media.id} alt={media.alt} />,
+        condition: ({ type }: { type?: MediaType }) => type === MediaType.IMAGE,
+    },
+    {
+        sorter: true,
+        title: 'Last updated',
+        key: 'updatedAt',
+        render: (media: Media) => dayjs(media.updatedAt).fromNow(),
+    },
+    {
+        width: 1,
+        key: 'action',
+        render: (media: Media) => (
+            <Popconfirm
+                placement="left"
+                title="Delete the task"
+                description="Are you sure to delete this task?"
+                // onConfirm={(e) => e?.stopPropagation()}
+                // onCancel={(e) => e?.stopPropagation()}
+                okText="Delete"
+                cancelText="Cancel"
+            >
+                <Tooltip title="Delete">
+                    <Button type="primary" danger icon={<DeleteOutlined />} size="small">
+                        Delete
+                    </Button>
+                </Tooltip>
+            </Popconfirm>
+        ),
+    },
+]
+
+const EditAlt = ({ id, alt }: { id: ObjectId; alt: string | null }) => {
+    const queryClient = useQueryClient()
+    const [newAlt, setNewAlt] = useState(alt || '')
+
+    const isDiff = (alt || '') === newAlt
+
+    const mutation = useMutation((value: string) => editImageAlt(id, value), {
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['medias'] }),
+    })
+
+    const handleChange = (value: string) => {
+        setNewAlt(value)
+        mutation.reset()
+    }
+
+    let validateStatus: 'validating' | 'success' | 'error' | undefined = undefined
+
+    switch (mutation.status) {
+        case 'loading':
+            validateStatus = 'validating'
+            break
+
+        case 'success':
+            validateStatus = 'success'
+            break
+
+        case 'error':
+            validateStatus = 'error'
+            break
+
+        default:
+            break
+    }
+
+    return (
+        <Form.Item hasFeedback validateStatus={validateStatus} style={{ margin: 0, width: 350 }}>
+            <Input.Group compact>
+                <Input
+                    size="small"
+                    style={{ width: 'calc(100% - 48px)' }}
+                    value={newAlt}
+                    onChange={(e) => handleChange(e.target.value)}
+                />
+                <Button
+                    disabled={isDiff || mutation.isLoading}
+                    type="primary"
+                    icon={<CloseOutlined />}
+                    danger
+                    size="small"
+                    onClick={() => setNewAlt(alt || '')}
+                />
+                <Button
+                    disabled={isDiff || mutation.isLoading}
+                    type="primary"
+                    icon={<CheckOutlined />}
+                    size="small"
+                    onClick={() => mutation.mutate(newAlt)}
+                />
+            </Input.Group>
+        </Form.Item>
+    )
+}
 
 const Settings = () => {
     return (
-        <>
-            <Card size="small">
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Space>
-                        <Input size="small" suffix={<SearchOutlined />} />
-                        <Radio.Group buttonStyle="solid" size="small">
-                            <Radio.Button value="image">
-                                <Space align="center">
-                                    <PictureOutlined />
-                                    Images
-                                </Space>
-                            </Radio.Button>
-                            <Radio.Button value="video">
-                                <Space align="center">
-                                    <VideoCameraOutlined />
-                                    Videos
-                                </Space>
-                            </Radio.Button>
-                            <Radio.Button value="file">
-                                <Space align="center">
-                                    <FilePdfOutlined />
-                                    Files
-                                </Space>
-                            </Radio.Button>
-                        </Radio.Group>
-                    </Space>
-
-                    <UploadButton onFileRecieved={() => {}} />
-                </div>
-            </Card>
-            <Card size="small" style={{ flex: 1 }}></Card>
-        </>
+        <AdminTable
+            name="medias"
+            columns={columns}
+            request={getMedias}
+            filters={[
+                {
+                    type: 'radio',
+                    key: 'type',
+                    default: MediaType.IMAGE,
+                    options: [
+                        { label: 'Images', value: MediaType.IMAGE, icon: <PictureOutlined /> },
+                        { label: 'Videos', value: MediaType.VIDEO, icon: <VideoCameraOutlined /> },
+                        { label: 'Files', value: MediaType.FILE, icon: <FilePdfOutlined /> },
+                    ],
+                },
+            ]}
+            extra={<UploadButton />}
+        />
     )
 }
 

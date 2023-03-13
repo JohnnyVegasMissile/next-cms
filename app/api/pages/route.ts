@@ -2,7 +2,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 import type PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
-import { PAGE_PAGE_SIZE } from '~/utilities/constants'
+import { PAGE_SIZE } from '~/utilities/constants'
 
 export const GET = async (request: NextRequest) => {
     const { searchParams } = request.nextUrl
@@ -11,11 +11,9 @@ export const GET = async (request: NextRequest) => {
     const type = searchParams.get('type')
     const sort = searchParams.get('sort')
 
-    console.log('sort', sort)
-
     let skip = 0
     if (typeof page === 'string' && page !== '0' && page !== '1') {
-        skip = (parseInt(page) - 1) * PAGE_PAGE_SIZE
+        skip = (parseInt(page) - 1) * PAGE_SIZE
     }
 
     const where: any = {}
@@ -37,12 +35,12 @@ export const GET = async (request: NextRequest) => {
     const pages = await prisma.page.findMany({
         where,
         orderBy,
-        take: PAGE_PAGE_SIZE,
+        take: PAGE_SIZE,
         skip,
         include: { slug: true },
     })
 
-    return NextResponse.json({ pages, count })
+    return NextResponse.json({ results: pages, count })
 }
 
 export const POST = async (request: NextRequest) => {

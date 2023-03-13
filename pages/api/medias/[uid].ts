@@ -40,7 +40,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const image: Media = await prisma.media.update({
         where: { id: parseInt(id) },
-        data: req.body,
+        data: { alt: req.body.alt },
     })
 
     return res.status(200).json(image)

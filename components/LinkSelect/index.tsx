@@ -1,6 +1,10 @@
-import { Cascader, Input, Select } from 'antd'
+import { Cascader, Input, Select, TreeSelect } from 'antd'
 import { LinkOutlined, GlobalOutlined } from '@ant-design/icons'
 import './styles.scss'
+import { useQuery } from '@tanstack/react-query'
+import { getSlugs } from '~/network/slugs'
+import { useState } from 'react'
+import { ObjectId } from '~/types'
 
 const { Option } = Select
 
@@ -10,46 +14,11 @@ interface Option {
     children?: Option[]
 }
 
-const options: Option[] = [
-    {
-        value: 'zhejiang',
-        label: 'Zhejiang',
-        children: [
-            {
-                value: 'hangzhou',
-                label: 'Hangzhou',
-                children: [
-                    {
-                        value: 'xihu',
-                        label: 'West Lake',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        value: 'jiangsu',
-        label: 'Jiangsu',
-        children: [
-            {
-                value: 'nanjing',
-                label: 'Nanjing',
-                children: [
-                    {
-                        value: 'zhonghuamen',
-                        label: 'Zhong Hua Men',
-                    },
-                ],
-            },
-        ],
-    },
-]
-
 export type LinkValue = {
     type: 'IN' | 'OUT'
-    slugId?: string
-    link?: string
-    prototol?: 'http' | 'https'
+    slugId?: ObjectId | undefined
+    link?: string | undefined
+    prototol?: 'http' | 'https' | undefined
 }
 
 interface LinkSelectProps {
@@ -57,12 +26,39 @@ interface LinkSelectProps {
     onChange(value: LinkValue): void
 }
 
-const LinkSelect = ({ value }: LinkSelectProps) => {
-    // const [type, setType] = useState<"in" | "out">("in");
-    const { type, link, prototol } = value
+const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
+    const [q, setQ] = useState('')
+    const slugs = useQuery(['slugs'], () => getSlugs(''))
+
+    const options = slugs.data?.map((slug) => ({
+        value: slug.id,
+        label: slug.page?.name || slug.full,
+        children: [],
+    }))
+
+    const onPageChange = (slugId: ObjectId | undefined) => onChange({ ...value, slugId })
+
+    const onTypeChange = (type: 'IN' | 'OUT') => {
+        if (type === 'IN') {
+            onChange({
+                type: 'IN',
+                link: '',
+            })
+        } else {
+            onChange({
+                type: 'OUT',
+                slugId: undefined,
+                prototol: 'https',
+            })
+        }
+    }
+
+    const onProtocolChange = (prototol: 'http' | 'https') => onChange({ ...value, prototol })
+
+    const onLinkChange = (link: string) => onChange({ ...value, link })
 
     const selectBefore = (
-        <Select value={prototol}>
+        <Select value={value.prototol} onChange={onProtocolChange}>
             <Option value="http">http://</Option>
             <Option value="https">https://</Option>
         </Select>
@@ -70,18 +66,39 @@ const LinkSelect = ({ value }: LinkSelectProps) => {
 
     return (
         <div>
-            {type === 'IN' ? (
-                <Cascader
-                    size="small"
-                    options={options}
-                    onChange={(e) => console.log(e)}
-                    placeholder="Please select"
-                    className="link-select-cascader"
-                    changeOnSelect
-                />
+            {value.type === 'IN' ? (
+                <>
+                    {/* <Cascader
+                        size="small"
+                        value={value.slugId ? [value.slugId] : undefined}
+                        options={options}
+                        onChange={(e) => onPageChange(e?.[0] as ObjectId)}
+                        placeholder="Please select"
+                        className="link-select-cascader"
+                        changeOnSelect
+                        showSearch
+                        searchValue={q}
+                        onSearch={setQ}
+                    /> */}
+                    <TreeSelect
+                        showSearch
+                        size="small"
+                        placeholder="Please select"
+                        className="link-select-tree"
+                        value={value.slugId}
+                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                        allowClear
+                        onChange={onPageChange}
+                        treeData={options}
+                        autoClearSearchValue={false}
+                        searchValue={q}
+                        onSearch={setQ}
+                    />
+                </>
             ) : (
                 <Input
-                    value={link}
+                    value={value.link}
+                    onChange={(e) => onLinkChange(e.target.value)}
                     addonBefore={selectBefore}
                     size="small"
                     placeholder="Please select"
@@ -89,16 +106,11 @@ const LinkSelect = ({ value }: LinkSelectProps) => {
                     allowClear
                 />
             )}
-            <Select
-                size="small"
-                value={type}
-                // onChange={setType}
-                className="link-select-select"
-            >
-                <Option value="in">
+            <Select size="small" value={value.type} onChange={onTypeChange} className="link-select-select">
+                <Option value="IN">
                     <LinkOutlined />
                 </Option>
-                <Option value="out">
+                <Option value="OUT">
                     <GlobalOutlined />
                 </Option>
             </Select>

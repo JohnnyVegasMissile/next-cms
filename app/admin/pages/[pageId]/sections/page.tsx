@@ -6,6 +6,7 @@ import {
     Button,
     Divider,
     Drawer,
+    Dropdown,
     FloatButton,
     Input,
     Menu,
@@ -28,7 +29,7 @@ import {
     PicCenterOutlined,
 } from '@ant-design/icons'
 import { useFormik } from 'formik'
-import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
+import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { getPageSections } from '~/network/pages'
 import SectionCreation from '~/types/sectionCreation'
 import MediaModal from '~/components/MediaModal'
@@ -118,6 +119,39 @@ const PageSections = ({ params }: any) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    const items = [
+        {
+            key: 'elements',
+            label: 'Elements',
+            icon: <BorderOutlined />,
+            children: Object.keys(blocks).map((key) => ({ key, label: key })),
+        },
+        {
+            key: 'blocks',
+            label: 'Blocks',
+            type: 'group',
+            children: Object.keys(blocks).map((key) => ({
+                key,
+                label: key,
+                onClick: () =>
+                    formik.setValues([
+                        ...formik.values,
+                        {
+                            tempId: '',
+                            type: SectionType.PAGE,
+                            block: key,
+                            position: formik.values.length - 1,
+                            content: {},
+                            pageId,
+
+                            medias: new Map(),
+                            forms: new Map(),
+                        },
+                    ]),
+            })),
+        },
+    ]
+
     if (details.isLoading) {
         return <Spin />
     }
@@ -132,56 +166,11 @@ const PageSections = ({ params }: any) => {
                 ))}
             </SectionsContext.Provider>
             <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
-                <Popover
-                    open={popOpen}
-                    onOpenChange={setPopOpen}
-                    trigger="click"
-                    content={
-                        <Menu
-                            onClick={(e) => {
-                                if (e.keyPath.length === 1) {
-                                    formik.setValues([
-                                        ...formik.values,
-                                        {
-                                            tempId: '',
-                                            type: SectionType.PAGE,
-                                            block: e.key,
-                                            position: formik.values.length - 1,
-                                            content: {},
-                                            pageId,
-
-                                            medias: new Map(),
-                                            forms: new Map(),
-                                        },
-                                    ])
-                                } else {
-                                    console.log(e)
-                                }
-                                setPopOpen(false)
-                            }}
-                            style={{ width: 256, border: 'none' }}
-                            mode="inline"
-                            items={[
-                                {
-                                    key: 'elements',
-                                    label: 'Elements',
-                                    icon: <BorderOutlined />,
-                                    children: Object.keys(blocks).map((key) => ({ key, label: key })),
-                                },
-                                {
-                                    key: 'blocks',
-                                    label: 'Blocks',
-                                    type: 'group',
-                                    children: Object.keys(blocks).map((key) => ({ key, label: key })),
-                                },
-                            ]}
-                        />
-                    }
-                >
+                <Dropdown menu={{ items }}>
                     <Button size="small" type="primary" icon={<PlusOutlined />}>
                         Add section
                     </Button>
-                </Popover>
+                </Dropdown>
             </div>
             <FloatButton.Group
                 trigger="hover"

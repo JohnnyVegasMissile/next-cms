@@ -7,8 +7,8 @@ const Banner = () => {
             <h3>What i do</h3>
 
             <div className={styles['grid']}>
-                {['', '', ''].map((element, idx) => (
-                    <div key={idx} className={styles['tiles']}>
+                {['', '', '', ''].map((element, idx) => (
+                    <div key={idx} className={styles['tile']}>
                         <img alt="Icon" />
                         <span>Web design</span>
                         <p>

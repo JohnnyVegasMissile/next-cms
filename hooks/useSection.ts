@@ -1,15 +1,18 @@
 import { Form, Media } from '@prisma/client'
+import { FormikErrors } from 'formik'
 import { createContext, useContext } from 'react'
 import SectionCreation from '~/types/sectionCreation'
 
 interface UseProvideAuthProps {
     sections: SectionCreation[]
     setFieldValue(name: string, value: any): void
+    errors: (FormikErrors<SectionCreation> | undefined)[]
 }
 
 export const SectionsContext = createContext<UseProvideAuthProps>({
     sections: [],
     setFieldValue: () => {},
+    errors: [],
 })
 
 const useSection = (position: number) => {

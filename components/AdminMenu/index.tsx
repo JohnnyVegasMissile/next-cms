@@ -184,7 +184,7 @@ const AdminMenu = () => {
     ]
 
     return (
-        <Affix>
+        <Affix className={styles['affix']}>
             <div className={styles['wrapper']}>
                 <Space size={3}>
                     {menuItems.map((item) => (

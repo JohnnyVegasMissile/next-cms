@@ -1,0 +1,34 @@
+.section {
+    background-color: #26282d;
+    color: #ffffff;
+
+    & h4 {
+        color: #e33341;
+        font-size: 1rem;
+        text-transform: uppercase;
+    }
+
+    & h3 {
+        text-transform: capitalize;
+    }
+
+    & .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        // grid-template-rows: ;
+        grid-column-gap: 8px;
+        grid-row-gap: 0px;
+
+        & .tiles {
+            padding: 1rem;
+            border-radius: 0.5rem;
+
+            background: rgb(43, 50, 55);
+            background: linear-gradient(135deg, rgba(43, 50, 55, 1) 0%, rgba(40, 40, 49, 1) 100%);
+
+            box-shadow: 2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02), 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.028),
+                12.5px 12.5px 10px rgba(0, 0, 0, 0.035), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
+                41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05), 100px 100px 80px rgba(0, 0, 0, 0.07);
+        }
+    }
+}

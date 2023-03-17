@@ -4,3 +4,7 @@
     justify-content: space-between;
     background-color: white;
 }
+
+.affix > div {
+    z-index: 1001;
+}

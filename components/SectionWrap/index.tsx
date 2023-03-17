@@ -20,7 +20,7 @@ const SectionWrap = ({ position, children, panel }: SectionWrapProps) => {
     const [open, setOpen] = useState(false)
 
     return (
-        <div style={{ position: 'relative' }}>
+        <>
             {!!panel && (
                 <Drawer
                     placement="right"
@@ -32,54 +32,55 @@ const SectionWrap = ({ position, children, panel }: SectionWrapProps) => {
                     {panel}
                 </Drawer>
             )}
-
-            <Input.Group compact className={styles['buttons-wrap']}>
-                <Popover
-                    placement="bottomRight"
-                    content={
-                        <Space direction="vertical">
-                            <Button
-                                size="small"
-                                onClick={(e) => e.stopPropagation()}
-                                icon={<CaretUpOutlined />}
-                                type="primary"
-                            />
-                            <Button
-                                size="small"
-                                onClick={(e) => e.stopPropagation()}
-                                icon={<CaretDownOutlined />}
-                                type="primary"
-                            />
-                            <Divider style={{ margin: 0 }} />
-
-                            <Popconfirm
-                                placement="left"
-                                title="Delete the task"
-                                description="Are you sure to delete this task?"
-                                onConfirm={(e) => e?.stopPropagation()}
-                                onCancel={(e) => e?.stopPropagation()}
-                                okText="Delete"
-                                cancelText="Cancel"
-                            >
+            <div style={{ position: 'relative' }}>
+                <Input.Group compact className={styles['buttons-wrap']}>
+                    <Popover
+                        placement="bottom"
+                        content={
+                            <Space direction="vertical">
                                 <Button
                                     size="small"
-                                    icon={<DeleteOutlined />}
-                                    danger
-                                    type="primary"
                                     onClick={(e) => e.stopPropagation()}
+                                    icon={<CaretUpOutlined />}
+                                    type="primary"
                                 />
-                            </Popconfirm>
-                        </Space>
-                    }
-                    trigger="click"
-                >
-                    <Button size="small" type="primary" icon={<SettingOutlined />} />
-                </Popover>
-                {!!panel && <Button size="small" onClick={() => setOpen(true)} icon={<MenuOutlined />} />}
-            </Input.Group>
+                                <Button
+                                    size="small"
+                                    onClick={(e) => e.stopPropagation()}
+                                    icon={<CaretDownOutlined />}
+                                    type="primary"
+                                />
+                                <Divider style={{ margin: 0 }} />
 
-            {children}
-        </div>
+                                <Popconfirm
+                                    placement="left"
+                                    title="Delete the task"
+                                    description="Are you sure to delete this task?"
+                                    onConfirm={(e) => e?.stopPropagation()}
+                                    onCancel={(e) => e?.stopPropagation()}
+                                    okText="Delete"
+                                    cancelText="Cancel"
+                                >
+                                    <Button
+                                        size="small"
+                                        icon={<DeleteOutlined />}
+                                        danger
+                                        type="primary"
+                                        onClick={(e) => e.stopPropagation()}
+                                    />
+                                </Popconfirm>
+                            </Space>
+                        }
+                        trigger="click"
+                    >
+                        <Button size="small" type="primary" icon={<SettingOutlined />} />
+                    </Popover>
+                    {!!panel && <Button size="small" onClick={() => setOpen(true)} icon={<MenuOutlined />} />}
+                </Input.Group>
+
+                {children}
+            </div>
+        </>
     )
 }
 

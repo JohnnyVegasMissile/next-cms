@@ -37,6 +37,8 @@
         "bcryptjs": "^2.4.3",
         "classnames": "^2.3.2",
         "dayjs": "^1.11.7",
+        "draft-convert": "^2.1.13",
+        "draft-js": "^0.11.7",
         "eslint": "8.34.0",
         "eslint-config-next": "^13.1.6",
         "formidable": "^2.1.1",
@@ -53,6 +55,8 @@
     "devDependencies": {
         "@playwright/test": "^1.30.0",
         "@types/bcryptjs": "^2.4.2",
+        "@types/draft-convert": "^2.1.4",
+        "@types/draft-js": "^0.11.10",
         "@types/formidable": "^2.0.5",
         "@types/lodash.get": "^4.4.7",
         "@types/lodash.set": "^4.3.7",

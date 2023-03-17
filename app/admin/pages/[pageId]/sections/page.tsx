@@ -1,48 +1,38 @@
 'use client'
 
-import { Form, Media, MediaType, Section, SectionType } from '@prisma/client'
-import { useMutation } from '@tanstack/react-query'
-import {
-    Button,
-    Divider,
-    Drawer,
-    Dropdown,
-    FloatButton,
-    Input,
-    Menu,
-    Popconfirm,
-    Popover,
-    Space,
-    Spin,
-    Typography,
-} from 'antd'
+import { Section, SectionType, SettingType } from '@prisma/client'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Button, Dropdown, FloatButton, Spin, Typography } from 'antd'
 import {
     PlusOutlined,
     MenuOutlined,
-    SettingOutlined,
-    CaretUpOutlined,
-    CaretDownOutlined,
-    DeleteOutlined,
     CloseOutlined,
     CheckOutlined,
-    BorderOutlined,
     PicCenterOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
 } from '@ant-design/icons'
 import { useFormik } from 'formik'
-import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getPageSections } from '~/network/pages'
 import SectionCreation from '~/types/sectionCreation'
-import MediaModal from '~/components/MediaModal'
 import { ObjectId } from '~/types'
-import CustomImage from '~/components/CustomImage'
-import blocks from '~/blocks'
-import SectionWrap from '~/components/SectionWrap'
-import useSection, { SectionsContext } from '~/hooks/useSection'
+import blocks, { BlockKey } from '~/blocks'
+import { SectionsContext } from '~/hooks/useSection'
+import styles from './page.module.scss'
+import classNames from 'classnames'
+import { getSidebar } from '~/network/api'
 
 const { Text } = Typography
 
 const validate = (values: SectionCreation[]) => {
-    let errors: any = {}
+    let errors: any[] = []
+
+    for (const section of values) {
+        const validate = blocks[section.block].validate
+
+        errors.push(validate ? validate(section) : undefined)
+    }
 
     return errors
 }
@@ -51,7 +41,7 @@ const cleanDetails = (sections: Section[]): SectionCreation[] => {
     return sections.map((section) => ({
         id: section.id,
         type: section.type,
-        block: section.block,
+        block: section.block as BlockKey,
         position: section.position,
         content: section.content as any,
         pageId: section.pageId!,
@@ -93,7 +83,7 @@ const cleanBeforeSend = (sections: SectionCreation[]) =>
 
 const PageSections = ({ params }: any) => {
     const { pageId } = params
-    const [popOpen, setPopOpen] = useState(false)
+    const [showSidebar, setShowSidebar] = useState(false)
     const formik = useFormik<SectionCreation[]>({
         initialValues: [],
         validate,
@@ -106,6 +96,22 @@ const PageSections = ({ params }: any) => {
     const details = useMutation(() => getPageSections(pageId), {
         onSuccess: (data) => formik.setValues(cleanDetails(data)),
     })
+
+    const sidebarSettings = useQuery(['sidebar'], () => getSidebar())
+
+    const sidebarIsActive =
+        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_IS_ACTIVE)?.value === 'true'
+    const sidebarWidth = `${
+        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_WIDTH)?.value || '0'
+    }${sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_UNIT)?.value || 'rem'}`
+
+    const sidebarColor =
+        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_COLOR)?.value || '#ef476f'
+    const sidebarBP =
+        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_BREAKPOINT_SIZE)?.value || 'medium'
+    const sidebarPosition =
+        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_POSITION)?.value || 'left'
+
     // const submit = useMutation(
     //     (values: PageCreation) => (isUpdate ? updatePages(pageId, values) : postPages(values)),
     //     {
@@ -123,7 +129,7 @@ const PageSections = ({ params }: any) => {
         {
             key: 'elements',
             label: 'Elements',
-            icon: <BorderOutlined />,
+            icon: <PicCenterOutlined />,
             children: Object.keys(blocks).map((key) => ({ key, label: key })),
         },
         {
@@ -139,9 +145,11 @@ const PageSections = ({ params }: any) => {
                         {
                             tempId: '',
                             type: SectionType.PAGE,
-                            block: key,
-                            position: formik.values.length - 1,
-                            content: {},
+                            block: key as BlockKey,
+                            position: formik.values.length,
+                            content: blocks?.[key as BlockKey]?.default
+                                ? blocks?.[key as BlockKey]?.default
+                                : {},
                             pageId,
 
                             medias: new Map(),
@@ -157,62 +165,77 @@ const PageSections = ({ params }: any) => {
     }
 
     return (
-        <div style={{ margin: '-1rem' }}>
-            <SectionsContext.Provider
-                value={{ sections: formik.values, setFieldValue: formik.setFieldValue }}
-            >
-                {formik.values.map((section, idx) => (
-                    <Section key={section.id || section.tempId || idx} position={idx} />
-                ))}
-            </SectionsContext.Provider>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
-                <Dropdown menu={{ items }}>
-                    <Button size="small" type="primary" icon={<PlusOutlined />}>
-                        Add section
-                    </Button>
-                </Dropdown>
+        <div className={classNames(styles['content-wrap'], sidebarPosition, sidebarBP)}>
+            {sidebarIsActive && (
+                <aside
+                    className={classNames(styles['aside'], { [styles['open']!]: showSidebar })}
+                    style={{ width: sidebarWidth, backgroundColor: sidebarColor }}
+                >
+                    <SectionsContext.Provider
+                        value={{
+                            sections: formik.values,
+                            setFieldValue: formik.setFieldValue,
+                            errors: formik.errors,
+                        }}
+                    >
+                        {formik.values.map((section, idx) => {
+                            const Block = blocks[section.block].Edit
+
+                            return (
+                                <Block
+                                    key={section.id || section.tempId || idx}
+                                    position={section.position}
+                                />
+                            )
+                        })}
+                    </SectionsContext.Provider>
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
+                        <Dropdown menu={{ items }}>
+                            <Button size="small" type="primary" icon={<PlusOutlined />}>
+                                Add section
+                            </Button>
+                        </Dropdown>
+                    </div>
+                </aside>
+            )}
+            <div className={styles['content']}>
+                <SectionsContext.Provider
+                    value={{
+                        sections: formik.values,
+                        setFieldValue: formik.setFieldValue,
+                        errors: formik.errors,
+                    }}
+                >
+                    {formik.values.map((section, idx) => {
+                        const Block = blocks[section.block].Edit
+
+                        return <Block key={section.id || section.tempId || idx} position={section.position} />
+                    })}
+                </SectionsContext.Provider>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
+                    <Dropdown menu={{ items }}>
+                        <Button size="small" type="primary" icon={<PlusOutlined />}>
+                            Add section
+                        </Button>
+                    </Dropdown>
+                </div>
             </div>
             <FloatButton.Group
                 trigger="hover"
                 type="primary"
-                style={{ right: 94, opacity: 0.5 }}
+                style={{ right: '2.5rem', opacity: 1 }}
                 icon={<MenuOutlined />}
             >
+                {sidebarIsActive && (
+                    <FloatButton
+                        icon={showSidebar ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+                        onClick={() => setShowSidebar(!showSidebar)}
+                    />
+                )}
                 <FloatButton icon={<CloseOutlined />} onClick={() => formik.setValues([])} />
                 <FloatButton type="primary" icon={<CheckOutlined />} onClick={() => formik.submitForm()} />
             </FloatButton.Group>
         </div>
-    )
-}
-
-interface SectionProps {
-    position: number
-}
-
-const Section = ({ position }: SectionProps) => {
-    const { content, setFieldValue, medias, addMedia } = useSection(position)
-
-    return (
-        <SectionWrap
-            position={position}
-            panel={
-                <MediaModal
-                    value={medias?.get(content.mediaId)}
-                    onChange={(media) => addMedia('mediaId', media)}
-                    mediaType={MediaType.IMAGE}
-                />
-            }
-        >
-            {JSON.stringify(content)}
-            <CustomImage.Background media={medias?.get(content.mediaId)}>
-                {JSON.stringify(content)}
-
-                <div style={{ height: 200, background: 'red' }}></div>
-                <Input value={content?.text} onChange={(e) => setFieldValue('text', e.target.value)} />
-
-                {/* <CustomImage media={medias?.get(content.mediaId)} /> */}
-            </CustomImage.Background>
-        </SectionWrap>
     )
 }
 

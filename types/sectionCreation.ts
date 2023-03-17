@@ -1,11 +1,12 @@
 import type { Form, Media, SectionType } from '@prisma/client'
 import { ObjectId } from '.'
+import { BlockKey } from '~/blocks'
 
 type SectionCreation = {
     tempId?: string
     id?: ObjectId
     type: SectionType
-    block: string
+    block: BlockKey
     position: number
     content: any
     pageId: ObjectId

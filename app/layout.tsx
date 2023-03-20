@@ -27,7 +27,12 @@ const getSidebar = async () => {
     return await prisma.setting.findMany({
         where: {
             type: {
-                in: [SettingType.SIDEBAR_IS_ACTIVE, SettingType.SIDEBAR_WIDTH, SettingType.SIDEBAR_UNIT],
+                in: [
+                    SettingType.SIDEBAR_IS_ACTIVE,
+                    SettingType.SIDEBAR_WIDTH,
+                    SettingType.SIDEBAR_UNIT,
+                    SettingType.SIDEBAR_COLOR,
+                ],
             },
         },
     })

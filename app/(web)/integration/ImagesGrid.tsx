@@ -8,7 +8,7 @@ const Banner = () => {
             <h3>Recent works</h3>
 
             <div className={styles['grid']}>
-                {['', '', ''].map((element, idx) => (
+                {['', '', ''].map((_, idx) => (
                     <div key={idx} className={styles['tile']}>
                         <Image
                             fill

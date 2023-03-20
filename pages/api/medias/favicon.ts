@@ -16,7 +16,7 @@ export const config = {
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     const form = new IncomingForm()
 
-    await form.parse(req, (err, fields, files) => {
+    await form.parse(req, (err, _, files) => {
         if (err) return res.status(500).json({ error: 'err' })
 
         const file: File | undefined | any = Array.isArray(files['file'])

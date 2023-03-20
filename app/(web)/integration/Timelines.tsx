@@ -1,4 +1,4 @@
-import styles from './Timelines.module.scss'
+// import styles from './Timelines.module.scss'
 
 const Banner = () => {
     return (
@@ -10,7 +10,7 @@ const Banner = () => {
                     <h5>Job experience</h5>
                     <span>2010 - 2020</span>
                     <div>
-                        {['', '', ''].map((element, idx) => (
+                        {['', '', ''].map((_, idx) => (
                             <div key={idx}>
                                 <h6>Bachelor Software engineer</h6>
                                 <span>University of oxford (2010 - 2011)</span>
@@ -26,7 +26,7 @@ const Banner = () => {
                     <h5>Eduquation quality</h5>
                     <span>2010 - 2020</span>
                     <div>
-                        {['', '', ''].map((element, idx) => (
+                        {['', '', ''].map((_, idx) => (
                             <div key={idx}>
                                 <h6>Bachelor Software engineer</h6>
                                 <span>University of oxford (2010 - 2011)</span>

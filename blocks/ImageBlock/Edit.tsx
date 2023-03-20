@@ -9,7 +9,7 @@ import CustomImage from '~/components/CustomImage'
 import Link from 'next/link'
 
 const ImageBlock = ({ position }: EditBlockProps) => {
-    const { content, setFieldValue, medias, addMedia } = useSection(position)
+    const { content, /*setFieldValue,*/ medias, addMedia } = useSection(position)
     const { title, mediaId, button } = content
 
     return (
@@ -25,7 +25,7 @@ const ImageBlock = ({ position }: EditBlockProps) => {
         >
             <section className={classNames(styles['section'])}>
                 {title && <h1>Title</h1>}
-                <CustomImage media={medias?.get(content.mediaId)} height={400} width={600} />
+                <CustomImage media={medias?.get(mediaId)} height={400} width={600} />
                 {button && (
                     <div
                         className={classNames(styles['button'], {

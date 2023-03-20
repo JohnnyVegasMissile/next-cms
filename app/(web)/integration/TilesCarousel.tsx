@@ -1,4 +1,4 @@
-import styles from './TilesCarousel.module.scss'
+// import styles from './TilesCarousel.module.scss'
 
 const TilesCarousel = () => {
     return (
@@ -16,9 +16,10 @@ const TilesCarousel = () => {
             </div>
 
             <div>
-                {['', '', ''].map((element, idx) => (
+                {['', '', ''].map((_, idx) => (
                     <div key={idx}>
                         <div>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img alt="Icon" />
                             <span>*****</span>
                         </div>
@@ -27,6 +28,7 @@ const TilesCarousel = () => {
                             incididunt ut labore et dolore magna aliqua.
                         </p>
                         <div>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img alt="Profile" />
                             <div>
                                 <span>Antoine geraud</span>

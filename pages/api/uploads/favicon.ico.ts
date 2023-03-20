@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { promises as fs } from 'fs'
 import mime from 'mime-types'
 
-const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+const GET = async (_: NextApiRequest, res: NextApiResponse) => {
     // const id = req.query.uid as string
     try {
         const file = await fs.readFile('./uploads/favicon.ico')

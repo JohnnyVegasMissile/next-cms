@@ -7,7 +7,7 @@ import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ColumnGroupType, SorterResult } from 'antd/es/table/interface'
+import { SorterResult } from 'antd/es/table/interface'
 import { PAGE_SIZE } from '~/utilities/constants'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -191,7 +191,7 @@ const AdminTable = <T,>({ name, columns, request, filters, extra }: AdminTablePr
                     columns={
                         columns.filter((e: any) =>
                             !!e.condition ? e.condition(extraFilters) : true
-                        ) as ColumnGroupType<T>[]
+                        ) as any[]
                     }
                     dataSource={results.data?.results as object[]}
                     pagination={{

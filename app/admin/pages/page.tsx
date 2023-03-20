@@ -124,18 +124,19 @@ const columns: ColumnsType<DataType> = [
                         <Button icon={<CopyOutlined />} size="small" />
                     </Tooltip>
                 </Link>
-                <Link href={`/admin/pages/${page.id}`} prefetch={false}>
-                    <Tooltip title="Edit">
-                        <Button
-                            type="primary"
-                            icon={<EditOutlined />}
-                            size="small"
-                            disabled={page.type !== PageType.HOMEPAGE && page.type !== PageType.PAGE}
-                        >
-                            Edit
-                        </Button>
-                    </Tooltip>
-                </Link>
+                {page.type !== PageType.HOMEPAGE && page.type !== PageType.PAGE ? (
+                    <Button type="primary" icon={<EditOutlined />} size="small" disabled={true}>
+                        Edit
+                    </Button>
+                ) : (
+                    <Link href={`/admin/pages/${page.id}`} prefetch={false}>
+                        <Tooltip title="Edit">
+                            <Button type="primary" icon={<EditOutlined />} size="small">
+                                Edit
+                            </Button>
+                        </Tooltip>
+                    </Link>
+                )}
                 <Popconfirm
                     placement="left"
                     title="Delete the task"

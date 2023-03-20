@@ -1,6 +1,3 @@
-import { PageType } from '@prisma/client'
-import QuickEditButton from '~/components/QuickEditButton'
-import { prisma } from '~/utilities/prisma'
 import Banner from './Banner'
 import TilesGrid from './TilesGrid'
 import ImagesGrid from './ImagesGrid'

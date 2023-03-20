@@ -49,7 +49,6 @@ const StyledInput = ({
     }
 
     const handleKeyCommand = (command: string, editorState: EditorState) => {
-        console.log('commmand')
         const newState = RichUtils.handleKeyCommand(editorState, command)
 
         if (newState) {
@@ -86,9 +85,7 @@ const StyledInput = ({
 
         const html = convertToHTML({
             blockToHTML: (block) => {
-                console.log('block', block)
                 if (block.type === 'unstyled' && !block.text) {
-                    console.log('block para', block)
                     return <br />
                 }
                 return

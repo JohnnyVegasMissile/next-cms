@@ -7,8 +7,9 @@ const Banner = () => {
             <h3>What i do</h3>
 
             <div className={styles['grid']}>
-                {['', '', '', ''].map((element, idx) => (
+                {['', '', '', ''].map((_, idx) => (
                     <div key={idx} className={styles['tile']}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img alt="Icon" />
                         <span>Web design</span>
                         <p>

@@ -20,15 +20,19 @@ const Banner = () => {
                     <span className={styles['find-me']}>Find me on</span>
                     <div className={styles['list']}>
                         <div className={styles['tile']}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img alt="F" />
                         </div>
                         <div className={styles['tile']}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img alt="F" />
                         </div>
                         <div className={styles['tile']}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img alt="F" />
                         </div>
                         <div className={styles['tile']}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img alt="F" />
                         </div>
                     </div>

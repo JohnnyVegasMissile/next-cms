@@ -2,13 +2,11 @@
 
 import { Section, SectionType, SettingType } from '@prisma/client'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Button, Dropdown, FloatButton, Spin, message } from 'antd'
+import { FloatButton, Spin, message } from 'antd'
 import {
-    PlusOutlined,
     MenuOutlined,
     CloseOutlined,
     CheckOutlined,
-    PicCenterOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     LoadingOutlined,
@@ -19,22 +17,10 @@ import { getPageSections, updatePageSections } from '~/network/pages'
 import SectionCreation, { SectionCreationCleaned } from '~/types/sectionCreation'
 import { ObjectId } from '~/types'
 import blocks, { BlockKey } from '~/blocks'
-import { SectionsContext } from '~/hooks/useSection'
 import styles from './page.module.scss'
 import classNames from 'classnames'
 import { getSidebar } from '~/network/api'
-
-function tempId() {
-    let result = ''
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    const charactersLength = characters.length
-    let counter = 0
-    while (counter < 5) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength))
-        counter += 1
-    }
-    return result
-}
+import SectionsManager from '~/components/SectionsManager'
 
 const validate = (values: { content: SectionCreation[]; sidebar: SectionCreation[] }) => {
     let errors: any = {}
@@ -212,53 +198,10 @@ const PageSections = ({ params }: any) => {
     const sidebarPosition =
         sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_POSITION)?.value || 'left'
 
-    // const submit = useMutation(
-    //     (values: PageCreation) => (isUpdate ? updatePages(pageId, values) : postPages(values)),
-    //     {
-    //         onSuccess: () => message.success(`Page ${isUpdate ? 'modified' : 'created'} with success.`),
-    //         onError: () => message.error('Something went wrong, try again later.'),
-    //     }
-    // )
-
     useEffect(() => {
         details.mutate()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    const items = (place: 'sidebar' | 'content') => [
-        {
-            key: 'elements',
-            label: 'Elements',
-            icon: <PicCenterOutlined />,
-            children: Object.keys(blocks).map((key) => ({ key, label: key })),
-        },
-        {
-            key: 'blocks',
-            label: 'Blocks',
-            type: 'group',
-            children: Object.keys(blocks).map((key) => ({
-                key,
-                label: key,
-                onClick: () =>
-                    formik.setFieldValue(place, [
-                        ...formik.values[place],
-                        {
-                            tempId: tempId(),
-                            type: place === 'content' ? SectionType.PAGE : SectionType.PAGE_SIDEBAR,
-                            block: key as BlockKey,
-                            position: formik.values[place].length,
-                            content: blocks?.[key as BlockKey]?.default
-                                ? blocks?.[key as BlockKey]?.default
-                                : {},
-                            pageId,
-
-                            medias: new Map(),
-                            forms: new Map(),
-                        },
-                    ]),
-            })),
-        },
-    ]
 
     if (details.isLoading || sidebarSettings.isLoading) {
         return <Spin />
@@ -271,56 +214,23 @@ const PageSections = ({ params }: any) => {
                     className={classNames(styles['aside'], { [styles['open']!]: showSidebar })}
                     style={{ width: sidebarWidth, backgroundColor: sidebarColor }}
                 >
-                    <SectionsContext.Provider
-                        value={{
-                            sections: formik.values.sidebar,
-                            setFieldValue: (name: string, value: any) =>
-                                formik.setFieldValue(`sidebar.${name}`, value),
-                            errors: formik.errors.sidebar as any,
-                        }}
-                    >
-                        {formik.values.sidebar.map((section, idx) => {
-                            const Block = blocks[section.block].Edit
-
-                            return (
-                                <Block
-                                    key={section.id || section.tempId || idx}
-                                    position={section.position}
-                                />
-                            )
-                        })}
-                    </SectionsContext.Provider>
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
-                        <Dropdown menu={{ items: items('sidebar') }}>
-                            <Button size="small" type="primary" icon={<PlusOutlined />}>
-                                Add section
-                            </Button>
-                        </Dropdown>
-                    </div>
+                    <SectionsManager
+                        name="sidebar"
+                        sections={formik.values.sidebar}
+                        onChange={formik.setFieldValue}
+                        error={formik.errors.sidebar}
+                        type={SectionType.PAGE_SIDEBAR}
+                    />
                 </aside>
             )}
             <div className={styles['content']}>
-                <SectionsContext.Provider
-                    value={{
-                        sections: formik.values.content,
-                        setFieldValue: (name: string, value: any) =>
-                            formik.setFieldValue(`content.${name}`, value),
-                        errors: formik.errors.content as any,
-                    }}
-                >
-                    {formik.values.content.map((section, idx) => {
-                        const Block = blocks[section.block].Edit
-
-                        return <Block key={section.id || section.tempId || idx} position={section.position} />
-                    })}
-                </SectionsContext.Provider>
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
-                    <Dropdown menu={{ items: items('content') }}>
-                        <Button size="small" type="primary" icon={<PlusOutlined />}>
-                            Add section
-                        </Button>
-                    </Dropdown>
-                </div>
+                <SectionsManager
+                    name="content"
+                    sections={formik.values.content}
+                    onChange={formik.setFieldValue}
+                    error={formik.errors.content}
+                    type={SectionType.PAGE}
+                />
             </div>
             <FloatButton.Group
                 trigger="hover"

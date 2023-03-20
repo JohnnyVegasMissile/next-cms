@@ -52,7 +52,6 @@ const UploadButton = ({
                     fileList={[]}
                     disabled={mutation.isLoading}
                     beforeUpload={(file) => {
-                        console.log('e', file)
                         mutation.mutate(file)
 
                         return false
@@ -80,7 +79,6 @@ const UploadButton = ({
 
 const Favicon = () => {
     const [loading, setLoading] = useState(false)
-    // const [value, setValue] = useState<File | null>(null)
 
     const handleFiles = async (event: any) => {
         setLoading(true)

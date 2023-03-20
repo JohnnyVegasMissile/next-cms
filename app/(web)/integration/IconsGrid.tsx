@@ -1,4 +1,4 @@
-import styles from './ImagesGrid.module.scss'
+// import styles from './ImagesGrid.module.scss'
 
 const IconsGrid = () => {
     return (
@@ -7,8 +7,9 @@ const IconsGrid = () => {
             <h3>Selected clients</h3>
 
             <div>
-                {['', '', ''].map((element, idx) => (
+                {['', '', ''].map((_, idx) => (
                     <div key={idx}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img alt="Icon" />
                     </div>
                 ))}

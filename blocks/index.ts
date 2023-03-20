@@ -1,7 +1,6 @@
 import SectionCreation from '~/types/sectionCreation'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
-import ViewTextBlock from './TextBlock/View'
 import { Form, Media } from '@prisma/client'
 
 export type ViewBlockProps = {

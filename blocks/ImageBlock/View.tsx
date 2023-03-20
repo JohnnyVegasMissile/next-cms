@@ -2,10 +2,10 @@ import Link from 'next/link'
 import styles from './ImageBlock.module.scss'
 import { ViewBlockProps } from '..'
 import classNames from 'classnames'
-import CustomImage from '~/components/CustomImage'
+// import CustomImage from '~/components/CustomImage'
 
 const ImageBlock = ({ content }: ViewBlockProps) => {
-    const { title, mediaId, button } = content
+    const { title, button } = content
 
     return (
         <section className={classNames(styles['section'])}>

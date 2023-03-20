@@ -298,12 +298,19 @@ enum SectionType {
   CONTAINER_SIDEBAR
 
   TEMPLATE
+  TEMPLATE_TOP
+  TEMPLATE_BOTTOM
   TEMPLATE_SIDEBAR
+
+  CONTENT
+  CONTENT_SIDEBAR
 
   LAYOUT_HEADER
   LAYOUT_FOOTER
+
   LAYOUT_CONTENT_TOP
   LAYOUT_CONTENT_BOTTOM
+
   LAYOUT_SIDEBAR_TOP
   LAYOUT_SIDEBAR_BOTTOM
 }
@@ -358,7 +365,7 @@ model Page {
   slug Slug?
 
   metadatas Metadata[]
-  Section   Section[]
+  sections  Section[]
 
   published Boolean @default(true)
 

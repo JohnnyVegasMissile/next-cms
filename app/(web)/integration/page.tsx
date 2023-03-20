@@ -15,7 +15,7 @@ import Form from './Form'
 
 const Integration = () => {
     return (
-        <>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
             <Banner />
             <TilesGrid />
             <ImagesGrid />
@@ -23,7 +23,7 @@ const Integration = () => {
             <TilesCarousel />
             <IconsGrid />
             <Form />
-        </>
+        </div>
     )
 }
 

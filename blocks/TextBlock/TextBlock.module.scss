@@ -36,10 +36,11 @@
             color: var(--secondary-text-color);
         }
 
-        & p {
+        & .text {
             line-height: 1.5rem;
 
-            & strong {
+            & strong,
+            & i {
                 color: var(--primary-color);
             }
         }

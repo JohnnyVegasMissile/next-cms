@@ -10,7 +10,7 @@ import {
     CheckOutlined,
     WarningOutlined,
 } from '@ant-design/icons'
-import { Media, MediaType, PageType } from '@prisma/client'
+import { Media, MediaType } from '@prisma/client'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import AdminTable from '~/components/AdminTable'
@@ -88,7 +88,7 @@ const columns = [
     {
         width: 1,
         key: 'action',
-        render: (media: Media) => (
+        render: (_: Media) => (
             <Popconfirm
                 placement="left"
                 title="Delete the task"

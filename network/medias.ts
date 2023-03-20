@@ -42,15 +42,14 @@ export const uploadMedia = (file: any): Promise<Media> => {
     })
 }
 
-export const uploadFavicon = (file: any): Promise<Media> =>
-    new Promise(async (resolve, reject) => {
-        const data = new FormData()
-        data.append('file', file)
+export const uploadFavicon = (file: any): Promise<Media> => {
+    const data = new FormData()
+    data.append('file', file)
 
-        return INSTANCE({
-            method: 'POST',
-            url: `/api/medias/favicon`,
-            headers: { 'Content-Type': 'application/json' },
-            data,
-        })
+    return INSTANCE({
+        method: 'POST',
+        url: `/api/medias/favicon`,
+        headers: { 'Content-Type': 'application/json' },
+        data,
     })
+}

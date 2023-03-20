@@ -1,4 +1,5 @@
 import styles from './ImagesGrid.module.scss'
+import Image from 'next/image'
 
 const Banner = () => {
     return (
@@ -9,7 +10,8 @@ const Banner = () => {
             <div className={styles['grid']}>
                 {['', '', ''].map((element, idx) => (
                     <div key={idx} className={styles['tile']}>
-                        <img
+                        <Image
+                            fill
                             src="https://images.unsplash.com/photo-1678985690723-e1d55583627e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
                             alt="Icon"
                         />

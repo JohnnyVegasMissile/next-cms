@@ -2,6 +2,7 @@ import PageCreation from '~/types/pageCreation'
 import INSTANCE from './api'
 import { Metadata, Page, PageType, Section, Slug } from '@prisma/client'
 import { ObjectId } from '~/types'
+import { SectionCreationCleaned } from '~/types/sectionCreation'
 
 type PageResponse = Page & {
     slug: Slug | null
@@ -35,15 +36,6 @@ export const getPage = (id: ObjectId): Promise<PageResponse> =>
         },
     })
 
-export const getPageSections = (id: ObjectId): Promise<Section[]> =>
-    INSTANCE({
-        method: 'GET',
-        url: `/api/pages/${id}/sections`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-
 export const postPages = (data: PageCreation): Promise<PageResponse> =>
     INSTANCE({
         method: 'POST',
@@ -54,10 +46,32 @@ export const postPages = (data: PageCreation): Promise<PageResponse> =>
         data,
     })
 
-export const updatePages = (id: ObjectId, data: PageCreation): Promise<PageResponse> =>
+export const updatePage = (id: ObjectId, data: PageCreation): Promise<PageResponse> =>
     INSTANCE({
         method: 'PUT',
         url: `/api/pages/${id}`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        data,
+    })
+
+export const getPageSections = (id: ObjectId): Promise<{ content: Section[]; sidebar: Section[] }> =>
+    INSTANCE({
+        method: 'GET',
+        url: `/api/pages/${id}/sections`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+export const updatePageSections = (
+    id: ObjectId,
+    data: { content: SectionCreationCleaned[]; sidebar: SectionCreationCleaned[] }
+): Promise<Section[]> =>
+    INSTANCE({
+        method: 'PUT',
+        url: `/api/pages/${id}/sections`,
         headers: {
             'Content-Type': 'application/json',
         },

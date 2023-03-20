@@ -2,7 +2,7 @@
 
 import { Section, SectionType, SettingType } from '@prisma/client'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Button, Dropdown, FloatButton, Spin, Typography } from 'antd'
+import { Button, Dropdown, FloatButton, Spin, message } from 'antd'
 import {
     PlusOutlined,
     MenuOutlined,
@@ -11,11 +11,12 @@ import {
     PicCenterOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
+    LoadingOutlined,
 } from '@ant-design/icons'
 import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
-import { getPageSections } from '~/network/pages'
-import SectionCreation from '~/types/sectionCreation'
+import { getPageSections, updatePageSections } from '~/network/pages'
+import SectionCreation, { SectionCreationCleaned } from '~/types/sectionCreation'
 import { ObjectId } from '~/types'
 import blocks, { BlockKey } from '~/blocks'
 import { SectionsContext } from '~/hooks/useSection'
@@ -23,22 +24,57 @@ import styles from './page.module.scss'
 import classNames from 'classnames'
 import { getSidebar } from '~/network/api'
 
-const { Text } = Typography
+function tempId() {
+    let result = ''
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    const charactersLength = characters.length
+    let counter = 0
+    while (counter < 5) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
+        counter += 1
+    }
+    return result
+}
 
-const validate = (values: SectionCreation[]) => {
-    let errors: any[] = []
+const validate = (values: { content: SectionCreation[]; sidebar: SectionCreation[] }) => {
+    let errors: any = {}
 
-    for (const section of values) {
+    for (const section of values.content) {
         const validate = blocks[section.block].validate
 
-        errors.push(validate ? validate(section) : undefined)
+        if (!!validate) {
+            const sectionErrors = validate(section)
+
+            if (!!Object.keys(sectionErrors).length) {
+                if (!!errors.content) errors.content = new Array()
+
+                errors.content[section.position] = sectionErrors
+            }
+        }
+    }
+
+    for (const section of values.sidebar) {
+        const validate = blocks[section.block].validate
+
+        if (!!validate) {
+            const sectionErrors = validate(section)
+
+            if (!!Object.keys(sectionErrors).length) {
+                if (!!errors.sidebar) errors.sidebar = new Array()
+
+                errors.sidebar[section.position] = sectionErrors
+            }
+        }
     }
 
     return errors
 }
 
-const cleanDetails = (sections: Section[]): SectionCreation[] => {
-    return sections.map((section) => ({
+const cleanDetails = (values: {
+    content: Section[]
+    sidebar: Section[]
+}): { content: SectionCreation[]; sidebar: SectionCreation[] } => {
+    const content = values.content.map((section) => ({
         id: section.id,
         type: section.type,
         block: section.block as BlockKey,
@@ -49,10 +85,24 @@ const cleanDetails = (sections: Section[]): SectionCreation[] => {
         medias: new Map(),
         forms: new Map(),
     }))
+
+    const sidebar = values.sidebar.map((section) => ({
+        id: section.id,
+        type: section.type,
+        block: section.block as BlockKey,
+        position: section.position,
+        content: section.content as any,
+        pageId: section.pageId!,
+
+        medias: new Map(),
+        forms: new Map(),
+    }))
+
+    return { content, sidebar }
 }
 
-const cleanBeforeSend = (sections: SectionCreation[]) =>
-    sections.map((section) => {
+const cleanBeforeSend = (values: { content: SectionCreation[]; sidebar: SectionCreation[] }) => {
+    const content = values.content.map((section) => {
         const medias: ObjectId[] = []
         const forms: ObjectId[] = []
 
@@ -78,26 +128,76 @@ const cleanBeforeSend = (sections: SectionCreation[]) =>
             ...section,
             medias,
             forms,
+            tempId: undefined,
         }
     })
+
+    const sidebar = values.sidebar.map((section) => {
+        const medias: ObjectId[] = []
+        const forms: ObjectId[] = []
+
+        const stringifiedContent = JSON.stringify(section.content)
+
+        section.medias.forEach((_, key) => {
+            if (
+                stringifiedContent.includes(`"mediaId":${key},`) ||
+                stringifiedContent.includes(`"mediaId":${key}}`)
+            )
+                medias.push(key)
+        })
+
+        section.forms.forEach((_, key) => {
+            if (
+                stringifiedContent.includes(`"formId":${key},`) ||
+                stringifiedContent.includes(`"formId":${key}}`)
+            )
+                forms.push(key)
+        })
+
+        return {
+            ...section,
+            medias,
+            forms,
+            tempId: undefined,
+        }
+    })
+
+    return { content, sidebar }
+}
 
 const PageSections = ({ params }: any) => {
     const { pageId } = params
     const [showSidebar, setShowSidebar] = useState(false)
-    const formik = useFormik<SectionCreation[]>({
-        initialValues: [],
+    const formik = useFormik<{ content: SectionCreation[]; sidebar: SectionCreation[] }>({
+        initialValues: { content: [], sidebar: [] },
         validate,
         validateOnChange: false,
         validateOnBlur: false,
         validateOnMount: false,
-        onSubmit: (values) => alert(JSON.stringify(cleanBeforeSend(values), null, 2)),
+        onSubmit: (values) => submit.mutate(cleanBeforeSend(values)),
     })
 
     const details = useMutation(() => getPageSections(pageId), {
         onSuccess: (data) => formik.setValues(cleanDetails(data)),
     })
 
-    const sidebarSettings = useQuery(['sidebar'], () => getSidebar())
+    const submit = useMutation(
+        (values: { content: SectionCreationCleaned[]; sidebar: SectionCreationCleaned[] }) =>
+            updatePageSections(pageId, values),
+        {
+            onSuccess: () => message.success(`Sections modified with success.`),
+            onError: () => message.error('Something went wrong, try again later.'),
+        }
+    )
+
+    const sidebarSettings = useQuery(['sidebar'], () => getSidebar(), {
+        onSuccess: () => {
+            const sidebarIsActive =
+                sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_IS_ACTIVE)?.value === 'true'
+
+            setShowSidebar(sidebarIsActive)
+        },
+    })
 
     const sidebarIsActive =
         sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_IS_ACTIVE)?.value === 'true'
@@ -125,7 +225,7 @@ const PageSections = ({ params }: any) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const items = [
+    const items = (place: 'sidebar' | 'content') => [
         {
             key: 'elements',
             label: 'Elements',
@@ -140,13 +240,13 @@ const PageSections = ({ params }: any) => {
                 key,
                 label: key,
                 onClick: () =>
-                    formik.setValues([
-                        ...formik.values,
+                    formik.setFieldValue(place, [
+                        ...formik.values[place],
                         {
-                            tempId: '',
-                            type: SectionType.PAGE,
+                            tempId: tempId(),
+                            type: place === 'content' ? SectionType.PAGE : SectionType.PAGE_SIDEBAR,
                             block: key as BlockKey,
-                            position: formik.values.length,
+                            position: formik.values[place].length,
                             content: blocks?.[key as BlockKey]?.default
                                 ? blocks?.[key as BlockKey]?.default
                                 : {},
@@ -160,7 +260,7 @@ const PageSections = ({ params }: any) => {
         },
     ]
 
-    if (details.isLoading) {
+    if (details.isLoading || sidebarSettings.isLoading) {
         return <Spin />
     }
 
@@ -173,12 +273,13 @@ const PageSections = ({ params }: any) => {
                 >
                     <SectionsContext.Provider
                         value={{
-                            sections: formik.values,
-                            setFieldValue: formik.setFieldValue,
-                            errors: formik.errors,
+                            sections: formik.values.sidebar,
+                            setFieldValue: (name: string, value: any) =>
+                                formik.setFieldValue(`sidebar.${name}`, value),
+                            errors: formik.errors.sidebar as any,
                         }}
                     >
-                        {formik.values.map((section, idx) => {
+                        {formik.values.sidebar.map((section, idx) => {
                             const Block = blocks[section.block].Edit
 
                             return (
@@ -190,7 +291,7 @@ const PageSections = ({ params }: any) => {
                         })}
                     </SectionsContext.Provider>
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
-                        <Dropdown menu={{ items }}>
+                        <Dropdown menu={{ items: items('sidebar') }}>
                             <Button size="small" type="primary" icon={<PlusOutlined />}>
                                 Add section
                             </Button>
@@ -201,19 +302,20 @@ const PageSections = ({ params }: any) => {
             <div className={styles['content']}>
                 <SectionsContext.Provider
                     value={{
-                        sections: formik.values,
-                        setFieldValue: formik.setFieldValue,
-                        errors: formik.errors,
+                        sections: formik.values.content,
+                        setFieldValue: (name: string, value: any) =>
+                            formik.setFieldValue(`content.${name}`, value),
+                        errors: formik.errors.content as any,
                     }}
                 >
-                    {formik.values.map((section, idx) => {
+                    {formik.values.content.map((section, idx) => {
                         const Block = blocks[section.block].Edit
 
                         return <Block key={section.id || section.tempId || idx} position={section.position} />
                     })}
                 </SectionsContext.Provider>
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
-                    <Dropdown menu={{ items }}>
+                    <Dropdown menu={{ items: items('content') }}>
                         <Button size="small" type="primary" icon={<PlusOutlined />}>
                             Add section
                         </Button>
@@ -224,16 +326,27 @@ const PageSections = ({ params }: any) => {
                 trigger="hover"
                 type="primary"
                 style={{ right: '2.5rem', opacity: 1 }}
-                icon={<MenuOutlined />}
+                icon={submit.isLoading ? <LoadingOutlined /> : <MenuOutlined />}
             >
-                {sidebarIsActive && (
-                    <FloatButton
-                        icon={showSidebar ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-                        onClick={() => setShowSidebar(!showSidebar)}
-                    />
+                {!submit.isLoading && (
+                    <>
+                        {sidebarIsActive && (
+                            <FloatButton
+                                icon={showSidebar ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+                                onClick={() => setShowSidebar(!showSidebar)}
+                            />
+                        )}
+                        <FloatButton
+                            icon={<CloseOutlined />}
+                            onClick={() => formik.setValues(cleanDetails(details.data!))}
+                        />
+                        <FloatButton
+                            type="primary"
+                            icon={<CheckOutlined />}
+                            onClick={() => formik.submitForm()}
+                        />
+                    </>
                 )}
-                <FloatButton icon={<CloseOutlined />} onClick={() => formik.setValues([])} />
-                <FloatButton type="primary" icon={<CheckOutlined />} onClick={() => formik.submitForm()} />
             </FloatButton.Group>
         </div>
     )

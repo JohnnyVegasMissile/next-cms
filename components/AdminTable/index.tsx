@@ -59,6 +59,7 @@ const AdminTable = <T,>({ name, columns, request, filters, extra }: AdminTablePr
 
         setExtraFilters(filtersFromSearch)
         router.push(`${pathname}?${params.toString()}`)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const onQChange = (value: string) => {

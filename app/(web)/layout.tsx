@@ -2,6 +2,9 @@ import styles from './layout.module.scss'
 import { prisma } from '~/utilities/prisma'
 import { SettingType } from '@prisma/client'
 import classNames from 'classnames'
+import localFont from '@next/font/local'
+
+const myFont = localFont({ src: '../../public/Garute-VF.ttf', variable: '--my-font' })
 
 const getAppname = async () => {
     return await prisma.setting.findUnique({
@@ -45,64 +48,14 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 
     return (
         <>
-            {/* <div style={{ height: 50, backgroundColor: 'orange' }}></div>
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: '25% 1fr',
-                    gridTemplateRows: undefined,
-                    gridColumnGap: 0,
-                    gridRowGap: 0,
-                }}
-            >
-                <div
-                    style={{
-                        height: 100,
-                        backgroundColor: 'orange',
-                        gridColumn: 1,
-                        border: 'solid 1px #000',
-                    }}
-                ></div>
-                <div
-                    style={{ height: 50, backgroundColor: 'orange', gridColumn: 2, border: 'solid 1px #000' }}
-                ></div>
-
-                <div
-                    style={{ height: 50, backgroundColor: 'blue', gridColumn: 1, border: 'solid 1px #000' }}
-                ></div>
-                <div
-                    style={{ height: 90, backgroundColor: 'blue', gridColumn: 2, border: 'solid 1px #000' }}
-                ></div>
-
-                <div
-                    style={{ height: 50, backgroundColor: 'green', gridColumn: 1, border: 'solid 1px #000' }}
-                ></div>
-                <div
-                    style={{ height: 60, backgroundColor: 'green', gridColumn: 2, border: 'solid 1px #000' }}
-                ></div>
-
-                <div
-                    style={{ height: 50, backgroundColor: 'blue', gridColumn: 2, border: 'solid 1px #000' }}
-                ></div>
-
-                <div
-                    style={{ height: 50, backgroundColor: 'orange', gridColumn: 1, border: 'solid 1px #000' }}
-                ></div>
-                <div
-                    style={{ height: 75, backgroundColor: 'orange', gridColumn: 2, border: 'solid 1px #000' }}
-                ></div>
-            </div>
-            <div style={{ height: 50, backgroundColor: 'orange' }}></div> */}
-
             <header>Header</header>
             <div
-                className={classNames(styles['content-wrap'], styles[brSize!], {
+                className={classNames(styles['content-wrap'], styles[brSize!], myFont.className, {
                     [styles['left']!]: position === 'left',
                     [styles['right']!]: position === 'right',
                 })}
             >
-                <aside className={styles['aside']}>side</aside>
-                <div className={styles['content']}>{children}</div>
+                {children}
             </div>
             <footer>Footer</footer>
         </>

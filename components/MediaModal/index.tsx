@@ -26,7 +26,6 @@ import {
     Typography,
     Tooltip,
     Tag,
-    Card,
 } from 'antd'
 import { SorterResult } from 'antd/es/table/interface'
 import dayjs from 'dayjs'

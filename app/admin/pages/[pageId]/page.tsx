@@ -8,7 +8,7 @@ import { PicCenterOutlined, CheckOutlined } from '@ant-design/icons'
 import MetadatasList from '~/components/MetadatasList'
 import PageCreation from '~/types/pageCreation'
 import SlugEdit from '~/components/SlugEdit'
-import { getPage, postPages, updatePages } from '~/network/pages'
+import { getPage, postPages, updatePage } from '~/network/pages'
 import { useMutation } from '@tanstack/react-query'
 import { Metadata, Page, Slug } from '@prisma/client'
 import { useEffect } from 'react'
@@ -77,7 +77,7 @@ const CreatePage = ({ params }: any) => {
         onSuccess: (data) => formik.setValues(cleanDetails(data)),
     })
     const submit = useMutation(
-        (values: PageCreation) => (isUpdate ? updatePages(pageId, values) : postPages(values)),
+        (values: PageCreation) => (isUpdate ? updatePage(pageId, values) : postPages(values)),
         {
             onSuccess: () => message.success(`Page ${isUpdate ? 'modified' : 'created'} with success.`),
             onError: () => message.error('Something went wrong, try again later.'),

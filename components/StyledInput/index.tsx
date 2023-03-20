@@ -73,7 +73,7 @@ const StyledInput = ({
                 }
                 return
             },
-        })(value)
+        })(value || '')
 
         setEditorState(EditorState.createWithContent(contentState))
     }

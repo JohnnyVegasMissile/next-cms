@@ -15,7 +15,7 @@ interface SectionWrapProps {
     panel: ReactNode
 }
 
-const SectionWrap = ({ position, children, panel }: SectionWrapProps) => {
+const SectionWrap = ({ children, panel }: SectionWrapProps) => {
     // const { sections, setFieldValue } = useContext(SectionsContext)
     const [open, setOpen] = useState(false)
 

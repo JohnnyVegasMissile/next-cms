@@ -1,5 +1,6 @@
-import { SettingType } from '@prisma/client'
+// eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextResponse } from 'next/server'
+import { SettingType } from '@prisma/client'
 import SettingsCreation from '~/types/settingsCreation'
 import { prisma } from '~/utilities/prisma'
 

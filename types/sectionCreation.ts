@@ -15,4 +15,17 @@ type SectionCreation = {
     forms: Map<ObjectId, Form>
 }
 
+export type SectionCreationCleaned = {
+    tempId?: string
+    id?: ObjectId
+    type: SectionType
+    block: BlockKey
+    position: number
+    content: any
+    pageId: ObjectId
+
+    medias: number[]
+    forms: number[]
+}
+
 export default SectionCreation

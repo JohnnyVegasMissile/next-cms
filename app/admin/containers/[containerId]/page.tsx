@@ -293,7 +293,11 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
     return (
         <Space direction="vertical" style={{ width: '100%' }}>
             {value.map((field, idx) => (
-                <Collapse size="small" key={field.id || field.tempId || `field-${idx}`}>
+                <Collapse
+                    size="small"
+                    key={field.id || field.tempId || `field-${idx}`}
+                    defaultActiveKey={field.tempId}
+                >
                     <Panel
                         key={field.id || field.tempId || `field-${idx}`}
                         header={

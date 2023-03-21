@@ -1,7 +1,6 @@
 'use client'
 
 import set from 'lodash.set'
-
 import {
     Button,
     Card,
@@ -9,6 +8,7 @@ import {
     Collapse,
     DatePicker,
     Divider,
+    Dropdown,
     FloatButton,
     Input,
     InputNumber,
@@ -39,6 +39,7 @@ import SlugEdit from '~/components/SlugEdit'
 import { ContainerFieldType } from '@prisma/client'
 import { Options } from '~/types'
 import { Dayjs } from 'dayjs'
+import { tempId } from '~/utilities'
 
 const { Panel } = Collapse
 const { Text } = Typography
@@ -219,7 +220,7 @@ const CreateContainer = () => {
 
 export default CreateContainer
 
-const containerOptions = [
+const fieldOptions = [
     { label: 'Text', value: ContainerFieldType.STRING },
     { label: 'Date', value: ContainerFieldType.DATE },
     { label: 'Boolean', value: ContainerFieldType.BOOLEAN },
@@ -231,7 +232,7 @@ const containerOptions = [
     { label: 'Video', value: ContainerFieldType.VIDEO },
     { label: 'Content', value: ContainerFieldType.CONTENT },
     { label: 'Option', value: ContainerFieldType.OPTION },
-    { label: 'Wysiwyg', value: ContainerFieldType.RICHTEXT },
+    { label: 'Rich text', value: ContainerFieldType.RICHTEXT },
     { label: 'Color', value: ContainerFieldType.COLOR },
     { label: 'Location', value: ContainerFieldType.LOCATION },
 ]
@@ -243,18 +244,51 @@ interface ContainerFieldsProps {
 }
 
 const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
-    const addField = () =>
+    const addField = (type: ContainerFieldType) =>
         onChange('', [
             ...value,
             {
-                tempId: 'nuber',
+                tempId: tempId(),
                 name: '',
                 required: false,
-                type: ContainerFieldType.STRING,
+                type,
                 multiple: false,
                 options: [],
+                position: value.length,
             },
         ])
+
+    const deleteField = (idx: number) => {
+        const fieldsCopy = [...value]
+        fieldsCopy.splice(idx, 1)
+        onChange('', fieldsCopy)
+    }
+
+    const moveField = (idx: number, direction: 'up' | 'down') => {
+        let fieldsCopy = [...value]
+        const temp = fieldsCopy[idx]!
+        if (direction === 'up') {
+            fieldsCopy[idx] = fieldsCopy[idx + 1]!
+            fieldsCopy[idx + 1] = temp
+
+            fieldsCopy[idx]!.position = fieldsCopy[idx]!.position - 1
+            fieldsCopy[idx + 1]!.position = fieldsCopy[idx + 1]!.position + 1
+        } else {
+            fieldsCopy[idx] = fieldsCopy[idx - 1]!
+            fieldsCopy[idx - 1] = temp
+
+            fieldsCopy[idx]!.position = fieldsCopy[idx]!.position + 1
+            fieldsCopy[idx - 1]!.position = fieldsCopy[idx - 1]!.position - 1
+        }
+
+        onChange('', fieldsCopy)
+    }
+
+    const items = fieldOptions.map((e) => ({
+        label: e.label,
+        key: e.value,
+        onClick: () => addField(e.value),
+    }))
 
     return (
         <Space direction="vertical" style={{ width: '100%' }}>
@@ -264,49 +298,73 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
                         key={field.id || field.tempId || `field-${idx}`}
                         header={
                             <Space>
-                                <Text strong>{field.type || 'New'} field: </Text>
+                                <Text strong>
+                                    {fieldOptions.find((e) => e.value === field.type)?.label} field:{' '}
+                                    {field.position}
+                                </Text>
                                 <Text>{field.name}</Text>
                             </Space>
                         }
                         extra={
                             <Popover
                                 placement="bottom"
-                                arrow={false}
                                 content={
                                     <Space direction="vertical">
                                         <Button
                                             size="small"
                                             disabled={idx === 0}
-                                            onClick={(e) => e.stopPropagation()}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                moveField(idx, 'up')
+                                            }}
                                             icon={<CaretUpOutlined />}
                                             type="primary"
                                         />
                                         <Button
                                             size="small"
                                             disabled={idx === value.length - 1}
-                                            onClick={(e) => e.stopPropagation()}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                moveField(idx, 'down')
+                                            }}
                                             icon={<CaretDownOutlined />}
                                             type="primary"
                                         />
                                         <Divider style={{ margin: 0 }} />
 
-                                        <Popconfirm
-                                            placement="left"
-                                            title="Delete the task"
-                                            description="Are you sure to delete this task?"
-                                            onConfirm={(e) => e?.stopPropagation()}
-                                            onCancel={(e) => e?.stopPropagation()}
-                                            okText="Delete"
-                                            cancelText="Cancel"
-                                        >
+                                        {field.id ? (
+                                            <Popconfirm
+                                                placement="left"
+                                                title="Delete the field ?"
+                                                description="The data from releated contents will be lost."
+                                                onConfirm={(e) => {
+                                                    e?.stopPropagation()
+                                                    deleteField(idx)
+                                                }}
+                                                onCancel={(e) => e?.stopPropagation()}
+                                                okText="Delete"
+                                                cancelText="Cancel"
+                                            >
+                                                <Button
+                                                    size="small"
+                                                    icon={<DeleteOutlined />}
+                                                    danger
+                                                    type="primary"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
+                                            </Popconfirm>
+                                        ) : (
                                             <Button
                                                 size="small"
                                                 icon={<DeleteOutlined />}
                                                 danger
                                                 type="primary"
-                                                onClick={(e) => e.stopPropagation()}
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    deleteField(idx)
+                                                }}
                                             />
-                                        </Popconfirm>
+                                        )}
                                     </Space>
                                 }
                                 trigger="click"
@@ -364,19 +422,6 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
                                 <Row gutter={[16, 16]}>
                                     <Col span={12}>
                                         <Space direction="vertical" size={3} style={{ width: '100%' }}>
-                                            <Text type="secondary">Type :</Text>
-                                            <Select
-                                                size="small"
-                                                style={{ width: '100%' }}
-                                                value={field.type}
-                                                disabled={!!field.id}
-                                                options={containerOptions}
-                                                onChange={(e) => onChange(`${idx}.type`, e)}
-                                            />
-                                        </Space>
-                                    </Col>
-                                    <Col span={12}>
-                                        <Space direction="vertical" size={3} style={{ width: '100%' }}>
                                             {field.type === ContainerFieldType.CONTENT && (
                                                 <>
                                                     <Text type="secondary">Content :</Text>
@@ -386,7 +431,7 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
                                                         style={{ width: '100%' }}
                                                         value={field.type}
                                                         disabled={!!field.id}
-                                                        options={containerOptions}
+                                                        options={[]}
                                                         onChange={(e) => onChange(`${idx}.type`, e)}
                                                     />
                                                     <Text type="danger">Title is required</Text>
@@ -529,9 +574,11 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
                 </Collapse>
             ))}
 
-            <Button size="small" type="primary" icon={<PlusOutlined />} onClick={addField}>
-                Add field
-            </Button>
+            <Dropdown menu={{ items }}>
+                <Button size="small" type="primary" icon={<PlusOutlined />}>
+                    Add field
+                </Button>
+            </Dropdown>
         </Space>
     )
 }

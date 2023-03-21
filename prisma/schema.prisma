@@ -396,6 +396,8 @@ model ContainerField {
   id Int @id @default(autoincrement())
 
   type ContainerFieldType
+
+  position Int
 }
 
 // MEDIAS

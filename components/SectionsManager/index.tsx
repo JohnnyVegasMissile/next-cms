@@ -4,18 +4,7 @@ import { PlusOutlined, PicCenterOutlined } from '@ant-design/icons'
 import SectionCreation from '~/types/sectionCreation'
 import blocks, { BlockKey } from '~/blocks'
 import { SectionsContext } from '~/hooks/useSection'
-
-function tempId() {
-    let result = ''
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    const charactersLength = characters.length
-    let counter = 0
-    while (counter < 5) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength))
-        counter += 1
-    }
-    return result
-}
+import { tempId } from '~/utilities'
 
 interface SectionsManagerProps {
     name: string

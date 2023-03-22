@@ -4,19 +4,15 @@ import set from 'lodash.set'
 import {
     Button,
     Card,
+    Checkbox,
     Col,
     Collapse,
-    DatePicker,
     Divider,
     Dropdown,
-    FloatButton,
     Input,
-    InputNumber,
     Popconfirm,
-    Popover,
     Radio,
     Row,
-    Select,
     Space,
     Switch,
     Tooltip,
@@ -26,20 +22,20 @@ import { Typography } from 'antd'
 import {
     PlusOutlined,
     EllipsisOutlined,
-    CaretUpOutlined,
-    CaretDownOutlined,
     DeleteOutlined,
     PicCenterOutlined,
     PicLeftOutlined,
     CheckOutlined,
+    InfoCircleOutlined,
 } from '@ant-design/icons'
 import MetadatasList from '~/components/MetadatasList'
 import ContainerCreation from '~/types/containerCreation'
 import SlugEdit from '~/components/SlugEdit'
 import { ContainerFieldType } from '@prisma/client'
 import { Options } from '~/types'
-import { Dayjs } from 'dayjs'
 import { tempId } from '~/utilities'
+import PopOptions from '~/components/PopOptions'
+import WithLabel from '~/components/WithLabel'
 
 const { Panel } = Collapse
 const { Text } = Typography
@@ -75,7 +71,9 @@ const validate = (values: ContainerCreation) => {
     return errors
 }
 
-const CreateContainer = () => {
+const CreateContainer = ({ params }: any) => {
+    const { containerId } = params
+    const isUpdate = containerId !== 'create'
     const formik = useFormik({
         initialValues,
         validate,
@@ -95,46 +93,52 @@ const CreateContainer = () => {
 
     return (
         <>
-            <Tooltip title="Save container">
-                <FloatButton
-                    shape="circle"
-                    type="primary"
-                    style={{ right: 50 }}
-                    icon={<CheckOutlined />}
-                    onClick={() => formik.handleSubmit()}
-                />
-            </Tooltip>
-            <Card
-                bordered={false}
-                size="small"
-                title="Information"
-                extra={
+            <Card size="small">
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Text strong>Create new container</Text>
+
                     <Space>
-                        <Button icon={<PicCenterOutlined />} key="1" size="small" type="dashed">
-                            Custom sections
-                        </Button>
-                        <Popconfirm
-                            placement="bottom"
-                            title="Save before?"
-                            description="If you don't your changes won't be saved"
-                            // onConfirm={confirm}
-                            // onCancel={cancel}
-                            okText="Save before"
-                            cancelText="Without saving"
+                        {isUpdate && (
+                            <>
+                                <Button icon={<PicCenterOutlined />} key="1" size="small" type="dashed">
+                                    Custom sections
+                                </Button>
+
+                                <Popconfirm
+                                    placement="bottom"
+                                    title="Save before?"
+                                    description="If you don't your changes won't be saved"
+                                    // onConfirm={confirm}
+                                    // onCancel={cancel}
+                                    okText="Save before"
+                                    cancelText="Without saving"
+                                >
+                                    <Button icon={<PicLeftOutlined />} key="2" size="small" type="dashed">
+                                        Custom template sections
+                                    </Button>
+                                </Popconfirm>
+                            </>
+                        )}
+
+                        <Button
+                            type="primary"
+                            icon={<CheckOutlined />}
+                            size="small"
+                            onClick={() => formik.handleSubmit()}
+                            // loading={submit.isLoading}
                         >
-                            <Button icon={<PicLeftOutlined />} key="2" size="small" type="dashed">
-                                Custom template sections
-                            </Button>
-                        </Popconfirm>
+                            {isUpdate ? 'Update page' : 'Create new'}
+                        </Button>
                     </Space>
-                }
-            >
+                </div>
+            </Card>
+
+            <Card bordered={false} size="small" title="Information">
                 <Row gutter={[16, 16]}>
                     <Col span={16}>
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <Space direction="vertical" size={3} style={{ width: '100%' }}>
-                                    <Text type="secondary">Name :</Text>
+                                <WithLabel label="Name :" error={formik.errors.name}>
                                     <Input
                                         size="small"
                                         status={!!formik.errors.name ? 'error' : undefined}
@@ -143,12 +147,10 @@ const CreateContainer = () => {
                                         value={formik.values.name}
                                         onChange={formik.handleChange}
                                     />
-                                    <Text type="danger">{formik.errors.name}</Text>
-                                </Space>
+                                </WithLabel>
                             </Col>
                             <Col span={12}>
-                                <Space direction="vertical" size={3} style={{ flex: 1, width: '100%' }}>
-                                    <Text type="secondary">Published :</Text>
+                                <WithLabel label="Published :">
                                     <Radio.Group
                                         name="published"
                                         value={formik.values.published}
@@ -158,21 +160,19 @@ const CreateContainer = () => {
                                             { label: 'Unpublished', value: false },
                                         ]}
                                     />
-                                </Space>
+                                </WithLabel>
                             </Col>
                         </Row>
 
                         <Divider style={{ margin: '1rem', width: '97%', minWidth: '97%' }} />
 
-                        <Space direction="vertical" size={3} style={{ width: '100%' }}>
-                            <Text type="secondary">URL :</Text>
+                        <WithLabel label="URL :" error={(formik.errors.slug as string[])?.find((e) => !!e)}>
                             <SlugEdit
                                 value={formik.values.slug}
                                 onChange={(e) => formik.setFieldValue('slug', e)}
                                 errors={formik.errors.slug as string[]}
                             />
-                            <Text type="danger">{(formik.errors.slug as string[])?.find((e) => !!e)}</Text>
-                        </Space>
+                        </WithLabel>
                     </Col>
                     <Col span={8}>
                         <Card size="small" title="Container metadatas" style={{ minHeight: '100%' }}>
@@ -293,11 +293,25 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
     return (
         <Space direction="vertical" style={{ width: '100%' }}>
             {value.map((field, idx) => (
-                <Collapse size="small" key={field.id || field.tempId || `field-${idx}`}>
+                <Collapse
+                    size="small"
+                    key={field.id || field.tempId || `field-${idx}`}
+                    defaultActiveKey={field.tempId}
+                >
                     <Panel
                         key={field.id || field.tempId || `field-${idx}`}
                         header={
                             <Space>
+                                <div onClick={(e) => e.stopPropagation()}>
+                                    <Switch
+                                        size="small"
+                                        disabled={!!field.id}
+                                        checked={field.multiple}
+                                        onChange={(e) => onChange(`${idx}.multiple`, e)}
+                                        checkedChildren="Multiple"
+                                        unCheckedChildren="Single"
+                                    />
+                                </div>
                                 <Text strong>
                                     {fieldOptions.find((e) => e.value === field.type)?.label} field:{' '}
                                     {field.position}
@@ -306,79 +320,47 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
                             </Space>
                         }
                         extra={
-                            <Popover
-                                placement="bottom"
-                                content={
-                                    <Space direction="vertical">
-                                        <Button
-                                            size="small"
-                                            disabled={idx === 0}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                moveField(idx, 'up')
-                                            }}
-                                            icon={<CaretUpOutlined />}
-                                            type="primary"
-                                        />
-                                        <Button
-                                            size="small"
-                                            disabled={idx === value.length - 1}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                moveField(idx, 'down')
-                                            }}
-                                            icon={<CaretDownOutlined />}
-                                            type="primary"
-                                        />
-                                        <Divider style={{ margin: 0 }} />
-
-                                        {field.id ? (
-                                            <Popconfirm
-                                                placement="left"
-                                                title="Delete the field ?"
-                                                description="The data from releated contents will be lost."
-                                                onConfirm={(e) => {
-                                                    e?.stopPropagation()
-                                                    deleteField(idx)
-                                                }}
-                                                onCancel={(e) => e?.stopPropagation()}
-                                                okText="Delete"
-                                                cancelText="Cancel"
-                                            >
-                                                <Button
-                                                    size="small"
-                                                    icon={<DeleteOutlined />}
-                                                    danger
-                                                    type="primary"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                />
-                                            </Popconfirm>
-                                        ) : (
-                                            <Button
-                                                size="small"
-                                                icon={<DeleteOutlined />}
-                                                danger
-                                                type="primary"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    deleteField(idx)
-                                                }}
-                                            />
-                                        )}
-                                    </Space>
-                                }
-                                trigger="click"
+                            <PopOptions
+                                onUp={() => moveField(idx, 'up')}
+                                disableUp={idx === 0}
+                                onDown={() => moveField(idx, 'down')}
+                                disableDown={idx === value.length - 1}
+                                onDelete={() => deleteField(idx)}
+                                alert={!!field.id}
                             >
-                                <Button
-                                    type="ghost"
-                                    onClick={(e) => e.stopPropagation()}
-                                    size="small"
-                                    icon={<EllipsisOutlined />}
-                                />
-                            </Popover>
+                                <Button type="ghost" size="small" icon={<EllipsisOutlined />} />
+                            </PopOptions>
                         }
                     >
                         <Row gutter={[16, 16]}>
+                            <Col span={12}>
+                                <WithLabel
+                                    label={
+                                        <Space>
+                                            <Text type="secondary">Name :</Text>
+
+                                            <Switch
+                                                size="small"
+                                                checked={field.required}
+                                                onChange={(e) => onChange(`${idx}.required`, e)}
+                                                checkedChildren="Required"
+                                                unCheckedChildren="Optional"
+                                            />
+                                        </Space>
+                                    }
+                                    error="Name is required"
+                                >
+                                    <Input
+                                        size="small"
+                                        status="error"
+                                        style={{ width: '100%' }}
+                                        value={field.name}
+                                        onChange={(e) => onChange(`${idx}.name`, e.target.value)}
+                                    />
+                                </WithLabel>
+                            </Col>
+                        </Row>
+                        {/* <Row gutter={[16, 16]}>
                             <Col span={16}>
                                 <Row gutter={[16, 16]}>
                                     <Col span={12}>
@@ -482,13 +464,6 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
 
                                 <Space style={{ width: '100%' }}>
                                     <Text type="secondary">Multiple :</Text>
-                                    <Switch
-                                        size="small"
-                                        checked={field.multiple}
-                                        onChange={(e) => onChange(`${idx}.multiple`, e)}
-                                        checkedChildren="Yes"
-                                        unCheckedChildren="No"
-                                    />
                                 </Space>
                                 <Row gutter={[16, 16]}>
                                     {field.multiple && (
@@ -557,19 +532,19 @@ const ContainerFields = ({ value, onChange, errors }: ContainerFieldsProps) => {
                                     </Card>
                                 </Col>
                             )}
-                        </Row>
+                        </Row> */}
 
-                        <Space direction="vertical">
+                        {/* <Space direction="vertical">
                             <Space></Space>
 
                             <Space>
-                                {/* <Space direction="vertical" size={3} style={{ flex: 1 }}>
+                                <Space direction="vertical" size={3} style={{ flex: 1 }}>
                   <Text type="secondary">Title :</Text>
                   <Input size="small" status="error" style={{ width: 172 }} />
                   <Text type="danger">Title is required</Text>
-                </Space> */}
+                </Space>
                             </Space>
-                        </Space>
+                        </Space> */}
                     </Panel>
                 </Collapse>
             ))}
@@ -595,52 +570,61 @@ const OptionList = ({ value, onChange }: OptionListProps) => {
     // const onRemove = () => {}
 
     return (
-        <Space style={{ width: '100%' }} direction="vertical">
-            {!!value.length && (
-                <div style={{ display: 'flex' }}>
-                    <Text type="secondary" style={{ width: 'calc(50% - 12px)' }}>
-                        Label:
-                    </Text>
-                    <Text type="secondary">Value:</Text>
-                </div>
-            )}
+        <Checkbox.Group onChange={(e) => console.log(e)}>
+            <Space style={{ width: '100%' }} direction="vertical">
+                {!!value.length && (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Tooltip title="Default value">
+                            <InfoCircleOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />
+                        </Tooltip>
+                        <Text type="secondary" style={{ marginLeft: 12, width: 'calc(50% - 24px)' }}>
+                            Label:
+                        </Text>
+                        <Text type="secondary">Value:</Text>
+                    </div>
+                )}
 
-            {value.map((option, idx) => {
-                // const onLabelChange = () => {}
+                {value.map((option, idx) => {
+                    // const onLabelChange = () => {}
 
-                // const onValueChange = () => {}
+                    // const onValueChange = () => {}
 
-                return (
-                    <Input.Group key={idx} compact style={{ width: '100%' }}>
-                        <Input
-                            size="small"
-                            style={{ width: 'calc(50% - 12px)' }}
-                            value={option.label}
-                            // onChange={onChange}
-                            // status={errors?.[idx] ? "error" : undefined}
-                        />
-                        <Input
-                            size="small"
-                            style={{ width: 'calc(50% - 12px)' }}
-                            value={option.value}
-                            // onChange={onChange}
-                            // status={errors?.[idx] ? "error" : undefined}
-                        />
-                        <Button
-                            size="small"
-                            type="primary"
-                            danger
-                            icon={<DeleteOutlined />}
-                            // onClick={() => handleRemove(idx)}
-                        />
-                    </Input.Group>
-                )
-            })}
+                    return (
+                        <Space key={idx}>
+                            <Checkbox value={option.value || idx} />
+                            {/* <Radio /> */}
+                            <Input.Group compact style={{ width: '100%' }}>
+                                <Input
+                                    size="small"
+                                    style={{ width: 'calc(50% - 12px)' }}
+                                    value={option.label}
+                                    // onChange={onChange}
+                                    // status={errors?.[idx] ? "error" : undefined}
+                                />
+                                <Input
+                                    size="small"
+                                    style={{ width: 'calc(50% - 12px)' }}
+                                    value={option.value}
+                                    // onChange={onChange}
+                                    // status={errors?.[idx] ? "error" : undefined}
+                                />
+                                <Button
+                                    size="small"
+                                    type="primary"
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                    // onClick={() => handleRemove(idx)}
+                                />
+                            </Input.Group>
+                        </Space>
+                    )
+                })}
 
-            <Button size="small" type="primary" icon={<PlusOutlined />} onClick={onAdd}>
-                Add option
-            </Button>
-        </Space>
+                <Button size="small" type="primary" icon={<PlusOutlined />} onClick={onAdd}>
+                    Add option
+                </Button>
+            </Space>
+        </Checkbox.Group>
     )
 }
 

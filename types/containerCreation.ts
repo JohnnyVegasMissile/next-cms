@@ -8,7 +8,7 @@ type ContainerCreation = {
     slug: string[]
     metadatas: Metadata[]
     contentsMetadatas: Metadata[]
-    fields: ContainerField[]
+    fields: ContainerFieldCreation[]
 }
 
 type Metadata = {
@@ -16,7 +16,7 @@ type Metadata = {
     content: string | string[]
 }
 
-type ContainerField = {
+export type ContainerFieldCreation = {
     id?: ObjectId
     tempId?: string
     name: string

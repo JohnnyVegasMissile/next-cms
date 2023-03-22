@@ -12,6 +12,7 @@ import { getPage, postPages, updatePage } from '~/network/pages'
 import { useMutation } from '@tanstack/react-query'
 import { Metadata, Page, Slug } from '@prisma/client'
 import { useEffect } from 'react'
+import WithLabel from '~/components/WithLabel'
 
 const { Text } = Typography
 
@@ -128,8 +129,7 @@ const CreatePage = ({ params }: any) => {
                     <Card bordered={false} size="small" title="Information">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <Space direction="vertical" size={3} style={{ width: '100%' }}>
-                                    <Text type="secondary">Name :</Text>
+                                <WithLabel label="Name :" error={formik.errors.name}>
                                     <Input
                                         size="small"
                                         status={!!formik.errors.name ? 'error' : undefined}
@@ -138,12 +138,10 @@ const CreatePage = ({ params }: any) => {
                                         value={formik.values.name}
                                         onChange={formik.handleChange}
                                     />
-                                    <Text type="danger">{formik.errors.name}</Text>
-                                </Space>
+                                </WithLabel>
                             </Col>
                             <Col span={12}>
-                                <Space direction="vertical" size={3} style={{ flex: 1, width: '100%' }}>
-                                    <Text type="secondary">Published :</Text>
+                                <WithLabel label="Published :">
                                     <Radio.Group
                                         name="published"
                                         value={formik.values.published}
@@ -153,21 +151,19 @@ const CreatePage = ({ params }: any) => {
                                             { label: 'Unpublished', value: false },
                                         ]}
                                     />
-                                </Space>
+                                </WithLabel>
                             </Col>
                         </Row>
 
                         <Divider style={{ margin: '1rem', width: '97%', minWidth: '97%' }} />
 
-                        <Space direction="vertical" size={3} style={{ width: '100%' }}>
-                            <Text type="secondary">URL :</Text>
+                        <WithLabel label="URL :" error={(formik.errors.slug as string[])?.find((e) => !!e)}>
                             <SlugEdit
                                 value={formik.values.slug}
                                 onChange={(e) => formik.setFieldValue('slug', e)}
                                 errors={formik.errors.slug as string[]}
                             />
-                            <Text type="danger">{(formik.errors.slug as string[])?.find((e) => !!e)}</Text>
-                        </Space>
+                        </WithLabel>
                     </Card>
                 </Col>
                 <Col span={8}>

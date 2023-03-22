@@ -1,6 +1,6 @@
 'use client'
 
-import { Section, SectionType, SettingType } from '@prisma/client'
+import { Section, SettingType } from '@prisma/client'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { FloatButton, Spin, message } from 'antd'
 import {
@@ -219,7 +219,6 @@ const PageSections = ({ params }: any) => {
                         sections={formik.values.sidebar}
                         onChange={formik.setFieldValue}
                         error={formik.errors.sidebar}
-                        type={SectionType.PAGE_SIDEBAR}
                     />
                 </aside>
             )}
@@ -229,7 +228,6 @@ const PageSections = ({ params }: any) => {
                     sections={formik.values.content}
                     onChange={formik.setFieldValue}
                     error={formik.errors.content}
-                    type={SectionType.PAGE}
                 />
             </div>
             <FloatButton.Group

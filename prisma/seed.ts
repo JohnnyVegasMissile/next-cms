@@ -1,44 +1,22 @@
-import { Login, PageType, PrismaClient, RightType, SettingType } from '@prisma/client'
+import { PageType, PrismaClient, SettingType } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
-    let superAdminId: number | undefined
-    const superAdmins = await prisma.role.findMany({
-        where: { superUser: true },
+    const root = await prisma.login.findFirst({
+        where: { root: true },
     })
 
-    if (!superAdmins.length) {
-        const newRole = await prisma.role.create({
-            data: {
-                superUser: true,
-                name: 'Super Admin',
-                // rights: {
-                //     create: Object.keys(RightType).map((key) => ({ rightType: key as RightType })),
-                // },
-                rights: Object.keys(RightType).map((key) => key as RightType),
-            },
-        })
-
-        superAdminId = newRole.id
-    } else {
-        superAdminId = superAdmins[0]?.id
-    }
-
-    const admins: Login[] = await prisma.login.findMany({
-        where: { roleId: superAdminId },
-    })
-
-    if (!admins.length) {
-        const hash = await bcrypt.hash('root', 10)
+    if (!root) {
+        const hash = await bcrypt.hash(process.env['ROOT_USER_PASS'] || 'root', 10)
 
         await prisma.user.create({
             data: {
-                name: 'root',
+                name: process.env['ROOT_USER_NAME'] || 'root',
                 login: {
                     create: {
-                        roleId: superAdminId!,
-                        email: 'root',
+                        root: true,
+                        email: process.env['ROOT_USER_MAIL'] || 'root',
                         password: hash,
                     },
                 },

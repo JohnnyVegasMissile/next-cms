@@ -47,7 +47,7 @@ export async function PUT(request: NextRequest, context: any) {
             const created = await prisma.section.create({
                 data: {
                     pageId: parseInt(pageId),
-                    type: section.type,
+                    type: SectionType.PAGE,
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
                     content: section.content,
@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest, context: any) {
             const created = await prisma.section.create({
                 data: {
                     pageId: parseInt(pageId),
-                    type: section.type,
+                    type: SectionType.PAGE_SIDEBAR,
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
                     content: section.content,
@@ -88,7 +88,9 @@ export async function PUT(request: NextRequest, context: any) {
         }
     }
 
-    await prisma.section.deleteMany({ where: { id: { notIn: [...content, ...sidebar].map((e) => e.id) } } })
+    await prisma.section.deleteMany({
+        where: { id: { notIn: [...content, ...sidebar].map((e) => e.id) }, pageId },
+    })
 
     // NextResponse extends the Web Response API
     return NextResponse.json({ content })

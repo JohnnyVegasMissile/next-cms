@@ -1,4 +1,3 @@
-import { SectionType } from '@prisma/client'
 import { Button, Dropdown } from 'antd'
 import { PlusOutlined, PicCenterOutlined } from '@ant-design/icons'
 import SectionCreation from '~/types/sectionCreation'
@@ -11,10 +10,9 @@ interface SectionsManagerProps {
     sections: SectionCreation[]
     onChange: (name: string, value: any) => void
     error: any
-    type: SectionType
 }
 
-const SectionsManager = ({ name, sections, onChange, error, type }: SectionsManagerProps) => {
+const SectionsManager = ({ name, sections, onChange, error }: SectionsManagerProps) => {
     const items = [
         {
             key: 'elements',
@@ -34,7 +32,6 @@ const SectionsManager = ({ name, sections, onChange, error, type }: SectionsMana
                         ...sections,
                         {
                             tempId: tempId(),
-                            type,
                             block: key as BlockKey,
                             position: sections.length,
                             content: blocks?.[key as BlockKey]?.default

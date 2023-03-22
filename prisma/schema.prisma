@@ -18,6 +18,10 @@ model User {
   name  String?
   login Login?
 
+  createdPages      Page[]
+  createdContainers Container[]
+  createdContents   Content[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -28,8 +32,10 @@ model Login {
   userId   Int       @unique
   user     User      @relation(fields: [userId], references: [id])
   sessions Session[]
-  roleId   Int
-  role     Role      @relation(fields: [roleId], references: [id])
+  roleId   Int?
+  role     Role?     @relation(fields: [roleId], references: [id])
+
+  root Boolean @default(false)
 
   email    String @unique
   password String
@@ -61,40 +67,47 @@ model Role {
   limitFileUpload  Int?
   limitVideoUpload Int?
 
-  superUser Boolean @default(false)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 enum RightType {
-  VIEW_PAGE
+  VIEW_ALL_PAGE
+  VIEW_MY_PAGE
   CREATE_PAGE
-  UPDATE_PAGE
+  UPDATE_ALL_PAGE
+  UPDATE_MY_PAGE
   DELETE_PAGE
   UPDATE_PAGE_SECTION
 
-  VIEW_CONTAINER
+  VIEW_ALL_CONTAINER
+  VIEW_MY_CONTAINER
   CREATE_CONTAINER
-  UPDATE_CONTAINER
+  UPDATE_ALL_CONTAINER
+  UPDATE_MY_CONTAINER
   DELETE_CONTAINER
   UPDATE_CONTAINER_SECTION
   UPDATE_CONTAINER_TEMPLATE_SECTION
 
-  VIEW_CONTENT
+  VIEW_ALL_CONTENT
+  VIEW_MY_CONTENT
   CREATE_CONTENT
-  UPDATE_CONTENT
+  UPDATE_ALL_CONTENT
+  UPDATE_MY_CONTENT
   DELETE_CONTENT
   UPDATE_CONTENT_SECTION
 
-  VIEW_MEDIA
+  VIEW_ALL_MEDIA
+  VIEW_MY_MEDIA
   UPLOAD_MEDIA
   UPDATE_MEDIA
   DELETE_MEDIA
 
-  VIEW_FORM
+  VIEW_ALL_FORM
+  VIEW_MY_FORM
   CREATE_FORM
-  UPDATE_FORM
+  UPDATE_ALL_FORM
+  UPDATE_MY_FORM
   DELETE_FORM
 
   VIEW_MESSAGE
@@ -263,7 +276,7 @@ model Slug {
   // childs   Slug[] @relation(name: "childs")
 
   pageId Int?  @unique
-  page   Page? @relation(fields: [pageId], references: [id])
+  page   Page? @relation(fields: [pageId], references: [id], onDelete: Cascade)
   // containerId String?    @unique
   // container   Container? @relation(fields: [containerId], references: [id])
   // contentId   String?    @unique
@@ -280,12 +293,12 @@ model Metadata {
   name    String
   content String
 
-  pageId Int?
-  page   Page? @relation(fields: [pageId], references: [id])
-  // containerId   String?
-  // container     Container? @relation(fields: [containerId], references: [id], name: "metadatas", onDelete: Cascade)
-  // contentId     String?
-  // contentLinked Content?   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  LinkedPageId      Int?
+  LinkedPage        Page?      @relation(fields: [LinkedPageId], references: [id], onDelete: Cascade)
+  LinkedContainerId Int?
+  LinkedContainer   Container? @relation(fields: [LinkedContainerId], references: [id], onDelete: Cascade)
+  LinkedContentId   Int?
+  LinkedContent     Content?   @relation(fields: [LinkedContentId], references: [id], onDelete: Cascade)
 }
 
 // SECTIONS
@@ -325,8 +338,8 @@ model Section {
   content Json
 
   // Element releated
-  pageId     Int?
-  pageLinked Page? @relation(fields: [pageId], references: [id])
+  pageId Int?
+  page   Page? @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   // Linked data
   medias LinkedToSection[]
@@ -336,11 +349,11 @@ model LinkedToSection {
   id Int @id @default(autoincrement())
 
   sectionId Int
-  section   Section @relation(fields: [sectionId], references: [id])
+  section   Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   mediaId   Int?
-  media     Media?  @relation(fields: [mediaId], references: [id])
+  media     Media?  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   formId    Int?
-  form      Form?   @relation(fields: [formId], references: [id])
+  form      Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   @@unique([sectionId, mediaId])
 }
@@ -369,11 +382,27 @@ model Page {
 
   published Boolean @default(true)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdByUserId Int?
+  createdBy       User?    @relation(fields: [createdByUserId], references: [id])
 }
 
 // CONTAINERS
+
+model Container {
+  id Int @id @default(autoincrement())
+
+  fields   ContainerField[]
+  metadata Metadata[]
+
+  contents Content[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdByUserId Int?
+  createdBy       User?    @relation(fields: [createdByUserId], references: [id])
+}
 
 enum ContainerFieldType {
   STRING
@@ -395,9 +424,60 @@ enum ContainerFieldType {
 model ContainerField {
   id Int @id @default(autoincrement())
 
-  type ContainerFieldType
+  containerId Int
+  container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
 
   position Int
+  type     ContainerFieldType
+  multiple Boolean
+
+  defaultTextValue           String?
+  defaultMultipleTextValue   String[]
+  defaultNumberValue         Float?
+  defaultMultipleNumberValue Float[]
+  defaultDateValue           DateTime?
+  defaultMultipleDateValue   DateTime[]
+
+  releatedFields ContentField[]
+}
+
+// CONTENTS
+
+model Content {
+  id Int @id @default(autoincrement())
+
+  containerId Int
+  container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
+
+  fields    ContentField[]
+  metadatas Metadata[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdByUserId Int?
+  createdBy       User?    @relation(fields: [createdByUserId], references: [id])
+}
+
+model ContentField {
+  id Int @id @default(autoincrement())
+
+  contentId Int
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  // Copy from parent field
+  position Int
+  type     ContainerFieldType
+  multiple Boolean
+
+  releatedFieldId Int
+  releatedField   ContainerField @relation(fields: [releatedFieldId], references: [id], onDelete: Cascade)
+
+  textValue           String?
+  multipleTextValue   String[]
+  numberValue         Float?
+  multipleNumberValue Float[]
+  dateValue           DateTime?
+  multipleDateValue   DateTime[]
 }
 
 // MEDIAS

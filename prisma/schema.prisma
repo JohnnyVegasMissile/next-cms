@@ -431,12 +431,24 @@ model ContainerField {
   type     ContainerFieldType
   multiple Boolean
 
+  metadata String[]
+
+  min Int?
+  max Int?
+
+  startDate DateTime?
+  endDate   DateTime?
+  valueMin  Float?
+  valueMax  Float?
+
   defaultTextValue           String?
   defaultMultipleTextValue   String[]
   defaultNumberValue         Float?
   defaultMultipleNumberValue Float[]
   defaultDateValue           DateTime?
   defaultMultipleDateValue   DateTime[]
+  defaultJSON                Json?
+  defaultMultipleJSON        Json[]
 
   releatedFields ContentField[]
 }

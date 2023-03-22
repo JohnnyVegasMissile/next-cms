@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Card, Divider, Input, Select, Space, Typography } from 'antd'
+import { Button, Card, Col, Divider, Input, Row, Select, Space, Typography } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons'
 import MenuLine from '~/components/MenuLine'
 import { useFormik } from 'formik'
@@ -56,6 +56,25 @@ const CreateMenu = () => {
 
     return (
         <Card bordered={false} title="Menu" size="small">
+            <Row gutter={[16, 16]}>
+                <Col span={16}>
+                    <Space direction="vertical" size={3} style={{ flex: 1, width: '100%' }}>
+                        <Text type="secondary">name :</Text>
+                        <Input
+                            size="small"
+                            // status={!!formik.errors.title ? "error" : undefined}
+                            style={{ width: '100%' }}
+                            name="title"
+                            // value={formik.values.title}
+                            // onChange={formik.handleChange}
+                        />
+                        {/* <Text type="danger">{formik.errors.title}</Text> */}
+                    </Space>
+                </Col>
+                <Col span={8}>
+                    <Card></Card>
+                </Col>
+            </Row>
             <div style={{ display: 'flex', gap: '1rem' }}>
                 <Space direction="vertical" style={{ flex: 1 }}>
                     <Space direction="vertical" size={3} style={{ flex: 1 }}>

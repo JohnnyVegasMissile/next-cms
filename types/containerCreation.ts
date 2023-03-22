@@ -31,11 +31,20 @@ export type ContainerFieldCreation = {
 
     startDate?: Dayjs
     endDate?: Dayjs
+    valueMin?: number
+    valueMax?: number
 
-    default: string | string[]
+    defaultTextValue: string | undefined
+    defaultMultipleTextValue: string[] | undefined
+    defaultNumberValue: number | undefined
+    defaultMultipleNumberValue: number[] | undefined
+    defaultDateValue: Date | undefined
+    defaultMultipleDateValue: Date[] | undefined
+    defaultJSON: any | undefined
+    defaultMultipleJSON: any[] | undefined
 
     options: Options<string>
-    metadata?: string
+    metadatas: string[]
 }
 
 export default ContainerCreation

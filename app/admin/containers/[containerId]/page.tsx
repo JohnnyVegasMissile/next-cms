@@ -1,27 +1,11 @@
 'use client'
 
 import set from 'lodash.set'
-import {
-    Button,
-    Card,
-    Checkbox,
-    Col,
-    Collapse,
-    Divider,
-    Dropdown,
-    Input,
-    Popconfirm,
-    Radio,
-    Row,
-    Space,
-    Switch,
-    Tooltip,
-} from 'antd'
+import { Button, Card, Checkbox, Col, Divider, Input, Popconfirm, Radio, Row, Space, Tooltip } from 'antd'
 import { useFormik } from 'formik'
 import { Typography } from 'antd'
 import {
     PlusOutlined,
-    EllipsisOutlined,
     DeleteOutlined,
     PicCenterOutlined,
     PicLeftOutlined,
@@ -33,12 +17,9 @@ import ContainerCreation from '~/types/containerCreation'
 import SlugEdit from '~/components/SlugEdit'
 import { ContainerFieldType } from '@prisma/client'
 import { Options } from '~/types'
-import { tempId } from '~/utilities'
-import PopOptions from '~/components/PopOptions'
 import WithLabel from '~/components/WithLabel'
 import ContainerFieldsManager from '~/components/ContainerFieldsManager'
 
-const { Panel } = Collapse
 const { Text } = Typography
 
 const initialValues: ContainerCreation = {

@@ -38,8 +38,8 @@ export type ContainerFieldCreation = {
     defaultMultipleTextValue: string[] | undefined
     defaultNumberValue: number | undefined
     defaultMultipleNumberValue: number[] | undefined
-    defaultDateValue: Date | undefined
-    defaultMultipleDateValue: Date[] | undefined
+    defaultDateValue: Dayjs | undefined
+    defaultMultipleDateValue: Dayjs[] | undefined
     defaultJSON: any | undefined
     defaultMultipleJSON: any[] | undefined
 

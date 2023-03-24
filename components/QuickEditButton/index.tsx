@@ -1,13 +1,13 @@
 'use client'
 
-import { Affix, Button, Input } from 'antd'
+import { Affix, Button, Space } from 'antd'
 import { ContainerOutlined, ReloadOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 
 const QuickEditButton = () => {
     return (
         <Affix offsetTop={37} style={{ position: 'absolute', right: 5, top: 37 }}>
-            <Input.Group compact>
+            <Space.Compact size="small" style={{ width: '100%' }}>
                 <Button size="small" type="primary">
                     <Link href="/">Edit</Link>
                 </Button>
@@ -17,7 +17,7 @@ const QuickEditButton = () => {
                     </Link>
                 </Button>
                 <Button size="small" type="primary" icon={<ReloadOutlined />} />
-            </Input.Group>
+            </Space.Compact>
         </Affix>
     )
 }

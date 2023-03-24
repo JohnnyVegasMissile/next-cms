@@ -144,7 +144,7 @@ const EditAlt = ({ id, alt }: { id: ObjectId; alt: string | null }) => {
 
     return (
         <Form.Item hasFeedback validateStatus={validateStatus} style={{ margin: 0, width: 350 }}>
-            <Input.Group compact>
+            <Space.Compact size="small" style={{ width: '100%' }}>
                 <Input
                     size="small"
                     style={{ width: 'calc(100% - 48px)' }}
@@ -166,7 +166,7 @@ const EditAlt = ({ id, alt }: { id: ObjectId; alt: string | null }) => {
                     size="small"
                     onClick={() => mutation.mutate(newAlt)}
                 />
-            </Input.Group>
+            </Space.Compact>
         </Form.Item>
     )
 }

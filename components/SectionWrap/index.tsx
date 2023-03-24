@@ -33,7 +33,7 @@ const SectionWrap = ({ children, panel }: SectionWrapProps) => {
                 </Drawer>
             )}
             <div style={{ position: 'relative' }}>
-                <Input.Group compact className={styles['buttons-wrap']}>
+                <Space.Compact size="small" className={styles['buttons-wrap']}>
                     <Popover
                         placement="bottom"
                         content={
@@ -76,7 +76,7 @@ const SectionWrap = ({ children, panel }: SectionWrapProps) => {
                         <Button size="small" type="primary" icon={<SettingOutlined />} />
                     </Popover>
                     {!!panel && <Button size="small" onClick={() => setOpen(true)} icon={<MenuOutlined />} />}
-                </Input.Group>
+                </Space.Compact>
 
                 {children}
             </div>

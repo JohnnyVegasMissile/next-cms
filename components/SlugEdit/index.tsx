@@ -1,4 +1,4 @@
-import { Button, Input } from 'antd'
+import { Button, Input, Space } from 'antd'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import { Fragment } from 'react'
 
@@ -46,7 +46,7 @@ const SlugEdit = ({ value, onChange, errors }: SlugEditProps) => {
             {value.map((slug, idx) => (
                 <Fragment key={idx}>
                     {idx === lastSlugIndex && (
-                        <Input.Group compact style={{ width: 'fit-content' }}>
+                        <Space.Compact size="small" style={{ width: 'fit-content' }}>
                             <Button
                                 size="small"
                                 onClick={removeSlug}
@@ -60,7 +60,7 @@ const SlugEdit = ({ value, onChange, errors }: SlugEditProps) => {
                                 onClick={addSlug}
                                 disabled={value.length > MAX_SLUG_SIZE}
                             />
-                        </Input.Group>
+                        </Space.Compact>
                     )}
                     <Input
                         size="small"

@@ -301,7 +301,10 @@ const Settings = () => {
                                                 <Card title="Options" size="small">
                                                     <Space style={{ width: '100%' }} direction="vertical">
                                                         <Space style={{ width: '100%' }}>
-                                                            <Input.Group compact>
+                                                            <Space.Compact
+                                                                size="small"
+                                                                style={{ width: '100%' }}
+                                                            >
                                                                 <Input
                                                                     size="small"
                                                                     style={{ width: 'calc(50% - 24px /2)' }}
@@ -318,7 +321,7 @@ const Settings = () => {
                                                                     type="primary"
                                                                     danger
                                                                 />
-                                                            </Input.Group>
+                                                            </Space.Compact>
                                                         </Space>
                                                         <Button
                                                             size="small"
@@ -348,7 +351,7 @@ const Settings = () => {
                                                             Max :
                                                         </Text>
                                                     </div>
-                                                    <Input.Group compact>
+                                                    <Space.Compact size="small" style={{ width: '100%' }}>
                                                         <InputNumber
                                                             size="small"
                                                             style={{ width: '50%' }}
@@ -360,7 +363,7 @@ const Settings = () => {
                                                             style={{ width: '50%' }}
                                                             placeholder="Max"
                                                         />
-                                                    </Input.Group>
+                                                    </Space.Compact>
                                                 </Space>
                                             </Col>
                                             <Col span={8}>

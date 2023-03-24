@@ -237,7 +237,7 @@ const OptionList = ({ value, onChange }: OptionListProps) => {
                         <Space key={idx}>
                             <Checkbox value={option.value || idx} />
                             {/* <Radio /> */}
-                            <Input.Group compact style={{ width: '100%' }}>
+                            <Space.Compact size="small" style={{ width: '100%' }}>
                                 <Input
                                     size="small"
                                     style={{ width: 'calc(50% - 12px)' }}
@@ -259,7 +259,7 @@ const OptionList = ({ value, onChange }: OptionListProps) => {
                                     icon={<DeleteOutlined />}
                                     // onClick={() => handleRemove(idx)}
                                 />
-                            </Input.Group>
+                            </Space.Compact>
                         </Space>
                     )
                 })}

@@ -64,7 +64,7 @@ const MetadatasList = ({ name, value, onChange, errors }: MetadatasListProps) =>
                 </div>
             )}
             {value.map((meta, idx) => (
-                <Input.Group key={`${name}-${idx}`} compact style={{ width: '100%' }}>
+                <Space.Compact key={`${name}-${idx}`} size="small" style={{ width: '100%' }}>
                     <Select
                         size="small"
                         style={{ width: '30%' }}
@@ -109,7 +109,7 @@ const MetadatasList = ({ name, value, onChange, errors }: MetadatasListProps) =>
                         icon={<DeleteOutlined />}
                         onClick={() => handleRemove(idx)}
                     />
-                </Input.Group>
+                </Space.Compact>
             ))}
 
             <Button

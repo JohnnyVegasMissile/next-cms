@@ -97,9 +97,18 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                                     onChange={(e) =>
                                         onChange(`defaultMultipleTextValue.${idx}`, e.target.value)
                                     }
+                                    onKeyDown={(e) => {
+                                        console.log('e')
+                                        if (e.code === 'Enter' && !(e.target as any).value) {
+                                            const copyTexts = [...field.defaultMultipleTextValue!]
+                                            copyTexts.splice(idx, 1)
+                                            onChange('defaultMultipleTextValue', copyTexts)
+                                        }
+                                    }}
                                 />
                             ))}
                             <Input
+                                key="new"
                                 allowClear
                                 size="small"
                                 placeholder="+ Add new value"
@@ -115,6 +124,15 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                                     }
                                 }}
                                 onChange={(e) => setNewValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.code === 'Enter') {
+                                        onChange(
+                                            `defaultMultipleTextValue.${field.defaultMultipleTextValue?.length}`,
+                                            newValue
+                                        )
+                                        setNewValue('')
+                                    }
+                                }}
                             />
                         </Space>
                     </Card>
@@ -165,7 +183,7 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                                 </div>
                             }
                         >
-                            <Input.Group compact>
+                            <Space.Compact size="small" style={{ width: '100%' }}>
                                 <InputNumber
                                     min={field.required ? 1 : undefined}
                                     max={field.max}
@@ -181,7 +199,7 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                                     value={field.max}
                                     onChange={(e) => onChange('max', e)}
                                 />
-                            </Input.Group>
+                            </Space.Compact>
                         </WithLabel>
                     </Col>
                     <Col span={12} />

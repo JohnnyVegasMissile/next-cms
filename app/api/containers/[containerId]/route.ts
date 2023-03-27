@@ -1,26 +1,27 @@
 /* eslint-disable @next/next/no-server-import-in-page */
+import { ContainerField } from '@prisma/client'
 import { NextResponse, NextRequest } from 'next/server'
 import { ObjectId } from '~/types'
-import PageCreation from '~/types/pageCreation'
+import ContainerCreation from '~/types/containerCreation'
 import { prisma } from '~/utilities/prisma'
 
 export async function GET(_: NextRequest, context: any) {
-    const { pageId } = context.params
+    const { containerId } = context.params
 
-    const page = await prisma.page.findUnique({
-        where: { id: parseInt(pageId) },
-        include: { slug: true, metadatas: true },
+    const page = await prisma.container.findUnique({
+        where: { id: parseInt(containerId) },
+        include: { slug: true, metadatas: true, fields: true },
     })
 
-    if (!page) NextResponse.json({ message: "Container doesn't exist" }, { status: 404 })
+    if (!page) NextResponse.json({ message: "Page doesn't exist" }, { status: 404 })
 
     // NextResponse extends the Web Response API
     return NextResponse.json(page)
 }
 
 export async function PUT(request: Request, context: any) {
-    const { pageId } = context.params
-    const { name, slug, published, metadatas } = (await request.json()) as PageCreation
+    const { containerId } = context.params
+    const { name, slug, published, metadatas, fields } = (await request.json()) as ContainerCreation<Date>
 
     if (typeof name !== 'string') NextResponse.json({ message: 'Name not valid' }, { status: 400 })
     if (!Array.isArray(slug)) NextResponse.json({ message: 'Slug not valid.' }, { status: 400 })
@@ -44,7 +45,7 @@ export async function PUT(request: Request, context: any) {
         } else {
             await prisma.metadata.create({
                 data: {
-                    linkedPageId: parseInt(pageId),
+                    linkedPageId: parseInt(containerId),
                     content: Array.isArray(metadata.content) ? metadata.content.join(', ') : metadata.content,
                     name: metadata.name,
                 },
@@ -52,8 +53,33 @@ export async function PUT(request: Request, context: any) {
         }
     }
 
-    const page = await prisma.page.update({
-        where: { id: parseInt(pageId) },
+    const updatedFields: ContainerField[] = []
+
+    for (const field of fields) {
+        if (field.id) {
+            const modified = await prisma.containerField.update({
+                where: {
+                    id: parseInt(field.id as unknown as string),
+                },
+                data: field,
+            })
+
+            updatedFields.push(modified)
+        } else {
+            const created = await prisma.containerField.create({
+                data: { ...field, containerId: parseInt(containerId) },
+            })
+
+            updatedFields.push(created)
+        }
+    }
+
+    await prisma.containerField.deleteMany({
+        where: { id: { notIn: [...updatedFields].map((e) => e.id) }, containerId },
+    })
+
+    const container = await prisma.container.update({
+        where: { id: parseInt(containerId) },
         data: {
             name,
             published,
@@ -64,9 +90,9 @@ export async function PUT(request: Request, context: any) {
                 },
             },
         },
-        include: { slug: true, metadatas: true },
+        include: { slug: true, metadatas: true, fields: true },
     })
 
     // NextResponse extends the Web Response API
-    return NextResponse.json(page)
+    return NextResponse.json(container)
 }

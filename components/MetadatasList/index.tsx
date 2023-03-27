@@ -55,7 +55,7 @@ const MetadatasList = ({ name, value, onChange, errors }: MetadatasListProps) =>
 
     return (
         <Space style={{ width: '100%' }} direction="vertical">
-            {!!value.length && (
+            {!!value?.length && (
                 <div style={{ display: 'flex' }}>
                     <Text type="secondary" style={{ width: '30%' }}>
                         Type:
@@ -63,7 +63,7 @@ const MetadatasList = ({ name, value, onChange, errors }: MetadatasListProps) =>
                     <Text type="secondary">Value:</Text>
                 </div>
             )}
-            {value.map((meta, idx) => (
+            {value?.map((meta, idx) => (
                 <Space.Compact key={`${name}-${idx}`} size="small" style={{ width: '100%' }}>
                     <Select
                         size="small"

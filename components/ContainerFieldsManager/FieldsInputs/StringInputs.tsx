@@ -6,7 +6,7 @@ import metadataTypes from '~/utilities/metadataTypes'
 
 const { Text } = Typography
 
-const StringInputs = ({ field, onChange }: FieldInputsProps) => {
+const StringInputs = ({ field, errors, onChange }: FieldInputsProps) => {
     const [newValue, setNewValue] = useState('')
     useEffect(() => {
         if (field.multiple) {
@@ -22,6 +22,7 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
         <Row gutter={[16, 16]}>
             <Col span={12}>
                 <WithLabel
+                    error={errors?.name}
                     label={
                         <Space>
                             <Text type="secondary">Name :</Text>
@@ -35,38 +36,16 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                             />
                         </Space>
                     }
-                    error="Name is required"
                 >
                     <Input
                         size="small"
-                        status="error"
+                        status={!!errors?.name ? 'error' : undefined}
                         style={{ width: '100%' }}
                         value={field.name}
                         onChange={(e) => onChange('name', e.target.value)}
                     />
                 </WithLabel>
             </Col>
-            {/* <Col span={12}>
-                <WithLabel label="Default :">
-                    {field.multiple ? (
-                        <Select
-                            mode="tags"
-                            size="small"
-                            options={field.defaultMultipleTextValue?.map((e) => ({ value: e }))}
-                            style={{ width: '100%' }}
-                            value={field.defaultMultipleTextValue}
-                            onChange={(e) => onChange('defaultMultipleTextValue', e)}
-                        />
-                    ) : (
-                        <Input
-                            size="small"
-                            style={{ width: '100%' }}
-                            value={field.defaultTextValue}
-                            onChange={(e) => onChange('defaultTextValue', e.target.value)}
-                        />
-                    )}
-                </WithLabel>
-            </Col> */}
 
             <Col span={12}>
                 {field.multiple ? (
@@ -117,7 +96,9 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                                 onBlur={() => {
                                     if (!!newValue) {
                                         onChange(
-                                            `defaultMultipleTextValue.${field.defaultMultipleTextValue?.length}`,
+                                            `defaultMultipleTextValue.${
+                                                field.defaultMultipleTextValue?.length || 0
+                                            }`,
                                             newValue
                                         )
                                         setNewValue('')
@@ -127,7 +108,9 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                                 onKeyDown={(e) => {
                                     if (e.code === 'Enter') {
                                         onChange(
-                                            `defaultMultipleTextValue.${field.defaultMultipleTextValue?.length}`,
+                                            `defaultMultipleTextValue.${
+                                                field.defaultMultipleTextValue?.length || 0
+                                            }`,
                                             newValue
                                         )
                                         setNewValue('')
@@ -185,7 +168,8 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                         >
                             <Space.Compact size="small" style={{ width: '100%' }}>
                                 <InputNumber
-                                    min={field.required ? 1 : undefined}
+                                    precision={0}
+                                    min={1}
                                     max={field.max}
                                     size="small"
                                     style={{ width: '50%' }}
@@ -193,7 +177,8 @@ const StringInputs = ({ field, onChange }: FieldInputsProps) => {
                                     onChange={(e) => onChange('min', e)}
                                 />
                                 <InputNumber
-                                    min={field.min}
+                                    precision={0}
+                                    min={field.min || 2}
                                     size="small"
                                     style={{ width: '50%' }}
                                     value={field.max}

@@ -1,5 +1,4 @@
 import { ContainerFieldCreation } from '~/types/containerCreation'
-import BooleanInputs from './BooleanInputs'
 import ColorInputs from './ColorInputs'
 import ContentInputs from './ContentInputs'
 import DateInputs from './DateInputs'
@@ -12,9 +11,11 @@ import ParagraphInputs from './ParagraphInputs'
 import RichTextInputs from './RichTextInputs'
 import StringInputs from './StringInputs'
 import VideoInputs from './VideoInputs'
+import { Dayjs } from 'dayjs'
 
 export interface FieldInputsProps {
-    field: ContainerFieldCreation
+    field: ContainerFieldCreation<Dayjs>
+    errors: any | undefined
     onChange(name: string, value: any): void
 }
 
@@ -22,7 +23,6 @@ const FieldInputs = ({}: FieldInputsProps) => <></>
 
 FieldInputs.STRING = StringInputs
 FieldInputs.DATE = DateInputs
-FieldInputs.BOOLEAN = BooleanInputs
 FieldInputs.NUMBER = NumberInputs
 FieldInputs.LINK = LinkInputs
 FieldInputs.PARAGRAPH = ParagraphInputs

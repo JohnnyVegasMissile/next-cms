@@ -9,7 +9,7 @@ type PageCreation = {
 
 type Metadata = {
     id?: ObjectId
-    name: 'description' | 'keywords' | 'author' | 'viewport' | string
+    name: string
     content: string | string[]
 }
 

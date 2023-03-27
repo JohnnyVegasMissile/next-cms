@@ -17,10 +17,13 @@ import { useEffect } from 'react'
 import metadataTypes from '~/utilities/metadataTypes'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+
+dayjs.extend(customParseFormat)
 
 const { Text } = Typography
 
-const DateInputs = ({ field, onChange }: FieldInputsProps) => {
+const DateInputs = ({ field, errors, onChange }: FieldInputsProps) => {
     useEffect(() => {
         if (field.multiple) {
             if (field.defaultDateValue) {
@@ -35,20 +38,23 @@ const DateInputs = ({ field, onChange }: FieldInputsProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [field.multiple])
 
+    const errorMultiDefault = errors?.defaultMultipleDateValue?.find((e: string) => !!e)
+
     const disabledDate: RangePickerProps['disabledDate'] = (current) => {
-        if (!current || (!field.startDate && !field.endDate)) return true
+        if (!current || (!field.startDate && !field.endDate)) return false
 
-        if (!field.startDate) return current > field.endDate!.endOf('day')
+        if (!field.startDate) return current.startOf('day') > field.endDate!.startOf('day')
 
-        if (!field.endDate) return current < field.startDate.endOf('day')
+        if (!field.endDate) return current.endOf('day') < field.startDate.endOf('day')
 
-        return current > field.startDate.endOf('day') && current < field.endDate.endOf('day')
+        return !(field.startDate.startOf('day') < current && current < field.endDate.endOf('day'))
     }
 
     return (
         <Row gutter={[16, 16]}>
             <Col span={12}>
                 <WithLabel
+                    error={errors?.name}
                     label={
                         <Space>
                             <Text type="secondary">Name :</Text>
@@ -62,11 +68,10 @@ const DateInputs = ({ field, onChange }: FieldInputsProps) => {
                             />
                         </Space>
                     }
-                    error="Name is required"
                 >
                     <Input
                         size="small"
-                        status="error"
+                        status={!!errors?.name ? 'error' : undefined}
                         style={{ width: '100%' }}
                         value={field.name}
                         onChange={(e) => onChange('name', e.target.value)}
@@ -86,8 +91,9 @@ const DateInputs = ({ field, onChange }: FieldInputsProps) => {
                         <Space direction="vertical" style={{ width: '100%' }}>
                             {field.defaultMultipleDateValue?.map((date, idx) => (
                                 <DatePicker
-                                    placeholder="Date"
                                     key={idx}
+                                    status={!!errors?.defaultMultipleDateValue?.[idx] ? 'error' : undefined}
+                                    placeholder="Date"
                                     allowClear
                                     size="small"
                                     style={{ width: '100%' }}
@@ -104,6 +110,7 @@ const DateInputs = ({ field, onChange }: FieldInputsProps) => {
                                     disabledDate={disabledDate}
                                 />
                             ))}
+                            {!!errorMultiDefault && <Text type="danger">{errorMultiDefault}</Text>}
                             <DatePicker
                                 key={field.defaultMultipleDateValue?.length}
                                 placeholder="+ Add new value"
@@ -123,9 +130,10 @@ const DateInputs = ({ field, onChange }: FieldInputsProps) => {
                         </Space>
                     </Card>
                 ) : (
-                    <WithLabel label="Default :">
+                    <WithLabel label="Default :" error={errors?.defaultDateValue}>
                         <DatePicker
                             size="small"
+                            status={!!errors?.defaultDateValue ? 'error' : undefined}
                             style={{ width: '100%' }}
                             value={field.defaultDateValue}
                             onChange={(e) => onChange('defaultDateValue', e)}
@@ -169,9 +177,9 @@ const DateInputs = ({ field, onChange }: FieldInputsProps) => {
                             value={field.startDate}
                             onChange={(e) => onChange('startDate', e)}
                             disabledDate={(current) => {
-                                if (!current || !field.endDate) return true
+                                if (!current || !field.endDate) return false
 
-                                return current < field.endDate.endOf('day')
+                                return current > field.endDate.endOf('day')
                             }}
                         />
                         <DatePicker
@@ -180,9 +188,9 @@ const DateInputs = ({ field, onChange }: FieldInputsProps) => {
                             value={field.endDate}
                             onChange={(e) => onChange('endDate', e)}
                             disabledDate={(current) => {
-                                if (!current || !field.startDate) return true
+                                if (!current || !field.startDate) return false
 
-                                return current > field.startDate.endOf('day')
+                                return current < field.startDate.startOf('day')
                             }}
                         />
                     </Space.Compact>
@@ -211,16 +219,18 @@ const DateInputs = ({ field, onChange }: FieldInputsProps) => {
                         >
                             <Space.Compact size="small" style={{ width: '100%' }}>
                                 <InputNumber
-                                    size="small"
-                                    min={field.required ? 1 : undefined}
+                                    precision={0}
+                                    min={1}
                                     max={field.max}
+                                    size="small"
                                     style={{ width: '50%' }}
                                     value={field.min}
                                     onChange={(e) => onChange('min', e)}
                                 />
                                 <InputNumber
+                                    precision={0}
+                                    min={field.min || 2}
                                     size="small"
-                                    min={field.min}
                                     style={{ width: '50%' }}
                                     value={field.max}
                                     onChange={(e) => onChange('max', e)}

@@ -1,7 +1,21 @@
 'use client'
 
-import set from 'lodash.set'
-import { Button, Card, Checkbox, Col, Divider, Input, Popconfirm, Radio, Row, Space, Tooltip } from 'antd'
+import dayjs, { Dayjs } from 'dayjs'
+import {
+    Button,
+    Card,
+    Checkbox,
+    Col,
+    Divider,
+    Input,
+    Popconfirm,
+    Radio,
+    Row,
+    Space,
+    Spin,
+    Tooltip,
+    message,
+} from 'antd'
 import { useFormik } from 'formik'
 import { Typography } from 'antd'
 import {
@@ -12,17 +26,24 @@ import {
     CheckOutlined,
     InfoCircleOutlined,
 } from '@ant-design/icons'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import MetadatasList from '~/components/MetadatasList'
-import ContainerCreation from '~/types/containerCreation'
+import ContainerCreation, { ContainerFieldCreation } from '~/types/containerCreation'
 import SlugEdit from '~/components/SlugEdit'
-import { ContainerFieldType } from '@prisma/client'
 import { Options } from '~/types'
 import WithLabel from '~/components/WithLabel'
 import ContainerFieldsManager from '~/components/ContainerFieldsManager'
+import validate from './validate'
+import { useMutation } from '@tanstack/react-query'
+import { ContainerResponse, getContainer, postContainer, updateContainer } from '~/network/containers'
+import { useEffect } from 'react'
+import { ContainerFieldType } from '@prisma/client'
+
+dayjs.extend(customParseFormat)
 
 const { Text } = Typography
 
-const initialValues: ContainerCreation = {
+const initialValues: ContainerCreation<Dayjs> = {
     name: '',
     published: true,
     slug: [''],
@@ -31,26 +52,78 @@ const initialValues: ContainerCreation = {
     fields: [],
 }
 
-const validate = (values: ContainerCreation) => {
-    let errors: any = {}
+const cleanDetails = (container: ContainerResponse): ContainerCreation<Dayjs> => ({
+    ...container,
+    slug: container?.slug?.basic.split('/') || [''],
+})
 
-    if (!values.name) {
-        errors.name = 'Required'
+const cleanBeforeSend = (values: ContainerCreation<Dayjs>) => {
+    let cleanValues = { ...values }
+    const fields: ContainerFieldCreation<Dayjs>[] = []
+
+    for (const field of cleanValues.fields) {
+        let defaultValue: any = {}
+
+        switch (field.type) {
+            case ContainerFieldType.RICHTEXT:
+            case ContainerFieldType.COLOR:
+            case ContainerFieldType.CONTENT:
+            case ContainerFieldType.VIDEO:
+            case ContainerFieldType.FILE:
+            case ContainerFieldType.IMAGE:
+            case ContainerFieldType.PARAGRAPH:
+            case ContainerFieldType.STRING: {
+                if (field.multiple) {
+                    defaultValue.defaultMultipleTextValue = field.defaultMultipleTextValue
+                } else {
+                    defaultValue.defaultTextValue = field.defaultTextValue
+                }
+                break
+            }
+
+            case ContainerFieldType.NUMBER: {
+                if (field.multiple) {
+                    defaultValue.defaultMultipleNumberValue = field.defaultMultipleNumberValue
+                } else {
+                    defaultValue.defaultNumberValue = field.defaultNumberValue
+                }
+                break
+            }
+
+            case ContainerFieldType.DATE: {
+                if (field.multiple) {
+                    defaultValue.defaultMultipleDateValue = field.defaultMultipleDateValue
+                } else {
+                    defaultValue.defaultDateValue = field.defaultDateValue
+                }
+                break
+            }
+
+            case ContainerFieldType.LOCATION:
+            case ContainerFieldType.OPTION:
+            case ContainerFieldType.LINK: {
+                if (field.multiple) {
+                    defaultValue.defaultMultipleJSON = field.defaultMultipleJSONValue
+                } else {
+                    defaultValue.defaultJSONValue = field.defaultJSONValue
+                }
+                break
+            }
+        }
+
+        fields.push({
+            id: field.id,
+            name: field.name,
+            required: !!field.required,
+            type: field.type,
+            multiple: !!field.multiple,
+            position: field.position,
+            metadatas: field.metadatas,
+            ...defaultValue,
+        })
     }
 
-    for (let i = 0; i < values.slug.length; i++) {
-        if (!values.slug[i]) set(errors, `slug.${i}`, 'Required')
-    }
-
-    for (let i = 0; i < values.metadatas.length; i++) {
-        if (!values.metadatas[i]?.content) set(errors, `metadatas.${i}`, 'Required')
-    }
-
-    for (let i = 0; i < values.contentsMetadatas.length; i++) {
-        if (!values.contentsMetadatas[i]?.content) set(errors, `contentsMetadatas.${i}`, 'Required')
-    }
-
-    return errors
+    return { ...cleanValues, fields }
 }
 
 const CreateContainer = ({ params }: any) => {
@@ -62,16 +135,31 @@ const CreateContainer = ({ params }: any) => {
         validateOnChange: false,
         validateOnBlur: false,
         validateOnMount: false,
-        onSubmit: (values) => {
-            alert(JSON.stringify(values, null, 2))
-        },
+        onSubmit: (values) => submit.mutate(values),
     })
 
-    // const options = [
-    //   { label: "Apple", value: "Apple" },
-    //   { label: "Pear", value: "Pear" },
-    //   { label: "Orange", value: "Orange" },
-    // ];
+    const details = useMutation(() => getContainer(containerId), {
+        onSuccess: (data) => formik.setValues(cleanDetails(data)),
+    })
+    const submit = useMutation(
+        (values: ContainerCreation<Dayjs>) =>
+            isUpdate
+                ? updateContainer(containerId, cleanBeforeSend(values))
+                : postContainer(cleanBeforeSend(values)),
+        {
+            onSuccess: () => message.success(`Container ${isUpdate ? 'modified' : 'created'} with success.`),
+            onError: () => message.error('Something went wrong, try again later.'),
+        }
+    )
+
+    useEffect(() => {
+        if (isUpdate) details.mutate()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    if (details.isLoading) {
+        return <Spin />
+    }
 
     return (
         <>
@@ -107,7 +195,7 @@ const CreateContainer = ({ params }: any) => {
                             icon={<CheckOutlined />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
-                            // loading={submit.isLoading}
+                            loading={submit.isLoading}
                         >
                             {isUpdate ? 'Update page' : 'Create new'}
                         </Button>
@@ -270,16 +358,4 @@ const OptionList = ({ value, onChange }: OptionListProps) => {
             </Space>
         </Checkbox.Group>
     )
-}
-
-interface DefaultFieldProps<T> {
-    type: ContainerFieldType
-    multiple: boolean
-    value: T
-    onChange(value: T): void
-    options?: Options<T>
-}
-
-const DefaultField = <T,>({}: DefaultFieldProps<T>) => {
-    return <Input disabled size="small" style={{ width: '100%' }} />
 }

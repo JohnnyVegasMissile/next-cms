@@ -6,6 +6,7 @@ import { ContainerFieldType } from '@prisma/client'
 import { tempId } from '~/utilities'
 import PopOptions from '~/components/PopOptions'
 import FieldInputs from './FieldsInputs'
+import { Dayjs } from 'dayjs'
 
 const { Panel } = Collapse
 const { Text } = Typography
@@ -13,7 +14,6 @@ const { Text } = Typography
 const fieldOptions = [
     { label: 'Text', value: ContainerFieldType.STRING },
     { label: 'Date', value: ContainerFieldType.DATE },
-    { label: 'Boolean', value: ContainerFieldType.BOOLEAN },
     { label: 'Number', value: ContainerFieldType.NUMBER },
     { label: 'Link', value: ContainerFieldType.LINK },
     { label: 'Paragraph', value: ContainerFieldType.PARAGRAPH },
@@ -28,9 +28,9 @@ const fieldOptions = [
 ]
 
 interface ContainerFieldsProps {
-    value: ContainerCreation['fields']
+    value: ContainerCreation<Dayjs>['fields']
     onChange(name: string, value: any): void
-    errors: any[]
+    errors: any[] | undefined
 }
 
 const ContainerFieldsManager = ({ value, onChange, errors }: ContainerFieldsProps) => {
@@ -43,7 +43,6 @@ const ContainerFieldsManager = ({ value, onChange, errors }: ContainerFieldsProp
                 required: false,
                 type,
                 multiple: false,
-                options: [],
                 position: value.length,
                 metadatas: [],
             },
@@ -128,6 +127,7 @@ const ContainerFieldsManager = ({ value, onChange, errors }: ContainerFieldsProp
                     >
                         <ContainerFields
                             field={field}
+                            errors={errors?.[idx]}
                             onChange={(name, value) => onChange(`${idx}.${name}`, value)}
                         />
                     </Panel>
@@ -144,7 +144,8 @@ const ContainerFieldsManager = ({ value, onChange, errors }: ContainerFieldsProp
 }
 
 interface ContainerFieldProps {
-    field: ContainerFieldCreation
+    field: ContainerFieldCreation<Dayjs>
+    errors: any
     onChange(name: string, value: any): void
 }
 

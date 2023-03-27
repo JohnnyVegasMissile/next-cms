@@ -14,7 +14,7 @@ const WithLabel = ({ label, children, error }: WithLabelProps) => {
         <Space direction="vertical" style={{ width: '100%' }}>
             {typeof label === 'string' ? <Text type="secondary">{label}</Text> : label}
             {children}
-            {!!error && <Text type="danger">Name is required</Text>}
+            {!!error && <Text type="danger">{error}</Text>}
         </Space>
     )
 }

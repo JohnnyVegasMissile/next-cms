@@ -275,10 +275,10 @@ model Slug {
   // parent   Slug?  @relation(fields: [parentId], references: [id], name: "childs")
   // childs   Slug[] @relation(name: "childs")
 
-  pageId Int?  @unique
-  page   Page? @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  // containerId String?    @unique
-  // container   Container? @relation(fields: [containerId], references: [id])
+  pageId      Int?       @unique
+  page        Page?      @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  containerId Int?       @unique
+  container   Container? @relation(fields: [containerId], references: [id], onDelete: Cascade)
   // contentId   String?    @unique
   // content     Content?   @relation(fields: [contentId], references: [id])
 
@@ -293,12 +293,15 @@ model Metadata {
   name    String
   content String
 
-  LinkedPageId      Int?
-  LinkedPage        Page?      @relation(fields: [LinkedPageId], references: [id], onDelete: Cascade)
-  LinkedContainerId Int?
-  LinkedContainer   Container? @relation(fields: [LinkedContainerId], references: [id], onDelete: Cascade)
-  LinkedContentId   Int?
-  LinkedContent     Content?   @relation(fields: [LinkedContentId], references: [id], onDelete: Cascade)
+  linkedPageId      Int?
+  linkedPage        Page?      @relation(fields: [linkedPageId], references: [id], onDelete: Cascade)
+  linkedContainerId Int?
+  linkedContainer   Container? @relation(fields: [linkedContainerId], references: [id], onDelete: Cascade, name: "containerMetadatas")
+  linkedContentId   Int?
+  linkedContent     Content?   @relation(fields: [linkedContentId], references: [id], onDelete: Cascade)
+
+  containerTemplateId Int?
+  containerTemplate   Container? @relation(fields: [containerTemplateId], references: [id], onDelete: Cascade, name: "contentsMetadatas")
 }
 
 // SECTIONS
@@ -393,10 +396,15 @@ model Page {
 model Container {
   id Int @id @default(autoincrement())
 
-  fields   ContainerField[]
-  metadata Metadata[]
+  name              String
+  slug              Slug?
+  fields            ContainerField[]
+  metadatas         Metadata[]       @relation(name: "containerMetadatas")
+  contentsMetadatas Metadata[]       @relation(name: "contentsMetadatas")
 
   contents Content[]
+
+  published Boolean @default(true)
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -408,7 +416,6 @@ enum ContainerFieldType {
   STRING
   NUMBER
   DATE
-  BOOLEAN
   LINK
   PARAGRAPH
   IMAGE
@@ -424,14 +431,12 @@ enum ContainerFieldType {
 model ContainerField {
   id Int @id @default(autoincrement())
 
-  containerId Int
-  container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
-
-  position Int
-  type     ContainerFieldType
-  multiple Boolean
-
-  metadata String[]
+  name      String
+  required  Boolean
+  type      ContainerFieldType
+  multiple  Boolean
+  position  Int
+  metadatas String[]
 
   min Int?
   max Int?
@@ -447,10 +452,13 @@ model ContainerField {
   defaultMultipleNumberValue Float[]
   defaultDateValue           DateTime?
   defaultMultipleDateValue   DateTime[]
-  defaultJSON                Json?
-  defaultMultipleJSON        Json[]
+  defaultJSONValue           Json?
+  defaultMultipleJSONValue   Json[]
 
   releatedFields ContentField[]
+
+  containerId Int
+  container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
 }
 
 // CONTENTS

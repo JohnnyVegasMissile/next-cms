@@ -1,22 +1,22 @@
 import type { ContainerFieldType } from '@prisma/client'
-import { ObjectId, Options } from '.'
-import { Dayjs } from 'dayjs'
+import { ObjectId } from '.'
 
-type ContainerCreation = {
+type ContainerCreation<T> = {
     name: string
     published: boolean
     slug: string[]
     metadatas: Metadata[]
     contentsMetadatas: Metadata[]
-    fields: ContainerFieldCreation[]
+    fields: ContainerFieldCreation<T>[]
 }
 
 type Metadata = {
-    name: 'description' | 'keywords' | 'author' | 'viewport'
+    id?: ObjectId
+    name: string
     content: string | string[]
 }
 
-export type ContainerFieldCreation = {
+export type ContainerFieldCreation<T> = {
     id?: ObjectId
     tempId?: string
     name: string
@@ -24,13 +24,13 @@ export type ContainerFieldCreation = {
     type: ContainerFieldType
     multiple: boolean
     position: number
+    metadatas: string[]
 
     min?: number
     max?: number
-    containerId?: ObjectId
 
-    startDate?: Dayjs
-    endDate?: Dayjs
+    startDate?: T
+    endDate?: T
     valueMin?: number
     valueMax?: number
 
@@ -38,13 +38,10 @@ export type ContainerFieldCreation = {
     defaultMultipleTextValue: string[] | undefined
     defaultNumberValue: number | undefined
     defaultMultipleNumberValue: number[] | undefined
-    defaultDateValue: Dayjs | undefined
-    defaultMultipleDateValue: Dayjs[] | undefined
-    defaultJSON: any | undefined
-    defaultMultipleJSON: any[] | undefined
-
-    options: Options<string>
-    metadatas: string[]
+    defaultDateValue: T | undefined
+    defaultMultipleDateValue: T[] | undefined
+    defaultJSONValue: any | undefined
+    defaultMultipleJSONValue: any[] | undefined
 }
 
 export default ContainerCreation

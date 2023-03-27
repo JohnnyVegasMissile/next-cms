@@ -6,7 +6,7 @@ import metadataTypes from '~/utilities/metadataTypes'
 
 const { Text } = Typography
 
-const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
+const NumberInputs = ({ field, errors, onChange }: FieldInputsProps) => {
     const [newValue, setNewValue] = useState<number>()
     useEffect(() => {
         if (field.multiple) {
@@ -18,10 +18,13 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [field.multiple])
 
+    const errorMultiDefault = errors?.defaultMultipleNumberValue?.find((e: string) => !!e)
+
     return (
         <Row gutter={[16, 16]}>
             <Col span={12}>
                 <WithLabel
+                    error={errors?.name}
                     label={
                         <Space>
                             <Text type="secondary">Name :</Text>
@@ -35,11 +38,10 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                             />
                         </Space>
                     }
-                    error="Name is required"
                 >
                     <Input
                         size="small"
-                        status="error"
+                        status={!!errors?.name ? 'error' : undefined}
                         style={{ width: '100%' }}
                         value={field.name}
                         onChange={(e) => onChange('name', e.target.value)}
@@ -58,15 +60,18 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                         size="small"
                     >
                         <Space direction="vertical" style={{ width: '100%' }}>
-                            {field.defaultMultipleNumberValue?.map((text, idx) => (
+                            {field.defaultMultipleNumberValue?.map((number, idx) => (
                                 <InputNumber
                                     key={idx}
+                                    min={field.valueMin}
+                                    max={field.valueMax}
+                                    status={!!errors?.defaultMultipleNumberValue?.[idx] ? 'error' : undefined}
                                     size="small"
                                     placeholder="Detault text"
                                     style={{ width: '100%' }}
-                                    value={text}
+                                    value={number}
                                     onBlur={() => {
-                                        if (text === undefined) {
+                                        if (number === undefined || number === null) {
                                             const copyTexts = [...field.defaultMultipleNumberValue!]
                                             copyTexts.splice(idx, 1)
                                             onChange('defaultMultipleNumberValue', copyTexts)
@@ -74,7 +79,7 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                                     }}
                                     onChange={(e) => onChange(`defaultMultipleNumberValue.${idx}`, e)}
                                     onKeyDown={(e) => {
-                                        if (e.code === 'Enter' && !(e.target as any).value === undefined) {
+                                        if (e.code === 'Enter' && (e.target as any).value !== undefined) {
                                             const copyTexts = [...field.defaultMultipleNumberValue!]
                                             copyTexts.splice(idx, 1)
                                             onChange('defaultMultipleNumberValue', copyTexts)
@@ -82,8 +87,11 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                                     }}
                                 />
                             ))}
+                            {!!errorMultiDefault && <Text type="danger">{errorMultiDefault}</Text>}
                             <InputNumber
                                 key="new"
+                                min={field.valueMin}
+                                max={field.valueMax}
                                 size="small"
                                 placeholder="+ Add new value"
                                 style={{ width: '100%' }}
@@ -91,7 +99,9 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                                 onBlur={() => {
                                     if (newValue !== undefined) {
                                         onChange(
-                                            `defaultMultipleNumberValue.${field.defaultMultipleNumberValue?.length}`,
+                                            `defaultMultipleNumberValue.${
+                                                field.defaultMultipleNumberValue?.length || 0
+                                            }`,
                                             newValue
                                         )
                                         setNewValue(undefined)
@@ -99,9 +109,11 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                                 }}
                                 onChange={(e) => setNewValue(e || undefined)}
                                 onKeyDown={(e) => {
-                                    if (e.code === 'Enter') {
+                                    if (e.code === 'Enter' && (e.target as any).value !== undefined) {
                                         onChange(
-                                            `defaultMultipleNumberValue.${field.defaultMultipleNumberValue?.length}`,
+                                            `defaultMultipleNumberValue.${
+                                                field.defaultMultipleNumberValue?.length || 0
+                                            }`,
                                             newValue
                                         )
                                         setNewValue(undefined)
@@ -111,9 +123,10 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                         </Space>
                     </Card>
                 ) : (
-                    <WithLabel label="Default :">
+                    <WithLabel label="Default :" error={errors?.defaultNumberValue}>
                         <InputNumber
                             size="small"
+                            status={!!errors?.defaultNumberValue ? 'error' : undefined}
                             style={{ width: '100%' }}
                             value={field.defaultNumberValue}
                             onChange={(e) => onChange('defaultNumberValue', e)}
@@ -134,6 +147,37 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                         onChange={(e) => onChange('metadatas', e)}
                         options={metadataTypes}
                     />
+                </WithLabel>
+            </Col>
+            <Col span={12}>
+                <WithLabel
+                    label={
+                        <div style={{ display: 'flex' }}>
+                            <Text type="secondary" style={{ flex: 1 }}>
+                                From :
+                            </Text>
+                            <Text type="secondary" style={{ flex: 1 }}>
+                                To :
+                            </Text>
+                        </div>
+                    }
+                >
+                    <Space.Compact size="small" style={{ width: '100%' }}>
+                        <InputNumber
+                            max={field.valueMax}
+                            size="small"
+                            style={{ width: '50%' }}
+                            value={field.valueMin}
+                            onChange={(e) => onChange('valueMin', e)}
+                        />
+                        <InputNumber
+                            min={field.valueMin}
+                            size="small"
+                            style={{ width: '50%' }}
+                            value={field.valueMax}
+                            onChange={(e) => onChange('valueMax', e)}
+                        />
+                    </Space.Compact>
                 </WithLabel>
             </Col>
 
@@ -159,7 +203,8 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                         >
                             <Space.Compact size="small" style={{ width: '100%' }}>
                                 <InputNumber
-                                    min={field.required ? 1 : undefined}
+                                    precision={0}
+                                    min={1}
                                     max={field.max}
                                     size="small"
                                     style={{ width: '50%' }}
@@ -167,7 +212,8 @@ const NumberInputs = ({ field, onChange }: FieldInputsProps) => {
                                     onChange={(e) => onChange('min', e)}
                                 />
                                 <InputNumber
-                                    min={field.min}
+                                    precision={0}
+                                    min={field.min || 2}
                                     size="small"
                                     style={{ width: '50%' }}
                                     value={field.max}

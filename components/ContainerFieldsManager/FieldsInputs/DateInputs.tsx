@@ -15,8 +15,7 @@ import WithLabel from '~/components/WithLabel'
 import { FieldInputsProps } from '.'
 import { useEffect } from 'react'
 import metadataTypes from '~/utilities/metadataTypes'
-import dayjs from 'dayjs'
-import { RangePickerProps } from 'antd/es/date-picker'
+import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 dayjs.extend(customParseFormat)
@@ -40,7 +39,7 @@ const DateInputs = ({ field, errors, onChange }: FieldInputsProps) => {
 
     const errorMultiDefault = errors?.defaultMultipleDateValue?.find((e: string) => !!e)
 
-    const disabledDate: RangePickerProps['disabledDate'] = (current) => {
+    const disabledDate = (current: Dayjs) => {
         if (!current || (!field.startDate && !field.endDate)) return false
 
         if (!field.startDate) return current.startOf('day') > field.endDate!.startOf('day')

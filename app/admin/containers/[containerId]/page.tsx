@@ -1,36 +1,14 @@
 'use client'
 
 import dayjs, { Dayjs } from 'dayjs'
-import {
-    Button,
-    Card,
-    Checkbox,
-    Col,
-    Divider,
-    Input,
-    Popconfirm,
-    Radio,
-    Row,
-    Space,
-    Spin,
-    Tooltip,
-    message,
-} from 'antd'
+import { Button, Card, Col, Divider, Input, Popconfirm, Radio, Row, Space, Spin, message } from 'antd'
 import { useFormik } from 'formik'
 import { Typography } from 'antd'
-import {
-    PlusOutlined,
-    DeleteOutlined,
-    PicCenterOutlined,
-    PicLeftOutlined,
-    CheckOutlined,
-    InfoCircleOutlined,
-} from '@ant-design/icons'
+import { PicCenterOutlined, PicLeftOutlined, CheckOutlined } from '@ant-design/icons'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import MetadatasList from '~/components/MetadatasList'
 import ContainerCreation, { ContainerFieldCreation } from '~/types/containerCreation'
 import SlugEdit from '~/components/SlugEdit'
-import { Options } from '~/types'
 import WithLabel from '~/components/WithLabel'
 import ContainerFieldsManager from '~/components/ContainerFieldsManager'
 import validate from './validate'
@@ -290,72 +268,72 @@ const CreateContainer = ({ params }: any) => {
 
 export default CreateContainer
 
-interface OptionListProps {
-    value: Options<string>
-    onChange(value: Options<string>): void
-    errors: Options<string>
-}
+// interface OptionListProps {
+//     value: Options<string>
+//     onChange(value: Options<string>): void
+//     errors: Options<string>
+// }
 
-const OptionList = ({ value, onChange }: OptionListProps) => {
-    const onAdd = () => onChange([...value, { label: '', value: '' }])
+// const OptionList = ({ value, onChange }: OptionListProps) => {
+//     const onAdd = () => onChange([...value, { label: '', value: '' }])
 
-    // const onRemove = () => {}
+//     // const onRemove = () => {}
 
-    return (
-        <Checkbox.Group onChange={(e) => console.log(e)}>
-            <Space style={{ width: '100%' }} direction="vertical">
-                {!!value.length && (
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Tooltip title="Default value">
-                            <InfoCircleOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />
-                        </Tooltip>
-                        <Text type="secondary" style={{ marginLeft: 12, width: 'calc(50% - 24px)' }}>
-                            Label:
-                        </Text>
-                        <Text type="secondary">Value:</Text>
-                    </div>
-                )}
+//     return (
+//         <Checkbox.Group onChange={(e) => console.log(e)}>
+//             <Space style={{ width: '100%' }} direction="vertical">
+//                 {!!value.length && (
+//                     <div style={{ display: 'flex', alignItems: 'center' }}>
+//                         <Tooltip title="Default value">
+//                             <InfoCircleOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />
+//                         </Tooltip>
+//                         <Text type="secondary" style={{ marginLeft: 12, width: 'calc(50% - 24px)' }}>
+//                             Label:
+//                         </Text>
+//                         <Text type="secondary">Value:</Text>
+//                     </div>
+//                 )}
 
-                {value.map((option, idx) => {
-                    // const onLabelChange = () => {}
+//                 {value.map((option, idx) => {
+//                     // const onLabelChange = () => {}
 
-                    // const onValueChange = () => {}
+//                     // const onValueChange = () => {}
 
-                    return (
-                        <Space key={idx}>
-                            <Checkbox value={option.value || idx} />
-                            {/* <Radio /> */}
-                            <Space.Compact size="small" style={{ width: '100%' }}>
-                                <Input
-                                    size="small"
-                                    style={{ width: 'calc(50% - 12px)' }}
-                                    value={option.label}
-                                    // onChange={onChange}
-                                    // status={errors?.[idx] ? "error" : undefined}
-                                />
-                                <Input
-                                    size="small"
-                                    style={{ width: 'calc(50% - 12px)' }}
-                                    value={option.value}
-                                    // onChange={onChange}
-                                    // status={errors?.[idx] ? "error" : undefined}
-                                />
-                                <Button
-                                    size="small"
-                                    type="primary"
-                                    danger
-                                    icon={<DeleteOutlined />}
-                                    // onClick={() => handleRemove(idx)}
-                                />
-                            </Space.Compact>
-                        </Space>
-                    )
-                })}
+//                     return (
+//                         <Space key={idx}>
+//                             <Checkbox value={option.value || idx} />
+//                             {/* <Radio /> */}
+//                             <Space.Compact size="small" style={{ width: '100%' }}>
+//                                 <Input
+//                                     size="small"
+//                                     style={{ width: 'calc(50% - 12px)' }}
+//                                     value={option.label}
+//                                     // onChange={onChange}
+//                                     // status={errors?.[idx] ? "error" : undefined}
+//                                 />
+//                                 <Input
+//                                     size="small"
+//                                     style={{ width: 'calc(50% - 12px)' }}
+//                                     value={option.value}
+//                                     // onChange={onChange}
+//                                     // status={errors?.[idx] ? "error" : undefined}
+//                                 />
+//                                 <Button
+//                                     size="small"
+//                                     type="primary"
+//                                     danger
+//                                     icon={<DeleteOutlined />}
+//                                     // onClick={() => handleRemove(idx)}
+//                                 />
+//                             </Space.Compact>
+//                         </Space>
+//                     )
+//                 })}
 
-                <Button size="small" type="primary" icon={<PlusOutlined />} onClick={onAdd}>
-                    Add option
-                </Button>
-            </Space>
-        </Checkbox.Group>
-    )
-}
+//                 <Button size="small" type="primary" icon={<PlusOutlined />} onClick={onAdd}>
+//                     Add option
+//                 </Button>
+//             </Space>
+//         </Checkbox.Group>
+//     )
+// }

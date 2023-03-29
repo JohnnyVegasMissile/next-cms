@@ -1,7 +1,7 @@
 'use client'
 
-import { Button, Card, Input, Radio, Select, Space, Table } from 'antd'
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Card, Divider, Input, Radio, Select, Space, Table, Typography } from 'antd'
+import { SearchOutlined, PlusOutlined, CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons'
 import { usePathname } from 'next/navigation'
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useQuery } from '@tanstack/react-query'
@@ -10,6 +10,8 @@ import { useEffect, useState } from 'react'
 import { SorterResult } from 'antd/es/table/interface'
 import { PAGE_SIZE } from '~/utilities/constants'
 import { useRouter, useSearchParams } from 'next/navigation'
+
+const { Text } = Typography
 
 interface AdminTableProps<T> {
     name: string
@@ -27,9 +29,10 @@ interface AdminTableProps<T> {
         options?: { value: string; label: string; icon?: JSX.Element }[]
     }[]
     extra?: React.ReactNode
+    isContent?: boolean
 }
 
-const AdminTable = <T,>({ name, columns, request, filters, extra }: AdminTableProps<T>) => {
+const AdminTable = <T,>({ name, columns, request, filters, extra, isContent }: AdminTableProps<T>) => {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -37,6 +40,9 @@ const AdminTable = <T,>({ name, columns, request, filters, extra }: AdminTablePr
     const [q, setQ] = useState<string>(searchParams?.has('q') ? searchParams.get('q')! : '')
     const [sort, setSort] = useState<`${string},${'asc' | 'desc'}`>()
     const [extraFilters, setExtraFilters] = useState<any>({})
+
+    const [container, setContainer] = useState<number>()
+    const [advancedOpen, setAdvancedOpen] = useState(false)
 
     const results = useQuery([name, { page, q, sort, ...extraFilters }], () =>
         request(page, q, sort, extraFilters)
@@ -169,6 +175,31 @@ const AdminTable = <T,>({ name, columns, request, filters, extra }: AdminTablePr
                                     )
                             }
                         })}
+                        {isContent && (
+                            <>
+                                <Select
+                                    allowClear
+                                    size="small"
+                                    value={container}
+                                    onChange={(e) => {
+                                        setContainer(e)
+
+                                        if (!e) setAdvancedOpen(false)
+                                    }}
+                                    style={{ width: 190 }}
+                                    options={[{ label: 'Container A', value: 1 }]}
+                                />
+                                <Button
+                                    type="link"
+                                    size="small"
+                                    disabled={!container}
+                                    icon={advancedOpen ? <CaretUpOutlined /> : <CaretDownOutlined />}
+                                    onClick={() => setAdvancedOpen(!advancedOpen)}
+                                >
+                                    Advanced
+                                </Button>
+                            </>
+                        )}
                     </Space>
 
                     {!!extra ? (
@@ -181,6 +212,30 @@ const AdminTable = <T,>({ name, columns, request, filters, extra }: AdminTablePr
                         </Link>
                     )}
                 </div>
+                {advancedOpen && container && (
+                    <>
+                        <Divider style={{ margin: '12px 0' }} />
+                        <div
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(3, 1fr)',
+                                gridColumnGap: '1rem',
+                                gridRowGap: '1rem',
+                            }}
+                        >
+                            {['', '', '', '', ''].map((_, idx) => (
+                                <div key={idx} style={{ display: 'flex' }}>
+                                    <div style={{ minWidth: 75 }}>
+                                        <Text type="secondary">Test :</Text>
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <Input size="small" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
             </Card>
             <Card size="small" style={{ flex: 1 }}>
                 <Table

@@ -37,7 +37,7 @@ const cleanDetails = (container: ContainerResponse): ContainerCreation<Dayjs> =>
 
 const cleanBeforeSend = (values: ContainerCreation<Dayjs>) => {
     let cleanValues = { ...values }
-    const fields: ContainerFieldCreation<Dayjs>[] = []
+    const fields: ContainerFieldCreation<string>[] = []
 
     for (const field of cleanValues.fields) {
         let defaultValue: any = {}
@@ -70,9 +70,9 @@ const cleanBeforeSend = (values: ContainerCreation<Dayjs>) => {
 
             case ContainerFieldType.DATE: {
                 if (field.multiple) {
-                    defaultValue.defaultMultipleDateValue = field.defaultMultipleDateValue
+                    defaultValue.defaultMultipleDateValue = field.defaultMultipleDateValue?.toString()
                 } else {
-                    defaultValue.defaultDateValue = field.defaultDateValue
+                    defaultValue.defaultDateValue = field.defaultDateValue?.toString()
                 }
                 break
             }
@@ -81,9 +81,9 @@ const cleanBeforeSend = (values: ContainerCreation<Dayjs>) => {
             case ContainerFieldType.OPTION:
             case ContainerFieldType.LINK: {
                 if (field.multiple) {
-                    defaultValue.defaultMultipleJSON = field.defaultMultipleJSONValue
+                    defaultValue.defaultMultipleJson = field.defaultMultipleJsonValue
                 } else {
-                    defaultValue.defaultJSONValue = field.defaultJSONValue
+                    defaultValue.defaultJsonValue = field.defaultJsonValue
                 }
                 break
             }

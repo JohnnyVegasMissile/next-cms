@@ -20,12 +20,12 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(relativeTime)
 
-type DataType = (Container & {
+type DataType = Container & {
     slug: Slug | null
     fields: ContainerField[]
     metadatas: Metadata[]
     contentsMetadatas: Metadata[]
-})[]
+}
 
 const columns: ColumnsType<DataType> = [
     {
@@ -119,7 +119,8 @@ const columns: ColumnsType<DataType> = [
 ]
 
 const Containers = () => {
-    return <AdminTable name="containers" columns={columns} request={getContainers} />
+    return <AdminTable isContent name="containers" columns={columns} request={getContainers} />
 }
 
+export const dynamic = 'force-dynamic'
 export default Containers

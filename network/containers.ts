@@ -1,14 +1,14 @@
-import PageCreation from '~/types/pageCreation'
 import INSTANCE from './api'
 import { Container, ContainerField, Metadata, Section, Slug } from '@prisma/client'
 import { ObjectId } from '~/types'
 import { SectionCreationCleaned } from '~/types/sectionCreation'
+import ContainerCreation from '~/types/containerCreation'
 
 export type ContainerResponse = Container & {
     slug: Slug | null
+    fields: ContainerField[]
     metadatas: Metadata[]
     contentsMetadatas: Metadata[]
-    fields: ContainerField[]
 }
 
 export const getContainers = (
@@ -38,7 +38,7 @@ export const getContainer = (id: ObjectId): Promise<ContainerResponse> =>
         },
     })
 
-export const postContainer = (data: PageCreation): Promise<ContainerResponse> =>
+export const postContainer = (data: ContainerCreation<string>): Promise<ContainerResponse> =>
     INSTANCE({
         method: 'POST',
         url: '/api/containers',
@@ -48,7 +48,7 @@ export const postContainer = (data: PageCreation): Promise<ContainerResponse> =>
         data,
     })
 
-export const updateContainer = (id: ObjectId, data: PageCreation): Promise<ContainerResponse> =>
+export const updateContainer = (id: ObjectId, data: ContainerCreation<string>): Promise<ContainerResponse> =>
     INSTANCE({
         method: 'PUT',
         url: `/api/containers/${id}`,

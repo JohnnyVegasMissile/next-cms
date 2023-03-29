@@ -40,8 +40,8 @@ export type ContainerFieldCreation<T> = {
     defaultMultipleNumberValue: number[] | undefined
     defaultDateValue: T | undefined
     defaultMultipleDateValue: T[] | undefined
-    defaultJSONValue: any | undefined
-    defaultMultipleJSONValue: any[] | undefined
+    defaultJsonValue: any | undefined
+    defaultMultipleJsonValue: any[] | undefined
 }
 
 export default ContainerCreation

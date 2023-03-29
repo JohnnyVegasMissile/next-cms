@@ -452,8 +452,8 @@ model ContainerField {
   defaultMultipleNumberValue Float[]
   defaultDateValue           DateTime?
   defaultMultipleDateValue   DateTime[]
-  defaultJSONValue           Json?
-  defaultMultipleJSONValue   Json[]
+  defaultJsonValue           Json?
+  defaultMultipleJsonValue   Json[]
 
   releatedFields ContentField[]
 
@@ -485,7 +485,6 @@ model ContentField {
   content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
 
   // Copy from parent field
-  position Int
   type     ContainerFieldType
   multiple Boolean
 
@@ -498,6 +497,8 @@ model ContentField {
   multipleNumberValue Float[]
   dateValue           DateTime?
   multipleDateValue   DateTime[]
+  jsonValue           Json?
+  multipleJsonValue   Json[]
 }
 
 // MEDIAS

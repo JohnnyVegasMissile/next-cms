@@ -8,12 +8,12 @@ export async function GET(_: NextRequest, context: any) {
     const { pageId } = context.params
 
     const content = await prisma.section.findMany({
-        where: { pageId: parseInt(pageId), type: SectionType.PAGE },
+        where: { pageId, type: SectionType.PAGE },
         orderBy: { position: 'asc' },
     })
 
     const sidebar = await prisma.section.findMany({
-        where: { pageId: parseInt(pageId), type: SectionType.PAGE_SIDEBAR },
+        where: { pageId, type: SectionType.PAGE_SIDEBAR },
         orderBy: { position: 'asc' },
     })
 
@@ -34,7 +34,7 @@ export async function PUT(request: NextRequest, context: any) {
         if (section.id) {
             const modified = await prisma.section.update({
                 where: {
-                    id: parseInt(section.id as unknown as string),
+                    id: section.id,
                 },
                 data: {
                     position: parseInt(section.position as unknown as string),
@@ -46,7 +46,7 @@ export async function PUT(request: NextRequest, context: any) {
         } else {
             const created = await prisma.section.create({
                 data: {
-                    pageId: parseInt(pageId),
+                    pageId,
                     type: SectionType.PAGE,
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
@@ -64,7 +64,7 @@ export async function PUT(request: NextRequest, context: any) {
         if (section.id) {
             const modified = await prisma.section.update({
                 where: {
-                    id: parseInt(section.id as unknown as string),
+                    id: section.id,
                 },
                 data: {
                     position: parseInt(section.position as unknown as string),
@@ -76,7 +76,7 @@ export async function PUT(request: NextRequest, context: any) {
         } else {
             const created = await prisma.section.create({
                 data: {
-                    pageId: parseInt(pageId),
+                    pageId,
                     type: SectionType.PAGE_SIDEBAR,
                     block: section.block,
                     position: parseInt(section.position as unknown as string),

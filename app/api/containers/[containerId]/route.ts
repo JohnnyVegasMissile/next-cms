@@ -9,7 +9,7 @@ export async function GET(_: NextRequest, context: any) {
     const { containerId } = context.params
 
     const page = await prisma.container.findUnique({
-        where: { id: parseInt(containerId) },
+        where: { id: containerId },
         include: { slug: true, metadatas: true, fields: true },
     })
 
@@ -23,9 +23,10 @@ export async function PUT(request: Request, context: any) {
     const { containerId } = context.params
     const { name, slug, published, metadatas, fields } = (await request.json()) as ContainerCreation<Date>
 
-    if (typeof name !== 'string') NextResponse.json({ message: 'Name not valid' }, { status: 400 })
-    if (!Array.isArray(slug)) NextResponse.json({ message: 'Slug not valid.' }, { status: 400 })
-    if (typeof published !== 'boolean') NextResponse.json({ message: 'Published not valid' }, { status: 400 })
+    if (typeof name !== 'string') return NextResponse.json({ message: 'Name not valid' }, { status: 400 })
+    if (!Array.isArray(slug)) return NextResponse.json({ message: 'Slug not valid.' }, { status: 400 })
+    if (typeof published !== 'boolean')
+        return NextResponse.json({ message: 'Published not valid' }, { status: 400 })
 
     const listID = metadatas?.map((metadata) => metadata.id)?.filter((id) => !!id)
 
@@ -38,15 +39,15 @@ export async function PUT(request: Request, context: any) {
             await prisma.metadata.update({
                 where: { id: metadata.id },
                 data: {
-                    content: Array.isArray(metadata.content) ? metadata.content.join(', ') : metadata.content,
+                    content: metadata.content,
                     name: metadata.name,
                 },
             })
         } else {
             await prisma.metadata.create({
                 data: {
-                    linkedPageId: parseInt(containerId),
-                    content: Array.isArray(metadata.content) ? metadata.content.join(', ') : metadata.content,
+                    linkedPageId: containerId,
+                    content: metadata.content,
                     name: metadata.name,
                 },
             })
@@ -59,7 +60,7 @@ export async function PUT(request: Request, context: any) {
         if (field.id) {
             const modified = await prisma.containerField.update({
                 where: {
-                    id: parseInt(field.id as unknown as string),
+                    id: field.id,
                 },
                 data: field,
             })
@@ -67,7 +68,7 @@ export async function PUT(request: Request, context: any) {
             updatedFields.push(modified)
         } else {
             const created = await prisma.containerField.create({
-                data: { ...field, containerId: parseInt(containerId) },
+                data: { ...field, containerId },
             })
 
             updatedFields.push(created)
@@ -79,7 +80,7 @@ export async function PUT(request: Request, context: any) {
     })
 
     const container = await prisma.container.update({
-        where: { id: parseInt(containerId) },
+        where: { id: containerId },
         data: {
             name,
             published,

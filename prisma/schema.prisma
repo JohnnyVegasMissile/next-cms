@@ -13,7 +13,7 @@ datasource db {
 // AUTH
 
 model User {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   name  String?
   login Login?
@@ -27,12 +27,12 @@ model User {
 }
 
 model Login {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
-  userId   Int       @unique
+  userId   String    @unique
   user     User      @relation(fields: [userId], references: [id])
   sessions Session[]
-  roleId   Int?
+  roleId   String?
   role     Role?     @relation(fields: [roleId], references: [id])
 
   root Boolean @default(false)
@@ -42,11 +42,11 @@ model Login {
 }
 
 model Session {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   token String @unique @default(cuid())
 
-  loginId   Int
+  loginId   String
   login     Login    @relation(fields: [loginId], references: [id], onDelete: Cascade)
   expiresAt DateTime
 
@@ -57,7 +57,7 @@ model Session {
 // RIGHTS & ACCESS
 
 model Role {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   name   String
   logins Login[]
@@ -138,7 +138,7 @@ enum RightType {
 // FORMS
 
 model Form {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   name           String  @unique
   redirectMail   Boolean @default(false)
@@ -172,9 +172,9 @@ enum FormFieldType {
 }
 
 model FormField {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
-  formId      Int
+  formId      String
   form        Form          @relation(fields: [formId], references: [id])
   name        String?
   type        FormFieldType
@@ -201,25 +201,25 @@ model FormField {
 }
 
 model Message {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   marked Boolean        @default(false)
   read   Boolean        @default(false)
   fields MessageField[]
 
-  formId Int
-  form   Form @relation(fields: [formId], references: [id])
+  formId String
+  form   Form   @relation(fields: [formId], references: [id])
 
   createdAt DateTime @default(now())
 }
 
 model MessageField {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
-  messageId Int
+  messageId String
   message   Message @relation(fields: [messageId], references: [id])
 
-  formFieldId Int
+  formFieldId String
   formField   FormField @relation(fields: [formFieldId], references: [id])
 
   valueText    String?
@@ -254,7 +254,7 @@ enum SettingType {
 }
 
 model Setting {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   type    SettingType @unique
   value   String
@@ -266,7 +266,7 @@ model Setting {
 // SLUGS
 
 model Slug {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   full  String @unique
   basic String
@@ -275,9 +275,9 @@ model Slug {
   // parent   Slug?  @relation(fields: [parentId], references: [id], name: "childs")
   // childs   Slug[] @relation(name: "childs")
 
-  pageId      Int?       @unique
+  pageId      String?    @unique
   page        Page?      @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  containerId Int?       @unique
+  containerId String?    @unique
   container   Container? @relation(fields: [containerId], references: [id], onDelete: Cascade)
   // contentId   String?    @unique
   // content     Content?   @relation(fields: [contentId], references: [id])
@@ -288,19 +288,19 @@ model Slug {
 // METADATAS
 
 model Metadata {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   name    String
   content String
 
-  linkedPageId      Int?
+  linkedPageId      String?
   linkedPage        Page?      @relation(fields: [linkedPageId], references: [id], onDelete: Cascade)
-  linkedContainerId Int?
+  linkedContainerId String?
   linkedContainer   Container? @relation(fields: [linkedContainerId], references: [id], onDelete: Cascade, name: "containerMetadatas")
-  linkedContentId   Int?
+  linkedContentId   String?
   linkedContent     Content?   @relation(fields: [linkedContentId], references: [id], onDelete: Cascade)
 
-  containerTemplateId Int?
+  containerTemplateId String?
   containerTemplate   Container? @relation(fields: [containerTemplateId], references: [id], onDelete: Cascade, name: "contentsMetadatas")
 }
 
@@ -332,7 +332,7 @@ enum SectionType {
 }
 
 model Section {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   type     SectionType
   block    String
@@ -341,21 +341,21 @@ model Section {
   content Json
 
   // Element releated
-  pageId Int?
-  page   Page? @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  pageId String?
+  page   Page?   @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   // Linked data
   medias LinkedToSection[]
 }
 
 model LinkedToSection {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
-  sectionId Int
+  sectionId String
   section   Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  mediaId   Int?
+  mediaId   String?
   media     Media?  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  formId    Int?
+  formId    String?
   form      Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   @@unique([sectionId, mediaId])
@@ -373,7 +373,7 @@ enum PageType {
 }
 
 model Page {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   name String
   type PageType @default(PAGE)
@@ -387,14 +387,14 @@ model Page {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  createdByUserId Int?
+  createdByUserId String?
   createdBy       User?    @relation(fields: [createdByUserId], references: [id])
 }
 
 // CONTAINERS
 
 model Container {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   name              String
   slug              Slug?
@@ -408,7 +408,7 @@ model Container {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  createdByUserId Int?
+  createdByUserId String?
   createdBy       User?    @relation(fields: [createdByUserId], references: [id])
 }
 
@@ -429,7 +429,7 @@ enum ContainerFieldType {
 }
 
 model ContainerField {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   name      String
   required  Boolean
@@ -457,16 +457,16 @@ model ContainerField {
 
   releatedFields ContentField[]
 
-  containerId Int
+  containerId String
   container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
 }
 
 // CONTENTS
 
 model Content {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
-  containerId Int
+  containerId String
   container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
 
   fields    ContentField[]
@@ -474,21 +474,21 @@ model Content {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  createdByUserId Int?
+  createdByUserId String?
   createdBy       User?    @relation(fields: [createdByUserId], references: [id])
 }
 
 model ContentField {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
-  contentId Int
+  contentId String
   content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
 
   // Copy from parent field
   type     ContainerFieldType
   multiple Boolean
 
-  releatedFieldId Int
+  releatedFieldId String
   releatedField   ContainerField @relation(fields: [releatedFieldId], references: [id], onDelete: Cascade)
 
   textValue           String?
@@ -510,7 +510,7 @@ enum MediaType {
 }
 
 model Media {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   type MediaType
 

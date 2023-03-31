@@ -8,7 +8,7 @@ export async function GET(_: NextRequest, context: any) {
     const { pageId } = context.params
 
     const page = await prisma.page.findUnique({
-        where: { id: parseInt(pageId) },
+        where: { id: pageId },
         include: { slug: true, metadatas: true },
     })
 
@@ -44,7 +44,7 @@ export async function PUT(request: Request, context: any) {
         } else {
             await prisma.metadata.create({
                 data: {
-                    linkedPageId: parseInt(pageId),
+                    linkedPageId: pageId,
                     content: Array.isArray(metadata.content) ? metadata.content.join(', ') : metadata.content,
                     name: metadata.name,
                 },
@@ -53,7 +53,7 @@ export async function PUT(request: Request, context: any) {
     }
 
     const page = await prisma.page.update({
-        where: { id: parseInt(pageId) },
+        where: { id: pageId },
         data: {
             name,
             published,

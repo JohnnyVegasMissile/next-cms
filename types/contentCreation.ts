@@ -2,8 +2,10 @@ import type { ContainerFieldType } from '@prisma/client'
 import { ObjectId } from '.'
 
 type ContentCreation<T> = {
+    id?: ObjectId
     name: string
     published: boolean
+    containerId: ObjectId | undefined
     slug: string
     metadatas: Metadata[]
     fields: ContentFieldCreation<T>[]

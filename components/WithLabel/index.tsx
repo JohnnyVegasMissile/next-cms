@@ -13,8 +13,14 @@ const WithLabel = ({ label, children, error }: WithLabelProps) => {
     return (
         <Space direction="vertical" style={{ width: '100%' }}>
             {typeof label === 'string' ? <Text type="secondary">{label}</Text> : label}
-            {children}
-            {!!error && <Text type="danger">{error}</Text>}
+            <Space direction="vertical" style={{ width: '100%' }} size={3}>
+                {children}
+                {!!error && (
+                    <Text type="danger" style={{ fontSize: 12 }}>
+                        {error}
+                    </Text>
+                )}
+            </Space>
         </Space>
     )
 }

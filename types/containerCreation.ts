@@ -13,7 +13,7 @@ type ContainerCreation<T> = {
 type Metadata = {
     id?: ObjectId
     name: string
-    content: string | string[]
+    content: string
 }
 
 export type ContainerFieldCreation<T> = {

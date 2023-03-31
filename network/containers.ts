@@ -23,19 +23,28 @@ export const getContainers = (
     INSTANCE({
         method: 'GET',
         url: '/api/containers',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
         params: { page, q, sort, ...others },
+    })
+
+export const getContainersSimple = (): Promise<{ id: ObjectId; name: string }[]> =>
+    INSTANCE({
+        method: 'GET',
+        url: '/api/containers/simple',
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
     })
 
 export const getContainer = (id: ObjectId): Promise<ContainerResponse> =>
     INSTANCE({
         method: 'GET',
         url: `/api/containers/${id}`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
     })
 
 export const postContainer = (data: ContainerCreation<string>): Promise<ContainerResponse> =>
@@ -62,9 +71,9 @@ export const getContainerSections = (id: ObjectId): Promise<{ content: Section[]
     INSTANCE({
         method: 'GET',
         url: `/api/containers/${id}/sections`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
     })
 
 export const getContainerTemplate = (
@@ -78,9 +87,9 @@ export const getContainerTemplate = (
     INSTANCE({
         method: 'GET',
         url: `/api/containers/${id}/template/sections`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
     })
 
 export const updateContainerSections = (

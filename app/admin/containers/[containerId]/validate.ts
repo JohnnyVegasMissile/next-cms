@@ -46,7 +46,7 @@ const validate = (values: ContainerCreation<Dayjs>) => {
                             set(errors, `fields.${i}.defaultMultipleNumberValue.${j}`, 'Out of limit')
                         }
                     }
-                } else {
+                } else if (field?.defaultNumberValue !== undefined) {
                     if (field?.valueMin !== undefined && (field?.defaultNumberValue || 0) < field?.valueMin) {
                         set(errors, `fields.${i}.defaultNumberValue`, 'Out of limit')
                     } else if (

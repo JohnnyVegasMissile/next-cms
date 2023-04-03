@@ -1,7 +1,13 @@
 'use client'
 
-import { Button, Card, Divider, Input, Radio, Select, Space, Table, Typography } from 'antd'
-import { SearchOutlined, PlusOutlined, CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons'
+import { Badge, Button, Card, Divider, Input, Radio, Select, Space, Table } from 'antd'
+import {
+    SearchOutlined,
+    PlusOutlined,
+    CaretDownOutlined,
+    CaretUpOutlined,
+    ClearOutlined,
+} from '@ant-design/icons'
 import { usePathname } from 'next/navigation'
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useQuery } from '@tanstack/react-query'
@@ -10,8 +16,10 @@ import { useEffect, useState } from 'react'
 import { SorterResult } from 'antd/es/table/interface'
 import { PAGE_SIZE } from '~/utilities/constants'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-const { Text } = Typography
+import { ObjectId } from '~/types'
+import { getContainer } from '~/network/containers'
+import ListSelect from '../ListSelect'
+import ContentsFilter from '../ContentsFilter'
 
 interface AdminTableProps<T> {
     name: string
@@ -41,8 +49,37 @@ const AdminTable = <T,>({ name, columns, request, filters, extra, isContent }: A
     const [sort, setSort] = useState<`${string},${'asc' | 'desc'}`>()
     const [extraFilters, setExtraFilters] = useState<any>({})
 
-    const [container, setContainer] = useState<number>()
+    const [advacedSort, seAdvacedSort] = useState<{ field: ObjectId | undefined; order: 'asc' | 'desc' }>({
+        field: undefined,
+        order: 'asc',
+    })
+    const [advacedFilters, seAdvacedFilters] = useState<Map<ObjectId, { operator?: string; value?: any }>>(
+        new Map()
+    )
+    const [containerId, setContainerId] = useState<ObjectId>()
     const [advancedOpen, setAdvancedOpen] = useState(false)
+
+    const clearAdvacedFilters = () => {
+        const copyValue = new Map(advacedFilters)
+        copyValue.forEach((value, key) => copyValue.set(key, { ...value, value: undefined }))
+        seAdvacedFilters(copyValue)
+
+        seAdvacedSort({ ...advacedSort, field: undefined })
+
+        setAdvancedOpen(false)
+    }
+
+    let nbFilters = 0
+    advacedFilters.forEach((value) => {
+        if (value.value !== undefined && value.value !== '') nbFilters++
+    })
+    if (advacedSort.field !== undefined) nbFilters++
+
+    const container = useQuery(['containers', { id: containerId }], () => getContainer(containerId!), {
+        enabled: isContent && !!containerId,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+    })
 
     const results = useQuery([name, { page, q, sort, ...extraFilters }], () =>
         request(page, q, sort, extraFilters)
@@ -177,27 +214,34 @@ const AdminTable = <T,>({ name, columns, request, filters, extra, isContent }: A
                         })}
                         {isContent && (
                             <>
-                                <Select
-                                    allowClear
-                                    size="small"
-                                    value={container}
-                                    onChange={(e) => {
-                                        setContainer(e)
-
-                                        if (!e) setAdvancedOpen(false)
-                                    }}
+                                <ListSelect.Container
                                     style={{ width: 190 }}
-                                    options={[{ label: 'Container A', value: 1 }]}
+                                    value={containerId}
+                                    onChange={(e) => {
+                                        setContainerId(e)
+
+                                        if (!e) {
+                                            setAdvancedOpen(false)
+                                            seAdvacedSort({
+                                                field: undefined,
+                                                order: 'asc',
+                                            })
+                                            seAdvacedFilters(new Map())
+                                        }
+                                    }}
                                 />
-                                <Button
-                                    type="link"
-                                    size="small"
-                                    disabled={!container}
-                                    icon={advancedOpen ? <CaretUpOutlined /> : <CaretDownOutlined />}
-                                    onClick={() => setAdvancedOpen(!advancedOpen)}
-                                >
-                                    Advanced
-                                </Button>
+                                <Badge count={nbFilters} size="small">
+                                    <Button
+                                        type="link"
+                                        size="small"
+                                        loading={container.isFetching}
+                                        disabled={!containerId || container.data?.fields?.length === 0}
+                                        icon={advancedOpen ? <CaretUpOutlined /> : <CaretDownOutlined />}
+                                        onClick={() => setAdvancedOpen(!advancedOpen)}
+                                    >
+                                        Advanced
+                                    </Button>
+                                </Badge>
                             </>
                         )}
                     </Space>
@@ -212,9 +256,20 @@ const AdminTable = <T,>({ name, columns, request, filters, extra, isContent }: A
                         </Link>
                     )}
                 </div>
-                {advancedOpen && container && (
+                {advancedOpen && !!containerId && !!container.data?.fields?.length && (
                     <>
-                        <Divider style={{ margin: '12px 0' }} />
+                        <Divider orientation="right" plain>
+                            <Button
+                                type="link"
+                                size="small"
+                                icon={<ClearOutlined />}
+                                danger
+                                onClick={clearAdvacedFilters}
+                            >
+                                Clear filters
+                            </Button>
+                        </Divider>
+
                         <div
                             style={{
                                 display: 'grid',
@@ -223,16 +278,18 @@ const AdminTable = <T,>({ name, columns, request, filters, extra, isContent }: A
                                 gridRowGap: '1rem',
                             }}
                         >
-                            {['', '', '', '', ''].map((_, idx) => (
-                                <div key={idx} style={{ display: 'flex' }}>
-                                    <div style={{ minWidth: 75 }}>
-                                        <Text type="secondary">Test :</Text>
-                                    </div>
-                                    <div style={{ flex: 1 }}>
-                                        <Input size="small" />
-                                    </div>
-                                </div>
-                            ))}
+                            <ContentsFilter.OrderBy
+                                fields={container.data?.fields}
+                                value={advacedSort}
+                                onChange={seAdvacedSort}
+                            />
+                            <div />
+                            <div />
+                            <ContentsFilter
+                                fields={container.data?.fields}
+                                values={advacedFilters}
+                                onChange={seAdvacedFilters}
+                            />
                         </div>
                     </>
                 )}

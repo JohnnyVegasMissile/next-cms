@@ -162,6 +162,7 @@ const CreatePage = ({ params }: any) => {
                                 value={formik.values.slug}
                                 onChange={(e) => formik.setFieldValue('slug', e)}
                                 errors={formik.errors.slug as string[]}
+                                paramsId={isUpdate ? { pageId } : undefined}
                             />
                         </WithLabel>
                     </Card>

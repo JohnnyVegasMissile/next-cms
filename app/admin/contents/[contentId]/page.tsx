@@ -166,10 +166,20 @@ const CreateContainer = ({ params }: any) => {
     )
 
     const slugExists = useQuery(
-        ['slug', { slug: formik.values.slug, contentId: isUpdate ? undefined : contentId }],
-        () => slugExist(formik.values.slug, isUpdate ? { contentId } : undefined),
+        [
+            'slug',
+            {
+                slug: `${container.data?.slug?.basic}/${formik.values.slug}`,
+                contentId: isUpdate ? undefined : contentId,
+            },
+        ],
+        () =>
+            slugExist(
+                `${container.data?.slug?.basic}/${formik.values.slug}`,
+                isUpdate ? { contentId } : undefined
+            ),
         {
-            enabled: !!formik.values.slug,
+            enabled: !!formik.values.slug && container.isSuccess,
         }
     )
 
@@ -261,7 +271,7 @@ const CreateContainer = ({ params }: any) => {
                                 <Form.Item
                                     hasFeedback
                                     validateStatus={
-                                        !formik.values.slug
+                                        !formik.values.slug || slugExists.isError
                                             ? undefined
                                             : slugExists.isFetching
                                             ? 'validating'
@@ -365,9 +375,14 @@ const FieldInputsString = ({ field, onChange }: FieldInputsProps<string | string
     field.multiple ? (
         <Space direction="vertical" style={{ width: '100%' }}>
             {field.multipleTextValue?.map((value, idx) => (
-                <Input key={idx} size="small" value={value} />
+                <Input
+                    key={idx}
+                    size="small"
+                    value={value}
+                    onChange={(e) => onChange(`multipleTextValue.${idx}`, e.target.value)}
+                />
             ))}
-            <Input size="small" />
+            <Input size="small" placeholder="+ Add new" />
         </Space>
     ) : (
         <Input
@@ -381,8 +396,8 @@ const FieldInputsNumber = ({
     field,
     matchingField,
     onChange,
-}: FieldInputsProps<number | number[] | undefined>) =>
-    field.multiple ? (
+}: FieldInputsProps<number | number[] | undefined>) => {
+    return field.multiple ? (
         <Space direction="vertical" style={{ width: '100%' }}>
             {field.multipleNumberValue?.map((value, idx) => (
                 <InputNumber
@@ -392,6 +407,7 @@ const FieldInputsNumber = ({
                     size="small"
                     style={{ width: '100%' }}
                     value={value}
+                    onChange={(e) => onChange(`multipleNumberValue.${idx}`, e || undefined)}
                 />
             ))}
             <InputNumber
@@ -399,6 +415,7 @@ const FieldInputsNumber = ({
                 max={matchingField.max || undefined}
                 size="small"
                 style={{ width: '100%' }}
+                placeholder="+ Add new"
             />
         </Space>
     ) : (
@@ -412,12 +429,15 @@ const FieldInputsNumber = ({
             onChange={(e) => onChange('numberValue', e || undefined)}
         />
     )
+}
+
 const FieldInputsDate = ({ field, onChange }: FieldInputsProps<Dayjs | Dayjs[] | undefined>) =>
     field.multiple ? (
         <Space direction="vertical" style={{ width: '100%' }}>
             {field.multipleDateValue?.map((value, idx) => (
                 <DatePicker key={idx} size="small" style={{ width: '100%' }} value={value || undefined} />
             ))}
+            <DatePicker size="small" style={{ width: '100%' }} placeholder="+ Add new" />
         </Space>
     ) : (
         <DatePicker

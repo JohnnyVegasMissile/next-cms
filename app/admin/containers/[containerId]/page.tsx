@@ -70,7 +70,9 @@ const cleanBeforeSend = (values: ContainerCreation<Dayjs>) => {
 
             case ContainerFieldType.DATE: {
                 if (field.multiple) {
-                    defaultValue.defaultMultipleDateValue = field.defaultMultipleDateValue?.toString()
+                    defaultValue.defaultMultipleDateValue = field.defaultMultipleDateValue?.map((date) =>
+                        date?.toString()
+                    )
                 } else {
                     defaultValue.defaultDateValue = field.defaultDateValue?.toString()
                 }
@@ -219,6 +221,7 @@ const CreateContainer = ({ params }: any) => {
                                 value={formik.values.slug}
                                 onChange={(e) => formik.setFieldValue('slug', e)}
                                 errors={formik.errors.slug as string[]}
+                                paramsId={isUpdate ? { containerId } : undefined}
                             />
                         </WithLabel>
                     </Col>

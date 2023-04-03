@@ -25,7 +25,7 @@ interface SlugEditProps {
 
 const SlugEdit = ({ value, onChange, errors, paramsId }: SlugEditProps) => {
     const slugExists = useQuery(
-        ['slug', { slug: value.join('/'), ...paramsId }],
+        ['slug-exists', { slug: value.join('/'), ...paramsId }],
         () => slugExist(value.filter((e) => !!e).join('/'), paramsId),
         {
             enabled: !!value.filter((e) => !!e).length,

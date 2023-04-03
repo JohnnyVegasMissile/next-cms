@@ -271,16 +271,16 @@ model Slug {
   full  String @unique
   basic String
 
-  // parentId Int?
-  // parent   Slug?  @relation(fields: [parentId], references: [id], name: "childs")
-  // childs   Slug[] @relation(name: "childs")
+  parentId String?
+  parent   Slug?   @relation(fields: [parentId], references: [id], name: "childs")
+  childs   Slug[]  @relation(name: "childs")
 
   pageId      String?    @unique
   page        Page?      @relation(fields: [pageId], references: [id], onDelete: Cascade)
   containerId String?    @unique
   container   Container? @relation(fields: [containerId], references: [id], onDelete: Cascade)
-  // contentId   String?    @unique
-  // content     Content?   @relation(fields: [contentId], references: [id])
+  contentId   String?    @unique
+  content     Content?   @relation(fields: [contentId], references: [id])
 
   updatedAt DateTime @updatedAt
 }
@@ -466,11 +466,16 @@ model ContainerField {
 model Content {
   id String @id @default(cuid())
 
+  name String
+  slug Slug?
+
   containerId String
   container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
 
   fields    ContentField[]
   metadatas Metadata[]
+
+  published Boolean @default(true)
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

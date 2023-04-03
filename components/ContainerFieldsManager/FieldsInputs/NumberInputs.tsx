@@ -3,6 +3,7 @@ import WithLabel from '~/components/WithLabel'
 import { FieldInputsProps } from '.'
 import { useEffect, useState } from 'react'
 import metadataTypes from '~/utilities/metadataTypes'
+import MultiInput from '~/components/MultiInputs'
 
 const { Text } = Typography
 
@@ -59,68 +60,13 @@ const NumberInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                         }
                         size="small"
                     >
-                        <Space direction="vertical" style={{ width: '100%' }}>
-                            {field.defaultMultipleNumberValue?.map((number, idx) => (
-                                <InputNumber
-                                    key={idx}
-                                    min={field.valueMin}
-                                    max={field.valueMax}
-                                    status={!!errors?.defaultMultipleNumberValue?.[idx] ? 'error' : undefined}
-                                    size="small"
-                                    placeholder="Detault text"
-                                    style={{ width: '100%' }}
-                                    value={number}
-                                    onBlur={() => {
-                                        if (number === undefined || number === null) {
-                                            const copyTexts = [...field.defaultMultipleNumberValue!]
-                                            copyTexts.splice(idx, 1)
-                                            onChange('defaultMultipleNumberValue', copyTexts)
-                                        }
-                                    }}
-                                    onChange={(e) => onChange(`defaultMultipleNumberValue.${idx}`, e)}
-                                    onKeyDown={(e) => {
-                                        if (e.code === 'Enter' && (e.target as any).value !== undefined) {
-                                            const copyTexts = [...field.defaultMultipleNumberValue!]
-                                            copyTexts.splice(idx, 1)
-                                            onChange('defaultMultipleNumberValue', copyTexts)
-                                        }
-                                    }}
-                                />
-                            ))}
-                            {!!errorMultiDefault && <Text type="danger">{errorMultiDefault}</Text>}
-                            <InputNumber
-                                key="new"
-                                min={field.valueMin}
-                                max={field.valueMax}
-                                size="small"
-                                placeholder="+ Add new value"
-                                style={{ width: '100%' }}
-                                value={newValue}
-                                onBlur={() => {
-                                    if (newValue !== undefined) {
-                                        onChange(
-                                            `defaultMultipleNumberValue.${
-                                                field.defaultMultipleNumberValue?.length || 0
-                                            }`,
-                                            newValue
-                                        )
-                                        setNewValue(undefined)
-                                    }
-                                }}
-                                onChange={(e) => setNewValue(e || undefined)}
-                                onKeyDown={(e) => {
-                                    if (e.code === 'Enter' && (e.target as any).value !== undefined) {
-                                        onChange(
-                                            `defaultMultipleNumberValue.${
-                                                field.defaultMultipleNumberValue?.length || 0
-                                            }`,
-                                            newValue
-                                        )
-                                        setNewValue(undefined)
-                                    }
-                                }}
-                            />
-                        </Space>
+                        <MultiInput.Number
+                            min={field.valueMin}
+                            max={field.valueMax}
+                            values={field.defaultMultipleNumberValue}
+                            onChange={(e) => onChange('defaultMultipleNumberValue', e)}
+                            errors={errors?.defaultMultipleNumberValue}
+                        />
                     </Card>
                 ) : (
                     <WithLabel label="Default :" error={errors?.defaultNumberValue}>

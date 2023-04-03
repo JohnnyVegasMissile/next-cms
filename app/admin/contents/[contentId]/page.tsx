@@ -23,7 +23,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import MetadatasList from '~/components/MetadatasList'
 import WithLabel from '~/components/WithLabel'
 import validate from './validate'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getContainer } from '~/network/containers'
 import { useEffect, useMemo } from 'react'
 import ContentCreation, { ContentFieldCreation } from '~/types/contentCreation'
@@ -32,6 +32,8 @@ import ListSelect from '~/components/ListSelect'
 import { ObjectId } from '~/types'
 import { ContainerField, ContainerFieldType } from '@prisma/client'
 import { slugExist } from '~/network/slugs'
+import MultiInput from '~/components/MultiInputs'
+import { useRouter } from 'next/router'
 
 dayjs.extend(customParseFormat)
 
@@ -47,14 +49,80 @@ const initialValues: ContentCreation<Dayjs> = {
 }
 
 const cleanDetails = (content: ContentResponse): ContentCreation<Dayjs> => ({
-    ...content,
-    fields: content.fields.map((field) => ({
-        ...field,
-        dateValue: field.dateValue ? dayjs(field.dateValue) : undefined,
-        multipleDateValue: field.multipleDateValue
-            ? field.multipleDateValue?.map((date) => dayjs(date))
-            : undefined,
-    })),
+    name: content.name,
+    published: content.published,
+    containerId: content.containerId,
+    slug: content.slug?.basic || '',
+    metadatas: content.metadatas,
+
+    fields: content.fields.map((field) => {
+        let cleanValue: {
+            multipleTextValue?: string[]
+            textValue?: string | undefined
+            multipleNumberValue?: number[]
+            numberValue?: number | undefined
+            multipleDateValue?: Dayjs[]
+            dateValue?: Dayjs | undefined
+            multipleJsonValue?: any[]
+            jsonValue?: any | undefined
+        } = {}
+
+        switch (field.type) {
+            case ContainerFieldType.RICHTEXT:
+            case ContainerFieldType.COLOR:
+            case ContainerFieldType.CONTENT:
+            case ContainerFieldType.VIDEO:
+            case ContainerFieldType.FILE:
+            case ContainerFieldType.IMAGE:
+            case ContainerFieldType.PARAGRAPH:
+            case ContainerFieldType.STRING:
+            case ContainerFieldType.OPTION: {
+                if (field.multiple) {
+                    cleanValue.multipleTextValue = field.multipleTextValue
+                } else {
+                    cleanValue.textValue = field.textValue!
+                }
+                break
+            }
+
+            case ContainerFieldType.NUMBER: {
+                if (field.multiple) {
+                    cleanValue.multipleNumberValue = field.multipleNumberValue
+                } else {
+                    cleanValue.numberValue = field.numberValue!
+                }
+                break
+            }
+
+            case ContainerFieldType.DATE: {
+                if (field.multiple) {
+                    cleanValue.multipleDateValue = field.multipleDateValue.map((date) => dayjs(date))
+                } else {
+                    cleanValue.dateValue = field.dateValue ? dayjs(field.dateValue) : undefined
+                }
+                break
+            }
+
+            case ContainerFieldType.LOCATION:
+            case ContainerFieldType.LINK: {
+                if (field.multiple) {
+                    cleanValue.multipleJsonValue = field.multipleJsonValue
+                } else {
+                    cleanValue.jsonValue = field.jsonValue
+                }
+                break
+            }
+        }
+
+        return {
+            type: field.type,
+            multiple: field.multiple,
+
+            releatedFieldId: field.id,
+
+            ...cleanValue,
+        }
+    }) as ContentCreation<Dayjs>['fields'],
 })
 
 const cleanBeforeSend = (values: ContentCreation<Dayjs>): ContentCreation<string> => ({
@@ -68,6 +136,8 @@ const cleanBeforeSend = (values: ContentCreation<Dayjs>): ContentCreation<string
 
 const CreateContainer = ({ params }: any) => {
     const { contentId } = params
+    const router = useRouter()
+    const queryClient = useQueryClient()
     const isUpdate = contentId !== 'create'
     const formik = useFormik({
         initialValues,
@@ -160,14 +230,18 @@ const CreateContainer = ({ params }: any) => {
                 ? updateContent(contentId, cleanBeforeSend(values))
                 : postContent(cleanBeforeSend(values)),
         {
-            onSuccess: () => message.success(`Content ${isUpdate ? 'modified' : 'created'} with success.`),
+            onSuccess: () => {
+                message.success(`Content ${isUpdate ? 'modified' : 'created'} with success.`)
+                queryClient.invalidateQueries({ queryKey: ['contents'] })
+                router.push('/admin/contents')
+            },
             onError: () => message.error('Something went wrong, try again later.'),
         }
     )
 
     const slugExists = useQuery(
         [
-            'slug',
+            'slug-exists',
             {
                 slug: `${container.data?.slug?.basic}/${formik.values.slug}`,
                 contentId: isUpdate ? undefined : contentId,
@@ -318,6 +392,7 @@ const CreateContainer = ({ params }: any) => {
                                     onChange={(name, value) =>
                                         formik.setFieldValue(`fields.${idx}.${name}`, value)
                                     }
+                                    errors={formik.errors.fields?.[idx] as any}
                                 />
                             </Col>
                         ))}
@@ -332,9 +407,10 @@ interface FieldCardProps {
     field: ContentFieldCreation<Dayjs>
     containerFields: ContainerField[]
     onChange(name: string, value: any): void
+    errors: (string | undefined)[] | string | undefined
 }
 
-const FieldCard = ({ field, containerFields, onChange }: FieldCardProps) => {
+const FieldCard = ({ field, containerFields, onChange, errors }: FieldCardProps) => {
     const matchingField = useMemo(() => {
         return containerFields.find((e) => e.id === field.releatedFieldId)!
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -352,7 +428,7 @@ const FieldCard = ({ field, containerFields, onChange }: FieldCardProps) => {
                 </Text>
             }
         >
-            <Component field={field} matchingField={matchingField} onChange={onChange} />
+            <Component field={field} matchingField={matchingField} onChange={onChange} errors={errors} />
         </Card>
     )
 }
@@ -361,6 +437,7 @@ interface FieldInputsProps<T> {
     field: ContentFieldCreation<Dayjs>
     matchingField: ContainerField
     onChange(name: string, value: T): void
+    errors: (string | undefined)[] | string | undefined
 }
 
 const FieldInputs = ({}: FieldInputsProps<any>) => null
@@ -371,19 +448,13 @@ const FieldInputsVideo = ({}: FieldInputsProps<string | string[]>) => null
 const FieldInputsFile = ({}: FieldInputsProps<string | string[]>) => null
 const FieldInputsImage = ({}: FieldInputsProps<string | string[]>) => null
 const FieldInputsParagraph = ({}: FieldInputsProps<string | string[]>) => null
-const FieldInputsString = ({ field, onChange }: FieldInputsProps<string | string[]>) =>
+const FieldInputsString = ({ field, errors, onChange }: FieldInputsProps<string | string[]>) =>
     field.multiple ? (
-        <Space direction="vertical" style={{ width: '100%' }}>
-            {field.multipleTextValue?.map((value, idx) => (
-                <Input
-                    key={idx}
-                    size="small"
-                    value={value}
-                    onChange={(e) => onChange(`multipleTextValue.${idx}`, e.target.value)}
-                />
-            ))}
-            <Input size="small" placeholder="+ Add new" />
-        </Space>
+        <MultiInput
+            values={field.multipleTextValue}
+            onChange={(e) => onChange('multipleTextValue', e)}
+            errors={errors as (string | undefined)[] | undefined}
+        />
     ) : (
         <Input
             size="small"
@@ -392,32 +463,21 @@ const FieldInputsString = ({ field, onChange }: FieldInputsProps<string | string
             onChange={(e) => onChange('textValue', e.target.value)}
         />
     )
+
 const FieldInputsNumber = ({
     field,
+    errors,
     matchingField,
     onChange,
-}: FieldInputsProps<number | number[] | undefined>) => {
+}: FieldInputsProps<number | (number | undefined)[] | undefined>) => {
     return field.multiple ? (
-        <Space direction="vertical" style={{ width: '100%' }}>
-            {field.multipleNumberValue?.map((value, idx) => (
-                <InputNumber
-                    key={idx}
-                    min={matchingField.min || undefined}
-                    max={matchingField.max || undefined}
-                    size="small"
-                    style={{ width: '100%' }}
-                    value={value}
-                    onChange={(e) => onChange(`multipleNumberValue.${idx}`, e || undefined)}
-                />
-            ))}
-            <InputNumber
-                min={matchingField.min || undefined}
-                max={matchingField.max || undefined}
-                size="small"
-                style={{ width: '100%' }}
-                placeholder="+ Add new"
-            />
-        </Space>
+        <MultiInput.Number
+            min={matchingField.min || undefined}
+            max={matchingField.max || undefined}
+            values={field.multipleNumberValue}
+            onChange={(e) => onChange('multipleNumberValue', e)}
+            errors={errors as (string | undefined)[] | undefined}
+        />
     ) : (
         <InputNumber
             min={matchingField.min || undefined}
@@ -431,14 +491,20 @@ const FieldInputsNumber = ({
     )
 }
 
-const FieldInputsDate = ({ field, onChange }: FieldInputsProps<Dayjs | Dayjs[] | undefined>) =>
+const FieldInputsDate = ({
+    field,
+    errors,
+    matchingField,
+    onChange,
+}: FieldInputsProps<Dayjs | (Dayjs | undefined)[] | undefined>) =>
     field.multiple ? (
-        <Space direction="vertical" style={{ width: '100%' }}>
-            {field.multipleDateValue?.map((value, idx) => (
-                <DatePicker key={idx} size="small" style={{ width: '100%' }} value={value || undefined} />
-            ))}
-            <DatePicker size="small" style={{ width: '100%' }} placeholder="+ Add new" />
-        </Space>
+        <MultiInput.Date
+            startDate={matchingField.startDate ? dayjs(matchingField.startDate) : undefined}
+            endDate={matchingField.endDate ? dayjs(matchingField.endDate) : undefined}
+            values={field.multipleDateValue}
+            onChange={(e) => onChange('multipleDateValue', e)}
+            errors={errors as (string | undefined)[] | undefined}
+        />
     ) : (
         <DatePicker
             size="small"
@@ -448,6 +514,7 @@ const FieldInputsDate = ({ field, onChange }: FieldInputsProps<Dayjs | Dayjs[] |
             onChange={(e) => onChange('dateValue', e || undefined)}
         />
     )
+
 const FieldInputsLocation = ({}: FieldInputsProps<any | any[]>) => null
 const FieldInputsOption = ({}: FieldInputsProps<string | string[]>) => null
 const FieldInputsLink = ({}: FieldInputsProps<any | any[]>) => null

@@ -3,11 +3,11 @@ import WithLabel from '~/components/WithLabel'
 import { FieldInputsProps } from '.'
 import { useEffect, useState } from 'react'
 import metadataTypes from '~/utilities/metadataTypes'
+import MultiInput from '~/components/MultiInputs'
 
 const { Text } = Typography
 
 const StringInputs = ({ field, errors, onChange }: FieldInputsProps) => {
-    const [newValue, setNewValue] = useState('')
     useEffect(() => {
         if (field.multiple) {
             if (field.defaultTextValue) onChange('defaultMultipleTextValue', [field.defaultTextValue])
@@ -57,67 +57,11 @@ const StringInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                         }
                         size="small"
                     >
-                        <Space direction="vertical" style={{ width: '100%' }}>
-                            {field.defaultMultipleTextValue?.map((text, idx) => (
-                                <Input
-                                    allowClear
-                                    key={idx}
-                                    size="small"
-                                    placeholder="Detault text"
-                                    style={{ width: '100%' }}
-                                    value={text}
-                                    onBlur={() => {
-                                        if (!text) {
-                                            const copyTexts = [...field.defaultMultipleTextValue!]
-                                            copyTexts.splice(idx, 1)
-                                            onChange('defaultMultipleTextValue', copyTexts)
-                                        }
-                                    }}
-                                    onChange={(e) =>
-                                        onChange(`defaultMultipleTextValue.${idx}`, e.target.value)
-                                    }
-                                    onKeyDown={(e) => {
-                                        console.log('e')
-                                        if (e.code === 'Enter' && !(e.target as any).value) {
-                                            const copyTexts = [...field.defaultMultipleTextValue!]
-                                            copyTexts.splice(idx, 1)
-                                            onChange('defaultMultipleTextValue', copyTexts)
-                                        }
-                                    }}
-                                />
-                            ))}
-                            <Input
-                                key="new"
-                                allowClear
-                                size="small"
-                                placeholder="+ Add new value"
-                                style={{ width: '100%' }}
-                                value={newValue}
-                                onBlur={() => {
-                                    if (!!newValue) {
-                                        onChange(
-                                            `defaultMultipleTextValue.${
-                                                field.defaultMultipleTextValue?.length || 0
-                                            }`,
-                                            newValue
-                                        )
-                                        setNewValue('')
-                                    }
-                                }}
-                                onChange={(e) => setNewValue(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.code === 'Enter') {
-                                        onChange(
-                                            `defaultMultipleTextValue.${
-                                                field.defaultMultipleTextValue?.length || 0
-                                            }`,
-                                            newValue
-                                        )
-                                        setNewValue('')
-                                    }
-                                }}
-                            />
-                        </Space>
+                        <MultiInput
+                            values={field.defaultMultipleTextValue}
+                            onChange={(e) => onChange('defaultMultipleTextValue', e)}
+                            errors={errors?.defaultMultipleTextValue}
+                        />
                     </Card>
                 ) : (
                     <WithLabel label="Default :">

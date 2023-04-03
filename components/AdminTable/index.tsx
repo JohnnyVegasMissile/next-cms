@@ -77,8 +77,6 @@ const AdminTable = <T,>({ name, columns, request, filters, extra, isContent }: A
 
     const container = useQuery(['containers', { id: containerId }], () => getContainer(containerId!), {
         enabled: isContent && !!containerId,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
     })
 
     const results = useQuery([name, { page, q, sort, ...extraFilters }], () =>

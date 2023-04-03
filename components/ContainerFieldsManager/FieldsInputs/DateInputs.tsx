@@ -17,6 +17,7 @@ import { useEffect } from 'react'
 import metadataTypes from '~/utilities/metadataTypes'
 import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import MultiInput from '~/components/MultiInputs'
 
 dayjs.extend(customParseFormat)
 
@@ -37,7 +38,7 @@ const DateInputs = ({ field, errors, onChange }: FieldInputsProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [field.multiple])
 
-    const errorMultiDefault = errors?.defaultMultipleDateValue?.find((e: string) => !!e)
+    // const errorMultiDefault = errors?.defaultMultipleDateValue?.find((e: string) => !!e)
 
     const disabledDate = (current: Dayjs) => {
         if (!current || (!field.startDate && !field.endDate)) return false
@@ -87,46 +88,13 @@ const DateInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                         }
                         size="small"
                     >
-                        <Space direction="vertical" style={{ width: '100%' }}>
-                            {field.defaultMultipleDateValue?.map((date, idx) => (
-                                <DatePicker
-                                    key={idx}
-                                    status={!!errors?.defaultMultipleDateValue?.[idx] ? 'error' : undefined}
-                                    placeholder="Date"
-                                    allowClear
-                                    size="small"
-                                    style={{ width: '100%' }}
-                                    value={date}
-                                    onChange={(e) => {
-                                        if (!!e) {
-                                            onChange(`defaultMultipleDateValue.${idx}`, e)
-                                        } else {
-                                            const copyDates = [...field.defaultMultipleDateValue!]
-                                            copyDates.splice(idx, 1)
-                                            onChange('defaultMultipleDateValue', copyDates)
-                                        }
-                                    }}
-                                    disabledDate={disabledDate}
-                                />
-                            ))}
-                            {!!errorMultiDefault && <Text type="danger">{errorMultiDefault}</Text>}
-                            <DatePicker
-                                key={field.defaultMultipleDateValue?.length}
-                                placeholder="+ Add new value"
-                                allowClear
-                                size="small"
-                                style={{ width: '100%' }}
-                                value={undefined}
-                                onChange={(e) => {
-                                    if (!!e)
-                                        onChange(
-                                            `defaultMultipleDateValue.${field.defaultMultipleDateValue?.length}`,
-                                            e
-                                        )
-                                }}
-                                disabledDate={disabledDate}
-                            />
-                        </Space>
+                        <MultiInput.Date
+                            startDate={field.startDate}
+                            endDate={field.endDate}
+                            values={field.defaultMultipleDateValue}
+                            onChange={(e) => onChange('defaultMultipleDateValue', e)}
+                            errors={errors?.defaultMultipleDateValue}
+                        />
                     </Card>
                 ) : (
                     <WithLabel label="Default :" error={errors?.defaultDateValue}>

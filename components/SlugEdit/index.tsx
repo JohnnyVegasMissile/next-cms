@@ -56,14 +56,7 @@ const SlugEdit = ({ value, onChange, errors, paramsId }: SlugEditProps) => {
     }
 
     return (
-        <div
-            style={{
-                width: '100%',
-                display: 'flex',
-                gap: '0.25rem',
-                flexWrap: 'wrap',
-            }}
-        >
+        <Space style={{ width: '100%', flexWrap: 'wrap' }}>
             {value.map((slug, idx) => (
                 <Fragment key={idx}>
                     {idx === lastSlugIndex ? (
@@ -124,7 +117,7 @@ const SlugEdit = ({ value, onChange, errors, paramsId }: SlugEditProps) => {
                     {lastSlugIndex - 1 > idx && '/'}
                 </Fragment>
             ))}
-        </div>
+        </Space>
     )
 }
 

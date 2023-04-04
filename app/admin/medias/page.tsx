@@ -9,6 +9,7 @@ import {
     CloseOutlined,
     CheckOutlined,
     WarningOutlined,
+    StopOutlined,
 } from '@ant-design/icons'
 import { Media, MediaType } from '@prisma/client'
 import dayjs from 'dayjs'
@@ -20,6 +21,7 @@ import Link from 'next/link'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ObjectId } from '~/types'
 import UploadButton from '~/components/UploadButton'
+import { formatBytes } from '~/utilities'
 
 const { Text } = Typography
 
@@ -37,39 +39,37 @@ const columns = [
                 }
             }
         ) => (
-            <div>
-                <Space align="center" size="large">
-                    {media.type === MediaType.IMAGE && (
-                        <Image
-                            width={35}
-                            style={{ height: 35, width: 35, objectFit: 'contain', objectPosition: 'center' }}
-                            src={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
-                            alt={media.alt || ''}
-                        />
-                    )}
-                    {media.type === MediaType.VIDEO && (
-                        <VideoCameraOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
-                    )}
-                    {media.type === MediaType.FILE && (
-                        <FilePdfOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
-                    )}
-                    <Text>
-                        <Link
-                            href={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
-                            target="_blank"
-                        >
-                            {media?.name}
-                        </Link>
-                    </Text>
-                    {!media._count.usedInSections && (
-                        <Tooltip title="This media is not used anywhere">
-                            <Tag color="red" icon={<WarningOutlined />}>
-                                Unused
-                            </Tag>
-                        </Tooltip>
-                    )}
-                </Space>
-            </div>
+            <Space align="center" size="large">
+                {media.type === MediaType.IMAGE && (
+                    <Image
+                        width={35}
+                        style={{ height: 35, width: 35, objectFit: 'contain', objectPosition: 'center' }}
+                        src={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
+                        alt={media.alt || ''}
+                    />
+                )}
+                {media.type === MediaType.VIDEO && (
+                    <VideoCameraOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
+                )}
+                {media.type === MediaType.FILE && (
+                    <FilePdfOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
+                )}
+                <Text>
+                    <Link
+                        href={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
+                        target="_blank"
+                    >
+                        {media?.name}
+                    </Link>
+                </Text>
+                {!media._count.usedInSections && (
+                    <Tooltip title="This media is not used anywhere">
+                        <Tag color="red" icon={<StopOutlined />}>
+                            Unused
+                        </Tag>
+                    </Tooltip>
+                )}
+            </Space>
         ),
     },
     {
@@ -78,6 +78,26 @@ const columns = [
         key: 'alt',
         render: (media: Media) => <EditAlt id={media.id} alt={media.alt} />,
         condition: ({ type }: { type?: MediaType }) => type === MediaType.IMAGE,
+    },
+    {
+        sorter: true,
+        title: 'Size',
+        key: 'size',
+        render: (media: Media) => {
+            const tooBig = media.type === MediaType.IMAGE && media.size > 1 * 1000 * 1000
+
+            return (
+                <Text type={tooBig ? 'danger' : undefined}>
+                    {tooBig && (
+                        <>
+                            <WarningOutlined />
+                            &nbsp;
+                        </>
+                    )}
+                    {formatBytes(media.size)}
+                </Text>
+            )
+        },
     },
     {
         sorter: true,

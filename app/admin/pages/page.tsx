@@ -1,7 +1,13 @@
 'use client'
 
-import { Badge, Breadcrumb, Button, Divider, Popconfirm, Space, Tag, Tooltip } from 'antd'
-import { CopyOutlined, EditOutlined, DeleteOutlined, PicCenterOutlined } from '@ant-design/icons'
+import { Badge, Breadcrumb, Button, Divider, Popconfirm, Popover, QRCode, Space, Tag, Tooltip } from 'antd'
+import {
+    CopyOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    PicCenterOutlined,
+    LinkOutlined,
+} from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { getPages } from '~/network/pages'
 import { Page, PageType, Slug } from '@prisma/client'
@@ -50,33 +56,67 @@ const columns: ColumnsType<DataType> = [
             switch (page.type) {
                 case PageType.HOMEPAGE:
                     return (
-                        <Link href={'/'} prefetch={false}>
-                            <Breadcrumb>
-                                <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                                <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                            </Breadcrumb>
+                        <Link href="/" prefetch={false}>
+                            <Breadcrumb
+                                items={[
+                                    {
+                                        title: (
+                                            <Popover
+                                                overlayInnerStyle={{ padding: 0 }}
+                                                content={
+                                                    <QRCode
+                                                        value={`${process.env['NEXT_PUBLIC_SITE_URL']}`}
+                                                        bordered={false}
+                                                    />
+                                                }
+                                            >
+                                                <LinkOutlined />
+                                            </Popover>
+                                        ),
+                                    },
+                                    { title: <>&#8203;</> },
+                                ]}
+                            />
                         </Link>
                     )
 
                 case PageType.SIGNIN:
                     return (
-                        <Link href={`/${encodeURIComponent(page?.slug?.full || '')}`} prefetch={false}>
-                            <Breadcrumb>
-                                <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                                <Breadcrumb.Item>sign-in</Breadcrumb.Item>
-                            </Breadcrumb>
+                        <Link href="/sign-in" prefetch={false}>
+                            <Breadcrumb
+                                items={[
+                                    {
+                                        title: (
+                                            <Popover
+                                                overlayInnerStyle={{ padding: 0 }}
+                                                content={
+                                                    <QRCode
+                                                        value={`${process.env['NEXT_PUBLIC_SITE_URL']}/sign-in`}
+                                                        bordered={false}
+                                                    />
+                                                }
+                                            >
+                                                <LinkOutlined />
+                                            </Popover>
+                                        ),
+                                    },
+                                    { title: 'sign-in' },
+                                ]}
+                            />
                         </Link>
                     )
 
                 case PageType.PAGE:
                     return (
                         <Link href={`/${encodeURIComponent(page?.slug?.full || '')}`} prefetch={false}>
-                            <Breadcrumb>
-                                <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                                {page?.slug?.full?.split('/').map((word: string, idx: number) => (
-                                    <Breadcrumb.Item key={idx}>{word}</Breadcrumb.Item>
-                                ))}
-                            </Breadcrumb>
+                            <Breadcrumb
+                                items={[
+                                    { title: <LinkOutlined /> },
+                                    ...(page?.slug?.full.split('/').map((word: string) => ({
+                                        title: word,
+                                    })) || []),
+                                ]}
+                            />
                         </Link>
                     )
 

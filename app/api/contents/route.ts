@@ -2,8 +2,9 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '~/utilities/prisma'
 import { PAGE_SIZE } from '~/utilities/constants'
-import ContainerCreation from '~/types/containerCreation'
 import ContentCreation from '~/types/contentCreation'
+import { ObjectId } from '~/types'
+import { ContainerFieldType } from '@prisma/client'
 
 export const GET = async (request: NextRequest) => {
     const { searchParams } = request.nextUrl
@@ -12,16 +13,111 @@ export const GET = async (request: NextRequest) => {
     const sort = searchParams.get('sort')
     const containerId = searchParams.get('containerId')
 
+    const advancedSort = searchParams.get('advancedSort')
+    const advancedFilters = searchParams.get('advancedFilters')
+
+    const where: any = {}
+    let orderBy: any = {}
+
+    if (!!containerId && (!!advancedSort || !!advancedFilters)) {
+        const container = await prisma.container.findUnique({
+            where: { id: containerId! },
+            include: { fields: true },
+        })
+
+        if (!container) return NextResponse.json({ message: 'Container not valid' }, { status: 400 })
+
+        // if (!!advancedSort) {
+        //     const contentsSort: { field: ObjectId; order: 'asc' | 'desc' } = JSON.parse(advancedSort)
+
+        //         const contents = await prisma.content.findMany({
+        //             orderBy: {
+        //                 fields: {
+
+        //                 }
+        //             }
+        //         })
+
+        //     console.log(contentsSort)
+        // }
+
+        if (!!advancedFilters) {
+            const contentsSort: {
+                [key: ObjectId]: { operator: 'contains' | 'equals' | 'gt' | 'lt'; value: any }
+            } = JSON.parse(advancedFilters)
+
+            const AND = Object.keys(contentsSort).map((key) => {
+                const matchingField = container.fields.find((f) => f.id === key)
+                let keyData: 'numberValue' | 'textValue' | 'dateValue' = 'textValue'
+
+                if (!matchingField) return
+
+                switch (matchingField.type) {
+                    case ContainerFieldType.RICHTEXT:
+                    case ContainerFieldType.COLOR:
+                    case ContainerFieldType.CONTENT:
+                    case ContainerFieldType.VIDEO:
+                    case ContainerFieldType.FILE:
+                    case ContainerFieldType.IMAGE:
+                    case ContainerFieldType.PARAGRAPH:
+                    case ContainerFieldType.STRING:
+                    case ContainerFieldType.OPTION: {
+                        if (matchingField.multiple) {
+                            return
+                        } else {
+                            keyData = 'textValue'
+                        }
+                        break
+                    }
+
+                    case ContainerFieldType.NUMBER: {
+                        if (matchingField.multiple) {
+                            return
+                        } else {
+                            keyData = 'numberValue'
+                        }
+                        break
+                    }
+
+                    case ContainerFieldType.DATE: {
+                        if (matchingField.multiple) {
+                            return
+                        } else {
+                            keyData = 'dateValue'
+                        }
+                        break
+                    }
+
+                    case ContainerFieldType.LOCATION:
+                    case ContainerFieldType.LINK: {
+                        if (matchingField.multiple) {
+                            return
+                        } else {
+                            return
+                        }
+                        break
+                    }
+                }
+
+                return {
+                    releatedFieldId: key,
+                    [keyData]: { [contentsSort[key]?.operator!]: contentsSort[key]?.value },
+                }
+            })
+
+            where.fields = { some: { AND } }
+
+            // nulls: 'last'
+        }
+    }
+
     let skip = 0
     if (typeof page === 'string' && page !== '0' && page !== '1') {
         skip = (parseInt(page) - 1) * PAGE_SIZE
     }
 
-    const where: any = {}
-    let orderBy: any = {}
-
     if (!!q) where.name = { contains: q }
-    if (!!containerId) where.containerId = { containerId }
+    if (!!containerId) where.containerId = containerId
     if (!!sort) {
         const parsedSort = sort.split(',')
 

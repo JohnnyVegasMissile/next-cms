@@ -20,15 +20,15 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
         fields.forEach((field) => {
             switch (field.type) {
                 case ContainerFieldType.STRING:
-                    copyValue.set(field.id, { operator: 'in', value: '' })
+                    copyValue.set(field.id, { operator: 'contains', value: '' })
                     break
 
                 case ContainerFieldType.DATE:
-                    copyValue.set(field.id, { operator: 'bf', value: undefined })
+                    copyValue.set(field.id, { operator: 'gt', value: undefined })
                     break
 
                 case ContainerFieldType.NUMBER:
-                    copyValue.set(field.id, { operator: 'eq', value: undefined })
+                    copyValue.set(field.id, { operator: 'equals', value: undefined })
                     break
 
                 default:
@@ -56,7 +56,7 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
             {fields
                 .filter((e) => !e.multiple)
                 .map((field) => (
-                    <div key={field.id} style={{ display: 'flex' }}>
+                    <div key={field.id} style={{ display: 'flex', gap: '0.5rem' }}>
                         <div style={{ minWidth: 85 }}>
                             <Text type="secondary">{field.name} :</Text>
                         </div>
@@ -68,15 +68,15 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
                                         onChange={(e) => onChangeOperator(field.id, e)}
                                         style={{ width: '33%', maxWidth: 121 }}
                                         options={[
-                                            { value: 'in', label: 'Contains' },
-                                            { value: 'eq', label: 'Equals' },
+                                            { value: 'contains', label: 'Contains' },
+                                            { value: 'equals', label: 'Equals' },
                                         ]}
                                     />
                                     <Input
                                         value={values.get(field.id)?.value}
                                         onChange={(e) => onChangeValue(field.id, e.target.value)}
                                         size="small"
-                                        style={{ width: '67%' }}
+                                        style={{ flex: 1 }}
                                         allowClear
                                     />
                                 </Space.Compact>
@@ -89,15 +89,15 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
                                         onChange={(e) => onChangeOperator(field.id, e)}
                                         style={{ width: '33%', maxWidth: 121 }}
                                         options={[
-                                            { value: 'bf', label: 'Before' },
-                                            { value: 'af', label: 'After' },
+                                            { value: 'lt', label: 'Before' },
+                                            { value: 'gt', label: 'After' },
                                         ]}
                                     />
                                     <DatePicker
                                         value={values.get(field.id)?.value}
                                         onChange={(e) => onChangeValue(field.id, e)}
                                         size="small"
-                                        style={{ width: '67%' }}
+                                        style={{ flex: 1 }}
                                         allowClear
                                     />
                                 </Space.Compact>
@@ -112,7 +112,7 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
                                         options={[
                                             { value: 'gt', label: 'Greater than' },
                                             { value: 'lt', label: 'Lower than' },
-                                            { value: 'eq', label: 'Equals' },
+                                            { value: 'equals', label: 'Equals' },
                                         ]}
                                     />
                                     <InputNumber

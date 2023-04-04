@@ -16,11 +16,11 @@ export async function GET(request: NextRequest) {
     const matchingId: any = {}
 
     if (!!pageId) {
-        matchingId.NOT = { pageId: parseInt(pageId) }
+        matchingId.NOT = { pageId }
     } else if (!!containerId) {
-        matchingId.NOT = { containerId: parseInt(containerId) }
+        matchingId.NOT = { containerId }
     } else if (!!contentId) {
-        matchingId.NOT = { contentId: parseInt(contentId) }
+        matchingId.NOT = { contentId }
     }
 
     const existingSlug = await prisma.slug.findFirst({

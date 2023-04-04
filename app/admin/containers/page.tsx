@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, Breadcrumb, Button, Divider, Popconfirm, Space, Tooltip } from 'antd'
+import { Badge, Breadcrumb, Button, Divider, Popconfirm, Popover, QRCode, Space, Tooltip } from 'antd'
 import {
     UnorderedListOutlined,
     CopyOutlined,
@@ -9,6 +9,7 @@ import {
     DeleteOutlined,
     PicCenterOutlined,
     PicLeftOutlined,
+    LinkOutlined,
 } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import AdminTable from '~/components/AdminTable'
@@ -40,12 +41,28 @@ const columns: ColumnsType<DataType> = [
         key: 'slug',
         render: (container) => (
             <Link href={`/${encodeURIComponent(container?.slug?.full || '')}`} prefetch={false}>
-                <Breadcrumb>
-                    <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                    {container?.slug?.full?.split('/').map((word: string, idx: number) => (
-                        <Breadcrumb.Item key={idx}>{word}</Breadcrumb.Item>
-                    ))}
-                </Breadcrumb>
+                <Breadcrumb
+                    items={[
+                        {
+                            title: (
+                                <Popover
+                                    overlayInnerStyle={{ padding: 0 }}
+                                    content={
+                                        <QRCode
+                                            value={`${process.env['NEXT_PUBLIC_SITE_URL']}/${container?.slug?.full}`}
+                                            bordered={false}
+                                        />
+                                    }
+                                >
+                                    <LinkOutlined />
+                                </Popover>
+                            ),
+                        },
+                        ...container?.slug?.full?.split('/').map((word: string, idx: number) => ({
+                            title: word,
+                        })),
+                    ]}
+                />
             </Link>
         ),
     },
@@ -125,7 +142,7 @@ const columns: ColumnsType<DataType> = [
 ]
 
 const Containers = () => {
-    return <AdminTable isContent name="containers" columns={columns} request={getContainers} />
+    return <AdminTable name="containers" columns={columns} request={getContainers} />
 }
 
 export const dynamic = 'force-dynamic'

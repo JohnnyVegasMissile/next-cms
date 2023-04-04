@@ -14,8 +14,27 @@ import {
 } from '@prisma/client'
 import Link from 'next/link'
 import { ColumnsType } from 'antd/es/table'
-import { Badge, Breadcrumb, Button, Divider, Popconfirm, Space, Tooltip, Table, Typography, Tag } from 'antd'
-import { PicCenterOutlined, CopyOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import {
+    Badge,
+    Breadcrumb,
+    Button,
+    Divider,
+    Popconfirm,
+    Space,
+    Tooltip,
+    Table,
+    Typography,
+    Tag,
+    Popover,
+    QRCode,
+} from 'antd'
+import {
+    PicCenterOutlined,
+    CopyOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    LinkOutlined,
+} from '@ant-design/icons'
 import { getContents } from '~/network/contents'
 
 dayjs.extend(relativeTime)
@@ -48,12 +67,28 @@ const columns: ColumnsType<DataType> = [
         key: 'slug',
         render: (content) => (
             <Link href={`/${encodeURIComponent(content?.slug?.full || '')}`} prefetch={false}>
-                <Breadcrumb>
-                    <Breadcrumb.Item>&#8203;</Breadcrumb.Item>
-                    {content?.slug?.full?.split('/').map((word: string, idx: number) => (
-                        <Breadcrumb.Item key={idx}>{word}</Breadcrumb.Item>
-                    ))}
-                </Breadcrumb>
+                <Breadcrumb
+                    items={[
+                        {
+                            title: (
+                                <Popover
+                                    overlayInnerStyle={{ padding: 0 }}
+                                    content={
+                                        <QRCode
+                                            value={`${process.env['NEXT_PUBLIC_SITE_URL']}/${content?.slug?.full}`}
+                                            bordered={false}
+                                        />
+                                    }
+                                >
+                                    <LinkOutlined />
+                                </Popover>
+                            ),
+                        },
+                        ...content?.slug?.full?.split('/').map((word: string) => ({
+                            title: word,
+                        })),
+                    ]}
+                />
             </Link>
         ),
     },
@@ -88,7 +123,7 @@ const columns: ColumnsType<DataType> = [
                 <Tooltip title="Duplicate">
                     <Button icon={<CopyOutlined />} size="small" />
                 </Tooltip>
-                <Link href={`/admin/containers/${content.id}`} prefetch={false}>
+                <Link href={`/admin/contents/${content.id}`} prefetch={false}>
                     <Tooltip title="Edit">
                         <Button type="primary" icon={<EditOutlined />} size="small">
                             Edit
@@ -207,7 +242,5 @@ const Contents = () => {
         />
     )
 }
-
-const expandedColumns: ColumnsType<DataType> = [{}]
 
 export default Contents

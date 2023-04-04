@@ -4,7 +4,7 @@ import { ObjectId } from '~/types'
 import { SectionCreationCleaned } from '~/types/sectionCreation'
 import ContentCreation from '~/types/contentCreation'
 
-type ContentResponse = Content & {
+export type ContentResponse = Content & {
     slug: Slug | null
     fields: ContentField[]
     metadatas: Metadata[]
@@ -15,7 +15,7 @@ export const getContents = (
     page: number,
     q: string,
     sort: `${string},${'asc' | 'desc'}` | undefined,
-    others: {}
+    others: any
 ): Promise<{
     results: ContentResponse[]
     count: number

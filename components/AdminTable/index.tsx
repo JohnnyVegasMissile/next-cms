@@ -58,38 +58,63 @@ const AdminTable = <T,>({
     const [sort, setSort] = useState<`${string},${'asc' | 'desc'}`>()
     const [extraFilters, setExtraFilters] = useState<any>({})
 
-    const [advacedSort, seAdvacedSort] = useState<{ field: ObjectId | undefined; order: 'asc' | 'desc' }>({
+    const [advancedSort, seAdvancedSort] = useState<{ field: ObjectId | undefined; order: 'asc' | 'desc' }>({
         field: undefined,
         order: 'asc',
     })
-    const [advacedFilters, seAdvacedFilters] = useState<Map<ObjectId, { operator?: string; value?: any }>>(
+    const [advancedFilters, seAdvancedFilters] = useState<Map<ObjectId, { operator?: string; value?: any }>>(
         new Map()
     )
     const [containerId, setContainerId] = useState<ObjectId>()
     const [advancedOpen, setAdvancedOpen] = useState(false)
 
-    const clearAdvacedFilters = () => {
-        const copyValue = new Map(advacedFilters)
-        copyValue.forEach((value, key) => copyValue.set(key, { ...value, value: undefined }))
-        seAdvacedFilters(copyValue)
+    const parsedFilters: any = {}
+    advancedFilters.forEach((value, key) => {
+        if (!!value.value) parsedFilters[key] = { ...value }
+    })
 
-        seAdvacedSort({ ...advacedSort, field: undefined })
+    const clearAdvacedFilters = () => {
+        const copyValue = new Map(advancedFilters)
+        copyValue.forEach((value, key) => copyValue.set(key, { ...value, value: undefined }))
+        seAdvancedFilters(copyValue)
+
+        seAdvancedSort({ ...advancedSort, field: undefined })
 
         setAdvancedOpen(false)
     }
 
     let nbFilters = 0
-    advacedFilters.forEach((value) => {
+    advancedFilters.forEach((value) => {
         if (value.value !== undefined && value.value !== '') nbFilters++
     })
-    if (advacedSort.field !== undefined) nbFilters++
+    if (advancedSort.field !== undefined) nbFilters++
 
     const container = useQuery(['containers', { id: containerId }], () => getContainer(containerId!), {
         enabled: isContent && !!containerId,
     })
 
-    const results = useQuery([name, { page, q, sort, ...extraFilters }], () =>
-        request(page, q, sort, extraFilters)
+    const results = useQuery(
+        [
+            name,
+            {
+                page,
+                q,
+                sort,
+                ...extraFilters,
+                containerId,
+                advancedSort: advancedSort.field ? advancedSort : undefined,
+                advancedFilters: !!Object.keys(parsedFilters).length ? parsedFilters : undefined,
+            },
+        ],
+        () =>
+            request(page, q, sort, {
+                ...extraFilters,
+                containerId,
+                advancedSort: advancedSort.field ? JSON.stringify(advancedSort) : undefined,
+                advancedFilters: !!Object.keys(parsedFilters).length
+                    ? JSON.stringify(parsedFilters)
+                    : undefined,
+            })
     )
 
     useEffect(() => {
@@ -229,11 +254,11 @@ const AdminTable = <T,>({
 
                                         if (!e) {
                                             setAdvancedOpen(false)
-                                            seAdvacedSort({
+                                            seAdvancedSort({
                                                 field: undefined,
                                                 order: 'asc',
                                             })
-                                            seAdvacedFilters(new Map())
+                                            seAdvancedFilters(new Map())
                                         }
                                     }}
                                 />
@@ -287,15 +312,15 @@ const AdminTable = <T,>({
                         >
                             <ContentsFilter.OrderBy
                                 fields={container.data?.fields}
-                                value={advacedSort}
-                                onChange={seAdvacedSort}
+                                value={advancedSort}
+                                onChange={seAdvancedSort}
                             />
                             <div />
                             <div />
                             <ContentsFilter
                                 fields={container.data?.fields}
-                                values={advacedFilters}
-                                onChange={seAdvacedFilters}
+                                values={advancedFilters}
+                                onChange={seAdvancedFilters}
                             />
                         </div>
                     </>

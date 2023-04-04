@@ -1,30 +1,30 @@
 /* eslint-disable @next/next/no-server-import-in-page */
-import { ContainerField } from '@prisma/client'
+import { ContentField } from '@prisma/client'
 import { NextResponse, NextRequest } from 'next/server'
 import { ObjectId } from '~/types'
-import ContainerCreation from '~/types/containerCreation'
+import ContentCreation from '~/types/contentCreation'
 import { prisma } from '~/utilities/prisma'
 
 export async function GET(_: NextRequest, context: any) {
-    const { containerId } = context.params
+    const { contentId } = context.params
 
-    const page = await prisma.container.findUnique({
-        where: { id: containerId },
+    const content = await prisma.content.findUnique({
+        where: { id: contentId },
         include: { slug: true, metadatas: true, fields: true },
     })
 
-    if (!page) NextResponse.json({ message: "Page doesn't exist" }, { status: 404 })
+    if (!content) NextResponse.json({ message: "Page doesn't exist" }, { status: 404 })
 
     // NextResponse extends the Web Response API
-    return NextResponse.json(page)
+    return NextResponse.json(content)
 }
 
 export async function PUT(request: Request, context: any) {
-    const { containerId } = context.params
-    const { name, slug, published, metadatas, fields } = (await request.json()) as ContainerCreation<Date>
+    const { contentId } = context.params
+    const { name, slug, published, metadatas, fields } = (await request.json()) as ContentCreation<Date>
 
     if (typeof name !== 'string') return NextResponse.json({ message: 'Name not valid' }, { status: 400 })
-    if (!Array.isArray(slug)) return NextResponse.json({ message: 'Slug not valid.' }, { status: 400 })
+    if (typeof slug !== 'string') return NextResponse.json({ message: 'Slug not valid.' }, { status: 400 })
     if (typeof published !== 'boolean')
         return NextResponse.json({ message: 'Published not valid' }, { status: 400 })
 
@@ -46,7 +46,7 @@ export async function PUT(request: Request, context: any) {
         } else {
             await prisma.metadata.create({
                 data: {
-                    linkedPageId: containerId,
+                    linkedContentId: contentId,
                     content: metadata.content,
                     name: metadata.name,
                 },
@@ -54,40 +54,32 @@ export async function PUT(request: Request, context: any) {
         }
     }
 
-    const updatedFields: ContainerField[] = []
+    const updatedFields: ContentField[] = []
+
+    await prisma.contentField.deleteMany({ where: { contentId } })
 
     for (const field of fields) {
-        if (field.id) {
-            const modified = await prisma.containerField.update({
-                where: {
-                    id: field.id,
-                },
-                data: field,
-            })
+        const created = await prisma.contentField.create({
+            data: { ...field, contentId },
+        })
 
-            updatedFields.push(modified)
-        } else {
-            const created = await prisma.containerField.create({
-                data: { ...field, containerId },
-            })
-
-            updatedFields.push(created)
-        }
+        updatedFields.push(created)
     }
 
-    await prisma.containerField.deleteMany({
-        where: { id: { notIn: [...updatedFields].map((e) => e.id) }, containerId },
+    const actualContent = await prisma.content.findUnique({
+        where: { id: contentId },
+        include: { container: { include: { slug: true } } },
     })
 
-    const container = await prisma.container.update({
-        where: { id: containerId },
+    const content = await prisma.content.update({
+        where: { id: contentId },
         data: {
             name,
             published,
             slug: {
                 update: {
-                    full: slug.join('/'),
-                    basic: slug.join('/'),
+                    full: `${actualContent?.container.slug?.full}/${slug}`,
+                    basic: slug,
                 },
             },
         },
@@ -95,5 +87,5 @@ export async function PUT(request: Request, context: any) {
     })
 
     // NextResponse extends the Web Response API
-    return NextResponse.json(container)
+    return NextResponse.json(content)
 }

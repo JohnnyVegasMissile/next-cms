@@ -33,7 +33,7 @@ import { ObjectId } from '~/types'
 import { ContainerField, ContainerFieldType } from '@prisma/client'
 import { slugExist } from '~/network/slugs'
 import MultiInput from '~/components/MultiInputs'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 dayjs.extend(customParseFormat)
 
@@ -153,75 +153,110 @@ const CreateContainer = ({ params }: any) => {
     })
     const container = useMutation((id: ObjectId) => getContainer(id), {
         onSuccess: (data) => {
-            console.log('onSuccess', isUpdate, data)
-            if (isUpdate) {
-            } else {
-                const fields = data.fields.map((field) => {
-                    let defaultValue: any = {}
+            const fields = data.fields.map((field) => {
+                const matching = details.data?.fields.find((f) => f.releatedFieldId === field.id)
+                let defaultValue: any = !!matching ? { id: matching.id } : {}
 
-                    switch (field.type) {
-                        case ContainerFieldType.RICHTEXT:
-                        case ContainerFieldType.COLOR:
-                        case ContainerFieldType.CONTENT:
-                        case ContainerFieldType.VIDEO:
-                        case ContainerFieldType.FILE:
-                        case ContainerFieldType.IMAGE:
-                        case ContainerFieldType.PARAGRAPH:
-                        case ContainerFieldType.STRING:
-                        case ContainerFieldType.OPTION: {
+                switch (field.type) {
+                    case ContainerFieldType.RICHTEXT:
+                    case ContainerFieldType.COLOR:
+                    case ContainerFieldType.CONTENT:
+                    case ContainerFieldType.VIDEO:
+                    case ContainerFieldType.FILE:
+                    case ContainerFieldType.IMAGE:
+                    case ContainerFieldType.PARAGRAPH:
+                    case ContainerFieldType.STRING:
+                    case ContainerFieldType.OPTION: {
+                        if (!!matching) {
+                            if (field.multiple) {
+                                defaultValue.multipleTextValue = matching.multipleTextValue
+                            } else {
+                                defaultValue.textValue = matching.textValue
+                            }
+                        } else {
                             if (field.multiple) {
                                 defaultValue.multipleTextValue = field.defaultMultipleTextValue
                             } else {
                                 defaultValue.textValue = field.defaultTextValue
                             }
-                            break
                         }
 
-                        case ContainerFieldType.NUMBER: {
+                        break
+                    }
+
+                    case ContainerFieldType.NUMBER: {
+                        if (!!matching) {
+                            if (field.multiple) {
+                                defaultValue.multipleNumberValue = matching.multipleNumberValue
+                            } else {
+                                defaultValue.numberValue = matching.numberValue
+                            }
+                        } else {
                             if (field.multiple) {
                                 defaultValue.multipleNumberValue = field.defaultMultipleNumberValue
                             } else {
                                 defaultValue.numberValue = field.defaultNumberValue
                             }
-                            break
                         }
+                        break
+                    }
 
-                        case ContainerFieldType.DATE: {
+                    case ContainerFieldType.DATE: {
+                        if (!!matching) {
                             if (field.multiple) {
-                                defaultValue.multipleDateValue = field.defaultMultipleDateValue.map((date) =>
-                                    data ? dayjs(date) : undefined
+                                defaultValue.multipleDateValue = matching.multipleDateValue.map((date) =>
+                                    date ? dayjs(date) : undefined
                                 )
                             } else {
-                                defaultValue.dateValue = field.defaultDateValue
+                                defaultValue.dateValue = !!matching.dateValue
+                                    ? dayjs(matching.dateValue)
+                                    : undefined
+                            }
+                        } else {
+                            if (field.multiple) {
+                                defaultValue.multipleDateValue = field.defaultMultipleDateValue.map((date) =>
+                                    date ? dayjs(date) : undefined
+                                )
+                            } else {
+                                defaultValue.dateValue = !!field.defaultDateValue
                                     ? dayjs(field.defaultDateValue)
                                     : undefined
                             }
-                            break
                         }
+                        break
+                    }
 
-                        case ContainerFieldType.LOCATION:
-                        case ContainerFieldType.LINK: {
+                    case ContainerFieldType.LOCATION:
+                    case ContainerFieldType.LINK: {
+                        if (!!matching) {
+                            if (field.multiple) {
+                                defaultValue.multipleJsonValue = matching.multipleJsonValue
+                            } else {
+                                defaultValue.jsonValue = matching.jsonValue
+                            }
+                        } else {
                             if (field.multiple) {
                                 defaultValue.multipleJsonValue = field.defaultMultipleJsonValue
                             } else {
                                 defaultValue.jsonValue = field.defaultJsonValue
                             }
-                            break
                         }
+
+                        break
                     }
+                }
 
-                    return {
-                        type: field.type,
-                        multiple: field.multiple,
+                return {
+                    type: field.type,
+                    multiple: field.multiple,
 
-                        releatedFieldId: field.id,
+                    releatedFieldId: field.id,
 
-                        ...defaultValue,
-                    }
-                })
+                    ...defaultValue,
+                }
+            })
 
-                formik.setFieldValue('fields', fields)
-            }
+            formik.setFieldValue('fields', fields)
         },
     })
     const submit = useMutation(

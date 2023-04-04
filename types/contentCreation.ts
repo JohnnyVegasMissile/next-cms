@@ -14,14 +14,14 @@ type ContentCreation<T> = {
 type Metadata = {
     id?: ObjectId
     name: string
-    content: string | string[]
+    content: string
 }
 
 export type ContentFieldCreation<T> = {
     id?: ObjectId
 
     type: ContainerFieldType
-    multiple: Boolean
+    multiple: boolean
 
     releatedFieldId: ObjectId
 

@@ -58,16 +58,7 @@ export const POST = async (request: NextRequest) => {
                     basic: slug.join('/'),
                 },
             },
-            metadatas: {
-                createMany: {
-                    data: metadatas.map((metadata) => ({
-                        content: Array.isArray(metadata.content)
-                            ? metadata.content.join(', ')
-                            : metadata.content,
-                        name: metadata.name,
-                    })),
-                },
-            },
+            metadatas: { createMany: { data: metadatas } },
             fields: { createMany: { data: fields } },
         },
     })

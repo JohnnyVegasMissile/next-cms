@@ -83,13 +83,19 @@ const columns: ColumnsType<DataType> = [
                 </Link>
                 <Divider type="vertical" style={{ margin: 0 }} />
                 <Tooltip title="Duplicate">
-                    <Button icon={<CopyOutlined />} size="small" />
+                    <Link href={`/admin/containers/create?containerId=${container.id}`} prefetch={false}>
+                        <Button icon={<CopyOutlined />} size="small" />
+                    </Link>
                 </Tooltip>
                 <Tooltip title="See all contents">
-                    <Button icon={<UnorderedListOutlined />} size="small" />
+                    <Link href={`/admin/contents?containerId=${container.id}`} prefetch={false}>
+                        <Button icon={<UnorderedListOutlined />} size="small" />
+                    </Link>
                 </Tooltip>
                 <Tooltip title="Create new content">
-                    <Button icon={<FileAddOutlined />} size="small" />
+                    <Link href={`/admin/contents/create?containerId=${container.id}`} prefetch={false}>
+                        <Button icon={<FileAddOutlined />} size="small" />
+                    </Link>
                 </Tooltip>
                 <Link href={`/admin/containers/${container.id}`} prefetch={false}>
                     <Tooltip title="Edit">

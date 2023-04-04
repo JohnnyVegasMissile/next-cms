@@ -13,7 +13,7 @@ import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { SorterResult } from 'antd/es/table/interface'
+import { ExpandableConfig, SorterResult } from 'antd/es/table/interface'
 import { PAGE_SIZE } from '~/utilities/constants'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ObjectId } from '~/types'
@@ -38,9 +38,18 @@ interface AdminTableProps<T> {
     }[]
     extra?: React.ReactNode
     isContent?: boolean
+    expandedRowRender?: ExpandableConfig<T>['expandedRowRender']
 }
 
-const AdminTable = <T,>({ name, columns, request, filters, extra, isContent }: AdminTableProps<T>) => {
+const AdminTable = <T,>({
+    name,
+    columns,
+    request,
+    filters,
+    extra,
+    isContent,
+    expandedRowRender,
+}: AdminTableProps<T>) => {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -315,6 +324,14 @@ const AdminTable = <T,>({ name, columns, request, filters, extra, isContent }: A
                             } of ${total}`,
                     }}
                     // scroll={{ y: 300 }}
+                    expandable={
+                        !expandedRowRender
+                            ? undefined
+                            : {
+                                  expandedRowRender:
+                                      expandedRowRender as ExpandableConfig<object>['expandedRowRender'],
+                              }
+                    }
                 />
             </Card>
         </>

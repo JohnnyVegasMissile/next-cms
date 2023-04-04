@@ -1,13 +1,14 @@
 import INSTANCE from './api'
-import { Content, ContentField, Metadata, Section, Slug } from '@prisma/client'
+import { Container, ContainerField, Content, ContentField, Metadata, Section, Slug } from '@prisma/client'
 import { ObjectId } from '~/types'
 import { SectionCreationCleaned } from '~/types/sectionCreation'
 import ContentCreation from '~/types/contentCreation'
 
-export type ContentResponse = Content & {
+type ContentResponse = Content & {
     slug: Slug | null
     fields: ContentField[]
     metadatas: Metadata[]
+    container: (Container & { fields: ContainerField[] }) | null
 }
 
 export const getContents = (

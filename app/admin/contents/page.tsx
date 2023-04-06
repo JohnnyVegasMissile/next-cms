@@ -185,37 +185,45 @@ const Contents = () => {
                                 case ContainerFieldType.OPTION: {
                                     if (field.multiple) {
                                         return matching.multipleTextValue.map((text, idx) => (
-                                            <Tag key={idx} color="blue">
+                                            <Tag key={idx} color="blue" bordered={false}>
                                                 {text}
                                             </Tag>
                                         ))
                                     } else {
-                                        return <Tag color="blue">{matching.textValue}</Tag>
+                                        return (
+                                            <Tag color="blue" bordered={false}>
+                                                {matching.textValue}
+                                            </Tag>
+                                        )
                                     }
                                 }
 
                                 case ContainerFieldType.NUMBER: {
                                     if (field.multiple) {
                                         return matching.multipleNumberValue.map((number, idx) => (
-                                            <Tag key={idx} color="blue">
+                                            <Tag key={idx} color="orange" bordered={false}>
                                                 {number}
                                             </Tag>
                                         ))
                                     } else {
-                                        return <Tag color="blue">{matching.numberValue}</Tag>
+                                        return (
+                                            <Tag color="orange" bordered={false}>
+                                                {matching.numberValue}
+                                            </Tag>
+                                        )
                                     }
                                 }
 
                                 case ContainerFieldType.DATE: {
                                     if (field.multiple) {
                                         return matching.multipleDateValue.map((date, idx) => (
-                                            <Tag key={idx} color="blue">
+                                            <Tag key={idx} color="purple" bordered={false}>
                                                 {dayjs(date).format('DD MMM YYYY')}
                                             </Tag>
                                         ))
                                     } else {
                                         return matching.dateValue ? (
-                                            <Tag color="blue">
+                                            <Tag color="purple" bordered={false}>
                                                 {dayjs(matching.dateValue).format('DD MMM YYYY')}
                                             </Tag>
                                         ) : null

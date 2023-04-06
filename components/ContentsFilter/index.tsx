@@ -74,7 +74,7 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
                                     />
                                     <Input
                                         value={values.get(field.id)?.value}
-                                        onChange={(e) => onChangeValue(field.id, e.target.value)}
+                                        onChange={(e) => onChangeValue(field.id, e.target.value || undefined)}
                                         size="small"
                                         style={{ flex: 1 }}
                                         allowClear
@@ -95,7 +95,9 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
                                     />
                                     <DatePicker
                                         value={values.get(field.id)?.value}
-                                        onChange={(e) => onChangeValue(field.id, e)}
+                                        onChange={(e) =>
+                                            onChangeValue(field.id, e ? e.startOf('day') : undefined)
+                                        }
                                         size="small"
                                         style={{ flex: 1 }}
                                         allowClear

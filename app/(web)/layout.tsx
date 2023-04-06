@@ -2,7 +2,7 @@ import styles from './layout.module.scss'
 import { prisma } from '~/utilities/prisma'
 import { SettingType } from '@prisma/client'
 import classNames from 'classnames'
-import localFont from '@next/font/local'
+import localFont from "next/font/local"
 
 const myFont = localFont({ src: '../../public/Garute-VF.ttf', variable: '--my-font' })
 

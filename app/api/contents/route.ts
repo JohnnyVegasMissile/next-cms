@@ -30,15 +30,28 @@ export const GET = async (request: NextRequest) => {
         // if (!!advancedSort) {
         //     const contentsSort: { field: ObjectId; order: 'asc' | 'desc' } = JSON.parse(advancedSort)
 
-        //         const contents = await prisma.content.findMany({
-        //             orderBy: {
-        //                 fields: {
+        //     const contents = await prisma.content.findMany({
+        //         orderBy: {
+        //             fields: {},
+        //         },
+        //     })
 
-        //                 }
-        //             }
-        //         })
+        //     // console.log(contentsSort)
 
-        //     console.log(contentsSort)
+        //     // nulls: 'last'
+
+        //     prisma.content.findMany({
+        //         orderBy: {
+        //             fields: {
+        //                 text
+        //                 where: {  }
+        //                 // releatedFieldId: contentsSort.field,
+        //             },
+        //         },
+        //         include: {
+        //             fields: true
+        //         }
+        //     })
         // }
 
         if (!!advancedFilters) {
@@ -100,16 +113,20 @@ export const GET = async (request: NextRequest) => {
                 }
 
                 return {
-                    releatedFieldId: key,
-                    [keyData]: { [contentsSort[key]?.operator!]: contentsSort[key]?.value },
+                    fields: {
+                        some: {
+                            releatedFieldId: key,
+                            [keyData]: { [contentsSort[key]?.operator!]: contentsSort[key]?.value },
+                        },
+                    },
                 }
             })
 
-            where.fields = { some: { AND } }
-
-            // nulls: 'last'
+            where.AND = AND
         }
     }
+
+    console.log(where?.AND)
 
     let skip = 0
     if (typeof page === 'string' && page !== '0' && page !== '1') {

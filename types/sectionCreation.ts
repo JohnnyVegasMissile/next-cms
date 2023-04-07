@@ -23,8 +23,8 @@ export type SectionCreationCleaned = {
     position: number
     content: any
 
-    medias: number[]
-    forms: number[]
+    medias: ObjectId[]
+    forms: ObjectId[]
 }
 
 export default SectionCreation

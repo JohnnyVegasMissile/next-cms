@@ -1,6 +1,6 @@
 import { ContainerField, ContainerFieldType } from '@prisma/client'
 import { DatePicker, Input, InputNumber, Select, Space, Typography } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { ObjectId } from '~/types'
 
 const { Text } = Typography
@@ -37,6 +37,7 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
         })
 
         onChange(copyValue)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const onChangeOperator = (fieldId: string, operator: string) => {

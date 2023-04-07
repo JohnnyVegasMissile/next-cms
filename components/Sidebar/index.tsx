@@ -3,13 +3,14 @@ import styles from './Sidebar.module.scss'
 import { prisma } from '~/utilities/prisma'
 import { blocksViews } from '~/blocks/views'
 import { BlockKey } from '~/blocks'
+import { ObjectId } from '~/types'
 
 interface SidebarProps {
-    id: number
+    id: ObjectId
     type: 'page' | 'container' | 'content'
 }
 
-const getProps = async (id: number, type: 'page' | 'container' | 'content') => {
+const getProps = async (id: ObjectId, type: 'page' | 'container' | 'content') => {
     const topLayout = await prisma.section.findMany({
         where: { pageId: id, type: SectionType.LAYOUT_SIDEBAR_TOP },
         orderBy: { position: 'asc' },

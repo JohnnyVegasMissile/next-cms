@@ -1,7 +1,7 @@
 import { Card, Col, Divider, Input, InputNumber, Row, Select, Space, Switch, Typography } from 'antd'
 import WithLabel from '~/components/WithLabel'
 import { FieldInputsProps } from '.'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import metadataTypes from '~/utilities/metadataTypes'
 import MultiInput from '~/components/MultiInputs'
 

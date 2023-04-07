@@ -9,7 +9,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query['uid'] as string
 
     const image = await prisma.media.findUnique({
-        where: { id: parseInt(id) },
+        where: { id },
     })
 
     if (!image) return res.status(500).json({ error: 'Image not found' })
@@ -21,7 +21,7 @@ const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query['uid'] as string
 
     const image: Media = await prisma.media.delete({
-        where: { id: parseInt(id) },
+        where: { id },
     })
 
     if (!image) return res.status(500).json({ error: 'File does not exist' })
@@ -39,7 +39,7 @@ const PUT = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query['uid'] as string
 
     const image: Media = await prisma.media.update({
-        where: { id: parseInt(id) },
+        where: { id },
         data: { alt: req.body.alt },
     })
 

@@ -58,7 +58,7 @@ const columns: ColumnsType<DataType> = [
                                 </Popover>
                             ),
                         },
-                        ...container?.slug?.full?.split('/').map((word: string, idx: number) => ({
+                        ...container?.slug?.full?.split('/').map((word: string) => ({
                             title: word,
                         })),
                     ]}

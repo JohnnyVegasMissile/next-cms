@@ -32,6 +32,27 @@ const initialValues: ContainerCreation<Dayjs> = {
 
 const cleanDetails = (container: ContainerResponse): ContainerCreation<Dayjs> => ({
     ...container,
+    fields:
+        container?.fields?.map((field) => ({
+            ...field,
+
+            min: field.min || undefined,
+            max: field.min || undefined,
+
+            startDate: field.startDate ? dayjs(field.startDate) : undefined,
+            endDate: field.endDate ? dayjs(field.endDate) : undefined,
+            valueMin: field.valueMin || undefined,
+            valueMax: field.valueMax || undefined,
+
+            defaultTextValue: field.defaultTextValue || undefined,
+            defaultMultipleTextValue: field.defaultMultipleTextValue || undefined,
+            defaultNumberValue: field.defaultNumberValue || undefined,
+            defaultMultipleNumberValue: field.defaultMultipleNumberValue || undefined,
+            defaultDateValue: field.defaultDateValue ? dayjs(field.defaultDateValue) : undefined,
+            defaultMultipleDateValue: field.defaultMultipleDateValue.map((date) => dayjs(date)) || [],
+            defaultJsonValue: field.defaultJsonValue || undefined,
+            defaultMultipleJsonValue: field.defaultMultipleJsonValue || undefined,
+        })) || [],
     slug: container?.slug?.basic.split('/') || [''],
 })
 

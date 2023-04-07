@@ -1,14 +1,14 @@
 import { Card, Col, Divider, Input, InputNumber, Row, Select, Space, Switch, Typography } from 'antd'
 import WithLabel from '~/components/WithLabel'
 import { FieldInputsProps } from '.'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import metadataTypes from '~/utilities/metadataTypes'
 import MultiInput from '~/components/MultiInputs'
 
 const { Text } = Typography
 
 const NumberInputs = ({ field, errors, onChange }: FieldInputsProps) => {
-    const [newValue, setNewValue] = useState<number>()
+    // const [newValue, setNewValue] = useState<number>()
     useEffect(() => {
         if (field.multiple) {
             if (field.defaultNumberValue) onChange('defaultMultipleNumberValue', [field.defaultNumberValue])
@@ -19,7 +19,7 @@ const NumberInputs = ({ field, errors, onChange }: FieldInputsProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [field.multiple])
 
-    const errorMultiDefault = errors?.defaultMultipleNumberValue?.find((e: string) => !!e)
+    // const errorMultiDefault = errors?.defaultMultipleNumberValue?.find((e: string) => !!e)
 
     return (
         <Row gutter={[16, 16]}>

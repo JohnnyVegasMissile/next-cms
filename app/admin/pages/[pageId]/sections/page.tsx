@@ -95,19 +95,11 @@ const cleanBeforeSend = (values: { content: SectionCreation[]; sidebar: SectionC
         const stringifiedContent = JSON.stringify(section.content)
 
         section.medias.forEach((_, key) => {
-            if (
-                stringifiedContent.includes(`"mediaId":${key},`) ||
-                stringifiedContent.includes(`"mediaId":${key}}`)
-            )
-                medias.push(key)
+            if (stringifiedContent.includes(`"${key}"`)) medias.push(key)
         })
 
         section.forms.forEach((_, key) => {
-            if (
-                stringifiedContent.includes(`"formId":${key},`) ||
-                stringifiedContent.includes(`"formId":${key}}`)
-            )
-                forms.push(key)
+            if (stringifiedContent.includes(`"${key}"`)) forms.push(key)
         })
 
         return {
@@ -125,19 +117,11 @@ const cleanBeforeSend = (values: { content: SectionCreation[]; sidebar: SectionC
         const stringifiedContent = JSON.stringify(section.content)
 
         section.medias.forEach((_, key) => {
-            if (
-                stringifiedContent.includes(`"mediaId":${key},`) ||
-                stringifiedContent.includes(`"mediaId":${key}}`)
-            )
-                medias.push(key)
+            if (stringifiedContent.includes(`"${key}"`)) medias.push(key)
         })
 
         section.forms.forEach((_, key) => {
-            if (
-                stringifiedContent.includes(`"formId":${key},`) ||
-                stringifiedContent.includes(`"formId":${key}}`)
-            )
-                forms.push(key)
+            if (stringifiedContent.includes(`"${key}"`)) forms.push(key)
         })
 
         return {

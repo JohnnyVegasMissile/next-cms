@@ -1,23 +1,35 @@
 import { PageType } from '@prisma/client'
 import QuickEditButton from '~/components/QuickEditButton'
 import { prisma } from '~/utilities/prisma'
+import Sidebar from '~/components/Sidebar'
+import { Suspense } from 'react'
+import Content from '~/components/Content'
 
 const getProps = async () => {
-    return await prisma.page.findFirst({
+    const page = await prisma.page.findFirst({
         where: { type: PageType.NOTFOUND },
     })
+
+    return { page }
 }
 
-const NotFound = async () => {
-    const page = await getProps()
+const Home = async () => {
+    const { page } = await getProps()
 
     return (
         <>
             <QuickEditButton />
-            <div>page: {page?.name}</div>
+            <Suspense>
+                {/* @ts-expect-error Server Component */}
+                <Sidebar id={page!.id} type="page" />
+            </Suspense>
+            <Suspense>
+                {/* @ts-expect-error Server Component */}
+                <Content id={page!.id} type="page" />
+            </Suspense>
         </>
     )
 }
 
 export const revalidate = 'force-cache'
-export default NotFound
+export default Home

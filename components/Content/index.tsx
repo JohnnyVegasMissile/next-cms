@@ -1,5 +1,5 @@
 import { SectionType } from '@prisma/client'
-import styles from './Sidebar.module.scss'
+import styles from './Content.module.scss'
 import { prisma } from '~/utilities/prisma'
 import { blocksViews } from '~/blocks/views'
 import { BlockKey } from '~/blocks'
@@ -12,19 +12,19 @@ interface ContentProps {
 
 const getProps = async (id: ObjectId, type: 'page' | 'container' | 'content') => {
     const topLayout = await prisma.section.findMany({
-        where: { pageId: id, type: SectionType.LAYOUT_SIDEBAR_TOP },
+        where: { type: SectionType.LAYOUT_CONTENT_TOP },
         orderBy: { position: 'asc' },
     })
 
     const bottomLayout = await prisma.section.findMany({
-        where: { pageId: id, type: SectionType.LAYOUT_SIDEBAR_BOTTOM },
+        where: { type: SectionType.LAYOUT_CONTENT_BOTTOM },
         orderBy: { position: 'asc' },
     })
 
     switch (type) {
         case 'page': {
             const content = await prisma.section.findMany({
-                where: { pageId: id, type: SectionType.PAGE_SIDEBAR },
+                where: { pageId: id, type: SectionType.PAGE },
                 orderBy: { position: 'asc' },
             })
 
@@ -45,7 +45,7 @@ const Content = async ({ id, type }: ContentProps) => {
     const { topLayout, content, bottomLayout } = await getProps(id, type)
 
     return (
-        <aside className={styles['aside']}>
+        <main className={styles['content']}>
             {topLayout.map((section) => {
                 const View = blocksViews[section.block as BlockKey]
 
@@ -94,7 +94,7 @@ const Content = async ({ id, type }: ContentProps) => {
                     />
                 )
             })}
-        </aside>
+        </main>
     )
 }
 

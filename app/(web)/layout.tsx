@@ -1,8 +1,10 @@
 import styles from './layout.module.scss'
 import { prisma } from '~/utilities/prisma'
-import { SettingType } from '@prisma/client'
+import { SectionType, SettingType } from '@prisma/client'
 import classNames from 'classnames'
-import localFont from "next/font/local"
+import localFont from 'next/font/local'
+import blocksViews from '~/blocks/views'
+import { BlockKey } from '~/blocks'
 
 const myFont = localFont({ src: '../../public/Garute-VF.ttf', variable: '--my-font' })
 
@@ -37,8 +39,20 @@ const getSettings = async () => {
     })
 }
 
+const getHeaders = async () =>
+    await prisma.section.findMany({
+        where: { type: SectionType.LAYOUT_HEADER },
+    })
+
+const getFooters = async () =>
+    await prisma.section.findMany({
+        where: { type: SectionType.LAYOUT_FOOTER },
+    })
+
 const Layout = async ({ children }: { children: React.ReactNode }) => {
     const settings = await getSettings()
+    const headers = await getHeaders()
+    const footers = await getFooters()
 
     const maintenance = settings.find((e) => e.type === SettingType.MAINTENANCE_MODE)?.value === 'true'
     const position = settings.find((e) => e.type === SettingType.SIDEBAR_POSITION)?.value
@@ -48,7 +62,24 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 
     return (
         <>
-            <header>Header</header>
+            <header>
+                {headers.map((section) => {
+                    const View = blocksViews[section.block as BlockKey]
+
+                    if (!View) return null
+
+                    return (
+                        <View
+                            key={section.id}
+                            content={section.content}
+                            images={[]}
+                            files={[]}
+                            videos={[]}
+                            forms={[]}
+                        />
+                    )
+                })}
+            </header>
             <div
                 className={classNames(styles['content-wrap'], styles[brSize!], myFont.className, {
                     [styles['left']!]: position === 'left',
@@ -57,7 +88,24 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
             >
                 {children}
             </div>
-            <footer>Footer</footer>
+            <footer>
+                {footers.map((section) => {
+                    const View = blocksViews[section.block as BlockKey]
+
+                    if (!View) return null
+
+                    return (
+                        <View
+                            key={section.id}
+                            content={section.content}
+                            images={[]}
+                            files={[]}
+                            videos={[]}
+                            forms={[]}
+                        />
+                    )
+                })}
+            </footer>
         </>
     )
 }

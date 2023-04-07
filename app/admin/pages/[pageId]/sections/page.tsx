@@ -1,7 +1,7 @@
 'use client'
 
-import { Section, SettingType } from '@prisma/client'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { Section } from '@prisma/client'
+import { useMutation } from '@tanstack/react-query'
 import { FloatButton, Spin, message } from 'antd'
 import {
     MenuOutlined,
@@ -19,8 +19,9 @@ import { ObjectId } from '~/types'
 import blocks, { BlockKey } from '~/blocks'
 import styles from './page.module.scss'
 import classNames from 'classnames'
-import { getSidebar } from '~/network/api'
 import SectionsManager from '~/components/SectionsManager'
+import useSidebarSettings from '~/hooks/useSidebarSettings'
+import FullScreenLoading from '~/components/FullScreenLoading'
 
 const validate = (values: { content: SectionCreation[]; sidebar: SectionCreation[] }) => {
     let errors: any = {}
@@ -160,60 +161,41 @@ const PageSections = ({ params }: any) => {
         }
     )
 
-    const sidebarSettings = useQuery(['sidebar'], () => getSidebar(), {
-        onSuccess: () => {
-            const sidebarIsActive =
-                sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_IS_ACTIVE)?.value === 'true'
-
-            setShowSidebar(sidebarIsActive)
-        },
-    })
-
-    const sidebarIsActive =
-        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_IS_ACTIVE)?.value === 'true'
-    const sidebarWidth = `${
-        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_WIDTH)?.value || '0'
-    }${sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_UNIT)?.value || 'rem'}`
-
-    const sidebarColor =
-        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_COLOR)?.value || '#ef476f'
-    const sidebarBP =
-        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_BREAKPOINT_SIZE)?.value || 'medium'
-    const sidebarPosition =
-        sidebarSettings.data?.find((e) => e.type === SettingType.SIDEBAR_POSITION)?.value || 'left'
+    const sidebar = useSidebarSettings(() => setShowSidebar(true))
 
     useEffect(() => {
         details.mutate()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    if (details.isLoading || sidebarSettings.isLoading) {
-        return <Spin />
-    }
+    if (details.isLoading || sidebar.isLoading) return <FullScreenLoading label="Loading sections..." />
 
     return (
-        <div className={classNames(styles['content-wrap'], sidebarPosition, sidebarBP)}>
-            {sidebarIsActive && (
-                <aside
-                    className={classNames(styles['aside'], { [styles['open']!]: showSidebar })}
-                    style={{ width: sidebarWidth, backgroundColor: sidebarColor }}
-                >
+        <>
+            <div className={classNames(styles['content-wrap'], sidebar.position, sidebar.breakpointClass)}>
+                {sidebar.isActive && (
+                    <aside
+                        className={classNames(styles['aside'], { [styles['open']!]: showSidebar })}
+                        style={{ width: sidebar.width, backgroundColor: sidebar.backgroundColor }}
+                    >
+                        <SectionsManager
+                            name="sidebar"
+                            sections={formik.values.sidebar}
+                            onChange={formik.setFieldValue}
+                            error={formik.errors.sidebar}
+                        />
+                    </aside>
+                )}
+                <div className={styles['content']}>
                     <SectionsManager
-                        name="sidebar"
-                        sections={formik.values.sidebar}
+                        name="content"
+                        sections={formik.values.content}
                         onChange={formik.setFieldValue}
-                        error={formik.errors.sidebar}
+                        error={formik.errors.content}
                     />
-                </aside>
-            )}
-            <div className={styles['content']}>
-                <SectionsManager
-                    name="content"
-                    sections={formik.values.content}
-                    onChange={formik.setFieldValue}
-                    error={formik.errors.content}
-                />
+                </div>
             </div>
+
             <FloatButton.Group
                 trigger="hover"
                 type="primary"
@@ -222,7 +204,7 @@ const PageSections = ({ params }: any) => {
             >
                 {!submit.isLoading && (
                     <>
-                        {sidebarIsActive && (
+                        {sidebar.isActive && (
                             <FloatButton
                                 icon={showSidebar ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
                                 onClick={() => setShowSidebar(!showSidebar)}
@@ -240,7 +222,7 @@ const PageSections = ({ params }: any) => {
                     </>
                 )}
             </FloatButton.Group>
-        </div>
+        </>
     )
 }
 

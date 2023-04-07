@@ -1,9 +1,10 @@
-import { SectionType } from '@prisma/client'
+import { SectionType, SettingType } from '@prisma/client'
 import styles from './Sidebar.module.scss'
 import { prisma } from '~/utilities/prisma'
 import { blocksViews } from '~/blocks/views'
 import { BlockKey } from '~/blocks'
 import { ObjectId } from '~/types'
+import classNames from 'classnames'
 
 interface SidebarProps {
     id: ObjectId
@@ -12,12 +13,12 @@ interface SidebarProps {
 
 const getProps = async (id: ObjectId, type: 'page' | 'container' | 'content') => {
     const topLayout = await prisma.section.findMany({
-        where: { pageId: id, type: SectionType.LAYOUT_SIDEBAR_TOP },
+        where: { type: SectionType.LAYOUT_SIDEBAR_TOP },
         orderBy: { position: 'asc' },
     })
 
     const bottomLayout = await prisma.section.findMany({
-        where: { pageId: id, type: SectionType.LAYOUT_SIDEBAR_BOTTOM },
+        where: { type: SectionType.LAYOUT_SIDEBAR_BOTTOM },
         orderBy: { position: 'asc' },
     })
 
@@ -41,11 +42,19 @@ const getProps = async (id: ObjectId, type: 'page' | 'container' | 'content') =>
     }
 }
 
+const getBP = async () =>
+    await prisma.setting.findUnique({
+        where: {
+            type: SettingType.SIDEBAR_BREAKPOINT_SIZE,
+        },
+    })
+
 const Sidebar = async ({ id, type }: SidebarProps) => {
     const { topLayout, content, bottomLayout } = await getProps(id, type)
+    const breakPoint = await getBP()
 
     return (
-        <aside className={styles['aside']}>
+        <aside className={classNames(styles['aside'], styles[breakPoint?.value!])}>
             {topLayout.map((section) => {
                 const View = blocksViews[section.block as BlockKey]
 

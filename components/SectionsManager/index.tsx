@@ -10,9 +10,10 @@ interface SectionsManagerProps {
     sections: SectionCreation[]
     onChange: (name: string, value: any) => void
     error: any
+    label?: string
 }
 
-const SectionsManager = ({ name, sections, onChange, error }: SectionsManagerProps) => {
+const SectionsManager = ({ name, sections, onChange, error, label }: SectionsManagerProps) => {
     const items = [
         {
             key: 'elements',
@@ -64,7 +65,7 @@ const SectionsManager = ({ name, sections, onChange, error }: SectionsManagerPro
             <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
                 <Dropdown menu={{ items }}>
                     <Button size="small" type="primary" icon={<PlusOutlined />}>
-                        Add section
+                        Add {label ? label : 'section'}
                     </Button>
                 </Dropdown>
             </div>

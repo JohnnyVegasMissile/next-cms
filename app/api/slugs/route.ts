@@ -8,7 +8,14 @@ export async function GET(request: NextRequest) {
 
     let where = {}
 
-    if (!!q) where = { page: { name: { contains: q } } }
+    if (!!q)
+        where = {
+            OR: [
+                { page: { name: { contains: q } } },
+                { container: { name: { contains: q } } },
+                { content: { name: { contains: q } } },
+            ],
+        }
 
     const slugs = await prisma.slug.findMany({ where, include: { page: true } })
 

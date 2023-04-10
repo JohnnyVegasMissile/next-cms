@@ -98,7 +98,7 @@ const CreatePage = ({ params }: any) => {
         <>
             <Card size="small">
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text strong>Create new page</Text>
+                    <Text strong>{isUpdate ? 'Update' : 'Create new'} page</Text>
 
                     <Space>
                         {isUpdate && (

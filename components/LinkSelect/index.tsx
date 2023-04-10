@@ -1,10 +1,18 @@
-import { Input, Select, TreeSelect } from 'antd'
-import { LinkOutlined, GlobalOutlined } from '@ant-design/icons'
+import { Input, Select, Space, TreeSelect } from 'antd'
+import {
+    LinkOutlined,
+    GlobalOutlined,
+    HomeOutlined,
+    LoginOutlined,
+    FileOutlined,
+    ContainerOutlined,
+    BookOutlined,
+} from '@ant-design/icons'
 import './styles.scss'
 import { useQuery } from '@tanstack/react-query'
-import { getSlugs } from '~/network/slugs'
-import { useState } from 'react'
+import { getSlugsSimple } from '~/network/slugs'
 import { ObjectId } from '~/types'
+import { PageType } from '@prisma/client'
 
 const { Option } = Select
 
@@ -27,13 +35,37 @@ interface LinkSelectProps {
 }
 
 const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
-    const [q, setQ] = useState('')
-    const slugs = useQuery(['slugs'], () => getSlugs(''))
+    // const [q, setQ] = useState('')
+    const slugs = useQuery(['slugs-simple'], () => getSlugsSimple(), { enabled: value.type === 'IN' })
 
     const options = slugs.data?.map((slug) => ({
         value: slug.id,
-        label: slug.page?.name || slug.full,
-        children: [],
+        label:
+            slug.page?.type === PageType.SIGNIN ? (
+                <Space>
+                    <LoginOutlined />
+                    {slug.page?.name}
+                </Space>
+            ) : !!slug.page ? (
+                <Space>
+                    <FileOutlined />
+                    {slug.page?.name}
+                </Space>
+            ) : (
+                <Space>
+                    <ContainerOutlined />
+                    {slug.container?.name}
+                </Space>
+            ),
+        children: slug.childs.map((child) => ({
+            value: child.id,
+            label: (
+                <Space>
+                    <BookOutlined />
+                    {child.content?.name}
+                </Space>
+            ),
+        })),
     }))
 
     const onPageChange = (slugId: ObjectId | undefined) => onChange({ ...value, slugId })
@@ -58,7 +90,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
     const onLinkChange = (link: string) => onChange({ ...value, link })
 
     const selectBefore = (
-        <Select value={value.prototol} onChange={onProtocolChange}>
+        <Select value={value.prototol} onChange={onProtocolChange} size="small">
             <Option value="http">http://</Option>
             <Option value="https">https://</Option>
         </Select>
@@ -81,7 +113,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                         onSearch={setQ}
                     /> */}
                     <TreeSelect
-                        showSearch
+                        // showSearch
                         size="small"
                         placeholder="Please select"
                         className="link-select-tree"
@@ -89,10 +121,21 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                         dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                         allowClear
                         onChange={onPageChange}
-                        treeData={options}
+                        treeData={[
+                            {
+                                value: '',
+                                label: (
+                                    <Space>
+                                        <HomeOutlined />
+                                        Homepage
+                                    </Space>
+                                ),
+                            },
+                            ...(options || []),
+                        ]}
                         autoClearSearchValue={false}
-                        searchValue={q}
-                        onSearch={setQ}
+                        // searchValue={q}
+                        // onSearch={setQ}
                     />
                 </>
             ) : (
@@ -116,7 +159,6 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
             </Select>
         </div>
     )
-    //    ;
 }
 
 export default LinkSelect

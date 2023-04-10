@@ -5,7 +5,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import styles from './layout.module.scss'
 
 const queryClient = new QueryClient({
-    defaultOptions: { queries: { refetchOnWindowFocus: false, refetchOnMount: false } },
+    defaultOptions: {
+        queries: { refetchOnWindowFocus: false, refetchOnMount: false, networkMode: 'always' },
+    },
 })
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

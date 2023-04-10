@@ -409,18 +409,12 @@ const Settings = () => {
         },
     ]
 
-    const [link, setLink] = useState<LinkValue>({
-        type: 'IN',
-    })
-
     if (details.isLoading) {
         return <Spin />
     }
 
     return (
         <>
-            {JSON.stringify(link, null, 2)}
-            <LinkSelect value={link} onChange={setLink} />
             <Card size="small">
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Text strong>Settings</Text>

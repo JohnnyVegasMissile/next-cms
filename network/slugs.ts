@@ -1,4 +1,4 @@
-import { Page, Slug } from '@prisma/client'
+import { Page, PageType, Slug } from '@prisma/client'
 import INSTANCE from './api'
 import { ObjectId } from '~/types'
 
@@ -12,6 +12,36 @@ export const getSlugs = (
     INSTANCE({
         method: 'GET',
         url: `/api/slugs`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        params: { q },
+    })
+
+export const getSlugsSimple = (
+    q?: string
+): Promise<
+    (Slug & {
+        page: {
+            id: string
+            name: string
+            type: PageType
+        } | null
+        container: {
+            id: string
+            name: string
+        } | null
+        childs: (Slug & {
+            content: {
+                id: string
+                name: string
+            } | null
+        })[]
+    })[]
+> =>
+    INSTANCE({
+        method: 'GET',
+        url: `/api/slugs/simple`,
         headers: {
             'Content-Type': 'application/json',
         },

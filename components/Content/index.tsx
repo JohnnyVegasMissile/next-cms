@@ -4,10 +4,12 @@ import { prisma } from '~/utilities/prisma'
 import { blocksViews } from '~/blocks/views'
 import { BlockKey } from '~/blocks'
 import { ObjectId } from '~/types'
+import { ReactNode } from 'react'
 
 interface ContentProps {
     id: ObjectId
     type: 'page' | 'container' | 'content'
+    fallback?: ReactNode
 }
 
 const getProps = async (id: ObjectId, type: 'page' | 'container' | 'content') => {
@@ -41,7 +43,7 @@ const getProps = async (id: ObjectId, type: 'page' | 'container' | 'content') =>
     }
 }
 
-const Content = async ({ id, type }: ContentProps) => {
+const Content = async ({ id, type, fallback }: ContentProps) => {
     const { topLayout, content, bottomLayout } = await getProps(id, type)
 
     return (
@@ -62,6 +64,7 @@ const Content = async ({ id, type }: ContentProps) => {
                     />
                 )
             })}
+            {!content?.length && fallback}
             {content?.map((section) => {
                 const View = blocksViews[section.block as BlockKey]
 

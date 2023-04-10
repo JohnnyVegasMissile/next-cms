@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Card, Col, Divider, Input, Row, Select, Space, Spin, Typography } from 'antd'
-import { DeleteOutlined, CheckOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Divider, Input, Row, Select, Space, Spin, Switch, Typography } from 'antd'
+import { DeleteOutlined, CheckOutlined, PlusOutlined } from '@ant-design/icons'
 import MenuLine from '~/components/MenuLine'
 import { useFormik } from 'formik'
 import get from 'lodash.get'
@@ -27,6 +27,7 @@ type Child<T> = {
     label: string
     type: 'TITLE' | 'LINK' | 'CONTENT'
     link?: LinkValue
+    extras: { name: string; value: string }[]
 
     container?: ObjectId
     filters?: any
@@ -48,6 +49,7 @@ const CreateMenu = ({ params }: any) => {
     const { menuId } = params
     const isUpdate = menuId !== 'create'
     const [selected, setSelected] = useState<number[] | undefined>()
+    const [test, setTest] = useState<string>()
     const formik = useFormik({
         initialValues,
         // validate,
@@ -154,6 +156,7 @@ const CreateMenu = ({ params }: any) => {
                                                                             type: 'IN',
                                                                         }
                                                                       : undefined,
+                                                              extras: [],
                                                           },
                                                       ])
                                         }
@@ -201,6 +204,7 @@ const CreateMenu = ({ params }: any) => {
                                                                                         type: 'IN',
                                                                                     }
                                                                                   : undefined,
+                                                                          extras: [],
                                                                       },
                                                                   ]
                                                               )
@@ -246,6 +250,7 @@ const CreateMenu = ({ params }: any) => {
                                                           type: 'IN',
                                                       }
                                                     : undefined,
+                                            extras: [],
                                         },
                                     ])
                                     handleSelection([formik.values.menuItems.length])
@@ -254,7 +259,7 @@ const CreateMenu = ({ params }: any) => {
                         </Space>
                     </Col>
                     <Col span={8}>
-                        {!!selected ? (
+                        {!!selected && (
                             <Card
                                 title={
                                     <Text>
@@ -264,40 +269,123 @@ const CreateMenu = ({ params }: any) => {
                                 }
                                 size="small"
                             >
-                                {selectedMenu.type === 'LINK' && (
-                                    <LinkSelect
-                                        value={selectedMenu.link!}
-                                        onChange={(e) => formik.setFieldValue(`${nameSelected}.link`, e)}
-                                    />
-                                )}
+                                <Space direction="vertical" style={{ width: '100%' }}>
+                                    {selectedMenu.type === 'LINK' && (
+                                        <WithLabel label="Link">
+                                            <LinkSelect
+                                                value={selectedMenu.link!}
+                                                onChange={(e) =>
+                                                    formik.setFieldValue(`${nameSelected}.link`, e)
+                                                }
+                                            />
+                                        </WithLabel>
+                                    )}
 
-                                {selectedMenu.type === 'CONTENT' && (
-                                    <>
-                                        <ListSelect.Container
-                                            value={selectedMenu.container}
-                                            onChange={(e) =>
-                                                formik.setFieldValue(`${nameSelected}.container`, e)
-                                            }
-                                        />
-                                        {!!selectedMenu.container && container.isFetching && <Spin />}
-
-                                        {!!selectedMenu.container && !!container.data?.fields?.length && (
-                                            <>
-                                                <Divider />
-
-                                                <ContentsFilter
-                                                    fields={container.data?.fields}
-                                                    values={selectedMenu.filters}
+                                    {selectedMenu.type === 'CONTENT' && (
+                                        <>
+                                            <WithLabel label="Container">
+                                                <ListSelect.Container
+                                                    value={selectedMenu.container}
                                                     onChange={(e) =>
-                                                        formik.setFieldValue(`${nameSelected}.filters`, e)
+                                                        formik.setFieldValue(`${nameSelected}.container`, e)
                                                     }
                                                 />
-                                            </>
-                                        )}
-                                    </>
-                                )}
+                                            </WithLabel>
+
+                                            {!!selectedMenu.container && container.isFetching && <Spin />}
+
+                                            {!!selectedMenu.container && !!container.data?.fields?.length && (
+                                                <>
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            gap: 8,
+                                                        }}
+                                                    >
+                                                        <Divider
+                                                            style={{ marginTop: '0.5rem', marginBottom: 0 }}
+                                                        />
+                                                        <ContentsFilter
+                                                            fields={container.data?.fields}
+                                                            values={selectedMenu.filters}
+                                                            onChange={(e) =>
+                                                                formik.setFieldValue(
+                                                                    `${nameSelected}.filters`,
+                                                                    e
+                                                                )
+                                                            }
+                                                        />
+                                                        <Divider
+                                                            style={{ marginTop: 0, marginBottom: '0.5rem' }}
+                                                        />
+                                                    </div>
+                                                </>
+                                            )}
+                                        </>
+                                    )}
+
+                                    <Card title="Extra" size="small">
+                                        <Space direction="vertical" style={{ width: '100%' }}>
+                                            {selectedMenu.extras.map((extra, idx) => (
+                                                <Space.Compact key={idx} size="small">
+                                                    <Input
+                                                        placeholder="Name"
+                                                        size="small"
+                                                        value={extra.name}
+                                                        onChange={(e) =>
+                                                            formik.setFieldValue(
+                                                                `${nameSelected}.extras.${idx}.name`,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                    <Input
+                                                        placeholder="Value"
+                                                        size="small"
+                                                        value={extra.value}
+                                                        onChange={(e) =>
+                                                            formik.setFieldValue(
+                                                                `${nameSelected}.extras.${idx}.value`,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                    <Button
+                                                        type="primary"
+                                                        danger
+                                                        icon={<DeleteOutlined />}
+                                                        onClick={() => {
+                                                            const extras = [...selectedMenu.extras]
+
+                                                            extras.splice(idx, 1)
+                                                            formik.setFieldValue(
+                                                                `${nameSelected}.extras`,
+                                                                extras
+                                                            )
+                                                        }}
+                                                    />
+                                                </Space.Compact>
+                                            ))}
+
+                                            <Button
+                                                icon={<PlusOutlined />}
+                                                type="primary"
+                                                size="small"
+                                                onClick={() =>
+                                                    formik.setFieldValue(
+                                                        `${nameSelected}.extras.${selectedMenu.extras.length}`,
+                                                        { name: '', value: '' }
+                                                    )
+                                                }
+                                            >
+                                                Add
+                                            </Button>
+                                        </Space>
+                                    </Card>
+                                </Space>
                             </Card>
-                        ) : null}
+                        )}
                     </Col>
                 </Row>
             </Card>

@@ -331,12 +331,29 @@ enum SectionType {
   LAYOUT_SIDEBAR_BOTTOM
 }
 
+enum CodeLanguage {
+  AR
+  ZH
+  EN
+  FR
+  DE
+  HI
+  IT
+  JA
+  KO
+  PO
+  RU
+  ES
+  TR
+}
+
 model Section {
   id String @id @default(cuid())
 
   type     SectionType
   block    String
   position Int
+  language CodeLanguage @default(EN)
 
   content Json
 
@@ -504,6 +521,8 @@ model ContentField {
   multipleDateValue   DateTime[]
   jsonValue           Json?
   multipleJsonValue   Json[]
+
+  @@unique([contentId, releatedFieldId])
 }
 
 // MEDIAS

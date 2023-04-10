@@ -1,8 +1,8 @@
+import { Suspense } from 'react'
 import { PageType } from '@prisma/client'
 import QuickEditButton from '~/components/QuickEditButton'
 import { prisma } from '~/utilities/prisma'
 import Sidebar from '~/components/Sidebar'
-import { Suspense } from 'react'
 import Content from '~/components/Content'
 
 const getProps = async () => {
@@ -10,11 +10,11 @@ const getProps = async () => {
         where: { type: PageType.HOMEPAGE },
     })
 
-    return { page }
+    return page
 }
 
 const Home = async () => {
-    const { page } = await getProps()
+    const page = await getProps()
 
     return (
         <>
@@ -25,7 +25,7 @@ const Home = async () => {
             </Suspense>
             <Suspense>
                 {/* @ts-expect-error Server Component */}
-                <Content id={page!.id} type="page" />
+                <Content id={page!.id} type="page" fallback={<>Sign in</>} />
             </Suspense>
         </>
     )

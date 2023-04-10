@@ -40,23 +40,17 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
 
     const options = slugs.data?.map((slug) => ({
         value: slug.id,
-        label:
-            slug.page?.type === PageType.SIGNIN ? (
-                <Space>
-                    <LoginOutlined />
-                    {slug.page?.name}
-                </Space>
-            ) : !!slug.page ? (
-                <Space>
-                    <FileOutlined />
-                    {slug.page?.name}
-                </Space>
-            ) : (
-                <Space>
-                    <ContainerOutlined />
-                    {slug.container?.name}
-                </Space>
-            ),
+        label: !!slug.page ? (
+            <Space>
+                <FileOutlined />
+                {slug.page?.name}
+            </Space>
+        ) : (
+            <Space>
+                <ContainerOutlined />
+                {slug.container?.name}
+            </Space>
+        ),
         children: slug.childs.map((child) => ({
             value: child.id,
             label: (
@@ -97,7 +91,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
     )
 
     return (
-        <div>
+        <Space.Compact size="small">
             {value.type === 'IN' ? (
                 <>
                     {/* <Cascader
@@ -123,11 +117,20 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                         onChange={onPageChange}
                         treeData={[
                             {
-                                value: '',
+                                value: 'HOME',
                                 label: (
                                     <Space>
                                         <HomeOutlined />
                                         Homepage
+                                    </Space>
+                                ),
+                            },
+                            {
+                                value: 'SIGNIN',
+                                label: (
+                                    <Space>
+                                        <LoginOutlined />
+                                        Sign In
                                     </Space>
                                 ),
                             },
@@ -157,7 +160,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                     <GlobalOutlined />
                 </Option>
             </Select>
-        </div>
+        </Space.Compact>
     )
 }
 

@@ -1,6 +1,18 @@
 'use client'
 
-import { Button, Card, Checkbox, Col, Divider, Input, Row, Space, Typography } from 'antd'
+import {
+    Button,
+    Card,
+    Checkbox,
+    Col,
+    Divider,
+    Input,
+    InputNumber,
+    Row,
+    Space,
+    Switch,
+    Typography,
+} from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useFormik } from 'formik'
 import { RightType } from '@prisma/client'
@@ -87,21 +99,36 @@ const Settings = () => {
                         <Col span={6}>
                             <Card title="Pages" size="small">
                                 <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Checkbox value={RightType.VIEW_MY_PAGE}>View my pages</Checkbox>
                                     <Checkbox value={RightType.VIEW_ALL_PAGE}>View all pages</Checkbox>
-                                    <Divider style={{ margin: 0 }} />
-                                    <Checkbox value={RightType.CREATE_PAGE}>Create pages</Checkbox>
-                                    <Checkbox value={RightType.UPDATE_ALL_PAGE}>Update pages</Checkbox>
-                                    <Checkbox value={RightType.DELETE_PAGE}>Delete pages</Checkbox>
-                                    <Divider style={{ margin: 0 }} />
-                                    <Checkbox value={RightType.UPDATE_PAGE_SECTION}>
-                                        Update pages sections
-                                    </Checkbox>
+                                    {(formik.values.rights.includes(RightType.VIEW_MY_PAGE) ||
+                                        formik.values.rights.includes(RightType.VIEW_ALL_PAGE)) && (
+                                        <>
+                                            <Divider style={{ margin: 0 }} />
+                                            <Checkbox value={RightType.CREATE_PAGE}>Create pages</Checkbox>
+                                            <Checkbox value={RightType.UPDATE_ALL_PAGE}>
+                                                Update pages
+                                            </Checkbox>
+                                            <Checkbox value={RightType.DELETE_PAGE}>Delete pages</Checkbox>
+                                        </>
+                                    )}
+                                    {formik.values.rights.includes(RightType.UPDATE_ALL_PAGE) && (
+                                        <>
+                                            <Divider style={{ margin: 0 }} />
+                                            <Checkbox value={RightType.UPDATE_PAGE_SECTION}>
+                                                Update pages sections
+                                            </Checkbox>
+                                        </>
+                                    )}
                                 </Space>
                             </Card>
                         </Col>
                         <Col span={6}>
                             <Card title="Containers" size="small">
                                 <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Checkbox value={RightType.VIEW_MY_CONTAINER}>
+                                        View my containers
+                                    </Checkbox>
                                     <Checkbox value={RightType.VIEW_ALL_CONTAINER}>
                                         View all containers
                                     </Checkbox>
@@ -124,6 +151,7 @@ const Settings = () => {
                         <Col span={6}>
                             <Card title="Contents" size="small">
                                 <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Checkbox value={RightType.VIEW_MY_CONTENT}>View my contents</Checkbox>
                                     <Checkbox value={RightType.VIEW_ALL_CONTENT}>View all contents</Checkbox>
                                     <Divider style={{ margin: 0 }} />
                                     <Checkbox value={RightType.CREATE_CONTENT}>Create contents</Checkbox>
@@ -139,10 +167,22 @@ const Settings = () => {
                         <Col span={6}>
                             <Card title="Medias" size="small">
                                 <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Checkbox value={RightType.VIEW_MY_MEDIA}>View my medias</Checkbox>
                                     <Checkbox value={RightType.VIEW_ALL_MEDIA}>View all medias</Checkbox>
                                     <Divider style={{ margin: 0 }} />
                                     <Checkbox value={RightType.UPLOAD_MEDIA}>Upload medias</Checkbox>
-                                    <Checkbox value={RightType.UPDATE_MEDIA}>Update medias</Checkbox>
+                                    {formik.values.rights.includes(RightType.UPLOAD_MEDIA) && (
+                                        <div style={{ display: 'flex', gap: 12 }}>
+                                            <Text>Max upload size :</Text>
+                                            <InputNumber
+                                                size="small"
+                                                style={{ flex: 1 }}
+                                                addonAfter="mb"
+                                                min={0}
+                                            />
+                                        </div>
+                                    )}
+                                    <Checkbox value={RightType.UPDATE_MEDIA}>Update medias (ALT)</Checkbox>
                                     <Checkbox value={RightType.DELETE_MEDIA}>Delete medias</Checkbox>
                                 </Space>
                             </Card>
@@ -150,6 +190,7 @@ const Settings = () => {
                         <Col span={6}>
                             <Card title="Forms" size="small">
                                 <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Checkbox value={RightType.VIEW_MY_FORM}>View my forms</Checkbox>
                                     <Checkbox value={RightType.VIEW_ALL_FORM}>View all forms</Checkbox>
                                     <Divider style={{ margin: 0 }} />
                                     <Checkbox value={RightType.CREATE_FORM}>Create forms</Checkbox>

@@ -123,7 +123,7 @@ const ContentsFilter = ({ fields, values, onChange }: ContentsFilterProps) => {
                                         onChange={(e) => onChangeValue(field.id, e)}
                                         min={typeof field.min === 'number' ? field.min - 1 : undefined}
                                         max={typeof field.max === 'number' ? field.max + 1 : undefined}
-                                        style={{ width: '67%' }}
+                                        style={{ width: '100%' }}
                                     />
                                 </Space.Compact>
                             )}

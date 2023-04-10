@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { SectionType, SettingType } from '@prisma/client'
 import styles from './Sidebar.module.scss'
 import { prisma } from '~/utilities/prisma'
@@ -9,6 +10,7 @@ import classNames from 'classnames'
 interface SidebarProps {
     id: ObjectId
     type: 'page' | 'container' | 'content'
+    fallback?: ReactNode
 }
 
 const getProps = async (id: ObjectId, type: 'page' | 'container' | 'content') => {
@@ -49,7 +51,7 @@ const getBP = async () =>
         },
     })
 
-const Sidebar = async ({ id, type }: SidebarProps) => {
+const Sidebar = async ({ id, type, fallback }: SidebarProps) => {
     const { topLayout, content, bottomLayout } = await getProps(id, type)
     const breakPoint = await getBP()
 
@@ -71,6 +73,7 @@ const Sidebar = async ({ id, type }: SidebarProps) => {
                     />
                 )
             })}
+            {!content?.length && fallback}
             {content?.map((section) => {
                 const View = blocksViews[section.block as BlockKey]
 

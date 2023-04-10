@@ -1,11 +1,17 @@
+import { Suspense } from 'react'
 import { PageType } from '@prisma/client'
 import QuickEditButton from '~/components/QuickEditButton'
 import { prisma } from '~/utilities/prisma'
+import DefaultSection from '~/components/DefaultSection'
+import Sidebar from '~/components/Sidebar'
+import Content from '~/components/Content'
 
 const getProps = async () => {
-    return await prisma.page.findFirst({
-        where: { type: PageType.SIGNIN },
+    const page = await prisma.page.findFirst({
+        where: { type: PageType.HOMEPAGE },
     })
+
+    return page
 }
 
 const SignIn = async () => {
@@ -14,7 +20,14 @@ const SignIn = async () => {
     return (
         <>
             <QuickEditButton />
-            <div>pagee: {page?.name}</div>
+            <Suspense>
+                {/* @ts-expect-error Server Component */}
+                <Sidebar id={page!.id} type="page" />
+            </Suspense>
+            <Suspense>
+                {/* @ts-expect-error Server Component */}
+                <Content id={page!.id} type="page" fallback={<DefaultSection.SignIn />} />
+            </Suspense>
         </>
     )
 }

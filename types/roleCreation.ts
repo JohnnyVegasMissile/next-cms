@@ -1,6 +1,9 @@
-type RoleCreation = {
-  name: string;
-  rights: string[];
-};
+import { RightType } from '@prisma/client'
 
-export default RoleCreation;
+type RoleCreation = {
+    name: string
+    rights: RightType[]
+    uploadMaxSize?: number
+}
+
+export default RoleCreation

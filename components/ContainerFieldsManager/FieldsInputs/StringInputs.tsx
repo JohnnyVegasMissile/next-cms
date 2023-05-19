@@ -2,7 +2,7 @@ import { Card, Col, Divider, Input, InputNumber, Row, Select, Space, Switch, Typ
 import WithLabel from '~/components/WithLabel'
 import { FieldInputsProps } from '.'
 import { useEffect } from 'react'
-import metadataTypes from '~/utilities/metadataTypes'
+import { basic, openGraph, apple, links } from '~/utilities/metadataTypes'
 import MultiInput from '~/components/MultiInputs'
 
 const { Text } = Typography
@@ -85,7 +85,21 @@ const StringInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                         style={{ width: '100%' }}
                         value={field.metadatas}
                         onChange={(e) => onChange('metadatas', e)}
-                        options={metadataTypes}
+                        options={[
+                            ...basic,
+                            {
+                                label: 'Open Graph',
+                                options: openGraph,
+                            },
+                            {
+                                label: 'Apple',
+                                options: apple,
+                            },
+                            {
+                                label: 'Links',
+                                options: links,
+                            },
+                        ]}
                     />
                 </WithLabel>
             </Col>

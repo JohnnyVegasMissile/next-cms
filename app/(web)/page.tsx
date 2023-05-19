@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { PageType } from '@prisma/client'
 import QuickEditButton from '~/components/QuickEditButton'
 import { prisma } from '~/utilities/prisma'
+import DefaultSection from '~/components/DefaultSection'
 import Sidebar from '~/components/Sidebar'
 import Content from '~/components/Content'
 
@@ -25,7 +26,7 @@ const Home = async () => {
             </Suspense>
             <Suspense>
                 {/* @ts-expect-error Server Component */}
-                <Content id={page!.id} type="page" fallback={<>Sign in</>} />
+                <Content id={page!.id} type="page" fallback={<DefaultSection.Homepage />} />
             </Suspense>
         </>
     )

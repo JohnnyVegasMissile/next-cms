@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Card, Col, Divider, Input, Row, Select, Space, Spin, Switch, Typography } from 'antd'
+import { Button, Card, Col, Divider, Input, Row, Space, Spin, Typography } from 'antd'
 import { DeleteOutlined, CheckOutlined, PlusOutlined } from '@ant-design/icons'
 import MenuLine from '~/components/MenuLine'
 import { useFormik } from 'formik'
@@ -72,6 +72,16 @@ const CreateMenu = ({ params }: any) => {
     const nameSelected = `menuItems.${selected?.join('.childrens.')}`
     const selectedMenu = get(formik, `values.${nameSelected}`) as unknown as Child<any>
 
+    const onDelete = () => {
+        const indexToDelete = selected![selected!?.length - 1]
+        const copySelected = [...selected!]
+        copySelected.pop()
+
+        const childsName = `${copySelected?.join('.childrens.')}`
+
+        console.log(indexToDelete, copySelected, childsName)
+    }
+
     const container = useQuery(
         ['containers', { id: selectedMenu?.container }],
         () => getContainer(selectedMenu?.container!),
@@ -98,7 +108,7 @@ const CreateMenu = ({ params }: any) => {
                 </div>
             </Card>
 
-            <Card bordered={false} title="Menu" size="small">
+            <Card title="Menu" size="small">
                 <Row gutter={[16, 16]}>
                     <Col span={8}>
                         <WithLabel label="Name :" error={formik.errors.name}>
@@ -268,6 +278,15 @@ const CreateMenu = ({ params }: any) => {
                                     </Text>
                                 }
                                 size="small"
+                                extra={
+                                    <Button
+                                        size="small"
+                                        type="primary"
+                                        danger
+                                        icon={<DeleteOutlined />}
+                                        onClick={onDelete}
+                                    />
+                                }
                             >
                                 <Space direction="vertical" style={{ width: '100%' }}>
                                     {selectedMenu.type === 'LINK' && (
@@ -325,64 +344,63 @@ const CreateMenu = ({ params }: any) => {
                                         </>
                                     )}
 
-                                    <Card title="Extra" size="small">
-                                        <Space direction="vertical" style={{ width: '100%' }}>
-                                            {selectedMenu.extras.map((extra, idx) => (
-                                                <Space.Compact key={idx} size="small">
-                                                    <Input
-                                                        placeholder="Name"
-                                                        size="small"
-                                                        value={extra.name}
-                                                        onChange={(e) =>
-                                                            formik.setFieldValue(
-                                                                `${nameSelected}.extras.${idx}.name`,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                    <Input
-                                                        placeholder="Value"
-                                                        size="small"
-                                                        value={extra.value}
-                                                        onChange={(e) =>
-                                                            formik.setFieldValue(
-                                                                `${nameSelected}.extras.${idx}.value`,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                    <Button
-                                                        type="primary"
-                                                        danger
-                                                        icon={<DeleteOutlined />}
-                                                        onClick={() => {
-                                                            const extras = [...selectedMenu.extras]
+                                    <Divider>Extras</Divider>
 
-                                                            extras.splice(idx, 1)
-                                                            formik.setFieldValue(
-                                                                `${nameSelected}.extras`,
-                                                                extras
-                                                            )
-                                                        }}
-                                                    />
-                                                </Space.Compact>
-                                            ))}
+                                    {/* <Card size="small"> */}
+                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                        {selectedMenu.extras.map((extra, idx) => (
+                                            <Space.Compact key={idx} size="small" style={{ width: '100%' }}>
+                                                <Input
+                                                    placeholder="Name"
+                                                    size="small"
+                                                    value={extra.name}
+                                                    onChange={(e) =>
+                                                        formik.setFieldValue(
+                                                            `${nameSelected}.extras.${idx}.name`,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <Input
+                                                    placeholder="Value"
+                                                    size="small"
+                                                    value={extra.value}
+                                                    onChange={(e) =>
+                                                        formik.setFieldValue(
+                                                            `${nameSelected}.extras.${idx}.value`,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <Button
+                                                    type="primary"
+                                                    danger
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => {
+                                                        const extras = [...selectedMenu.extras]
 
-                                            <Button
-                                                icon={<PlusOutlined />}
-                                                type="primary"
-                                                size="small"
-                                                onClick={() =>
-                                                    formik.setFieldValue(
-                                                        `${nameSelected}.extras.${selectedMenu.extras.length}`,
-                                                        { name: '', value: '' }
-                                                    )
-                                                }
-                                            >
-                                                Add
-                                            </Button>
-                                        </Space>
-                                    </Card>
+                                                        extras.splice(idx, 1)
+                                                        formik.setFieldValue(`${nameSelected}.extras`, extras)
+                                                    }}
+                                                />
+                                            </Space.Compact>
+                                        ))}
+
+                                        <Button
+                                            icon={<PlusOutlined />}
+                                            type="primary"
+                                            size="small"
+                                            onClick={() =>
+                                                formik.setFieldValue(
+                                                    `${nameSelected}.extras.${selectedMenu.extras.length}`,
+                                                    { name: '', value: '' }
+                                                )
+                                            }
+                                        >
+                                            Add
+                                        </Button>
+                                    </Space>
+                                    {/* </Card> */}
                                 </Space>
                             </Card>
                         )}
@@ -390,7 +408,7 @@ const CreateMenu = ({ params }: any) => {
                 </Row>
             </Card>
 
-            {/* <Card bordered={false} title="Menu" size="small">
+            {/* <Card title="Menu" size="small">
                 <Row gutter={[16, 16]}>
                     <Col span={16}>
                         <Space direction="vertical" size={3} style={{ flex: 1, width: '100%' }}>

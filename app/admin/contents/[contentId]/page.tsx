@@ -332,7 +332,7 @@ const CreateContainer = ({ params }: any) => {
                 </div>
             </Card>
 
-            <Card bordered={false} size="small" title="Information">
+            <Card size="small" title="Information">
                 <Row gutter={[16, 16]}>
                     <Col span={16}>
                         <Row gutter={[16, 16]}>
@@ -417,7 +417,7 @@ const CreateContainer = ({ params }: any) => {
                 </Row>
             </Card>
             {!!formik.values.containerId && container.isSuccess && (
-                <Card bordered={false} bodyStyle={{ height: 'fit-content' }} size="small" title="Fields">
+                <Card bodyStyle={{ height: 'fit-content' }} size="small" title="Fields">
                     <Row gutter={[16, 16]}>
                         {formik.values.fields.map((field, idx) => (
                             <Col key={field.releatedFieldId} span={6}>

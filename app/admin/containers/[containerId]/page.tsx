@@ -204,7 +204,7 @@ const CreateContainer = ({ params }: any) => {
                 </div>
             </Card>
 
-            <Card bordered={false} size="small" title="Information">
+            <Card size="small" title="Information">
                 <Row gutter={[16, 16]}>
                     <Col span={16}>
                         <Row gutter={[16, 16]}>
@@ -260,7 +260,7 @@ const CreateContainer = ({ params }: any) => {
             </Card>
             <Row gutter={[16, 16]}>
                 <Col span={16}>
-                    <Card bordered={false} bodyStyle={{ height: 'fit-content' }} size="small" title="Field">
+                    <Card bodyStyle={{ height: 'fit-content' }} size="small" title="Field">
                         <ContainerFieldsManager
                             value={formik.values.fields}
                             onChange={(name, value) =>
@@ -271,12 +271,7 @@ const CreateContainer = ({ params }: any) => {
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card
-                        bordered={false}
-                        style={{ height: 'fit-content' }}
-                        size="small"
-                        title="Contents metadatas"
-                    >
+                    <Card style={{ height: 'fit-content' }} size="small" title="Contents metadatas">
                         <MetadatasList
                             name="contentsMetadatas"
                             value={formik.values.contentsMetadatas}

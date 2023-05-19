@@ -16,9 +16,10 @@ import {
     Select,
     message,
     Spin,
+    ColorPicker,
 } from 'antd'
 import { UploadOutlined, CheckOutlined, ReloadOutlined } from '@ant-design/icons'
-import ColorPicker from '~/components/ColorPicker'
+// import ColorPicker from '~/components/ColorPicker'
 import { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import { useMutation } from '@tanstack/react-query'
@@ -176,40 +177,68 @@ const Settings = () => {
             key: '1',
             title: 'Primary color',
             element: (
-                <ColorPicker
-                    value={formik.values[SettingType.PRIMARY_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.PRIMARY_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.PRIMARY_COLOR] && (
+                        <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                            formik.values[SettingType.PRIMARY_COLOR]
+                        }`}</Text>
+                    )}
+                    <ColorPicker
+                        value={formik.values[SettingType.PRIMARY_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.PRIMARY_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
         {
             key: '2',
             title: 'Secondary color',
             element: (
-                <ColorPicker
-                    value={formik.values[SettingType.SECONDARY_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.SECONDARY_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.SECONDARY_COLOR] && (
+                        <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                            formik.values[SettingType.SECONDARY_COLOR]
+                        }`}</Text>
+                    )}
+                    <ColorPicker
+                        value={formik.values[SettingType.SECONDARY_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.SECONDARY_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
         {
             key: '3',
             title: 'Background color',
             element: (
-                <ColorPicker
-                    value={formik.values[SettingType.BACKGROUND_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.BACKGROUND_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.BACKGROUND_COLOR] && (
+                        <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                            formik.values[SettingType.BACKGROUND_COLOR]
+                        }`}</Text>
+                    )}
+                    <ColorPicker
+                        value={formik.values[SettingType.BACKGROUND_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.BACKGROUND_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
         {
             key: '4',
             title: 'Extra color',
             element: (
-                <ColorPicker
-                    value={formik.values[SettingType.EXTRA_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.EXTRA_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.EXTRA_COLOR] && (
+                        <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                            formik.values[SettingType.EXTRA_COLOR]
+                        }`}</Text>
+                    )}
+                    <ColorPicker
+                        value={formik.values[SettingType.EXTRA_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.EXTRA_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
     ]
@@ -219,40 +248,68 @@ const Settings = () => {
             key: '1',
             title: 'Primary text color',
             element: (
-                <ColorPicker
-                    value={formik.values[SettingType.PRIMARY_TEXT_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.PRIMARY_TEXT_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.PRIMARY_TEXT_COLOR] && (
+                        <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                            formik.values[SettingType.PRIMARY_TEXT_COLOR]
+                        }`}</Text>
+                    )}
+                    <ColorPicker
+                        value={formik.values[SettingType.PRIMARY_TEXT_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.PRIMARY_TEXT_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
         {
             key: '2',
             title: 'Secondary text color',
             element: (
-                <ColorPicker
-                    value={formik.values[SettingType.SECONDARY_TEXT_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.SECONDARY_TEXT_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.SECONDARY_TEXT_COLOR] && (
+                        <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                            formik.values[SettingType.SECONDARY_TEXT_COLOR]
+                        }`}</Text>
+                    )}
+                    <ColorPicker
+                        value={formik.values[SettingType.SECONDARY_TEXT_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.SECONDARY_TEXT_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
         {
             key: '3',
             title: 'Dark color',
             element: (
-                <ColorPicker
-                    value={formik.values[SettingType.DARK_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.DARK_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.DARK_COLOR] && (
+                        <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                            formik.values[SettingType.DARK_COLOR]
+                        }`}</Text>
+                    )}
+                    <ColorPicker
+                        value={formik.values[SettingType.DARK_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.DARK_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
         {
             key: '4',
             title: 'Light color',
             element: (
-                <ColorPicker
-                    value={formik.values[SettingType.LIGHT_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.LIGHT_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.LIGHT_COLOR] && (
+                        <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                            formik.values[SettingType.LIGHT_COLOR]
+                        }`}</Text>
+                    )}
+                    <ColorPicker
+                        value={formik.values[SettingType.LIGHT_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.LIGHT_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
     ]
@@ -353,11 +410,21 @@ const Settings = () => {
             key: '3',
             title: 'Background color',
             element: (
-                <ColorPicker
-                    disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
-                    value={formik.values[SettingType.SIDEBAR_COLOR]}
-                    onChange={(e) => formik.setFieldValue(SettingType.SIDEBAR_COLOR, e)}
-                />
+                <Space>
+                    {formik.values[SettingType.SIDEBAR_COLOR] && (
+                        <Text
+                            strong
+                            type="secondary"
+                            style={{ textTransform: 'uppercase' }}
+                            disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                        >{`${formik.values[SettingType.SIDEBAR_COLOR]}`}</Text>
+                    )}
+                    <ColorPicker
+                        disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                        value={formik.values[SettingType.SIDEBAR_COLOR]}
+                        onChange={(_, hex) => formik.setFieldValue(SettingType.SIDEBAR_COLOR, hex)}
+                    />
+                </Space>
             ),
         },
         {
@@ -373,32 +440,56 @@ const Settings = () => {
                     options={[
                         {
                             label: (
-                                <Text>
-                                    Extra small <Text type="secondary">(480px)</Text>
+                                <Text disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}>
+                                    Extra small{' '}
+                                    <Text
+                                        type="secondary"
+                                        disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                                    >
+                                        (480px)
+                                    </Text>
                                 </Text>
                             ),
                             value: 'extra-small',
                         },
                         {
                             label: (
-                                <Text>
-                                    Medium <Text type="secondary">(768px)</Text>{' '}
+                                <Text disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}>
+                                    Medium{' '}
+                                    <Text
+                                        type="secondary"
+                                        disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                                    >
+                                        (768px)
+                                    </Text>{' '}
                                 </Text>
                             ),
                             value: 'medium',
                         },
                         {
                             label: (
-                                <Text>
-                                    Large <Text type="secondary">(1024px)</Text>
+                                <Text disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}>
+                                    Large{' '}
+                                    <Text
+                                        type="secondary"
+                                        disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                                    >
+                                        (1024px)
+                                    </Text>
                                 </Text>
                             ),
                             value: 'large',
                         },
                         {
                             label: (
-                                <Text>
-                                    Extra large <Text type="secondary">(1280px)</Text>
+                                <Text disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}>
+                                    Extra large{' '}
+                                    <Text
+                                        type="secondary"
+                                        disabled={!formik.values[SettingType.SIDEBAR_IS_ACTIVE]}
+                                    >
+                                        (1280px)
+                                    </Text>
                                 </Text>
                             ),
                             value: 'extra-large',

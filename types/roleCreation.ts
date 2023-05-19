@@ -2,8 +2,8 @@ import { RightType } from '@prisma/client'
 
 type RoleCreation = {
     name: string
-    rights: RightType[]
-    uploadMaxSize?: number
+    rights: Set<RightType>
+    limitUpload?: number | undefined
 }
 
 export default RoleCreation

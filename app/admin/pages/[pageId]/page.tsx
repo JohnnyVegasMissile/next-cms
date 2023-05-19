@@ -126,7 +126,7 @@ const CreatePage = ({ params }: any) => {
             </Card>
             <Row gutter={[16, 16]}>
                 <Col span={16}>
-                    <Card bordered={false} size="small" title="Information">
+                    <Card size="small" title="Information">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
                                 <WithLabel label="Name :" error={formik.errors.name}>

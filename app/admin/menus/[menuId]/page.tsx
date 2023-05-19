@@ -49,7 +49,6 @@ const CreateMenu = ({ params }: any) => {
     const { menuId } = params
     const isUpdate = menuId !== 'create'
     const [selected, setSelected] = useState<number[] | undefined>()
-    const [test, setTest] = useState<string>()
     const formik = useFormik({
         initialValues,
         // validate,

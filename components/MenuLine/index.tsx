@@ -28,8 +28,8 @@ const MenuLine = ({ title = 'New item', level = 0, onClick, selected, addChild }
             }}
         >
             <Space align="center" direction="vertical" size={1}>
-                <Button size="small" type="primary" icon={<CaretUpOutlined />} />
-                <Button size="small" type="primary" icon={<CaretDownOutlined />} />
+                <Button size="small" type="primary" icon={<CaretUpOutlined rev={undefined} />} />
+                <Button size="small" type="primary" icon={<CaretDownOutlined rev={undefined} />} />
             </Space>
             <Card
                 size="small"
@@ -45,7 +45,12 @@ const MenuLine = ({ title = 'New item', level = 0, onClick, selected, addChild }
                         {!!addChild && (
                             <Tooltip title="Add children">
                                 <Dropdown menu={{ items }} trigger={['click']}>
-                                    <Button size="small" type="primary" icon={<PlusOutlined />} ghost />
+                                    <Button
+                                        size="small"
+                                        type="primary"
+                                        icon={<PlusOutlined rev={undefined} />}
+                                        ghost
+                                    />
                                 </Dropdown>
                             </Tooltip>
                         )}
@@ -73,7 +78,7 @@ const Add = ({ title = 'Add new', onClick }: AddProps) => {
             <Card size="small" className={classNames(styles['line'], styles['add'])}>
                 <div className={styles['body']}>
                     <Text type="secondary">
-                        <PlusOutlined className={styles['icon']} />
+                        <PlusOutlined className={styles['icon']} rev={undefined} />
                         {title}
                     </Text>
                 </div>

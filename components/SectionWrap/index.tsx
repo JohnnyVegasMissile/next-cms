@@ -1,13 +1,8 @@
 import { ReactNode, useState } from 'react'
 import styles from './SectionWrap.module.scss'
-import { Button, Divider, Drawer, Popconfirm, Popover, Space } from 'antd'
-import {
-    CaretUpOutlined,
-    CaretDownOutlined,
-    DeleteOutlined,
-    SettingOutlined,
-    MenuOutlined,
-} from '@ant-design/icons'
+import { Button, Drawer, Space } from 'antd'
+import { SettingOutlined, MenuOutlined } from '@ant-design/icons'
+import PopOptions from '../PopOptions'
 
 interface SectionWrapProps {
     position: number
@@ -34,48 +29,22 @@ const SectionWrap = ({ children, panel }: SectionWrapProps) => {
             )}
             <div style={{ position: 'relative' }}>
                 <Space.Compact size="small" className={styles['buttons-wrap']}>
-                    <Popover
-                        placement="bottom"
-                        content={
-                            <Space direction="vertical">
-                                <Button
-                                    size="small"
-                                    onClick={(e) => e.stopPropagation()}
-                                    icon={<CaretUpOutlined />}
-                                    type="primary"
-                                />
-                                <Button
-                                    size="small"
-                                    onClick={(e) => e.stopPropagation()}
-                                    icon={<CaretDownOutlined />}
-                                    type="primary"
-                                />
-                                <Divider style={{ margin: 0 }} />
-
-                                <Popconfirm
-                                    placement="left"
-                                    title="Delete the task"
-                                    description="Are you sure to delete this task?"
-                                    onConfirm={(e) => e?.stopPropagation()}
-                                    onCancel={(e) => e?.stopPropagation()}
-                                    okText="Delete"
-                                    cancelText="Cancel"
-                                >
-                                    <Button
-                                        size="small"
-                                        icon={<DeleteOutlined />}
-                                        danger
-                                        type="primary"
-                                        onClick={(e) => e.stopPropagation()}
-                                    />
-                                </Popconfirm>
-                            </Space>
-                        }
-                        trigger="click"
+                    <PopOptions
+                        onUp={() => {}}
+                        disableUp={true}
+                        onDown={() => {}}
+                        disableDown={true}
+                        onDelete={() => {}}
                     >
-                        <Button size="small" type="primary" icon={<SettingOutlined />} />
-                    </Popover>
-                    {!!panel && <Button size="small" onClick={() => setOpen(true)} icon={<MenuOutlined />} />}
+                        <Button size="small" type="primary" icon={<SettingOutlined rev={undefined} />} />
+                    </PopOptions>
+                    {!!panel && (
+                        <Button
+                            size="small"
+                            onClick={() => setOpen(true)}
+                            icon={<MenuOutlined rev={undefined} />}
+                        />
+                    )}
                 </Space.Compact>
 
                 {children}

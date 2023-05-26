@@ -1,22 +1,40 @@
-import { ObjectId } from ".";
+import { FormFieldType } from '@prisma/client'
+import { ObjectId } from '.'
+import { LinkValue } from '~/components/LinkSelect'
 
 type FormCreation = {
-  name: string;
-  redirectMail: boolean;
-  mailToRedirect?: string;
-  hasExtraData: boolean;
-  extraData?: any;
-  fields: {
-    id?: ObjectId;
-    tempId?: string;
+    name: string
 
-    line: number;
-    position: number;
+    sendMail: boolean
+    mail?: string
 
-    label: string;
-    type: string;
-    required: boolean;
-  }[];
-};
+    successMessage: string
+    errorMessage: string
 
-export default FormCreation;
+    extraData?: { name: string; value: string }[]
+    fields: FormFieldCreation[]
+}
+
+export type FormFieldCreation = {
+    id?: ObjectId
+    tempId?: string
+
+    line: number
+    position: number
+
+    buttonType?: 'submit' | 'link'
+    containerId?: ObjectId | undefined
+    options?: { value: string; label: string }[]
+    link?: LinkValue
+
+    min?: number
+    max?: number
+
+    label: string
+    placeholder?: string
+    default?: string
+    type: FormFieldType
+    required: boolean
+}
+
+export default FormCreation

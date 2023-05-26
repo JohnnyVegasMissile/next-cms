@@ -21,3 +21,8 @@ export const formatBytes = (bytes: number, decimals: number = 2) => {
 
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
+
+export const isEmail = (email: string) => {
+    const re = /\S+@\S+\.\S+/
+    return re.test(email)
+}

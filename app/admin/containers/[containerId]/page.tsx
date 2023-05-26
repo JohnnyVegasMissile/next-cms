@@ -171,7 +171,12 @@ const CreateContainer = ({ params }: any) => {
                     <Space>
                         {isUpdate && (
                             <>
-                                <Button icon={<PicCenterOutlined />} key="1" size="small" type="dashed">
+                                <Button
+                                    icon={<PicCenterOutlined rev={undefined} />}
+                                    key="1"
+                                    size="small"
+                                    type="dashed"
+                                >
                                     Custom sections
                                 </Button>
 
@@ -184,7 +189,12 @@ const CreateContainer = ({ params }: any) => {
                                     okText="Save before"
                                     cancelText="Without saving"
                                 >
-                                    <Button icon={<PicLeftOutlined />} key="2" size="small" type="dashed">
+                                    <Button
+                                        icon={<PicLeftOutlined rev={undefined} />}
+                                        key="2"
+                                        size="small"
+                                        type="dashed"
+                                    >
                                         Custom template sections
                                     </Button>
                                 </Popconfirm>
@@ -193,7 +203,7 @@ const CreateContainer = ({ params }: any) => {
 
                         <Button
                             type="primary"
-                            icon={<CheckOutlined />}
+                            icon={<CheckOutlined rev={undefined} />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
                             loading={submit.isLoading}

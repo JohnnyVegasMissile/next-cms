@@ -213,9 +213,11 @@ enum FormFieldType {
   PARAGRAPH
   OPTION
   CHECKBOX
+  MULTICHECKBOX
   RADIO
   BUTTON
   TITLE
+  CONTENT
 }
 
 model FormField {
@@ -227,6 +229,9 @@ model FormField {
   type        FormFieldType
   label       String
   placeholder String?
+
+  containerId String?
+  container   Container? @relation(fields: [containerId], references: [id])
 
   position Int
   line     Int
@@ -466,7 +471,8 @@ model Container {
   metadatas         Metadata[]       @relation(name: "containerMetadatas")
   contentsMetadatas Metadata[]       @relation(name: "contentsMetadatas")
 
-  contents Content[]
+  contents  Content[]
+  formField FormField[]
 
   published Boolean @default(true)
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Button, Card, Col, Divider, Input, Row, Space, Spin, Typography } from 'antd'
 import { DeleteOutlined, CheckOutlined, PlusOutlined } from '@ant-design/icons'
 import MenuLine from '~/components/MenuLine'
@@ -97,7 +97,7 @@ const CreateMenu = ({ params }: any) => {
 
                     <Button
                         type="primary"
-                        icon={<CheckOutlined />}
+                        icon={<CheckOutlined rev={undefined} />}
                         size="small"
                         onClick={() => formik.handleSubmit()}
                         // loading={submit.isLoading}
@@ -129,7 +129,7 @@ const CreateMenu = ({ params }: any) => {
                     <Col span={16}>
                         <Space direction="vertical" style={{ width: '100%' }}>
                             {formik.values.menuItems.map((level1Menu, idx1) => (
-                                <>
+                                <Fragment key={idx1}>
                                     <MenuLine
                                         title={
                                             <Space>
@@ -171,7 +171,7 @@ const CreateMenu = ({ params }: any) => {
                                         }
                                     />
                                     {level1Menu.childrens?.map((level2Menu, idx2) => (
-                                        <>
+                                        <Fragment key={`${idx1}/${idx2}`}>
                                             <MenuLine
                                                 title={
                                                     <Input
@@ -220,28 +220,27 @@ const CreateMenu = ({ params }: any) => {
                                                 }
                                             />
                                             {level2Menu.childrens?.map((level3Menu, idx3) => (
-                                                <>
-                                                    <MenuLine
-                                                        title={
-                                                            <Input
-                                                                size="small"
-                                                                placeholder="Menu label"
-                                                                bordered={false}
-                                                                name={`menuItems.${idx1}.childrens.${idx2}.childrens.${idx3}.label`}
-                                                                value={level3Menu.label}
-                                                                onChange={formik.handleChange}
-                                                            />
-                                                        }
-                                                        // title={level3Menu.label}
-                                                        level={2}
-                                                        onClick={() => handleSelection([idx1, idx2, idx3])}
-                                                        selected={areEqual(selected, [idx1, idx2, idx3])}
-                                                    />
-                                                </>
+                                                <MenuLine
+                                                    key={`${idx1}/${idx2}/${idx3}`}
+                                                    title={
+                                                        <Input
+                                                            size="small"
+                                                            placeholder="Menu label"
+                                                            bordered={false}
+                                                            name={`menuItems.${idx1}.childrens.${idx2}.childrens.${idx3}.label`}
+                                                            value={level3Menu.label}
+                                                            onChange={formik.handleChange}
+                                                        />
+                                                    }
+                                                    // title={level3Menu.label}
+                                                    level={2}
+                                                    onClick={() => handleSelection([idx1, idx2, idx3])}
+                                                    selected={areEqual(selected, [idx1, idx2, idx3])}
+                                                />
                                             ))}
-                                        </>
+                                        </Fragment>
                                     ))}
-                                </>
+                                </Fragment>
                             ))}
 
                             <MenuLine.Add
@@ -282,7 +281,7 @@ const CreateMenu = ({ params }: any) => {
                                         size="small"
                                         type="primary"
                                         danger
-                                        icon={<DeleteOutlined />}
+                                        icon={<DeleteOutlined rev={undefined} />}
                                         onClick={onDelete}
                                     />
                                 }
@@ -374,7 +373,7 @@ const CreateMenu = ({ params }: any) => {
                                                 <Button
                                                     type="primary"
                                                     danger
-                                                    icon={<DeleteOutlined />}
+                                                    icon={<DeleteOutlined rev={undefined} />}
                                                     onClick={() => {
                                                         const extras = [...selectedMenu.extras]
 
@@ -386,7 +385,7 @@ const CreateMenu = ({ params }: any) => {
                                         ))}
 
                                         <Button
-                                            icon={<PlusOutlined />}
+                                            icon={<PlusOutlined rev={undefined} />}
                                             type="primary"
                                             size="small"
                                             onClick={() =>

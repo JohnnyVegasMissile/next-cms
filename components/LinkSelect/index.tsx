@@ -12,7 +12,6 @@ import './styles.scss'
 import { useQuery } from '@tanstack/react-query'
 import { getSlugsSimple } from '~/network/slugs'
 import { ObjectId } from '~/types'
-import { PageType } from '@prisma/client'
 
 const { Option } = Select
 
@@ -22,12 +21,21 @@ interface Option {
     children?: Option[]
 }
 
-export type LinkValue = {
-    type: 'IN' | 'OUT'
-    slugId?: ObjectId | undefined
-    link?: string | undefined
-    prototol?: 'http' | 'https' | undefined
-}
+export type LinkValue =
+    | {
+          type: 'IN'
+          slugId?: ObjectId | undefined
+
+          link?: never
+          prototol?: never
+      }
+    | {
+          type: 'OUT'
+          link?: string | undefined
+          prototol?: 'http' | 'https' | undefined
+
+          slugId?: never
+      }
 
 interface LinkSelectProps {
     value: LinkValue
@@ -42,12 +50,12 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
         value: slug.id,
         label: !!slug.page ? (
             <Space>
-                <FileOutlined />
+                <FileOutlined rev={undefined} />
                 {slug.page?.name}
             </Space>
         ) : (
             <Space>
-                <ContainerOutlined />
+                <ContainerOutlined rev={undefined} />
                 {slug.container?.name}
             </Space>
         ),
@@ -55,33 +63,35 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
             value: child.id,
             label: (
                 <Space>
-                    <BookOutlined />
+                    <BookOutlined rev={undefined} />
                     {child.content?.name}
                 </Space>
             ),
         })),
     }))
 
-    const onPageChange = (slugId: ObjectId | undefined) => onChange({ ...value, slugId })
+    const onPageChange = (slugId: ObjectId | undefined) =>
+        value.type === 'IN' && onChange({ ...value, slugId })
 
     const onTypeChange = (type: 'IN' | 'OUT') => {
         if (type === 'IN') {
             onChange({
                 type: 'IN',
-                link: '',
+                slugId: undefined,
             })
         } else {
             onChange({
                 type: 'OUT',
-                slugId: undefined,
+                link: '',
                 prototol: 'https',
             })
         }
     }
 
-    const onProtocolChange = (prototol: 'http' | 'https') => onChange({ ...value, prototol })
+    const onProtocolChange = (prototol: 'http' | 'https') =>
+        value.type === 'OUT' && onChange({ ...value, prototol })
 
-    const onLinkChange = (link: string) => onChange({ ...value, link })
+    const onLinkChange = (link: string) => value.type === 'OUT' && onChange({ ...value, link })
 
     const selectBefore = (
         <Select value={value.prototol} onChange={onProtocolChange} size="small">
@@ -120,7 +130,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                                 value: 'HOME',
                                 label: (
                                     <Space>
-                                        <HomeOutlined />
+                                        <HomeOutlined rev={undefined} />
                                         Homepage
                                     </Space>
                                 ),
@@ -129,7 +139,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                                 value: 'SIGNIN',
                                 label: (
                                     <Space>
-                                        <LoginOutlined />
+                                        <LoginOutlined rev={undefined} />
                                         Sign In
                                     </Space>
                                 ),
@@ -154,10 +164,10 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
             )}
             <Select size="small" value={value.type} onChange={onTypeChange} className="link-select-select">
                 <Option value="IN">
-                    <LinkOutlined />
+                    <LinkOutlined rev={undefined} />
                 </Option>
                 <Option value="OUT">
-                    <GlobalOutlined />
+                    <GlobalOutlined rev={undefined} />
                 </Option>
             </Select>
         </Space.Compact>

@@ -121,7 +121,11 @@ const ContainerFieldsManager = ({ value, onChange, errors }: ContainerFieldsProp
                                 onDelete={() => deleteField(idx)}
                                 alert={!!field.id}
                             >
-                                <Button type="ghost" size="small" icon={<EllipsisOutlined />} />
+                                <Button
+                                    type="ghost"
+                                    size="small"
+                                    icon={<EllipsisOutlined rev={undefined} />}
+                                />
                             </PopOptions>
                         }
                     >
@@ -135,7 +139,7 @@ const ContainerFieldsManager = ({ value, onChange, errors }: ContainerFieldsProp
             ))}
 
             <Dropdown menu={{ items }} trigger={['click']}>
-                <Button size="small" type="primary" icon={<PlusOutlined />}>
+                <Button size="small" type="primary" icon={<PlusOutlined rev={undefined} />}>
                     Add field
                 </Button>
             </Dropdown>

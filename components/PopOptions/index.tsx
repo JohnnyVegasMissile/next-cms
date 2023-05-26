@@ -18,6 +18,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
     return (
         <div onClick={(e) => e.stopPropagation()}>
             <Popover
+                arrow={false}
                 open={open}
                 onOpenChange={setOpen}
                 trigger="click"
@@ -32,7 +33,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
                                 onUp()
                                 setOpen(false)
                             }}
-                            icon={<CaretUpOutlined />}
+                            icon={<CaretUpOutlined rev={undefined} />}
                             type="primary"
                         />
                         <Button
@@ -43,7 +44,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
                                 onDown()
                                 setOpen(false)
                             }}
-                            icon={<CaretDownOutlined />}
+                            icon={<CaretDownOutlined rev={undefined} />}
                             type="primary"
                         />
                         <Divider style={{ margin: 0 }} />
@@ -63,7 +64,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
                             >
                                 <Button
                                     size="small"
-                                    icon={<DeleteOutlined />}
+                                    icon={<DeleteOutlined rev={undefined} />}
                                     danger
                                     type="primary"
                                     onClick={(e) => e.stopPropagation()}
@@ -72,7 +73,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
                         ) : (
                             <Button
                                 size="small"
-                                icon={<DeleteOutlined />}
+                                icon={<DeleteOutlined rev={undefined} />}
                                 danger
                                 type="primary"
                                 onClick={(e) => {

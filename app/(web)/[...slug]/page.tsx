@@ -3,13 +3,28 @@ import { notFound } from 'next/navigation'
 import { SectionType } from '@prisma/client'
 import DisplaySection from '~/components/DisplaySection'
 
-// export async function generateMetadata({ params }: { params: { slug: string } }) {
-//     const page = await getProps(Array.isArray(params.slug) ? params.slug.join('/') : params.slug)
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+    const full = Array.isArray(params.slug) ? params.slug.join('/') : params.slug
+    const page = await prisma.page.findFirst({
+        where: { slug: { full } },
+    })
 
-//     return {
-//         title: page?.name,
-//     }
-// }
+    if (!!page) return { title: page.name }
+
+    const content = await prisma.container.findFirst({
+        where: { slug: { full } },
+    })
+
+    if (!!content) return { title: content.name }
+
+    const container = await prisma.container.findFirst({
+        where: { slug: { full } },
+    })
+
+    if (!!container) return { title: container.name }
+
+    return undefined
+}
 
 const getSections = async (slug: string) => {
     const pageSections = await prisma.section.findMany({

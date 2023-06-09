@@ -63,6 +63,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 
     return (
         <html>
+            {/* eslint-disable-next-line @next/next/no-head-element */}
             <head>
                 <style
                     dangerouslySetInnerHTML={{

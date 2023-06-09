@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { SettingType } from '@prisma/client'
 import SettingsCreation from '~/types/settingsCreation'
 import { prisma } from '~/utilities/prisma'
+import { revalidatePath } from 'next/cache'
 
 export const GET = async () => {
     const settings = await prisma.setting.findMany()
@@ -24,6 +25,12 @@ export async function PUT(request: Request) {
 
         newSettings.push(updatedSetting)
     }
+
+    const slugs = await prisma.slug.findMany()
+
+    slugs.forEach(async (slug) => await revalidatePath(`/${slug.full}`))
+    revalidatePath('/')
+    revalidatePath('/sign-in')
 
     // NextResponse extends the Web Response API
     return NextResponse.json(newSettings)

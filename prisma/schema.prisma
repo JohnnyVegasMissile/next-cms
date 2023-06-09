@@ -362,13 +362,10 @@ enum SectionType {
   PAGE
   PAGE_SIDEBAR
 
-  CONTAINER
-  CONTAINER_SIDEBAR
-
-  TEMPLATE
   TEMPLATE_TOP
   TEMPLATE_BOTTOM
-  TEMPLATE_SIDEBAR
+  TEMPLATE_SIDEBAR_TOP
+  TEMPLATE_SIDEBAR_BOTTOM
 
   CONTENT
   CONTENT_SIDEBAR
@@ -412,6 +409,12 @@ model Section {
   // Element releated
   pageId String?
   page   Page?   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  containerId String?
+  container   Container? @relation(fields: [containerId], references: [id], onDelete: Cascade)
+
+  contentId     String?
+  linkedContent Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
 
   // Linked data
   medias LinkedToSection[]
@@ -473,6 +476,8 @@ model Container {
 
   contents  Content[]
   formField FormField[]
+
+  sections Section[]
 
   published Boolean @default(true)
 
@@ -544,6 +549,8 @@ model Content {
 
   fields    ContentField[]
   metadatas Metadata[]
+
+  sections Section[]
 
   published Boolean @default(true)
 

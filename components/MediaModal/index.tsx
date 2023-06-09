@@ -253,15 +253,18 @@ const columns = [
                         />
                     )}
                     {media.type === MediaType.VIDEO && (
-                        <VideoCameraOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
+                        <VideoCameraOutlined
+                            style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }}
+                            rev={undefined}
+                        />
                     )}
                     {media.type === MediaType.FILE && (
-                        <FilePdfOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
+                        <FilePdfOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} rev={undefined} />
                     )}
                     <Text>{media?.name}</Text>
                     {!media._count.usedInSections && (
                         <Tooltip title="This media is not used anywhere">
-                            <Tag color="red" icon={<WarningOutlined />}>
+                            <Tag color="red" icon={<WarningOutlined rev={undefined} />}>
                                 Unused
                             </Tag>
                         </Tooltip>
@@ -330,7 +333,12 @@ const MediaModal = ({ mediaType, value, onChange }: MediaModalProps) => {
 
     return (
         <>
-            <Button size="small" type="primary" icon={<SelectOutlined />} onClick={() => setOpen(true)}>
+            <Button
+                size="small"
+                type="primary"
+                icon={<SelectOutlined rev={undefined} />}
+                onClick={() => setOpen(true)}
+            >
                 {`Select a${typeLabel}`}
             </Button>
 
@@ -363,7 +371,7 @@ const MediaModal = ({ mediaType, value, onChange }: MediaModalProps) => {
                     <Input
                         allowClear
                         size="small"
-                        prefix={<SearchOutlined />}
+                        prefix={<SearchOutlined rev={undefined} />}
                         placeholder="Search by name"
                         style={{ width: 190 }}
                         value={q}

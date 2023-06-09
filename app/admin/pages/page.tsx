@@ -1,13 +1,7 @@
 'use client'
 
-import { Badge, Breadcrumb, Button, Divider, Popconfirm, Popover, QRCode, Space, Tag, Tooltip } from 'antd'
-import {
-    CopyOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    PicCenterOutlined,
-    LinkOutlined,
-} from '@ant-design/icons'
+import { Badge, Button, Divider, Popconfirm, Space, Tag, Tooltip } from 'antd'
+import { CopyOutlined, EditOutlined, DeleteOutlined, PicCenterOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { getPages } from '~/network/pages'
 import { Page, PageType, Slug } from '@prisma/client'
@@ -15,6 +9,7 @@ import Link from 'next/link'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import AdminTable from '~/components/AdminTable'
+import BreadcrumdLink from '~/components/BreadcrumdLink'
 
 dayjs.extend(relativeTime)
 
@@ -55,70 +50,13 @@ const columns: ColumnsType<DataType> = [
         render: (page: DataType) => {
             switch (page.type) {
                 case PageType.HOMEPAGE:
-                    return (
-                        <Link href="/" prefetch={false}>
-                            <Breadcrumb
-                                items={[
-                                    {
-                                        title: (
-                                            <Popover
-                                                overlayInnerStyle={{ padding: 0 }}
-                                                content={
-                                                    <QRCode
-                                                        value={`${process.env['NEXT_PUBLIC_SITE_URL']}`}
-                                                        bordered={false}
-                                                    />
-                                                }
-                                            >
-                                                <LinkOutlined />
-                                            </Popover>
-                                        ),
-                                    },
-                                    { title: <>&#8203;</> },
-                                ]}
-                            />
-                        </Link>
-                    )
+                    return <BreadcrumdLink url="" />
 
                 case PageType.SIGNIN:
-                    return (
-                        <Link href="/sign-in" prefetch={false}>
-                            <Breadcrumb
-                                items={[
-                                    {
-                                        title: (
-                                            <Popover
-                                                overlayInnerStyle={{ padding: 0 }}
-                                                content={
-                                                    <QRCode
-                                                        value={`${process.env['NEXT_PUBLIC_SITE_URL']}/sign-in`}
-                                                        bordered={false}
-                                                    />
-                                                }
-                                            >
-                                                <LinkOutlined />
-                                            </Popover>
-                                        ),
-                                    },
-                                    { title: 'sign-in' },
-                                ]}
-                            />
-                        </Link>
-                    )
+                    return <BreadcrumdLink url="sign-in" />
 
                 case PageType.PAGE:
-                    return (
-                        <Link href={`/${encodeURIComponent(page?.slug?.full || '')}`} prefetch={false}>
-                            <Breadcrumb
-                                items={[
-                                    { title: <LinkOutlined /> },
-                                    ...(page?.slug?.full.split('/').map((word: string) => ({
-                                        title: word,
-                                    })) || []),
-                                ]}
-                            />
-                        </Link>
-                    )
+                    return <BreadcrumdLink url={`${page?.slug?.full}`} />
 
                 default:
                     return null
@@ -149,7 +87,7 @@ const columns: ColumnsType<DataType> = [
             <Space>
                 <Link href={`/admin/pages/${page.id}/sections`} prefetch={false}>
                     <Tooltip title="Custom sections">
-                        <Button icon={<PicCenterOutlined />} size="small" type="dashed" />
+                        <Button icon={<PicCenterOutlined rev={undefined} />} size="small" type="dashed" />
                     </Tooltip>
                 </Link>
                 <Divider type="vertical" style={{ margin: 0 }} />
@@ -161,17 +99,22 @@ const columns: ColumnsType<DataType> = [
                     prefetch={false}
                 >
                     <Tooltip title="Duplicate">
-                        <Button icon={<CopyOutlined />} size="small" />
+                        <Button icon={<CopyOutlined rev={undefined} />} size="small" />
                     </Tooltip>
                 </Link>
                 {page.type !== PageType.HOMEPAGE && page.type !== PageType.PAGE ? (
-                    <Button type="primary" icon={<EditOutlined />} size="small" disabled={true}>
+                    <Button
+                        type="primary"
+                        icon={<EditOutlined rev={undefined} />}
+                        size="small"
+                        disabled={true}
+                    >
                         Edit
                     </Button>
                 ) : (
                     <Link href={`/admin/pages/${page.id}`} prefetch={false}>
                         <Tooltip title="Edit">
-                            <Button type="primary" icon={<EditOutlined />} size="small">
+                            <Button type="primary" icon={<EditOutlined rev={undefined} />} size="small">
                                 Edit
                             </Button>
                         </Tooltip>
@@ -192,7 +135,7 @@ const columns: ColumnsType<DataType> = [
                             disabled={page.type !== PageType.PAGE}
                             type="primary"
                             danger
-                            icon={<DeleteOutlined />}
+                            icon={<DeleteOutlined rev={undefined} />}
                             size="small"
                         >
                             Delete

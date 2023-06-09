@@ -61,7 +61,7 @@ const UploadButton = ({
                         loading={mutation.isLoading}
                         size="small"
                         type="primary"
-                        icon={<UploadOutlined />}
+                        icon={<UploadOutlined rev={undefined} />}
                     >
                         {children}
                     </Button>
@@ -69,7 +69,11 @@ const UploadButton = ({
                 {value && (
                     <>
                         <Typography.Text underline>{value?.name}</Typography.Text>
-                        <Button onClick={onDeleteValue} shape="circle" icon={<CloseOutlined />} />
+                        <Button
+                            onClick={onDeleteValue}
+                            shape="circle"
+                            icon={<CloseOutlined rev={undefined} />}
+                        />
                     </>
                 )}
             </Space>
@@ -97,7 +101,7 @@ const Favicon = () => {
             <Button
                 size="small"
                 type="primary"
-                icon={<UploadOutlined />}
+                icon={<UploadOutlined rev={undefined} />}
                 style={{ position: 'relative' }}
                 loading={loading}
             >

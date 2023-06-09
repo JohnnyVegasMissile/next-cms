@@ -283,23 +283,31 @@ const Settings = () => {
                 trigger="hover"
                 type="primary"
                 style={{ right: '2.5rem', opacity: 1 }}
-                icon={submit.isLoading ? <LoadingOutlined /> : <MenuOutlined />}
+                icon={
+                    submit.isLoading ? <LoadingOutlined rev={undefined} /> : <MenuOutlined rev={undefined} />
+                }
             >
                 {!submit.isLoading && (
                     <>
                         {sidebar.isActive && (
                             <FloatButton
-                                icon={showSidebar ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+                                icon={
+                                    showSidebar ? (
+                                        <MenuFoldOutlined rev={undefined} />
+                                    ) : (
+                                        <MenuUnfoldOutlined rev={undefined} />
+                                    )
+                                }
                                 onClick={() => setShowSidebar(!showSidebar)}
                             />
                         )}
                         <FloatButton
-                            icon={<CloseOutlined />}
+                            icon={<CloseOutlined rev={undefined} />}
                             onClick={() => formik.setValues(cleanDetails(details.data!))}
                         />
                         <FloatButton
                             type="primary"
-                            icon={<CheckOutlined />}
+                            icon={<CheckOutlined rev={undefined} />}
                             onClick={() => formik.submitForm()}
                         />
                     </>

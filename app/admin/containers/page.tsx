@@ -54,7 +54,7 @@ const columns: ColumnsType<DataType> = [
                                         />
                                     }
                                 >
-                                    <LinkOutlined />
+                                    <LinkOutlined rev={undefined} />
                                 </Popover>
                             ),
                         },
@@ -90,33 +90,33 @@ const columns: ColumnsType<DataType> = [
             <Space>
                 <Link href={`/admin/containers/${container.id}/sections`} prefetch={false}>
                     <Tooltip title="Custom sections">
-                        <Button icon={<PicCenterOutlined />} size="small" type="dashed" />
+                        <Button icon={<PicCenterOutlined rev={undefined} />} size="small" type="dashed" />
                     </Tooltip>
                 </Link>
                 <Link href={`/admin/containers/${container.id}/template/sections`} prefetch={false}>
                     <Tooltip title="Custom template sections">
-                        <Button icon={<PicLeftOutlined />} size="small" type="dashed" />
+                        <Button icon={<PicLeftOutlined rev={undefined} />} size="small" type="dashed" />
                     </Tooltip>
                 </Link>
                 <Divider type="vertical" style={{ margin: 0 }} />
                 <Tooltip title="Duplicate">
                     <Link href={`/admin/containers/create?containerId=${container.id}`} prefetch={false}>
-                        <Button icon={<CopyOutlined />} size="small" />
+                        <Button icon={<CopyOutlined rev={undefined} />} size="small" />
                     </Link>
                 </Tooltip>
                 <Tooltip title="See all contents">
                     <Link href={`/admin/contents?containerId=${container.id}`} prefetch={false}>
-                        <Button icon={<UnorderedListOutlined />} size="small" />
+                        <Button icon={<UnorderedListOutlined rev={undefined} />} size="small" />
                     </Link>
                 </Tooltip>
                 <Tooltip title="Create new content">
                     <Link href={`/admin/contents/create?containerId=${container.id}`} prefetch={false}>
-                        <Button icon={<FileAddOutlined />} size="small" />
+                        <Button icon={<FileAddOutlined rev={undefined} />} size="small" />
                     </Link>
                 </Tooltip>
                 <Link href={`/admin/containers/${container.id}`} prefetch={false}>
                     <Tooltip title="Edit">
-                        <Button type="primary" icon={<EditOutlined />} size="small">
+                        <Button type="primary" icon={<EditOutlined rev={undefined} />} size="small">
                             Edit
                         </Button>
                     </Tooltip>
@@ -131,7 +131,7 @@ const columns: ColumnsType<DataType> = [
                     cancelText="Cancel"
                 >
                     <Tooltip title="Delete">
-                        <Button type="primary" danger icon={<DeleteOutlined />} size="small">
+                        <Button type="primary" danger icon={<DeleteOutlined rev={undefined} />} size="small">
                             Delete
                         </Button>
                     </Tooltip>

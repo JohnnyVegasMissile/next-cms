@@ -13,10 +13,10 @@ const QuickEditButton = () => {
                 </Button>
                 <Button size="small">
                     <Link href="/" style={{ transition: 'none' }}>
-                        <ContainerOutlined />
+                        <ContainerOutlined rev={undefined} />
                     </Link>
                 </Button>
-                <Button size="small" type="primary" icon={<ReloadOutlined />} />
+                <Button size="small" type="primary" icon={<ReloadOutlined rev={undefined} />} />
             </Space.Compact>
         </Affix>
     )

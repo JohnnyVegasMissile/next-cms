@@ -80,7 +80,7 @@ const columns: ColumnsType<DataType> = [
                                         />
                                     }
                                 >
-                                    <LinkOutlined />
+                                    <LinkOutlined rev={undefined} />
                                 </Popover>
                             ),
                         },
@@ -116,16 +116,16 @@ const columns: ColumnsType<DataType> = [
             <Space>
                 <Link href={`/admin/contents/${content.id}/sections`} prefetch={false}>
                     <Tooltip title="Custom sections">
-                        <Button icon={<PicCenterOutlined />} size="small" type="dashed" />
+                        <Button icon={<PicCenterOutlined rev={undefined} />} size="small" type="dashed" />
                     </Tooltip>
                 </Link>
                 <Divider type="vertical" style={{ margin: 0 }} />
                 <Tooltip title="Duplicate">
-                    <Button icon={<CopyOutlined />} size="small" />
+                    <Button icon={<CopyOutlined rev={undefined} />} size="small" />
                 </Tooltip>
                 <Link href={`/admin/contents/${content.id}`} prefetch={false}>
                     <Tooltip title="Edit">
-                        <Button type="primary" icon={<EditOutlined />} size="small">
+                        <Button type="primary" icon={<EditOutlined rev={undefined} />} size="small">
                             Edit
                         </Button>
                     </Tooltip>
@@ -140,7 +140,7 @@ const columns: ColumnsType<DataType> = [
                     cancelText="Cancel"
                 >
                     <Tooltip title="Delete">
-                        <Button type="primary" danger icon={<DeleteOutlined />} size="small">
+                        <Button type="primary" danger icon={<DeleteOutlined rev={undefined} />} size="small">
                             Delete
                         </Button>
                     </Tooltip>

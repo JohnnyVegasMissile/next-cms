@@ -27,8 +27,6 @@ export async function GET(request: NextRequest) {
         where: { full: slug, ...matchingId },
     })
 
-    console.log(existingSlug, { full: slug, ...matchingId })
-
     // NextResponse extends the Web Response API
     return NextResponse.json({ exist: !!existingSlug })
 }

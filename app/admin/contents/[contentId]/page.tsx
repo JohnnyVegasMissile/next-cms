@@ -314,14 +314,19 @@ const CreateContainer = ({ params }: any) => {
 
                     <Space>
                         {isUpdate && (
-                            <Button icon={<PicCenterOutlined />} key="1" size="small" type="dashed">
+                            <Button
+                                icon={<PicCenterOutlined rev={undefined} />}
+                                key="1"
+                                size="small"
+                                type="dashed"
+                            >
                                 Custom sections
                             </Button>
                         )}
 
                         <Button
                             type="primary"
-                            icon={<CheckOutlined />}
+                            icon={<CheckOutlined rev={undefined} />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
                             loading={submit.isLoading}
@@ -416,6 +421,7 @@ const CreateContainer = ({ params }: any) => {
                     </Col>
                 </Row>
             </Card>
+            {container.isLoading && <Spin />}
             {!!formik.values.containerId && container.isSuccess && (
                 <Card bodyStyle={{ height: 'fit-content' }} size="small" title="Fields">
                     <Row gutter={[16, 16]}>
@@ -457,10 +463,17 @@ const FieldCard = ({ field, containerFields, onChange, errors }: FieldCardProps)
         <Card
             size="small"
             title={
-                <Text>
-                    {matchingField.name}
+                <Space>
+                    <Text>{matchingField.name}</Text>
                     {matchingField.required && <Text type="danger"> *</Text>}
-                </Text>
+                    {(matchingField.min || matchingField.max) && (
+                        <Text type="secondary">
+                            {`(${matchingField.min ? 'matchingField.min' : ''}${
+                                matchingField.min && matchingField.max ? ' ' : ''
+                            }${matchingField.max ? 'matchingField.min' : ''})`}
+                        </Text>
+                    )}
+                </Space>
             }
         >
             <Component field={field} matchingField={matchingField} onChange={onChange} errors={errors} />

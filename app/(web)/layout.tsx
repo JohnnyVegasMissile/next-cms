@@ -1,10 +1,12 @@
-import styles from './layout.module.scss'
-import { prisma } from '~/utilities/prisma'
-import { SectionType, SettingType } from '@prisma/client'
+import { ReactNode } from 'react'
 import classNames from 'classnames'
 import localFont from 'next/font/local'
-import blocksViews from '~/blocks/views'
-import { BlockKey } from '~/blocks'
+import { PageType, SectionType, SettingType } from '@prisma/client'
+
+import styles from './layout.module.scss'
+import { prisma } from '~/utilities/prisma'
+import DisplaySection from '~/components/DisplaySection'
+import Link from 'next/link'
 
 const myFont = localFont({ src: '../../public/Garute-VF.ttf', variable: '--my-font' })
 
@@ -39,72 +41,127 @@ const getSettings = async () => {
     })
 }
 
-const getHeaders = async () =>
-    await prisma.section.findMany({
+const getSections = async () => {
+    const layoutHeader = await prisma.section.findMany({
         where: { type: SectionType.LAYOUT_HEADER },
+        orderBy: { position: 'asc' },
     })
 
-const getFooters = async () =>
-    await prisma.section.findMany({
+    const layoutFooter = await prisma.section.findMany({
         where: { type: SectionType.LAYOUT_FOOTER },
+        orderBy: { position: 'asc' },
     })
 
-const Layout = async ({ children }: { children: React.ReactNode }) => {
+    const layoutSidebarHeader = await prisma.section.findMany({
+        where: { type: SectionType.LAYOUT_SIDEBAR_TOP },
+        orderBy: { position: 'asc' },
+    })
+
+    const layoutSidebarFooter = await prisma.section.findMany({
+        where: { type: SectionType.LAYOUT_SIDEBAR_BOTTOM },
+        orderBy: { position: 'asc' },
+    })
+
+    const layoutContentHeader = await prisma.section.findMany({
+        where: { type: SectionType.LAYOUT_CONTENT_TOP },
+        orderBy: { position: 'asc' },
+    })
+
+    const layoutContentFooter = await prisma.section.findMany({
+        where: { type: SectionType.LAYOUT_CONTENT_BOTTOM },
+        orderBy: { position: 'asc' },
+    })
+
+    const maintenanceSections = await prisma.section.findMany({
+        where: { page: { type: PageType.MAINTENANCE } },
+        orderBy: { position: 'asc' },
+    })
+
+    return {
+        layoutHeader,
+        layoutFooter,
+        layoutContentHeader,
+        layoutContentFooter,
+        layoutSidebarHeader,
+        layoutSidebarFooter,
+        maintenanceSections,
+    }
+}
+
+const Layout = async ({
+    children,
+    sidebar,
+}: {
+    children: ReactNode
+    content: ReactNode
+    sidebar: ReactNode
+}) => {
     const settings = await getSettings()
-    const headers = await getHeaders()
-    const footers = await getFooters()
+    const {
+        layoutHeader,
+        layoutFooter,
+        layoutContentHeader,
+        layoutContentFooter,
+        layoutSidebarHeader,
+        layoutSidebarFooter,
+        maintenanceSections,
+    } = await getSections()
 
     const maintenance = settings.find((e) => e.type === SettingType.MAINTENANCE_MODE)?.value === 'true'
+
     const position = settings.find((e) => e.type === SettingType.SIDEBAR_POSITION)?.value
     const brSize = settings.find((e) => e.type === SettingType.SIDEBAR_BREAKPOINT_SIZE)?.value
 
-    if (maintenance) return <p>Maintenance</p>
+    if (maintenance)
+        return (
+            <>
+                {maintenanceSections.map((section) => (
+                    <DisplaySection key={section.id} section={section} />
+                ))}
+            </>
+        )
 
     return (
         <>
             <header>
-                {headers.map((section) => {
-                    const View = blocksViews[section.block as BlockKey]
-
-                    if (!View) return null
-
-                    return (
-                        <View
-                            key={section.id}
-                            content={section.content}
-                            images={[]}
-                            files={[]}
-                            videos={[]}
-                            forms={[]}
-                        />
-                    )
-                })}
+                <Link href="/">Home</Link>
+                <Link href="/my-test-2">Test</Link>
+                <Link href="/my-test-3">Not found</Link>
+                {layoutHeader.map((section) => (
+                    <DisplaySection key={section.id} section={section} />
+                ))}
             </header>
+
             <div
                 className={classNames(styles['content-wrap'], styles[brSize!], myFont.className, {
                     [styles['left']!]: position === 'left',
                     [styles['right']!]: position === 'right',
                 })}
             >
-                {children}
+                <aside className={classNames(styles['aside'], styles[brSize!])}>
+                    {layoutSidebarHeader.map((section) => (
+                        <DisplaySection key={section.id} section={section} />
+                    ))}
+                    {sidebar}
+                    {layoutSidebarFooter.map((section) => (
+                        <DisplaySection key={section.id} section={section} />
+                    ))}
+                </aside>
+                <main className={styles['content']}>
+                    {layoutContentHeader.map((section) => (
+                        <DisplaySection key={section.id} section={section} />
+                    ))}
+                    {children}
+                    {layoutContentFooter.map((section) => (
+                        <DisplaySection key={section.id} section={section} />
+                    ))}
+                </main>
             </div>
+
             <footer>
-                {footers.map((section) => {
-                    const View = blocksViews[section.block as BlockKey]
-
-                    if (!View) return null
-
-                    return (
-                        <View
-                            key={section.id}
-                            content={section.content}
-                            images={[]}
-                            files={[]}
-                            videos={[]}
-                            forms={[]}
-                        />
-                    )
-                })}
+                {layoutFooter.map((section) => (
+                    <DisplaySection key={section.id} section={section} />
+                ))}
             </footer>
         </>
     )

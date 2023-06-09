@@ -19,14 +19,12 @@ import {
     ColorPicker,
 } from 'antd'
 import { UploadOutlined, CheckOutlined, ReloadOutlined } from '@ant-design/icons'
-// import ColorPicker from '~/components/ColorPicker'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useFormik } from 'formik'
 import { useMutation } from '@tanstack/react-query'
 import { getSettings, updateSettings } from '~/network/settings'
 import SettingsCreation from '~/types/settingsCreation'
 import { Setting, SettingType } from '@prisma/client'
-import LinkSelect, { LinkValue } from '~/components/LinkSelect'
 
 const { Text } = Typography
 
@@ -122,7 +120,7 @@ const Settings = () => {
             element: (
                 <Space>
                     <Avatar shape="square" />
-                    <Button icon={<UploadOutlined />} size="small" type="primary">
+                    <Button icon={<UploadOutlined rev={undefined} />} size="small" type="primary">
                         Upload
                     </Button>
                 </Space>
@@ -164,7 +162,7 @@ const Settings = () => {
                         width={32}
                         src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
                     />
-                    <Button icon={<UploadOutlined />} size="small" type="primary">
+                    <Button icon={<UploadOutlined rev={undefined} />} size="small" type="primary">
                         Upload
                     </Button>
                 </Space>
@@ -500,6 +498,42 @@ const Settings = () => {
         },
     ]
 
+    const grpd = [
+        {
+            key: '1',
+            title: 'Popup style',
+            element: (
+                <Select
+                    size="small"
+                    style={{ width: 200 }}
+                    options={[
+                        { value: 'modal', label: 'Modal' },
+                        { value: 'banner', label: 'Banner' },
+                    ]}
+                />
+            ),
+        },
+        {
+            key: '3',
+            title: 'Policy page',
+            element: (
+                <></>
+                // <LinkSelect />
+                // <Space>
+                //     {formik.values[SettingType.LIGHT_COLOR] && (
+                //         <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
+                //             formik.values[SettingType.LIGHT_COLOR]
+                //         }`}</Text>
+                //     )}
+                //     <ColorPicker
+                //         value={formik.values[SettingType.LIGHT_COLOR]}
+                //         onChange={(_, hex) => formik.setFieldValue(SettingType.LIGHT_COLOR, hex)}
+                //     />
+                // </Space>
+            ),
+        },
+    ]
+
     if (details.isLoading) {
         return <Spin />
     }
@@ -512,7 +546,7 @@ const Settings = () => {
 
                     <Space>
                         <Button
-                            icon={<ReloadOutlined />}
+                            icon={<ReloadOutlined rev={undefined} />}
                             size="small"
                             // onClick={() => formik.handleSubmit()}
                             disabled={submit.isLoading}
@@ -521,7 +555,7 @@ const Settings = () => {
                         </Button>
                         <Button
                             type="primary"
-                            icon={<CheckOutlined />}
+                            icon={<CheckOutlined rev={undefined} />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
                             loading={submit.isLoading}
@@ -599,6 +633,22 @@ const Settings = () => {
                             size="small"
                             itemLayout="horizontal"
                             dataSource={sidebar}
+                            renderItem={(item) => (
+                                <List.Item key={item.key} style={{ padding: 16 }}>
+                                    <Text strong>{item.title} :</Text>
+                                    {item.element}
+                                </List.Item>
+                            )}
+                        />
+                    </Card>
+                </Col>
+
+                <Col span={12}>
+                    <Card size="small" title="GRPD" bordered={false}>
+                        <List
+                            size="small"
+                            itemLayout="horizontal"
+                            dataSource={grpd}
                             renderItem={(item) => (
                                 <List.Item key={item.key} style={{ padding: 16 }}>
                                     <Text strong>{item.title} :</Text>

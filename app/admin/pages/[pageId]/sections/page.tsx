@@ -2,7 +2,7 @@
 
 import { Section } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
-import { FloatButton, Spin, message } from 'antd'
+import { FloatButton, message } from 'antd'
 import {
     MenuOutlined,
     CloseOutlined,
@@ -22,6 +22,7 @@ import classNames from 'classnames'
 import SectionsManager from '~/components/SectionsManager'
 import useSidebarSettings from '~/hooks/useSidebarSettings'
 import FullScreenLoading from '~/components/FullScreenLoading'
+import { useRouter } from 'next/navigation'
 
 const validate = (values: { content: SectionCreation[]; sidebar: SectionCreation[] }) => {
     let errors: any = {}
@@ -138,6 +139,7 @@ const cleanBeforeSend = (values: { content: SectionCreation[]; sidebar: SectionC
 
 const PageSections = ({ params }: any) => {
     const { pageId } = params
+    const router = useRouter()
     const [showSidebar, setShowSidebar] = useState(false)
     const formik = useFormik<{ content: SectionCreation[]; sidebar: SectionCreation[] }>({
         initialValues: { content: [], sidebar: [] },
@@ -156,7 +158,10 @@ const PageSections = ({ params }: any) => {
         (values: { content: SectionCreationCleaned[]; sidebar: SectionCreationCleaned[] }) =>
             updatePageSections(pageId, values),
         {
-            onSuccess: () => message.success(`Sections modified with success.`),
+            onSuccess: () => {
+                message.success(`Sections modified with success.`)
+                router.push('/admin/pages')
+            },
             onError: () => message.error('Something went wrong, try again later.'),
         }
     )
@@ -200,23 +205,31 @@ const PageSections = ({ params }: any) => {
                 trigger="hover"
                 type="primary"
                 style={{ right: '2.5rem', opacity: 1 }}
-                icon={submit.isLoading ? <LoadingOutlined /> : <MenuOutlined />}
+                icon={
+                    submit.isLoading ? <LoadingOutlined rev={undefined} /> : <MenuOutlined rev={undefined} />
+                }
             >
                 {!submit.isLoading && (
                     <>
                         {sidebar.isActive && (
                             <FloatButton
-                                icon={showSidebar ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+                                icon={
+                                    showSidebar ? (
+                                        <MenuFoldOutlined rev={undefined} />
+                                    ) : (
+                                        <MenuUnfoldOutlined rev={undefined} />
+                                    )
+                                }
                                 onClick={() => setShowSidebar(!showSidebar)}
                             />
                         )}
                         <FloatButton
-                            icon={<CloseOutlined />}
+                            icon={<CloseOutlined rev={undefined} />}
                             onClick={() => formik.setValues(cleanDetails(details.data!))}
                         />
                         <FloatButton
                             type="primary"
-                            icon={<CheckOutlined />}
+                            icon={<CheckOutlined rev={undefined} />}
                             onClick={() => formik.submitForm()}
                         />
                     </>

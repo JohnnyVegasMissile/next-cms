@@ -72,7 +72,7 @@ const Settings = ({ params }: any) => {
 
                     <Button
                         type="primary"
-                        icon={<CheckOutlined />}
+                        icon={<CheckOutlined rev={undefined} />}
                         size="small"
                         onClick={() => formik.handleSubmit()}
                         // loading={submit.isLoading}

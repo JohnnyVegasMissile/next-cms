@@ -1,33 +1,27 @@
-import { Suspense } from 'react'
-import { PageType } from '@prisma/client'
-import QuickEditButton from '~/components/QuickEditButton'
-import { prisma } from '~/utilities/prisma'
+import { PageType, SectionType } from '@prisma/client'
 import DefaultSection from '~/components/DefaultSection'
-import Sidebar from '~/components/Sidebar'
-import Content from '~/components/Content'
+import DisplaySection from '~/components/DisplaySection'
+import { prisma } from '~/utilities/prisma'
 
 const getProps = async () => {
-    const page = await prisma.page.findFirst({
-        where: { type: PageType.HOMEPAGE },
+    const sections = await prisma.section.findMany({
+        where: { page: { type: PageType.HOMEPAGE }, type: SectionType.PAGE },
+        orderBy: { position: 'asc' },
     })
 
-    return page
+    return sections
 }
 
 const Home = async () => {
-    const page = await getProps()
+    const sections = await getProps()
+
+    if (!sections.length) return <DefaultSection.Homepage />
 
     return (
         <>
-            <QuickEditButton />
-            <Suspense>
-                {/* @ts-expect-error Server Component */}
-                <Sidebar id={page!.id} type="page" />
-            </Suspense>
-            <Suspense>
-                {/* @ts-expect-error Server Component */}
-                <Content id={page!.id} type="page" fallback={<DefaultSection.Homepage />} />
-            </Suspense>
+            {sections.map((section) => (
+                <DisplaySection key={section.id} section={section} />
+            ))}
         </>
     )
 }

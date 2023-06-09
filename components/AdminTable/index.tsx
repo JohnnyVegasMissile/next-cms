@@ -8,14 +8,14 @@ import {
     CaretUpOutlined,
     ClearOutlined,
 } from '@ant-design/icons'
-import { usePathname } from 'next/navigation'
+import {} from 'next/navigation'
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { ExpandableConfig, SorterResult } from 'antd/es/table/interface'
 import { PAGE_SIZE } from '~/utilities/constants'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { ObjectId } from '~/types'
 import { getContainer } from '~/network/containers'
 import ListSelect from '../ListSelect'
@@ -192,7 +192,7 @@ const AdminTable = <T,>({
                         <Input
                             allowClear
                             size="small"
-                            prefix={<SearchOutlined />}
+                            prefix={<SearchOutlined rev={undefined} />}
                             placeholder="Search by name"
                             style={{ width: 190 }}
                             value={q}
@@ -268,7 +268,13 @@ const AdminTable = <T,>({
                                         size="small"
                                         loading={container.isFetching}
                                         disabled={!containerId || container.data?.fields?.length === 0}
-                                        icon={advancedOpen ? <CaretUpOutlined /> : <CaretDownOutlined />}
+                                        icon={
+                                            advancedOpen ? (
+                                                <CaretUpOutlined rev={undefined} />
+                                            ) : (
+                                                <CaretDownOutlined rev={undefined} />
+                                            )
+                                        }
                                         onClick={() => setAdvancedOpen(!advancedOpen)}
                                     >
                                         Advanced
@@ -282,7 +288,7 @@ const AdminTable = <T,>({
                         extra
                     ) : (
                         <Link href={`${pathname}/create`} prefetch={false}>
-                            <Button type="primary" icon={<PlusOutlined />} size="small">
+                            <Button type="primary" icon={<PlusOutlined rev={undefined} />} size="small">
                                 Create new
                             </Button>
                         </Link>
@@ -294,7 +300,7 @@ const AdminTable = <T,>({
                             <Button
                                 type="link"
                                 size="small"
-                                icon={<ClearOutlined />}
+                                icon={<ClearOutlined rev={undefined} />}
                                 danger
                                 onClick={clearAdvacedFilters}
                             >

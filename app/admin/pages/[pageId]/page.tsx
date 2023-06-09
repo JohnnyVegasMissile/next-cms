@@ -1,17 +1,31 @@
 'use client'
 
+import { useEffect } from 'react'
+import {
+    Button,
+    Card,
+    Col,
+    Divider,
+    Input,
+    Popconfirm,
+    Radio,
+    Row,
+    Space,
+    Spin,
+    Typography,
+    message,
+} from 'antd'
+import { PicCenterOutlined, CheckOutlined } from '@ant-design/icons'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Metadata, Page, PageType, Slug } from '@prisma/client'
+import { useRouter } from 'next/navigation'
+import { useFormik } from 'formik'
 import set from 'lodash.set'
 
-import { Button, Card, Col, Divider, Input, Radio, Row, Space, Spin, Typography, message } from 'antd'
-import { useFormik } from 'formik'
-import { PicCenterOutlined, CheckOutlined } from '@ant-design/icons'
+import { getPage, postPages, updatePage } from '~/network/pages'
 import MetadatasList from '~/components/MetadatasList'
 import PageCreation from '~/types/pageCreation'
 import SlugEdit from '~/components/SlugEdit'
-import { getPage, postPages, updatePage } from '~/network/pages'
-import { useMutation } from '@tanstack/react-query'
-import { Metadata, Page, Slug } from '@prisma/client'
-import { useEffect } from 'react'
 import WithLabel from '~/components/WithLabel'
 
 const { Text } = Typography
@@ -65,6 +79,8 @@ const cleanDetails = (
 const CreatePage = ({ params }: any) => {
     const { pageId } = params
     const isUpdate = pageId !== 'create'
+    const router = useRouter()
+    const queryClient = useQueryClient()
     const formik = useFormik({
         initialValues,
         validate,
@@ -80,7 +96,11 @@ const CreatePage = ({ params }: any) => {
     const submit = useMutation(
         (values: PageCreation) => (isUpdate ? updatePage(pageId, values) : postPages(values)),
         {
-            onSuccess: () => message.success(`Page ${isUpdate ? 'modified' : 'created'} with success.`),
+            onSuccess: () => {
+                message.success(`Page ${isUpdate ? 'modified' : 'created'} with success.`)
+                queryClient.invalidateQueries({ queryKey: ['pages'] })
+                router.push('/admin/pages')
+            },
             onError: () => message.error('Something went wrong, try again later.'),
         }
     )
@@ -102,19 +122,25 @@ const CreatePage = ({ params }: any) => {
 
                     <Space>
                         {isUpdate && (
-                            <Button
-                                icon={<PicCenterOutlined />}
-                                key="1"
-                                size="small"
-                                type="dashed"
-                                disabled={submit.isLoading}
+                            <Popconfirm
+                                title="Continue without saving?"
+                                description="Make sure to save your changes."
+                                onConfirm={() => router.push(`/admin/pages/${pageId}/sections`)}
+                                okText="Continue"
                             >
-                                Custom sections
-                            </Button>
+                                <Button
+                                    icon={<PicCenterOutlined rev={undefined} />}
+                                    size="small"
+                                    type="dashed"
+                                    disabled={submit.isLoading}
+                                >
+                                    Custom sections
+                                </Button>
+                            </Popconfirm>
                         )}
                         <Button
                             type="primary"
-                            icon={<CheckOutlined />}
+                            icon={<CheckOutlined rev={undefined} />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
                             loading={submit.isLoading}
@@ -137,34 +163,44 @@ const CreatePage = ({ params }: any) => {
                                         name="name"
                                         value={formik.values.name}
                                         onChange={formik.handleChange}
+                                        disabled={details.data?.type !== PageType.PAGE}
                                     />
                                 </WithLabel>
                             </Col>
-                            <Col span={12}>
-                                <WithLabel label="Published :">
-                                    <Radio.Group
-                                        name="published"
-                                        value={formik.values.published}
-                                        onChange={formik.handleChange}
-                                        options={[
-                                            { label: 'Published', value: true },
-                                            { label: 'Unpublished', value: false },
-                                        ]}
-                                    />
-                                </WithLabel>
-                            </Col>
+                            {details.data?.type === PageType.PAGE && (
+                                <Col span={12}>
+                                    <WithLabel label="Published :">
+                                        <Radio.Group
+                                            name="published"
+                                            value={formik.values.published}
+                                            onChange={formik.handleChange}
+                                            options={[
+                                                { label: 'Published', value: true },
+                                                { label: 'Unpublished', value: false },
+                                            ]}
+                                        />
+                                    </WithLabel>
+                                </Col>
+                            )}
                         </Row>
 
-                        <Divider style={{ margin: '1rem', width: '97%', minWidth: '97%' }} />
+                        {details.data?.type !== PageType.HOMEPAGE && (
+                            <>
+                                <Divider style={{ margin: '1rem', width: '97%', minWidth: '97%' }} />
 
-                        <WithLabel label="URL :" error={(formik.errors.slug as string[])?.find((e) => !!e)}>
-                            <SlugEdit
-                                value={formik.values.slug}
-                                onChange={(e) => formik.setFieldValue('slug', e)}
-                                errors={formik.errors.slug as string[]}
-                                paramsId={isUpdate ? { pageId } : undefined}
-                            />
-                        </WithLabel>
+                                <WithLabel
+                                    label="URL :"
+                                    error={(formik.errors.slug as string[])?.find((e) => !!e)}
+                                >
+                                    <SlugEdit
+                                        value={formik.values.slug}
+                                        onChange={(e) => formik.setFieldValue('slug', e)}
+                                        errors={formik.errors.slug as string[]}
+                                        paramsId={isUpdate ? { pageId } : undefined}
+                                    />
+                                </WithLabel>
+                            </>
+                        )}
                     </Card>
                 </Col>
                 <Col span={8}>

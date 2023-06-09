@@ -3,6 +3,8 @@ import { NextResponse, NextRequest } from 'next/server'
 import { ObjectId } from '~/types'
 import PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
+import { revalidatePath } from 'next/cache'
+import { PageType } from '@prisma/client'
 
 export async function GET(_: NextRequest, context: any) {
     const { pageId } = context.params
@@ -66,6 +68,24 @@ export async function PUT(request: Request, context: any) {
         },
         include: { slug: true, metadatas: true },
     })
+
+    switch (page?.type) {
+        case PageType.HOMEPAGE: {
+            revalidatePath('/')
+            break
+        }
+        case PageType.HOMEPAGE: {
+            revalidatePath('/sign-in')
+            break
+        }
+        case PageType.PAGE: {
+            const oldPage = await prisma.page.findUnique({ where: { id: pageId }, include: { slug: true } })
+
+            if (oldPage?.slug) revalidatePath(`/${oldPage?.slug.full as string}`)
+            revalidatePath(`/${slug.join('/')}`)
+            break
+        }
+    }
 
     // NextResponse extends the Web Response API
     return NextResponse.json(page)

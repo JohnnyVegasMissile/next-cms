@@ -1,8 +1,9 @@
 // eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextRequest, NextResponse } from 'next/server'
-import { Section, SectionType } from '@prisma/client'
+import { PageType, Section, SectionType } from '@prisma/client'
 import { SectionCreationCleaned } from '~/types/sectionCreation'
 import { prisma } from '~/utilities/prisma'
+import { revalidatePath } from 'next/cache'
 
 export async function GET(_: NextRequest, context: any) {
     const { pageId } = context.params
@@ -91,6 +92,26 @@ export async function PUT(request: NextRequest, context: any) {
     await prisma.section.deleteMany({
         where: { id: { notIn: [...content, ...sidebar].map((e) => e.id) }, pageId },
     })
+
+    const page = await prisma.page.findUnique({ where: { id: pageId }, include: { slug: true } })
+
+    switch (page?.type) {
+        case PageType.HOMEPAGE: {
+            revalidatePath('/')
+
+            break
+        }
+        case PageType.HOMEPAGE: {
+            revalidatePath('/sign-in')
+
+            break
+        }
+        case PageType.PAGE: {
+            if (page?.slug) revalidatePath(`/${page?.slug.full as string}`)
+
+            break
+        }
+    }
 
     // NextResponse extends the Web Response API
     return NextResponse.json({ content })

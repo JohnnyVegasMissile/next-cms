@@ -1,35 +1,30 @@
-import { PageType } from '@prisma/client'
-import QuickEditButton from '~/components/QuickEditButton'
+import { PageType, SectionType } from '@prisma/client'
+import DefaultSection from '~/components/DefaultSection'
+import DisplaySection from '~/components/DisplaySection'
 import { prisma } from '~/utilities/prisma'
-import Sidebar from '~/components/Sidebar'
-import { Suspense } from 'react'
-import Content from '~/components/Content'
 
 const getProps = async () => {
-    const page = await prisma.page.findFirst({
-        where: { type: PageType.NOTFOUND },
+    const sections = await prisma.section.findMany({
+        where: { page: { type: PageType.NOTFOUND }, type: SectionType.PAGE },
+        orderBy: { position: 'asc' },
     })
 
-    return { page }
+    return sections
 }
 
-const Home = async () => {
-    const { page } = await getProps()
+const NotFound = async () => {
+    const sections = await getProps()
+
+    if (!sections.length) return <DefaultSection.NotFound />
 
     return (
         <>
-            <QuickEditButton />
-            <Suspense>
-                {/* @ts-expect-error Server Component */}
-                <Sidebar id={page!.id} type="page" />
-            </Suspense>
-            <Suspense>
-                {/* @ts-expect-error Server Component */}
-                <Content id={page!.id} type="page" />
-            </Suspense>
+            {sections.map((section) => (
+                <DisplaySection key={section.id} section={section} />
+            ))}
         </>
     )
 }
 
 export const revalidate = 'force-cache'
-export default Home
+export default NotFound

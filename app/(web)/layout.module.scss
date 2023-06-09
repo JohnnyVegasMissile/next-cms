@@ -35,3 +35,39 @@
         }
     }
 }
+
+.aside {
+    display: var(--sidebar-display);
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-background-color);
+
+    @media (max-width: 480px) {
+        &.extra-small {
+            width: 100%;
+        }
+    }
+    @media (max-width: 640px) {
+        &.small {
+            width: 100%;
+        }
+    }
+    @media (max-width: 768px) {
+        &.medium {
+            width: 100%;
+        }
+    }
+    @media (max-width: 1024px) {
+        &.large {
+            width: 100%;
+        }
+    }
+    @media (max-width: 1280px) {
+        &.extra-large {
+            width: 100%;
+        }
+    }
+}
+
+.content {
+    flex: 1;
+}

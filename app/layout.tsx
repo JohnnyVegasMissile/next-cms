@@ -3,6 +3,7 @@ import styles from './layout.module.scss'
 import { prisma } from '~/utilities/prisma'
 import './global.scss'
 import { SettingType } from '@prisma/client'
+import QueryClientWrapper from '~/components/QueryClientWrapper'
 
 const getTheme = async () => {
     return await prisma.setting.findMany({
@@ -65,6 +66,8 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
         <html>
             {/* eslint-disable-next-line @next/next/no-head-element */}
             <head>
+                {/* <link rel="icon" href="/favicon.ico" sizes="any" /> */}
+
                 <style
                     dangerouslySetInnerHTML={{
                         __html: `
@@ -88,10 +91,12 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
                     }}
                 />
             </head>
-            <body className={styles['body']}>
-                <AdminMenu />
-                {children}
-            </body>
+            <QueryClientWrapper>
+                <body className={styles['body']}>
+                    <AdminMenu />
+                    {children}
+                </body>
+            </QueryClientWrapper>
         </html>
     )
 }

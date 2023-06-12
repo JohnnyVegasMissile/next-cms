@@ -1,7 +1,8 @@
 import { SettingType } from '@prisma/client'
 
 type SettingsCreation = {
-    [SettingType.REVALIDATE_DELAY]?: number
+    [SettingType.SITE_URL]?: string
+    [SettingType.INDEXED]?: boolean
     [SettingType.APP_NAME]?: string
     [SettingType.MAINTENANCE_MODE]?: boolean
 
@@ -15,6 +16,8 @@ type SettingsCreation = {
     [SettingType.DARK_COLOR]?: `#${string}`
     [SettingType.LIGHT_COLOR]?: `#${string}`
     [SettingType.EXTRA_COLOR]?: `#${string}`
+
+    [SettingType.LANGUAGE]?: string[]
 
     [SettingType.MAIL_HOST]?: string
     [SettingType.MAIL_PORT]?: number

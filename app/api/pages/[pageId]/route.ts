@@ -54,6 +54,7 @@ export async function PUT(request: Request, context: any) {
         }
     }
 
+    const oldPage = await prisma.page.findUnique({ where: { id: pageId }, include: { slug: true } })
     const page = await prisma.page.update({
         where: { id: pageId },
         data: {
@@ -63,6 +64,7 @@ export async function PUT(request: Request, context: any) {
                 update: {
                     full: slug.join('/'),
                     basic: slug.join('/'),
+                    revalidatedAt: new Date(),
                 },
             },
         },
@@ -79,9 +81,9 @@ export async function PUT(request: Request, context: any) {
             break
         }
         case PageType.PAGE: {
-            const oldPage = await prisma.page.findUnique({ where: { id: pageId }, include: { slug: true } })
+            if (oldPage?.slug && oldPage?.slug?.full !== slug.join('/'))
+                revalidatePath(`/${oldPage?.slug.full as string}`)
 
-            if (oldPage?.slug) revalidatePath(`/${oldPage?.slug.full as string}`)
             revalidatePath(`/${slug.join('/')}`)
             break
         }

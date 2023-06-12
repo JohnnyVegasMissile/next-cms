@@ -780,7 +780,7 @@ const RightSelect = ({
             </Space>
             {info && (
                 <Tooltip title={info}>
-                    <InfoCircleOutlined rev="" style={{ color: '#aaa' }} />
+                    <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
                 </Tooltip>
             )}
         </Space>
@@ -826,7 +826,7 @@ const SimpleRightSelect = ({
         <Text>{label}</Text>
         {info && (
             <Tooltip title={info}>
-                <InfoCircleOutlined rev="" style={{ color: '#aaa' }} />
+                <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
             </Tooltip>
         )}
     </Space>

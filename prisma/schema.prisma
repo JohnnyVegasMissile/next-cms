@@ -282,7 +282,6 @@ model MessageField {
 // SETTINGS
 
 enum SettingType {
-  REVALIDATE_DELAY
   APP_NAME
   BACKGROUND_COLOR
   PRIMARY_COLOR
@@ -303,6 +302,9 @@ enum SettingType {
   SIDEBAR_COLOR
   SIDEBAR_BREAKPOINT_SIZE
   MAINTENANCE_MODE
+  SITE_URL
+  INDEXED
+  LANGUAGE
 }
 
 model Setting {
@@ -334,7 +336,8 @@ model Slug {
   contentId   String?    @unique
   content     Content?   @relation(fields: [contentId], references: [id])
 
-  updatedAt DateTime @updatedAt
+  revalidatedAt DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 // METADATAS

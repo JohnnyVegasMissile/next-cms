@@ -17,14 +17,17 @@ import {
     message,
     Spin,
     ColorPicker,
+    Transfer,
+    Tooltip,
 } from 'antd'
-import { UploadOutlined, CheckOutlined, ReloadOutlined } from '@ant-design/icons'
+import { UploadOutlined, CheckOutlined, ReloadOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { useEffect } from 'react'
 import { useFormik } from 'formik'
 import { useMutation } from '@tanstack/react-query'
 import { getSettings, updateSettings } from '~/network/settings'
 import SettingsCreation from '~/types/settingsCreation'
 import { Setting, SettingType } from '@prisma/client'
+import { revalidateAll } from '~/network/api'
 
 const { Text } = Typography
 
@@ -39,12 +42,12 @@ const cleanDetails = (settings: Setting[]): SettingsCreation => {
 
     for (const setting of settings) {
         switch (setting.type) {
-            case SettingType.REVALIDATE_DELAY:
             case SettingType.MAIL_PORT:
             case SettingType.SIDEBAR_WIDTH:
                 cleanValues[setting.type] = parseInt(setting.value)
                 break
 
+            case SettingType.INDEXED:
             case SettingType.SIDEBAR_IS_ACTIVE:
             case SettingType.MAINTENANCE_MODE:
                 cleanValues[setting.type] = setting.value === 'true'
@@ -66,6 +69,10 @@ const cleanDetails = (settings: Setting[]): SettingsCreation => {
 
             case SettingType.SIDEBAR_POSITION:
                 cleanValues[setting.type] = setting.value as 'left' | 'right'
+                break
+
+            case SettingType.LANGUAGE:
+                cleanValues[setting.type] = setting.value.split(',')
                 break
 
             case SettingType.SIDEBAR_BREAKPOINT_SIZE:
@@ -104,7 +111,11 @@ const Settings = () => {
         onSuccess: (data) => formik.setValues(cleanDetails(data)),
     })
     const submit = useMutation((values: SettingsCreation) => updateSettings(values), {
-        onSuccess: () => message.success(`Settings modified with success.`),
+        onSuccess: () => message.success('Settings modified with success.'),
+        onError: () => message.error('Something went wrong, try again later.'),
+    })
+    const revalidate = useMutation(() => revalidateAll(), {
+        onSuccess: () => message.success('All pages revalidated with success.'),
         onError: () => message.error('Something went wrong, try again later.'),
     })
 
@@ -534,9 +545,7 @@ const Settings = () => {
         },
     ]
 
-    if (details.isLoading) {
-        return <Spin />
-    }
+    if (details.isLoading) return <Spin />
 
     return (
         <>
@@ -548,8 +557,9 @@ const Settings = () => {
                         <Button
                             icon={<ReloadOutlined rev={undefined} />}
                             size="small"
-                            // onClick={() => formik.handleSubmit()}
+                            onClick={() => revalidate.mutate()}
                             disabled={submit.isLoading}
+                            loading={revalidate.isLoading}
                         >
                             Revalidate all
                         </Button>
@@ -565,147 +575,180 @@ const Settings = () => {
                     </Space>
                 </div>
             </Card>
-            <Row gutter={[16, 16]}>
+            <Row gutter={[8, 8]} style={{ marginTop: -6 }}>
                 <Col span={12}>
-                    <Card size="small" title="General" bordered={false}>
-                        <List
-                            size="small"
-                            itemLayout="horizontal"
-                            dataSource={general}
-                            renderItem={(item) => (
-                                <List.Item key={item.key} style={{ padding: 16 }}>
-                                    <Text strong>{item.title} :</Text>
-                                    {item.element}
-                                </List.Item>
-                            )}
-                        />
-                    </Card>
-                </Col>
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                        <Card size="small" title="General">
+                            <List
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={general}
+                                renderItem={(item) => (
+                                    <List.Item key={item.key} style={{ padding: 16 }}>
+                                        <Text strong>{item.title} :</Text>
+                                        {item.element}
+                                    </List.Item>
+                                )}
+                            />
+                        </Card>
 
+                        <Card size="small" title="SMTP">
+                            <List
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={email}
+                                renderItem={(item) => (
+                                    <List.Item key={item.key} style={{ padding: 16 }}>
+                                        <Text strong>{item.title} :</Text>
+                                        {item.element}
+                                    </List.Item>
+                                )}
+                            />
+                        </Card>
+
+                        <Card size="small" title="GRPD">
+                            <List
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={grpd}
+                                renderItem={(item) => (
+                                    <List.Item key={item.key} style={{ padding: 16 }}>
+                                        <Text strong>{item.title} :</Text>
+                                        {item.element}
+                                    </List.Item>
+                                )}
+                            />
+                        </Card>
+                    </Space>
+                </Col>
                 <Col span={12}>
-                    <Card size="small" title="Theme" bordered={false} bodyStyle={{ display: 'flex' }}>
-                        <List
-                            style={{ flex: 1, marginRight: 16 }}
-                            size="small"
-                            itemLayout="horizontal"
-                            dataSource={themeLeft}
-                            renderItem={(item) => (
-                                <List.Item key={item.key} style={{ padding: 16 }}>
-                                    <Text strong>{item.title} :</Text>
-                                    {item.element}
-                                </List.Item>
-                            )}
-                        />
-                        <List
-                            style={{ flex: 1 }}
-                            size="small"
-                            itemLayout="horizontal"
-                            dataSource={themeRight}
-                            renderItem={(item) => (
-                                <List.Item key={item.key} style={{ padding: 16 }}>
-                                    <Text strong>{item.title} :</Text>
-                                    {item.element}
-                                </List.Item>
-                            )}
-                        />
-                    </Card>
-                </Col>
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                        <Card size="small" title="Theme" bodyStyle={{ display: 'flex' }}>
+                            <List
+                                style={{ flex: 1, marginRight: 16 }}
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={themeLeft}
+                                renderItem={(item) => (
+                                    <List.Item key={item.key} style={{ padding: 16 }}>
+                                        <Text strong>{item.title} :</Text>
+                                        {item.element}
+                                    </List.Item>
+                                )}
+                            />
+                            <List
+                                style={{ flex: 1 }}
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={themeRight}
+                                renderItem={(item) => (
+                                    <List.Item key={item.key} style={{ padding: 16 }}>
+                                        <Text strong>{item.title} :</Text>
+                                        {item.element}
+                                    </List.Item>
+                                )}
+                            />
+                        </Card>
 
-                <Col span={12}>
-                    <Card size="small" title="SMTP" bordered={false}>
-                        <List
-                            size="small"
-                            itemLayout="horizontal"
-                            dataSource={email}
-                            renderItem={(item) => (
-                                <List.Item key={item.key} style={{ padding: 16 }}>
-                                    <Text strong>{item.title} :</Text>
-                                    {item.element}
-                                </List.Item>
-                            )}
-                        />
-                    </Card>
-                </Col>
+                        <Card size="small" title="Sidebar">
+                            <List
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={sidebar}
+                                renderItem={(item) => (
+                                    <List.Item key={item.key} style={{ padding: 16 }}>
+                                        <Text strong>{item.title} :</Text>
+                                        {item.element}
+                                    </List.Item>
+                                )}
+                            />
+                        </Card>
 
-                <Col span={12}>
-                    <Card size="small" title="Sidebar" bordered={false}>
-                        <List
-                            size="small"
-                            itemLayout="horizontal"
-                            dataSource={sidebar}
-                            renderItem={(item) => (
-                                <List.Item key={item.key} style={{ padding: 16 }}>
-                                    <Text strong>{item.title} :</Text>
-                                    {item.element}
-                                </List.Item>
-                            )}
-                        />
-                    </Card>
+                        <Card size="small" title="Internationalization">
+                            <Transfer
+                                oneWay
+                                dataSource={[
+                                    {
+                                        key: 'en',
+                                        title: 'English',
+                                        description: 'English',
+                                    },
+                                    {
+                                        key: 'fr',
+                                        title: 'Français',
+                                        description: 'French',
+                                    },
+                                    {
+                                        key: 'es',
+                                        title: 'Español',
+                                        description: 'Spanish',
+                                    },
+                                    {
+                                        key: 'de',
+                                        title: 'Deutsch',
+                                        description: 'German',
+                                    },
+                                    {
+                                        key: 'it',
+                                        title: 'Italiano',
+                                        description: 'Italian',
+                                    },
+                                    {
+                                        key: 'pt',
+                                        title: `Português`,
+                                        description: 'Portuguese',
+                                    },
+                                    {
+                                        key: 'ru',
+                                        title: 'Русский',
+                                        description: 'Russian',
+                                    },
+                                    {
+                                        key: 'zh',
+                                        title: '中文',
+                                        description: 'Chinese',
+                                    },
+                                    {
+                                        key: 'ja',
+                                        title: '日本語',
+                                        description: 'Japanese',
+                                    },
+                                    {
+                                        key: 'ko',
+                                        title: '한국어',
+                                        description: 'Korean',
+                                    },
+                                    {
+                                        key: 'ar',
+                                        title: 'العربية',
+                                        description: 'Arabic',
+                                    },
+                                    {
+                                        key: 'tr',
+                                        title: 'Türkçe',
+                                        description: 'Turkish',
+                                    },
+                                ]}
+                                titles={['Inactive', 'Active']}
+                                selectedKeys={formik.values.LANGUAGE}
+                                onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE, e)}
+                                onSelectChange={(e) => formik.setFieldValue(SettingType.LANGUAGE, e)}
+                                render={(item) => (
+                                    <Space>
+                                        <Text>{item.title}</Text>
+                                        <Tooltip title={item.description}>
+                                            <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
+                                        </Tooltip>
+                                    </Space>
+                                )}
+                            />
+                        </Card>
+                    </Space>
                 </Col>
-
-                <Col span={12}>
-                    <Card size="small" title="GRPD" bordered={false}>
-                        <List
-                            size="small"
-                            itemLayout="horizontal"
-                            dataSource={grpd}
-                            renderItem={(item) => (
-                                <List.Item key={item.key} style={{ padding: 16 }}>
-                                    <Text strong>{item.title} :</Text>
-                                    {item.element}
-                                </List.Item>
-                            )}
-                        />
-                    </Card>
-                </Col>
-
-                {/* <Col span={12}>
-          <Card></Card>
-        </Col> */}
             </Row>
         </>
     )
 }
-
-// function secondsToDhms(seconds: number | undefined) {
-//     if (!seconds) return 'Unlimited'
-
-//     seconds = Number(seconds)
-//     var d = Math.floor(seconds / (3600 * 24))
-//     var h = Math.floor((seconds % (3600 * 24)) / 3600)
-
-//     const res = []
-//     if (d > 0) {
-//         res.push(d + (d == 1 ? ' day, ' : ' days '))
-//     }
-
-//     if (h > 0) {
-//         res.push(h + (h == 1 ? ' hour' : ' hours'))
-//     }
-
-//     return d === 365 ? '1 Year.' : `${res.join(', ')}.`
-// }
-
-// const RevalidateSlider = () => {
-//     const [value, setValue] = useState(0)
-
-//     // const val = secondsToDhms(value);
-
-//     return (
-//         <Space direction="vertical" align="end">
-//             {/* {val} */}
-//             <Slider
-//                 tooltip={{ formatter: (e) => secondsToDhms(e) }}
-//                 value={value}
-//                 onChange={setValue}
-//                 style={{ width: 200 }}
-//                 min={0}
-//                 max={31536000}
-//                 step={3600}
-//             />
-//         </Space>
-//     )
-// }
 
 export const dynamic = 'force-dynamic'
 export default Settings

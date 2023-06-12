@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment } from 'react'
-import { Affix, Badge, Button, Dropdown, Space } from 'antd'
+import { Affix, Badge, Button, Dropdown, Space, message } from 'antd'
 import {
     HomeOutlined,
     FileOutlined,
@@ -20,26 +20,35 @@ import {
     TeamOutlined,
     MailOutlined,
     BookOutlined,
+    LoadingOutlined,
 } from '@ant-design/icons'
 import { usePathname, useRouter } from 'next/navigation'
 import styles from './AdminMenu.module.scss'
+import { useMutation } from '@tanstack/react-query'
+import { revalidateAll } from '~/network/api'
 
 const AdminMenu = () => {
     const router = useRouter()
     const pathname = usePathname()
 
+    const revalidate = useMutation(() => revalidateAll(), {
+        onSuccess: () => message.success('All pages revalidated with success.'),
+        onError: () => message.error('Something went wrong, try again later.'),
+    })
+
     const onClick = (e: any) => {
         switch (e.key) {
-            case '/admin':
-                router.push('/admin')
+            case 'revalidate':
+                revalidate.mutate()
+                break
+
+            case 'signout':
                 break
 
             default:
+                router.push(e.key)
                 break
         }
-
-        console.log(e.keyPath)
-        router.push(e.key)
     }
 
     const menuItems = [
@@ -175,7 +184,11 @@ const AdminMenu = () => {
         {
             key: 'revalidate',
             label: 'Revalidate all',
-            icon: <ReloadOutlined rev={undefined} />,
+            icon: revalidate.isLoading ? (
+                <LoadingOutlined rev={undefined} />
+            ) : (
+                <ReloadOutlined rev={undefined} />
+            ),
         },
         {
             type: 'divider',
@@ -198,7 +211,7 @@ const AdminMenu = () => {
                                 <Dropdown
                                     menu={{
                                         items: item.children as any,
-                                        onClick: (e) => router.push(e.key),
+                                        onClick,
                                     }}
                                     placement="bottomLeft"
                                 >
@@ -206,8 +219,8 @@ const AdminMenu = () => {
                                         <Button
                                             size="small"
                                             icon={item.icon}
-                                            onClick={() => router.push(item.key)}
-                                            type={pathname === item.key ? 'primary' : 'default'}
+                                            onClick={() => onClick(item)}
+                                            type={pathname?.startsWith(item.key) ? 'primary' : 'default'}
                                         >
                                             {item.label}
                                         </Button>

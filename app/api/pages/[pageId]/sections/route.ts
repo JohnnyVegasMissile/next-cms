@@ -90,24 +90,41 @@ export async function PUT(request: NextRequest, context: any) {
     }
 
     await prisma.section.deleteMany({
-        where: { id: { notIn: [...content, ...sidebar].map((e) => e.id) }, pageId },
+        where: {
+            id: { notIn: [...content, ...sidebar].map((e) => e.id) },
+            pageId,
+        },
     })
 
-    const page = await prisma.page.findUnique({ where: { id: pageId }, include: { slug: true } })
+    const page = await prisma.page.findUnique({
+        where: {
+            id: pageId,
+        },
+        include: {
+            slug: true,
+        },
+    })
 
     switch (page?.type) {
         case PageType.HOMEPAGE: {
             revalidatePath('/')
-
             break
         }
         case PageType.HOMEPAGE: {
             revalidatePath('/sign-in')
-
             break
         }
         case PageType.PAGE: {
             if (page?.slug) revalidatePath(`/${page?.slug.full as string}`)
+
+            await prisma.slug.update({
+                where: {
+                    pageId,
+                },
+                data: {
+                    revalidatedAt: new Date(),
+                },
+            })
 
             break
         }

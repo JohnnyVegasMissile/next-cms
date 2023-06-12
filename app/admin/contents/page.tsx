@@ -1,6 +1,7 @@
 'use client'
 
 import AdminTable from '~/components/AdminTable'
+import BreadcrumdLink from '~/components/BreadcrumdLink'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import {
@@ -14,27 +15,8 @@ import {
 } from '@prisma/client'
 import Link from 'next/link'
 import { ColumnsType } from 'antd/es/table'
-import {
-    Badge,
-    Breadcrumb,
-    Button,
-    Divider,
-    Popconfirm,
-    Space,
-    Tooltip,
-    Table,
-    Typography,
-    Tag,
-    Popover,
-    QRCode,
-} from 'antd'
-import {
-    PicCenterOutlined,
-    CopyOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    LinkOutlined,
-} from '@ant-design/icons'
+import { Badge, Button, Divider, Popconfirm, Space, Tooltip, Table, Typography, Tag } from 'antd'
+import { PicCenterOutlined, CopyOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { getContents } from '~/network/contents'
 
 dayjs.extend(relativeTime)
@@ -65,32 +47,7 @@ const columns: ColumnsType<DataType> = [
         sorter: true,
         title: 'Url',
         key: 'slug',
-        render: (content) => (
-            <Link href={`/${encodeURIComponent(content?.slug?.full || '')}`} prefetch={false}>
-                <Breadcrumb
-                    items={[
-                        {
-                            title: (
-                                <Popover
-                                    overlayInnerStyle={{ padding: 0 }}
-                                    content={
-                                        <QRCode
-                                            value={`${process.env['NEXT_PUBLIC_SITE_URL']}/${content?.slug?.full}`}
-                                            bordered={false}
-                                        />
-                                    }
-                                >
-                                    <LinkOutlined rev={undefined} />
-                                </Popover>
-                            ),
-                        },
-                        ...content?.slug?.full?.split('/').map((word: string) => ({
-                            title: word,
-                        })),
-                    ]}
-                />
-            </Link>
-        ),
+        render: (content) => <BreadcrumdLink url={content?.slug?.full} />,
     },
     {
         sorter: true,

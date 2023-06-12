@@ -12,10 +12,7 @@ const BreadcrumdLink = ({ url }: { url: string }) => {
                             <Popover
                                 overlayInnerStyle={{ padding: 0 }}
                                 content={
-                                    <QRCode
-                                        value={`${process.env['NEXT_PUBLIC_SITE_URL']}/${url}`}
-                                        bordered={false}
-                                    />
+                                    <QRCode value={`${window.location.origin}/${url}`} bordered={false} />
                                 }
                             >
                                 <LinkOutlined rev={undefined} />

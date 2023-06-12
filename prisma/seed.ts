@@ -25,8 +25,12 @@ async function main() {
     }
 
     const newSettings = [
-        { type: SettingType.REVALIDATE_DELAY, value: '0' },
         { type: SettingType.APP_NAME, value: 'NextJS App' },
+        { type: SettingType.LANGUAGE, value: 'en' },
+        // SEO
+        { type: SettingType.SITE_URL, value: 'http://localhost:8080' },
+        { type: SettingType.INDEXED, value: 'false' },
+        // Theme
         { type: SettingType.BACKGROUND_COLOR, value: '#e9ecef' },
         { type: SettingType.PRIMARY_COLOR, value: '#ffc300' },
         { type: SettingType.SECONDARY_COLOR, value: '#003566' },
@@ -35,16 +39,19 @@ async function main() {
         { type: SettingType.DARK_COLOR, value: '#000814' },
         { type: SettingType.LIGHT_COLOR, value: '#e9ecef' },
         { type: SettingType.EXTRA_COLOR, value: '#ef476f' },
+        // SMTP
         { type: SettingType.MAIL_HOST, value: '' },
         { type: SettingType.MAIL_PORT, value: '', visible: false },
         { type: SettingType.MAIL_USER, value: '' },
         { type: SettingType.MAIL_PASS, value: '' },
+        // Sidebar
         { type: SettingType.SIDEBAR_IS_ACTIVE, value: 'false' },
         { type: SettingType.SIDEBAR_WIDTH, value: '25' },
         { type: SettingType.SIDEBAR_UNIT, value: '%' },
         { type: SettingType.SIDEBAR_POSITION, value: 'left' },
         { type: SettingType.SIDEBAR_COLOR, value: '#ef476f' },
         { type: SettingType.SIDEBAR_BREAKPOINT_SIZE, value: 'medium' },
+        // Maintenance
         { type: SettingType.MAINTENANCE_MODE, value: 'false' },
     ]
 

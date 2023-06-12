@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import AdminTable from '~/components/AdminTable'
+import BreadcrumdLink from '~/components/BreadcrumdLink'
 import { getContainers } from '~/network/containers'
 import { Container, ContainerField, Metadata, Slug } from '@prisma/client'
 import Link from 'next/link'
@@ -39,32 +40,7 @@ const columns: ColumnsType<DataType> = [
         sorter: true,
         title: 'Url',
         key: 'slug',
-        render: (container) => (
-            <Link href={`/${encodeURIComponent(container?.slug?.full || '')}`} prefetch={false}>
-                <Breadcrumb
-                    items={[
-                        {
-                            title: (
-                                <Popover
-                                    overlayInnerStyle={{ padding: 0 }}
-                                    content={
-                                        <QRCode
-                                            value={`${process.env['NEXT_PUBLIC_SITE_URL']}/${container?.slug?.full}`}
-                                            bordered={false}
-                                        />
-                                    }
-                                >
-                                    <LinkOutlined rev={undefined} />
-                                </Popover>
-                            ),
-                        },
-                        ...container?.slug?.full?.split('/').map((word: string) => ({
-                            title: word,
-                        })),
-                    ]}
-                />
-            </Link>
-        ),
+        render: (container) => <BreadcrumdLink url={container?.slug?.full} />,
     },
     {
         sorter: true,

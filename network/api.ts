@@ -27,4 +27,13 @@ export const getSidebar = (): Promise<Setting[]> =>
         },
     })
 
+export const revalidateAll = (): Promise<{ revalidate: boolean }> =>
+    INSTANCE({
+        method: 'POST',
+        url: `/api/revalidate`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
 export default INSTANCE

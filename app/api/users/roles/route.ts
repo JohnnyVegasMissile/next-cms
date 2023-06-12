@@ -1,14 +1,13 @@
 // eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextResponse, NextRequest } from 'next/server'
-import type PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 import { PAGE_SIZE } from '~/utilities/constants'
+import type RoleCreation from '~/types/roleCreation'
 
 export const GET = async (request: NextRequest) => {
     const { searchParams } = request.nextUrl
     const q = searchParams.get('q')
     const page = searchParams.get('page')
-    const type = searchParams.get('type')
     const sort = searchParams.get('sort')
 
     let skip = 0
@@ -20,7 +19,6 @@ export const GET = async (request: NextRequest) => {
     let orderBy: any = {}
 
     if (!!q) where.name = { contains: q }
-    if (!!type) where.type = type
     if (!!sort) {
         const parsedSort = sort.split(',')
 
@@ -31,48 +29,36 @@ export const GET = async (request: NextRequest) => {
         }
     }
 
-    const count = await prisma.page.count({ where })
-    const pages = await prisma.page.findMany({
+    const count = await prisma.role.count({ where })
+    const roles = await prisma.role.findMany({
         where,
         orderBy,
         take: PAGE_SIZE,
         skip,
-        include: { slug: true },
+        include: {
+            _count: {
+                select: { logins: true },
+            },
+        },
     })
 
-    return NextResponse.json({ results: pages, count })
+    return NextResponse.json({ results: roles, count })
 }
 
 export const POST = async (request: NextRequest) => {
-    const { name, slug, published, metadatas } = (await request.json()) as PageCreation
+    const { name, rights, limitUpload } = (await request.json()) as RoleCreation
 
     if (typeof name !== 'string') return NextResponse.json({ message: 'Name not valid' }, { status: 400 })
 
-    if (!Array.isArray(slug)) return NextResponse.json({ message: 'Slug not valid.' }, { status: 400 })
+    if (isNaN(parseInt(limitUpload as unknown as string))) {
+        NextResponse.json({ message: 'Limit upload not valid' }, { status: 400 })
+    }
 
-    if (typeof published !== 'boolean')
-        return NextResponse.json({ message: 'Published not valid' }, { status: 400 })
-
-    const page = await prisma.page.create({
+    const page = await prisma.role.create({
         data: {
             name,
-            published,
-            slug: {
-                create: {
-                    full: slug.join('/'),
-                    basic: slug.join('/'),
-                },
-            },
-            metadatas: {
-                createMany: {
-                    data: metadatas.map((metadata) => ({
-                        content: Array.isArray(metadata.content)
-                            ? metadata.content.join(', ')
-                            : metadata.content,
-                        name: metadata.name,
-                    })),
-                },
-            },
+            limitUpload,
+            rights: Array.from(rights),
         },
     })
 

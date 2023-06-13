@@ -66,7 +66,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
         <html>
             {/* eslint-disable-next-line @next/next/no-head-element */}
             <head>
-                {/* <link rel="icon" href="/favicon.ico" sizes="any" /> */}
+                <link rel="icon" href="/storage/favicon.ico" sizes="any" />
 
                 <style
                     dangerouslySetInnerHTML={{

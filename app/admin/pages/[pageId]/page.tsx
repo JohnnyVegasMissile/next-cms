@@ -110,9 +110,7 @@ const CreatePage = ({ params }: any) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    if (details.isLoading) {
-        return <Spin />
-    }
+    if (details.isLoading) return <Spin />
 
     return (
         <>
@@ -138,6 +136,7 @@ const CreatePage = ({ params }: any) => {
                                 </Button>
                             </Popconfirm>
                         )}
+
                         <Button
                             type="primary"
                             icon={<CheckOutlined rev={undefined} />}
@@ -150,6 +149,7 @@ const CreatePage = ({ params }: any) => {
                     </Space>
                 </div>
             </Card>
+
             <Row gutter={[16, 16]}>
                 <Col span={16}>
                     <Card size="small" title="Information">
@@ -167,6 +167,7 @@ const CreatePage = ({ params }: any) => {
                                     />
                                 </WithLabel>
                             </Col>
+
                             {details.data?.type === PageType.PAGE && (
                                 <Col span={12}>
                                     <WithLabel label="Published :">

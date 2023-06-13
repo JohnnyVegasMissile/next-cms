@@ -14,7 +14,7 @@ export async function GET(_: NextRequest, context: any) {
         include: { slug: true, metadatas: true },
     })
 
-    if (!page) NextResponse.json({ message: "Container doesn't exist" }, { status: 404 })
+    if (!page) NextResponse.json({ message: "Page doesn't exist" }, { status: 404 })
 
     // NextResponse extends the Web Response API
     return NextResponse.json(page)

@@ -72,7 +72,7 @@ const cleanDetails = (settings: Setting[]): SettingsCreation => {
                 break
 
             case SettingType.LANGUAGE:
-                cleanValues[setting.type] = setting.value.split(',')
+                cleanValues[setting.type] = setting.value.split(', ')
                 break
 
             case SettingType.SIDEBAR_BREAKPOINT_SIZE:
@@ -110,10 +110,17 @@ const Settings = () => {
     const details = useMutation(() => getSettings(), {
         onSuccess: (data) => formik.setValues(cleanDetails(data)),
     })
-    const submit = useMutation((values: SettingsCreation) => updateSettings(values), {
-        onSuccess: () => message.success('Settings modified with success.'),
-        onError: () => message.error('Something went wrong, try again later.'),
-    })
+    const submit = useMutation(
+        (values: SettingsCreation) =>
+            updateSettings({
+                ...values,
+                [`${SettingType.LANGUAGE}`]: values[SettingType.LANGUAGE]?.join(', '),
+            }),
+        {
+            onSuccess: () => message.success('Settings modified with success.'),
+            onError: () => message.error('Something went wrong, try again later.'),
+        }
+    )
     const revalidate = useMutation(() => revalidateAll(), {
         onSuccess: () => message.success('All pages revalidated with success.'),
         onError: () => message.error('Something went wrong, try again later.'),
@@ -177,6 +184,19 @@ const Settings = () => {
                         Upload
                     </Button>
                 </Space>
+            ),
+        },
+        {
+            key: '6',
+            title: 'Indexed',
+            element: (
+                <Switch
+                    size="small"
+                    checkedChildren="Yes"
+                    unCheckedChildren="No"
+                    checked={formik.values[SettingType.INDEXED]}
+                    onChange={(e) => formik.setFieldValue(SettingType.INDEXED, e)}
+                />
             ),
         },
     ]
@@ -730,9 +750,9 @@ const Settings = () => {
                                     },
                                 ]}
                                 titles={['Inactive', 'Active']}
-                                selectedKeys={formik.values.LANGUAGE}
+                                targetKeys={formik.values.LANGUAGE}
                                 onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE, e)}
-                                onSelectChange={(e) => formik.setFieldValue(SettingType.LANGUAGE, e)}
+                                // onSelectChange={(e) => formik.setFieldValue(SettingType.LANGUAGE, e)}
                                 render={(item) => (
                                     <Space>
                                         <Text>{item.title}</Text>

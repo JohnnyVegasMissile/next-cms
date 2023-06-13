@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '~/utilities/prisma'
 import { PAGE_SIZE } from '~/utilities/constants'
 import type RoleCreation from '~/types/roleCreation'
+import { RightType } from '@prisma/client'
 
 export const GET = async (request: NextRequest) => {
     const { searchParams } = request.nextUrl
@@ -50,14 +51,22 @@ export const POST = async (request: NextRequest) => {
 
     if (typeof name !== 'string') return NextResponse.json({ message: 'Name not valid' }, { status: 400 })
 
-    if (isNaN(parseInt(limitUpload as unknown as string))) {
-        NextResponse.json({ message: 'Limit upload not valid' }, { status: 400 })
+    if (rights.includes(RightType.UPLOAD_MEDIA) && isNaN(parseInt(limitUpload as unknown as string)))
+        return NextResponse.json({ message: 'Limit upload not valid' }, { status: 400 })
+
+    if (Array.isArray(rights)) {
+        for (const right of rights) {
+            if (RightType[right] === undefined)
+                return NextResponse.json({ message: `Rights ${right} not valid` }, { status: 400 })
+        }
+    } else {
+        return NextResponse.json({ message: 'Rights not valid' }, { status: 400 })
     }
 
     const page = await prisma.role.create({
         data: {
             name,
-            limitUpload,
+            limitUpload: rights.includes(RightType.UPLOAD_MEDIA) ? limitUpload : undefined,
             rights: Array.from(rights),
         },
     })

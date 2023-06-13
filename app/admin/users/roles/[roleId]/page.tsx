@@ -11,18 +11,46 @@ import {
     Row,
     Select,
     Space,
+    Spin,
     Tooltip,
     Typography,
+    message,
 } from 'antd'
 import { CheckOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { useFormik } from 'formik'
 import { RightType } from '@prisma/client'
 import RoleCreation from '~/types/roleCreation'
 import WithLabel from '~/components/WithLabel'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { getRole, postRole, updateRole } from '~/network/roles'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 const { Text } = Typography
 
-const initialValues: RoleCreation = {
+type RoleCreationEdit = {
+    name: string
+    rights: Set<RightType>
+    limitUpload?: number | undefined
+}
+
+const convertToRoleCreation = (role: RoleCreationEdit): RoleCreation => {
+    return {
+        name: role.name,
+        rights: Array.from(role.rights),
+        limitUpload: role.limitUpload,
+    }
+}
+
+const convertToRoleCreationEdit = (role: RoleCreation): RoleCreationEdit => {
+    return {
+        name: role.name,
+        rights: new Set(role.rights),
+        limitUpload: role.limitUpload,
+    }
+}
+
+const initialValues: RoleCreationEdit = {
     name: '',
     limitUpload: undefined,
     rights: new Set([
@@ -40,7 +68,7 @@ const initialValues: RoleCreation = {
     ]),
 }
 
-const validate = (values: RoleCreation) => {
+const validate = (values: RoleCreationEdit) => {
     const errors: any = {}
 
     if (!values.name) {
@@ -53,29 +81,51 @@ const validate = (values: RoleCreation) => {
 const Settings = ({ params }: any) => {
     const { roleId } = params
     const isUpdate = roleId !== 'create'
-    const formik = useFormik<RoleCreation>({
+    const router = useRouter()
+    const queryClient = useQueryClient()
+    const formik = useFormik<RoleCreationEdit>({
         initialValues,
         validate,
         validateOnChange: false,
         validateOnBlur: false,
         validateOnMount: false,
-        onSubmit: (values) => {
-            alert(JSON.stringify(values, null, 2))
-        },
+        onSubmit: (values) => submit.mutate(convertToRoleCreation(values)),
     })
+
+    const details = useMutation(() => getRole(roleId), {
+        onSuccess: (data) => formik.setValues(convertToRoleCreationEdit(data as RoleCreation)),
+    })
+    const submit = useMutation(
+        (values: RoleCreation) => (isUpdate ? updateRole(roleId, values) : postRole(values)),
+        {
+            onSuccess: () => {
+                message.success(`Role ${isUpdate ? 'modified' : 'created'} with success.`)
+                queryClient.invalidateQueries({ queryKey: ['roles'] })
+                router.push('/admin/users/roles')
+            },
+            onError: () => message.error('Something went wrong, try again later.'),
+        }
+    )
+
+    useEffect(() => {
+        if (isUpdate) details.mutate()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    if (details.isLoading) return <Spin />
 
     return (
         <>
             <Card size="small">
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text strong>{isUpdate ? 'Update' : 'Create new'} menu</Text>
+                    <Text strong>{isUpdate ? 'Update' : 'Create new'} role</Text>
 
                     <Button
                         type="primary"
                         icon={<CheckOutlined rev={undefined} />}
                         size="small"
                         onClick={() => formik.handleSubmit()}
-                        // loading={submit.isLoading}
+                        loading={submit.isLoading}
                     >
                         {isUpdate ? 'Update role' : 'Create new'}
                     </Button>

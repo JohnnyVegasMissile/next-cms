@@ -21,6 +21,26 @@ import { getContainer } from '~/network/containers'
 import ListSelect from '../ListSelect'
 import ContentsFilter from '../ContentsFilter'
 
+type FiltersType =
+    | {
+          key: string
+          type: 'select' | 'input' | 'radio'
+          default?: string
+          options: { value: string; label: string; icon?: JSX.Element }[]
+
+          name?: never
+          request?: never
+      }
+    | {
+          key: string
+          type: 'select'
+          name: string
+          request: () => Promise<{ id: ObjectId; name: string }[]>
+
+          default?: never
+          options?: never
+      }
+
 interface AdminTableProps<T> {
     name: string
     columns: ColumnsType<T>
@@ -30,12 +50,7 @@ interface AdminTableProps<T> {
         sort: `${string},${'asc' | 'desc'}` | undefined,
         others: any
     ): Promise<{ results: T[]; count: number }>
-    filters?: {
-        key: string
-        type: 'select' | 'input' | 'radio'
-        default?: string
-        options?: { value: string; label: string; icon?: JSX.Element }[]
-    }[]
+    filters?: FiltersType[]
     extra?: React.ReactNode
     isContent?: boolean
     expandedRowRender?: ExpandableConfig<T>['expandedRowRender']
@@ -201,6 +216,17 @@ const AdminTable = <T,>({
                         {filters?.map((filter) => {
                             switch (filter.type) {
                                 case 'select':
+                                    if (filter.request)
+                                        return (
+                                            <RequestSelect
+                                                key={filter.key}
+                                                name={filter.name}
+                                                request={filter.request}
+                                                value={extraFilters[filter.key]}
+                                                onChange={(e) => onFilterChange(filter.key, e)}
+                                            />
+                                        )
+
                                     return (
                                         <Select
                                             allowClear
@@ -370,3 +396,27 @@ const AdminTable = <T,>({
 }
 
 export default AdminTable
+
+interface RequestSelectProps {
+    name: string
+    value: string
+    onChange: (value: string) => void
+    request: () => Promise<{ id: ObjectId; name: string }[]>
+}
+
+const RequestSelect = ({ name, value, onChange, request }: RequestSelectProps) => {
+    const data = useQuery([name], request)
+
+    return (
+        <Select
+            loading={data.isFetching}
+            options={data.data}
+            fieldNames={{ label: 'name', value: 'id' }}
+            allowClear
+            size="small"
+            style={{ width: 190 }}
+            value={value}
+            onChange={onChange}
+        />
+    )
+}

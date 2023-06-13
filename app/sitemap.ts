@@ -19,11 +19,11 @@ const sitemap = async (): Promise<MetadataRoute.Sitemap> => {
 
     const defaults = [
         {
-            url: '/',
+            url: `${url?.value}`,
             lastModified: new Date(),
         },
         {
-            url: 'sign-in',
+            url: `${url?.value}/sign-in`,
             lastModified: new Date(),
         },
     ]

@@ -19,26 +19,35 @@ export const getRoles = (
 }> =>
     INSTANCE({
         method: 'GET',
-        url: `/api/roles`,
+        url: `/api/users/roles`,
         headers: {
             'Content-Type': 'application/json',
         },
         params: { page, q, sort },
     })
 
-export const getRole = (id: ObjectId): Promise<RoleResponse> =>
+export const getRolesSimple = (): Promise<{ id: ObjectId; name: string }[]> =>
     INSTANCE({
         method: 'GET',
-        url: `/api/roles/${id}`,
+        url: '/api/users/roles/simple',
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
+    })
+
+export const getRole = (id: ObjectId): Promise<Role> =>
+    INSTANCE({
+        method: 'GET',
+        url: `/api/users/roles/${id}`,
         headers: {
             'Content-Type': 'application/json',
         },
     })
 
-export const postRole = (data: RoleCreation): Promise<RoleResponse> =>
+export const postRole = (data: RoleCreation): Promise<Role> =>
     INSTANCE({
         method: 'POST',
-        url: `/api/roles`,
+        url: `/api/users/roles`,
         headers: {
             'Content-Type': 'application/json',
         },
@@ -48,7 +57,7 @@ export const postRole = (data: RoleCreation): Promise<RoleResponse> =>
 export const updateRole = (id: ObjectId, data: RoleCreation): Promise<RoleResponse> =>
     INSTANCE({
         method: 'PUT',
-        url: `/api/roles/${id}`,
+        url: `/api/users/roles/${id}`,
         headers: {
             'Content-Type': 'application/json',
         },

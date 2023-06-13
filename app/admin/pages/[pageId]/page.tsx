@@ -163,7 +163,9 @@ const CreatePage = ({ params }: any) => {
                                         name="name"
                                         value={formik.values.name}
                                         onChange={formik.handleChange}
-                                        disabled={details.data?.type !== PageType.PAGE}
+                                        disabled={
+                                            !!details.data?.type && details.data?.type !== PageType.PAGE
+                                        }
                                     />
                                 </WithLabel>
                             </Col>

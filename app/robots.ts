@@ -11,7 +11,7 @@ const robots = async (): Promise<MetadataRoute.Robots> => {
         )?.value === 'false'
 
     const allow = INDEXED ? undefined : '/'
-    const disallow = ['/admin/*', '/api/*']
+    const disallow = ['/admin/', '/api/']
 
     const url = await prisma.setting.findUnique({
         where: { type: SettingType.SITE_URL },

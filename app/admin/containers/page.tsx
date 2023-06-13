@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, Breadcrumb, Button, Divider, Popconfirm, Popover, QRCode, Space, Tooltip } from 'antd'
+import { Badge, Button, Divider, Popconfirm, Space, Tooltip } from 'antd'
 import {
     UnorderedListOutlined,
     CopyOutlined,
@@ -9,7 +9,6 @@ import {
     DeleteOutlined,
     PicCenterOutlined,
     PicLeftOutlined,
-    LinkOutlined,
 } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import AdminTable from '~/components/AdminTable'

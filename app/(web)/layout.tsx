@@ -6,7 +6,6 @@ import { PageType, SectionType, SettingType } from '@prisma/client'
 import styles from './layout.module.scss'
 import { prisma } from '~/utilities/prisma'
 import DisplaySection from '~/components/DisplaySection'
-import Link from 'next/link'
 
 const myFont = localFont({ src: '../../public/Garute-VF.ttf', variable: '--my-font' })
 
@@ -124,9 +123,6 @@ const Layout = async ({
     return (
         <>
             <header>
-                <Link href="/">Home</Link>
-                <Link href="/my-test-2">Test</Link>
-                <Link href="/my-test-3">Not found</Link>
                 {layoutHeader.map((section) => (
                     <DisplaySection key={section.id} section={section} />
                 ))}

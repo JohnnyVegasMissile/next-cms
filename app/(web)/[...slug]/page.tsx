@@ -7,9 +7,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     const full = Array.isArray(params.slug) ? params.slug.join('/') : params.slug
     const page = await prisma.page.findFirst({
         where: { slug: { full } },
+        include: { metadatas: true },
     })
 
-    if (!!page) return { title: page.name }
+    if (!!page) {
+        let metadata: any = {}
+        page.metadatas.forEach((element) => (metadata[element.name] = element.content))
+
+        return { title: page.name, ...metadata }
+    }
 
     const content = await prisma.container.findFirst({
         where: { slug: { full } },
@@ -27,6 +33,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 const getSections = async (slug: string) => {
+    const existingSlug = await prisma.slug.findFirst({ where: { full: slug } })
+
+    if (!existingSlug) return null
+
     const pageSections = await prisma.section.findMany({
         where: { page: { slug: { full: slug } }, type: SectionType.PAGE },
         orderBy: { position: 'asc' },
@@ -53,7 +63,7 @@ const getSections = async (slug: string) => {
 const Content = async ({ params }: { params: { slug: string } }) => {
     const sections = await getSections(Array.isArray(params.slug) ? params.slug.join('/') : params.slug)
 
-    if (!sections.length) notFound()
+    if (sections === null) notFound()
 
     return (
         <>

@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from 'next/server'
 import type PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 import { PAGE_SIZE } from '~/utilities/constants'
+import { revalidatePath } from 'next/cache'
 
 export const GET = async (request: NextRequest) => {
     const { searchParams } = request.nextUrl
@@ -75,6 +76,8 @@ export const POST = async (request: NextRequest) => {
             },
         },
     })
+
+    revalidatePath(slug.join('/'))
 
     return NextResponse.json(page, { status: 200 })
 }

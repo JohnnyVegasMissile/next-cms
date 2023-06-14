@@ -26,7 +26,8 @@ async function main() {
 
     const newSettings = [
         { type: SettingType.APP_NAME, value: 'NextJS App' },
-        { type: SettingType.LANGUAGE, value: 'en' },
+        { type: SettingType.LANGUAGE_LOCALES, value: 'EN' },
+        { type: SettingType.LANGUAGE_PREFERRED, value: 'EN' },
         // SEO
         { type: SettingType.SITE_URL, value: 'http://localhost:8080' },
         { type: SettingType.INDEXED, value: 'false' },

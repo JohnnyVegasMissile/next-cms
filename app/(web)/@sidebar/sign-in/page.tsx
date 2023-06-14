@@ -24,4 +24,5 @@ const SignInSidebar = async () => {
 }
 
 export const revalidate = 'force-cache'
+
 export default SignInSidebar

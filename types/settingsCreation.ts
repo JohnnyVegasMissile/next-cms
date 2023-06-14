@@ -17,7 +17,8 @@ type SettingsCreation = {
     [SettingType.LIGHT_COLOR]?: `#${string}`
     [SettingType.EXTRA_COLOR]?: `#${string}`
 
-    [SettingType.LANGUAGE]?: string[]
+    [SettingType.LANGUAGE_LOCALES]?: string[]
+    [SettingType.LANGUAGE_PREFERRED]?: string
 
     [SettingType.MAIL_HOST]?: string
     [SettingType.MAIL_PORT]?: number

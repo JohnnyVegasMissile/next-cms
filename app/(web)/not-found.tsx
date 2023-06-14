@@ -27,4 +27,5 @@ const NotFound = async () => {
 }
 
 export const revalidate = 'force-cache'
+
 export default NotFound

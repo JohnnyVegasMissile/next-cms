@@ -75,4 +75,5 @@ const Content = async ({ params }: { params: { slug: string } }) => {
 }
 
 export const revalidate = 'force-cache'
+
 export default Content

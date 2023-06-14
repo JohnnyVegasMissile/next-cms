@@ -39,4 +39,5 @@ const Sidebar = async ({ params }: { params: { slug: string } }) => {
 }
 
 export const revalidate = 'force-cache'
+
 export default Sidebar

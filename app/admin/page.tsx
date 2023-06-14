@@ -28,8 +28,26 @@ import { getSettings, updateSettings } from '~/network/settings'
 import SettingsCreation from '~/types/settingsCreation'
 import { Setting, SettingType } from '@prisma/client'
 import { revalidateAll } from '~/network/api'
+import { time } from 'console'
 
 const { Text } = Typography
+
+type codeLang = 'EN' | 'FR' | 'ES' | 'DE' | 'IT' | 'PT' | 'RU' | 'ZH' | 'JA' | 'KO' | 'AR' | 'TR'
+
+const Locales: { [key in codeLang]: { title: string; en: string } } = {
+    EN: { title: 'English', en: 'English' },
+    FR: { title: 'Français', en: 'French' },
+    ES: { title: 'Español', en: 'Spanish' },
+    DE: { title: 'Deutsch', en: 'German' },
+    IT: { title: 'Italiano', en: 'Italian' },
+    PT: { title: `Português`, en: 'Portuguese' },
+    RU: { title: 'Русский', en: 'Russian' },
+    ZH: { title: '中文', en: 'Chinese' },
+    JA: { title: '日本語', en: 'Japanese' },
+    KO: { title: '한국어', en: 'Korean' },
+    AR: { title: 'العربية', en: 'Arabic' },
+    TR: { title: 'Türkçe', en: 'Turkish' },
+}
 
 const validate = (_: SettingsCreation) => {
     const errors = {}
@@ -71,7 +89,7 @@ const cleanDetails = (settings: Setting[]): SettingsCreation => {
                 cleanValues[setting.type] = setting.value as 'left' | 'right'
                 break
 
-            case SettingType.LANGUAGE:
+            case SettingType.LANGUAGE_LOCALES:
                 cleanValues[setting.type] = setting.value.split(', ')
                 break
 
@@ -114,7 +132,7 @@ const Settings = () => {
         (values: SettingsCreation) =>
             updateSettings({
                 ...values,
-                [`${SettingType.LANGUAGE}`]: values[SettingType.LANGUAGE]?.join(', '),
+                [`${SettingType.LANGUAGE_LOCALES}`]: values[SettingType.LANGUAGE_LOCALES]?.join(', '),
             }),
         {
             onSuccess: () => message.success('Settings modified with success.'),
@@ -196,6 +214,19 @@ const Settings = () => {
                     unCheckedChildren="No"
                     checked={formik.values[SettingType.INDEXED]}
                     onChange={(e) => formik.setFieldValue(SettingType.INDEXED, e)}
+                />
+            ),
+        },
+        {
+            key: '7',
+            title: 'App name',
+            element: (
+                <Input
+                    size="small"
+                    style={{ width: 200 }}
+                    placeholder="https://example.com"
+                    value={formik.values[SettingType.SITE_URL]}
+                    onChange={(e) => formik.setFieldValue(SettingType.SITE_URL, e.target.value)}
                 />
             ),
         },
@@ -545,7 +576,7 @@ const Settings = () => {
             ),
         },
         {
-            key: '3',
+            key: '2',
             title: 'Policy page',
             element: (
                 <></>
@@ -561,6 +592,53 @@ const Settings = () => {
                 //         onChange={(_, hex) => formik.setFieldValue(SettingType.LIGHT_COLOR, hex)}
                 //     />
                 // </Space>
+            ),
+        },
+    ]
+
+    const language = [
+        {
+            key: '1',
+            title: 'Allowed languages',
+            element: (
+                <Transfer
+                    oneWay
+                    dataSource={Object.keys(Locales).map((key) => ({
+                        key,
+                        title: Locales[key as codeLang].title || '',
+                        description: Locales[key as codeLang].en || '',
+                        disabled: key === formik.values[SettingType.LANGUAGE_PREFERRED],
+                    }))}
+                    titles={['Inactive', 'Active']}
+                    targetKeys={formik.values.LANGUAGE_LOCALES}
+                    onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_LOCALES, e)}
+                    render={(item) => (
+                        <Space>
+                            <Text>{item.title}</Text>
+                            <Tooltip title={item.description}>
+                                <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
+                            </Tooltip>
+                        </Space>
+                    )}
+                />
+            ),
+        },
+        {
+            key: '2',
+            title: 'Preferred language',
+            element: (
+                <Select
+                    size="small"
+                    disabled={!formik.values.LANGUAGE_LOCALES?.length}
+                    value={formik.values[SettingType.LANGUAGE_PREFERRED]}
+                    onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_PREFERRED, e)}
+                    placeholder="Preferred language"
+                    style={{ width: 200 }}
+                    options={formik.values.LANGUAGE_LOCALES?.map((e) => ({
+                        value: e,
+                        label: Locales[e as codeLang]?.title,
+                    }))}
+                />
             ),
         },
     ]
@@ -685,81 +763,15 @@ const Settings = () => {
                         </Card>
 
                         <Card size="small" title="Internationalization">
-                            <Transfer
-                                oneWay
-                                dataSource={[
-                                    {
-                                        key: 'en',
-                                        title: 'English',
-                                        description: 'English',
-                                    },
-                                    {
-                                        key: 'fr',
-                                        title: 'Français',
-                                        description: 'French',
-                                    },
-                                    {
-                                        key: 'es',
-                                        title: 'Español',
-                                        description: 'Spanish',
-                                    },
-                                    {
-                                        key: 'de',
-                                        title: 'Deutsch',
-                                        description: 'German',
-                                    },
-                                    {
-                                        key: 'it',
-                                        title: 'Italiano',
-                                        description: 'Italian',
-                                    },
-                                    {
-                                        key: 'pt',
-                                        title: `Português`,
-                                        description: 'Portuguese',
-                                    },
-                                    {
-                                        key: 'ru',
-                                        title: 'Русский',
-                                        description: 'Russian',
-                                    },
-                                    {
-                                        key: 'zh',
-                                        title: '中文',
-                                        description: 'Chinese',
-                                    },
-                                    {
-                                        key: 'ja',
-                                        title: '日本語',
-                                        description: 'Japanese',
-                                    },
-                                    {
-                                        key: 'ko',
-                                        title: '한국어',
-                                        description: 'Korean',
-                                    },
-                                    {
-                                        key: 'ar',
-                                        title: 'العربية',
-                                        description: 'Arabic',
-                                    },
-                                    {
-                                        key: 'tr',
-                                        title: 'Türkçe',
-                                        description: 'Turkish',
-                                    },
-                                ]}
-                                titles={['Inactive', 'Active']}
-                                targetKeys={formik.values.LANGUAGE}
-                                onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE, e)}
-                                // onSelectChange={(e) => formik.setFieldValue(SettingType.LANGUAGE, e)}
-                                render={(item) => (
-                                    <Space>
-                                        <Text>{item.title}</Text>
-                                        <Tooltip title={item.description}>
-                                            <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
-                                        </Tooltip>
-                                    </Space>
+                            <List
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={language}
+                                renderItem={(item) => (
+                                    <List.Item key={item.key} style={{ padding: 16 }}>
+                                        <Text strong>{item.title} :</Text>
+                                        {item.element}
+                                    </List.Item>
                                 )}
                             />
                         </Card>
@@ -771,4 +783,5 @@ const Settings = () => {
 }
 
 export const dynamic = 'force-dynamic'
+
 export default Settings

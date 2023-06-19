@@ -5,6 +5,25 @@ import './global.scss'
 import { SettingType } from '@prisma/client'
 import QueryClientWrapper from '~/components/QueryClientWrapper'
 
+// const getLang = async () => {
+//     const locales = await prisma.setting.findUnique({
+//         where: {
+//             type: SettingType.LANGUAGE_LOCALES,
+//         },
+//     })
+
+//     if (!locales) return
+
+//     const accept = locales.value
+//         .split(', ')
+//         .map((e) => e.toLocaleLowerCase())
+//         .join(';')
+
+// const headersList = headers()
+// headersList.set('Accept-Language', 'en-US,en;q=0.5')
+// headersList.set('Accept-Language', accept)
+// }
+
 const getTheme = async () => {
     return await prisma.setting.findMany({
         where: {

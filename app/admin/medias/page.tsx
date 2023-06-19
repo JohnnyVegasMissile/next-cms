@@ -44,7 +44,7 @@ const columns = [
                     <Image
                         width={35}
                         style={{ height: 35, width: 35, objectFit: 'contain', objectPosition: 'center' }}
-                        src={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
+                        src={`/storage/${media.type.toLocaleLowerCase()}s/${media.uri}`}
                         alt={media.alt || ''}
                     />
                 )}
@@ -55,10 +55,7 @@ const columns = [
                     <FilePdfOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} rev={undefined} />
                 )}
                 <Text>
-                    <Link
-                        href={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
-                        target="_blank"
-                    >
+                    <Link href={`/storage/${media.type.toLocaleLowerCase()}s/${media.uri}`} target="_blank">
                         {media?.name}
                     </Link>
                 </Text>

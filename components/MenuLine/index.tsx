@@ -1,4 +1,4 @@
-import { Button, Card, Dropdown, Space, Tooltip, Typography } from 'antd'
+import { Button, Card, Dropdown, Input, Space, Tooltip, Typography } from 'antd'
 import styles from './MenuLine.module.scss'
 import classNames from 'classnames'
 import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons'
@@ -6,14 +6,31 @@ import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/ic
 const { Text } = Typography
 
 interface MenuLineProps {
-    title: React.ReactNode | undefined
+    name: string
+    title: string
+    label: string
+    type: string
+    error: any | undefined
+    onLabelChange(value: any): void
+
+    // title: React.ReactNode | undefined
     level?: number
     onClick(): void
     selected?: boolean
     addChild?(type: 'TITLE' | 'LINK' | 'CONTENT'): void
 }
 
-const MenuLine = ({ title = 'New item', level = 0, onClick, selected, addChild }: MenuLineProps) => {
+const MenuLine = ({
+    level = 0,
+    title,
+    error,
+    name,
+    label,
+    onLabelChange,
+    onClick,
+    selected,
+    addChild,
+}: MenuLineProps) => {
     const items = [
         { key: 'TITLE', label: 'Title', onClick: () => addChild!('TITLE') },
         { key: 'LINK', label: 'Link', onClick: () => addChild!('LINK') },
@@ -21,12 +38,7 @@ const MenuLine = ({ title = 'New item', level = 0, onClick, selected, addChild }
     ]
 
     return (
-        <div
-            className={styles['wrapper']}
-            style={{
-                marginLeft: `${level * 3}rem`,
-            }}
-        >
+        <div className={styles['wrapper']} style={{ marginLeft: `${level * 3}rem` }}>
             <Space align="center" direction="vertical" size={1}>
                 <Button size="small" type="primary" icon={<CaretUpOutlined rev={undefined} />} />
                 <Button size="small" type="primary" icon={<CaretDownOutlined rev={undefined} />} />
@@ -35,11 +47,22 @@ const MenuLine = ({ title = 'New item', level = 0, onClick, selected, addChild }
                 size="small"
                 className={classNames(styles['line'], styles['default'], {
                     [styles['selected']!]: selected,
+                    [styles['error']!]: !!error?.link || !!error?.container,
                 })}
                 onClick={onClick}
             >
                 <div className={styles['body']}>
-                    <Text>{title}</Text>
+                    <Space>
+                        <Text strong type={!!error?.label ? 'danger' : undefined}>{`${title} :`}</Text>
+                        <Input
+                            size="small"
+                            placeholder="Menu label"
+                            bordered={false}
+                            name={name}
+                            value={label}
+                            onChange={onLabelChange}
+                        />
+                    </Space>
 
                     <Space>
                         {!!addChild && (

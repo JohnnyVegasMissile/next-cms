@@ -210,14 +210,14 @@ const { Text } = Typography
 //     {
 //         width: 75,
 //         render: (image: Media) => (
-//             <Image width={50} height={50} src={`/api/uploads/images/${image.uri}`} alt="" />
+//             <Image width={50} height={50} src={`/storage/images/${image.uri}`} alt="" />
 //         ),
 //     },
 //     {
 //         title: 'Name',
 //         // dataIndex: 'name',
 //         render: (image: Media) => (
-//             <a target="_blank" rel="noreferrer" href={`/api/uploads/images/${image.uri}`}>
+//             <a target="_blank" rel="noreferrer" href={`/storage/images/${image.uri}`}>
 //                 {image.name}
 //             </a>
 //         ),
@@ -248,7 +248,7 @@ const columns = [
                         <Image
                             width={35}
                             style={{ height: 35, width: 35, objectFit: 'contain', objectPosition: 'center' }}
-                            src={`/api/uploads/${media.type.toLocaleLowerCase()}s/${media.uri}`}
+                            src={`/storage/${media.type.toLocaleLowerCase()}s/${media.uri}`}
                             alt={media.alt || ''}
                         />
                     )}

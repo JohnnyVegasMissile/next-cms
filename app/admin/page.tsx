@@ -17,10 +17,9 @@ import {
     message,
     Spin,
     ColorPicker,
-    Transfer,
-    Tooltip,
+    Upload,
 } from 'antd'
-import { UploadOutlined, CheckOutlined, ReloadOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { UploadOutlined, CheckOutlined, ReloadOutlined, DownloadOutlined } from '@ant-design/icons'
 import { useEffect } from 'react'
 import { useFormik } from 'formik'
 import { useMutation } from '@tanstack/react-query'
@@ -28,26 +27,10 @@ import { getSettings, updateSettings } from '~/network/settings'
 import SettingsCreation from '~/types/settingsCreation'
 import { Setting, SettingType } from '@prisma/client'
 import { revalidateAll } from '~/network/api'
-import { time } from 'console'
+import { exportDB, importDB } from '~/network/db'
+import { RcFile } from 'antd/es/upload'
 
 const { Text } = Typography
-
-type codeLang = 'EN' | 'FR' | 'ES' | 'DE' | 'IT' | 'PT' | 'RU' | 'ZH' | 'JA' | 'KO' | 'AR' | 'TR'
-
-const Locales: { [key in codeLang]: { title: string; en: string } } = {
-    EN: { title: 'English', en: 'English' },
-    FR: { title: 'Français', en: 'French' },
-    ES: { title: 'Español', en: 'Spanish' },
-    DE: { title: 'Deutsch', en: 'German' },
-    IT: { title: 'Italiano', en: 'Italian' },
-    PT: { title: `Português`, en: 'Portuguese' },
-    RU: { title: 'Русский', en: 'Russian' },
-    ZH: { title: '中文', en: 'Chinese' },
-    JA: { title: '日本語', en: 'Japanese' },
-    KO: { title: '한국어', en: 'Korean' },
-    AR: { title: 'العربية', en: 'Arabic' },
-    TR: { title: 'Türkçe', en: 'Turkish' },
-}
 
 const validate = (_: SettingsCreation) => {
     const errors = {}
@@ -560,6 +543,101 @@ const Settings = () => {
         },
     ]
 
+    const dbExport = useMutation(() => exportDB())
+    const dbImport = useMutation((file: RcFile) => importDB(file), {
+        onSuccess: () => message.success('DB imported successfully'),
+        onError: () => message.success('Error importing DB'),
+    })
+
+    const database = [
+        {
+            key: '1',
+            title: 'Export DB',
+            element: (
+                <Button
+                    size="small"
+                    type="primary"
+                    icon={<DownloadOutlined rev={undefined} />}
+                    loading={dbExport.isLoading}
+                    onClick={() => dbExport.mutate()}
+                >
+                    Export
+                </Button>
+            ),
+        },
+        {
+            key: '2',
+            title: 'Import DB',
+            element: (
+                <Upload
+                    accept=".json"
+                    fileList={[]}
+                    disabled={dbImport.isLoading}
+                    beforeUpload={(file) => {
+                        dbImport.mutate(file)
+
+                        return false
+                    }}
+                >
+                    <Button
+                        loading={dbImport.isLoading}
+                        size="small"
+                        icon={<UploadOutlined rev={undefined} />}
+                    >
+                        Import
+                    </Button>
+                </Upload>
+            ),
+        },
+    ]
+
+    // const language = [
+    //     {
+    //         key: '1',
+    //         title: 'Allowed languages',
+    //         element: (
+    //             <Transfer
+    //                 oneWay
+    //                 dataSource={Object.keys(Locales).map((key) => ({
+    //                     key,
+    //                     title: Locales[key as codeLang].title || '',
+    //                     description: Locales[key as codeLang].en || '',
+    //                     disabled: key === formik.values[SettingType.LANGUAGE_PREFERRED],
+    //                 }))}
+    //                 titles={['Inactive', 'Active']}
+    //                 targetKeys={formik.values.LANGUAGE_LOCALES}
+    //                 onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_LOCALES, e)}
+    //                 render={(item) => (
+    //                     <Space>
+    //                         <Text>{item.title}</Text>
+    //                         <Tooltip title={item.description}>
+    //                             <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
+    //                         </Tooltip>
+    //                     </Space>
+    //                 )}
+    //             />
+    //         ),
+    //     },
+    //     {
+    //         key: '2',
+    //         title: 'Preferred language',
+    //         element: (
+    //             <Select
+    //                 size="small"
+    //                 disabled={!formik.values.LANGUAGE_LOCALES?.length}
+    //                 value={formik.values[SettingType.LANGUAGE_PREFERRED]}
+    //                 onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_PREFERRED, e)}
+    //                 placeholder="Preferred language"
+    //                 style={{ width: 200 }}
+    //                 options={formik.values.LANGUAGE_LOCALES?.map((e) => ({
+    //                     value: e,
+    //                     label: Locales[e as codeLang]?.title,
+    //                 }))}
+    //             />
+    //         ),
+    //     },
+    // ]
+
     const grpd = [
         {
             key: '1',
@@ -578,68 +656,7 @@ const Settings = () => {
         {
             key: '2',
             title: 'Policy page',
-            element: (
-                <></>
-                // <LinkSelect />
-                // <Space>
-                //     {formik.values[SettingType.LIGHT_COLOR] && (
-                //         <Text style={{ textTransform: 'uppercase' }} strong type="secondary">{`${
-                //             formik.values[SettingType.LIGHT_COLOR]
-                //         }`}</Text>
-                //     )}
-                //     <ColorPicker
-                //         value={formik.values[SettingType.LIGHT_COLOR]}
-                //         onChange={(_, hex) => formik.setFieldValue(SettingType.LIGHT_COLOR, hex)}
-                //     />
-                // </Space>
-            ),
-        },
-    ]
-
-    const language = [
-        {
-            key: '1',
-            title: 'Allowed languages',
-            element: (
-                <Transfer
-                    oneWay
-                    dataSource={Object.keys(Locales).map((key) => ({
-                        key,
-                        title: Locales[key as codeLang].title || '',
-                        description: Locales[key as codeLang].en || '',
-                        disabled: key === formik.values[SettingType.LANGUAGE_PREFERRED],
-                    }))}
-                    titles={['Inactive', 'Active']}
-                    targetKeys={formik.values.LANGUAGE_LOCALES}
-                    onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_LOCALES, e)}
-                    render={(item) => (
-                        <Space>
-                            <Text>{item.title}</Text>
-                            <Tooltip title={item.description}>
-                                <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
-                            </Tooltip>
-                        </Space>
-                    )}
-                />
-            ),
-        },
-        {
-            key: '2',
-            title: 'Preferred language',
-            element: (
-                <Select
-                    size="small"
-                    disabled={!formik.values.LANGUAGE_LOCALES?.length}
-                    value={formik.values[SettingType.LANGUAGE_PREFERRED]}
-                    onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_PREFERRED, e)}
-                    placeholder="Preferred language"
-                    style={{ width: 200 }}
-                    options={formik.values.LANGUAGE_LOCALES?.map((e) => ({
-                        value: e,
-                        label: Locales[e as codeLang]?.title,
-                    }))}
-                />
-            ),
+            element: <></>,
         },
     ]
 
@@ -717,6 +734,20 @@ const Settings = () => {
                                 )}
                             />
                         </Card>
+
+                        <Card size="small" title="Database">
+                            <List
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={database}
+                                renderItem={(item) => (
+                                    <List.Item key={item.key} style={{ padding: 16 }}>
+                                        <Text strong>{item.title} :</Text>
+                                        {item.element}
+                                    </List.Item>
+                                )}
+                            />
+                        </Card>
                     </Space>
                 </Col>
                 <Col span={12}>
@@ -762,7 +793,7 @@ const Settings = () => {
                             />
                         </Card>
 
-                        <Card size="small" title="Internationalization">
+                        {/* <Card size="small" title="Internationalization">
                             <List
                                 size="small"
                                 itemLayout="horizontal"
@@ -774,7 +805,7 @@ const Settings = () => {
                                     </List.Item>
                                 )}
                             />
-                        </Card>
+                        </Card> */}
                     </Space>
                 </Col>
             </Row>

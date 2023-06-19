@@ -1,48 +1,103 @@
 'use client'
 
 import { Fragment, useState } from 'react'
-import { Button, Card, Col, Divider, Input, Row, Space, Spin, Typography } from 'antd'
+import { Button, Card, Col, Divider, Input, Row, Select, Space, Spin, Typography } from 'antd'
 import { DeleteOutlined, CheckOutlined, PlusOutlined } from '@ant-design/icons'
 import MenuLine from '~/components/MenuLine'
 import { useFormik } from 'formik'
 import get from 'lodash.get'
-import LinkSelect, { LinkValue } from '~/components/LinkSelect'
+import LinkSelect from '~/components/LinkSelect'
 import WithLabel from '~/components/WithLabel'
 import ListSelect from '~/components/ListSelect'
-import { ObjectId } from '~/types'
 import ContentsFilter from '~/components/ContentsFilter'
 import { useQuery } from '@tanstack/react-query'
 import { getContainer } from '~/network/containers'
+import MenuCreation, { MenuChild } from '~/types/menuCreation'
+import set from 'lodash.set'
 
 const { Text } = Typography
-
-// const DEFAULT_CHILD = { label: '', type: 'title', childrens: [] }
-
-const initialValues: Menu = {
-    name: '',
-    menuItems: [],
-}
-
-type Child<T> = {
-    label: string
-    type: 'TITLE' | 'LINK' | 'CONTENT'
-    link?: LinkValue
-    extras: { name: string; value: string }[]
-
-    container?: ObjectId
-    filters?: any
-    childrens: T
-}
-
-type Menu = {
-    name: string
-    menuItems: Child<Child<Child<undefined>[]>[] | undefined>[]
-}
 
 const labelize = {
     TITLE: 'Title',
     LINK: 'Link',
     CONTENT: 'Content',
+}
+
+const initialValues: MenuCreation = {
+    name: '',
+    menuItems: [],
+}
+
+const validate = (values: MenuCreation) => {
+    let errors: any = {}
+
+    if (!values.name) {
+        errors.name = 'Required'
+    }
+
+    for (let i = 0; i < values.menuItems.length; i++) {
+        const menuFirstLevel = values.menuItems[i]
+        const menuFirstName = `menuItems.${i}`
+        if (!menuFirstLevel) continue
+
+        if (!menuFirstLevel.label) {
+            set(errors, `${menuFirstName}.label`, 'Required')
+        }
+
+        if (menuFirstLevel.type === 'CONTENT' && !menuFirstLevel.container) {
+            set(errors, `${menuFirstName}.container`, 'Required')
+        } else if (
+            menuFirstLevel.type === 'LINK' &&
+            !menuFirstLevel.link?.link &&
+            !menuFirstLevel.link?.slugId
+        ) {
+            set(errors, `${menuFirstName}.link`, 'Required')
+        }
+
+        for (let j = 0; j < (menuFirstLevel.childrens?.length || 0); j++) {
+            const menuSecondLevel = menuFirstLevel.childrens?.[j]
+            const menuSecondName = `${menuFirstName}.childrens.${j}`
+            if (!menuSecondLevel) continue
+
+            if (!menuSecondLevel?.label) {
+                set(errors, `${menuSecondName}.label`, 'Required')
+            }
+
+            if (menuSecondLevel.type === 'CONTENT' && !menuSecondLevel.container) {
+                set(errors, `.${menuSecondName}.container`, 'Required')
+            } else if (
+                menuSecondLevel.type === 'LINK' &&
+                !menuSecondLevel.link?.link &&
+                !menuSecondLevel.link?.slugId
+            ) {
+                set(errors, `${menuSecondName}.link`, 'Required')
+            }
+
+            for (let k = 0; k < (menuSecondLevel.childrens?.length || 0); k++) {
+                const menuThirdLevel = menuSecondLevel.childrens[k]
+                const menuThirdName = `${menuSecondName}.childrens.${k}`
+                if (!menuThirdLevel) continue
+
+                if (!menuThirdLevel.label) {
+                    set(errors, `${menuThirdName}.label`, 'Required')
+                }
+
+                if (menuThirdLevel.type === 'CONTENT' && !menuThirdLevel.container) {
+                    set(errors, `${menuThirdName}.container`, 'Required')
+                } else if (
+                    menuThirdLevel.type === 'LINK' &&
+                    !menuThirdLevel.link?.link &&
+                    !menuThirdLevel.link?.slugId
+                ) {
+                    set(errors, `${menuThirdName}.link`, 'Required')
+                }
+            }
+        }
+    }
+
+    console.log('errors', errors)
+
+    return errors
 }
 
 const CreateMenu = ({ params }: any) => {
@@ -51,11 +106,13 @@ const CreateMenu = ({ params }: any) => {
     const [selected, setSelected] = useState<number[] | undefined>()
     const formik = useFormik({
         initialValues,
-        // validate,
+        validate,
         validateOnChange: false,
         validateOnBlur: false,
         validateOnMount: false,
         onSubmit: (values) => {
+            // const filters = values.menuItems[0]?.filters?.forEach((filter) => {})
+
             alert(JSON.stringify(values, null, 2))
         },
     })
@@ -69,7 +126,8 @@ const CreateMenu = ({ params }: any) => {
         JSON.stringify(a) === JSON.stringify(b)
 
     const nameSelected = `menuItems.${selected?.join('.childrens.')}`
-    const selectedMenu = get(formik, `values.${nameSelected}`) as unknown as Child<any>
+    const selectedMenu = get(formik, `values.${nameSelected}`) as unknown as MenuChild<any>
+    const selectedError = get(formik, `errors.${nameSelected}`) as any
 
     const onDelete = () => {
         const indexToDelete = selected![selected!?.length - 1]
@@ -131,19 +189,12 @@ const CreateMenu = ({ params }: any) => {
                             {formik.values.menuItems.map((level1Menu, idx1) => (
                                 <Fragment key={idx1}>
                                     <MenuLine
-                                        title={
-                                            <Space>
-                                                <Text>{`${labelize[level1Menu.type]} :`}</Text>
-                                                <Input
-                                                    size="small"
-                                                    placeholder="Menu label"
-                                                    bordered={false}
-                                                    name={`menuItems.${idx1}.label`}
-                                                    value={level1Menu.label}
-                                                    onChange={formik.handleChange}
-                                                />
-                                            </Space>
-                                        }
+                                        title={labelize[level1Menu.type]}
+                                        name={`menuItems.${idx1}.label`}
+                                        type={level1Menu.type}
+                                        error={get(formik, `errors.menuItems.${idx1}`)}
+                                        label={level1Menu.label}
+                                        onLabelChange={formik.handleChange}
                                         level={0}
                                         onClick={() => handleSelection([idx1])}
                                         selected={areEqual(selected, [idx1])}
@@ -173,16 +224,15 @@ const CreateMenu = ({ params }: any) => {
                                     {level1Menu.childrens?.map((level2Menu, idx2) => (
                                         <Fragment key={`${idx1}/${idx2}`}>
                                             <MenuLine
-                                                title={
-                                                    <Input
-                                                        size="small"
-                                                        placeholder="Menu label"
-                                                        bordered={false}
-                                                        name={`menuItems.${idx1}.childrens.${idx2}.label`}
-                                                        value={level2Menu.label}
-                                                        onChange={formik.handleChange}
-                                                    />
-                                                }
+                                                title={labelize[level2Menu.type]}
+                                                name={`menuItems.${idx1}.childrens.${idx2}.label`}
+                                                type={level2Menu.type}
+                                                error={get(
+                                                    formik,
+                                                    `errors.menuItems.${idx1}.childrens.${idx2}`
+                                                )}
+                                                label={level2Menu.label}
+                                                onLabelChange={formik.handleChange}
                                                 level={1}
                                                 onClick={() => handleSelection([idx1, idx2])}
                                                 selected={areEqual(selected, [idx1, idx2])}
@@ -222,17 +272,15 @@ const CreateMenu = ({ params }: any) => {
                                             {level2Menu.childrens?.map((level3Menu, idx3) => (
                                                 <MenuLine
                                                     key={`${idx1}/${idx2}/${idx3}`}
-                                                    title={
-                                                        <Input
-                                                            size="small"
-                                                            placeholder="Menu label"
-                                                            bordered={false}
-                                                            name={`menuItems.${idx1}.childrens.${idx2}.childrens.${idx3}.label`}
-                                                            value={level3Menu.label}
-                                                            onChange={formik.handleChange}
-                                                        />
-                                                    }
-                                                    // title={level3Menu.label}
+                                                    title={labelize[level3Menu.type]}
+                                                    name={`menuItems.${idx1}.childrens.${idx2}.childrens.${idx3}.label`}
+                                                    type={level3Menu.type}
+                                                    error={get(
+                                                        formik,
+                                                        `errors.menuItems.${idx1}.childrens.${idx2}.childrens.${idx3}`
+                                                    )}
+                                                    label={level3Menu.label}
+                                                    onLabelChange={formik.handleChange}
                                                     level={2}
                                                     onClick={() => handleSelection([idx1, idx2, idx3])}
                                                     selected={areEqual(selected, [idx1, idx2, idx3])}
@@ -288,8 +336,9 @@ const CreateMenu = ({ params }: any) => {
                             >
                                 <Space direction="vertical" style={{ width: '100%' }}>
                                     {selectedMenu.type === 'LINK' && (
-                                        <WithLabel label="Link">
+                                        <WithLabel label="Link" error={selectedError?.link}>
                                             <LinkSelect
+                                                error={selectedError?.link}
                                                 value={selectedMenu.link!}
                                                 onChange={(e) =>
                                                     formik.setFieldValue(`${nameSelected}.link`, e)
@@ -300,8 +349,9 @@ const CreateMenu = ({ params }: any) => {
 
                                     {selectedMenu.type === 'CONTENT' && (
                                         <>
-                                            <WithLabel label="Container">
+                                            <WithLabel label="Container" error={selectedError?.container}>
                                                 <ListSelect.Container
+                                                    error={selectedError?.container}
                                                     value={selectedMenu.container}
                                                     onChange={(e) =>
                                                         formik.setFieldValue(`${nameSelected}.container`, e)
@@ -309,7 +359,17 @@ const CreateMenu = ({ params }: any) => {
                                                 />
                                             </WithLabel>
 
-                                            {!!selectedMenu.container && container.isFetching && <Spin />}
+                                            {!!selectedMenu.container && container.isFetching && (
+                                                <div
+                                                    style={{
+                                                        padding: 8,
+                                                        display: 'flex',
+                                                        justifyContent: 'center',
+                                                    }}
+                                                >
+                                                    <Spin />
+                                                </div>
+                                            )}
 
                                             {!!selectedMenu.container && !!container.data?.fields?.length && (
                                                 <>
@@ -325,17 +385,59 @@ const CreateMenu = ({ params }: any) => {
                                                         />
                                                         <ContentsFilter
                                                             fields={container.data?.fields}
-                                                            values={selectedMenu.filters}
-                                                            onChange={(e) =>
+                                                            values={selectedMenu.filters!}
+                                                            onChange={(e) => {
+                                                                console.log(`${nameSelected}.filters`, e)
                                                                 formik.setFieldValue(
                                                                     `${nameSelected}.filters`,
                                                                     e
                                                                 )
-                                                            }
+                                                            }}
                                                         />
-                                                        <Divider
+                                                        {/* <Divider
                                                             style={{ marginTop: 0, marginBottom: '0.5rem' }}
-                                                        />
+                                                        /> */}
+
+                                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                            <div style={{ minWidth: 85 }}>
+                                                                <Text type="secondary">Order by :</Text>
+                                                            </div>
+                                                            <div style={{ flex: 1 }}>
+                                                                <Space.Compact block size="small">
+                                                                    <Select
+                                                                        allowClear
+                                                                        value={selectedMenu.orderByField}
+                                                                        onChange={(e) =>
+                                                                            formik.setFieldValue(
+                                                                                `${nameSelected}.orderByField`,
+                                                                                e
+                                                                            )
+                                                                        }
+                                                                        style={{ flex: 1 }}
+                                                                        options={container.data?.fields
+                                                                            .filter((e) => !e.multiple)
+                                                                            .map((field) => ({
+                                                                                value: field.id,
+                                                                                label: field.name,
+                                                                            }))}
+                                                                    />
+                                                                    <Select
+                                                                        value={selectedMenu.orderBy}
+                                                                        onChange={(e) =>
+                                                                            formik.setFieldValue(
+                                                                                `${nameSelected}.orderBy`,
+                                                                                e
+                                                                            )
+                                                                        }
+                                                                        style={{ width: '33%' }}
+                                                                        options={[
+                                                                            { value: 'asc', label: 'Asc' },
+                                                                            { value: 'desc', label: 'Desc' },
+                                                                        ]}
+                                                                    />
+                                                                </Space.Compact>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </>
                                             )}
@@ -344,7 +446,6 @@ const CreateMenu = ({ params }: any) => {
 
                                     <Divider>Extras</Divider>
 
-                                    {/* <Card size="small"> */}
                                     <Space direction="vertical" style={{ width: '100%' }}>
                                         {selectedMenu.extras.map((extra, idx) => (
                                             <Space.Compact key={idx} size="small" style={{ width: '100%' }}>
@@ -398,174 +499,12 @@ const CreateMenu = ({ params }: any) => {
                                             Add
                                         </Button>
                                     </Space>
-                                    {/* </Card> */}
                                 </Space>
                             </Card>
                         )}
                     </Col>
                 </Row>
             </Card>
-
-            {/* <Card title="Menu" size="small">
-                <Row gutter={[16, 16]}>
-                    <Col span={16}>
-                        <Space direction="vertical" size={3} style={{ flex: 1, width: '100%' }}>
-                            <Text type="secondary">name :</Text>
-                            <Input
-                                size="small"
-                                // status={!!formik.errors.title ? "error" : undefined}
-                                style={{ width: '100%' }}
-                                name="title"
-                                // value={formik.values.title}
-                                // onChange={formik.handleChange}
-                            />
-                        </Space>
-                    </Col>
-                    <Col span={8}>
-                        <Card></Card>
-                    </Col>
-                </Row>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Space direction="vertical" style={{ flex: 1 }}>
-                        <Space direction="vertical" size={3} style={{ flex: 1 }}>
-                            <Text type="secondary">name :</Text>
-                            <Input
-                                size="small"
-                                // status={!!formik.errors.title ? "error" : undefined}
-                                // style={{ width: "100%" }}
-                                name="title"
-                                // value={formik.values.title}
-                                // onChange={formik.handleChange}
-                            />
-                        </Space>
-
-                        <Divider />
-                        {formik.values.menuItems.map((level1Menu, idx1) => (
-                            <>
-                                <MenuLine
-                                    title={
-                                        <Input
-                                            size="small"
-                                            placeholder="Menu label"
-                                            bordered={false}
-                                            name={`menuItems.${idx1}.label`}
-                                            value={level1Menu.label}
-                                            onChange={formik.handleChange}
-                                        />
-                                    }
-                                    level={0}
-                                    onClick={() => handleSelection([idx1])}
-                                    selected={areEqual(selected, [idx1])}
-                                    addChild={() =>
-                                        formik.setFieldValue(`menuItems.${idx1}.childrens`, [
-                                            ...(formik.values.menuItems[idx1]?.childrens || []),
-                                            DEFAULT_CHILD,
-                                        ])
-                                    }
-                                />
-                                {level1Menu.childrens?.map((level2Menu, idx2) => (
-                                    <>
-                                        <MenuLine
-                                            title={
-                                                <Input
-                                                    size="small"
-                                                    placeholder="Menu label"
-                                                    bordered={false}
-                                                    name={`menuItems.${idx1}.childrens.${idx2}.label`}
-                                                    value={level2Menu.label}
-                                                    onChange={formik.handleChange}
-                                                />
-                                            }
-                                            level={1}
-                                            onClick={() => handleSelection([idx1, idx2])}
-                                            selected={areEqual(selected, [idx1, idx2])}
-                                            addChild={() =>
-                                                formik.setFieldValue(
-                                                    `menuItems.${idx1}.childrens.${idx2}.childrens`,
-                                                    [
-                                                        ...(formik.values.menuItems?.[idx1]?.childrens?.[idx2]
-                                                            ?.childrens || []),
-                                                        DEFAULT_CHILD,
-                                                    ]
-                                                )
-                                            }
-                                        />
-                                        {level2Menu.childrens?.map((level3Menu, idx3) => (
-                                            <>
-                                                <MenuLine
-                                                    title={
-                                                        <Input
-                                                            size="small"
-                                                            placeholder="Menu label"
-                                                            bordered={false}
-                                                            name={`menuItems.${idx1}.childrens.${idx2}.childrens.${idx3}.label`}
-                                                            value={level3Menu.label}
-                                                            onChange={formik.handleChange}
-                                                        />
-                                                    }
-                                                    // title={level3Menu.label}
-                                                    level={2}
-                                                    onClick={() => handleSelection([idx1, idx2, idx3])}
-                                                    selected={areEqual(selected, [idx1, idx2, idx3])}
-                                                />
-                                            </>
-                                        ))}
-                                    </>
-                                ))}
-                            </>
-                        ))}
-
-                        <MenuLine.Add
-                            onClick={() =>
-                                formik.setFieldValue('menuItems', [...formik.values.menuItems, DEFAULT_CHILD])
-                            }
-                        />
-                    </Space>
-
-                    {selected && (
-                        <Card
-                            title={
-                                <Space>
-                                    <Text>Type :</Text>
-                                    <Select
-                                        size="small"
-                                        value={selectedMenu.type}
-                                        onChange={(e) => formik.setFieldValue(`${nameSelected}.type`, e)}
-                                        options={[
-                                            { value: 'title', label: 'Title' },
-                                            { value: 'contents', label: 'Contents' },
-                                            { value: 'link', label: 'Link' },
-                                        ]}
-                                        style={{ width: 190 }}
-                                    />
-                                </Space>
-                            }
-                            size="small"
-                            extra={
-                                !!selected ? (
-                                    <Button
-                                        type="primary"
-                                        size="small"
-                                        danger
-                                        icon={<DeleteOutlined />}
-                                        onClick={() => {
-                                            // selected[0]
-                                        }}
-                                    />
-                                ) : undefined
-                            }
-                            style={{ width: 500 }}
-                        >
-                            {selectedMenu.link && (
-                                <LinkSelect
-                                    value={selectedMenu.link}
-                                    onChange={(e) => formik.setFieldValue(`${nameSelected}.link`, e)}
-                                />
-                            )}
-                        </Card>
-                    )}
-                </div>
-            </Card> */}
         </>
     )
 }

@@ -339,6 +339,7 @@ model Slug {
 
   revalidatedAt DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  Link          Link[]
 }
 
 // METADATAS
@@ -485,6 +486,8 @@ model Container {
 
   published Boolean @default(true)
 
+  menuChild MenuChild[]
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   createdByUserId String?
@@ -535,6 +538,7 @@ model ContainerField {
   defaultMultipleJsonValue   Json[]
 
   releatedFields ContentField[]
+  orderByInMenu  MenuChild[]
 
   containerId String
   container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
@@ -612,4 +616,74 @@ model Media {
   updatedAt DateTime @updatedAt
 
   usedInSections LinkedToSection[]
+}
+
+// MENU
+
+enum MenuChildType {
+  TITLE
+  LINK
+  CONTENT
+}
+
+model Menu {
+  id String @id @default(cuid())
+
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum OrderBy {
+  ASC
+  DESC
+}
+
+model MenuChild {
+  id String @id @default(cuid())
+
+  type     MenuChildType
+  parentId String?
+  parent   MenuChild?    @relation(fields: [parentId], references: [id], name: "childs", onDelete: Cascade)
+  childs   MenuChild[]   @relation(name: "childs")
+
+  containerId    String?
+  container      Container?      @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  filters        Json?
+  orderByFieldId String?
+  orderByField   ContainerField? @relation(fields: [orderByFieldId], references: [id], onDelete: Cascade)
+  orderBy        OrderBy?
+
+  linkId String?
+  Link   Link?   @relation(fields: [linkId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// LINK
+
+enum LinkType {
+  IN
+  OUT
+}
+
+enum LinkProtocol {
+  HTTP
+  HTTPS
+}
+
+model Link {
+  id String @id @default(cuid())
+
+  type LinkType
+
+  slugId String?
+  slug   Slug?   @relation(fields: [slugId], references: [id], onDelete: Cascade)
+
+  link     String?
+  prototol LinkProtocol?
+
+  menuChild MenuChild[]
 }

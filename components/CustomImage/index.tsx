@@ -14,7 +14,7 @@ const CustomImage = ({ media, height, width, className }: CustomImageProps) => {
 
     return (
         <Image
-            src={`/api/uploads/images/${media.uri}`}
+            src={`/storage/images/${media.uri}`}
             alt={media.alt || ''}
             height={height}
             width={width}
@@ -36,7 +36,7 @@ const Background = ({ media, className, classNameImage, children }: BackgroundPr
     return (
         <div className={className} style={{ position: 'relative' }}>
             <Image
-                src={`/api/uploads/images/${media.uri}`}
+                src={`/storage/images/${media.uri}`}
                 alt={media.alt || ''}
                 className={classNameImage}
                 fill={true}

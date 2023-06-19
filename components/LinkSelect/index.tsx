@@ -12,6 +12,7 @@ import './styles.scss'
 import { useQuery } from '@tanstack/react-query'
 import { getSlugsSimple } from '~/network/slugs'
 import { ObjectId } from '~/types'
+import { LinkType, LinkProtocol, PageType, Link } from '@prisma/client'
 
 const { Option } = Select
 
@@ -23,16 +24,16 @@ interface Option {
 
 export type LinkValue =
     | {
-          type: 'IN'
+          type: typeof LinkType.IN
           slugId?: ObjectId | undefined
 
           link?: never
           prototol?: never
       }
     | {
-          type: 'OUT'
+          type: typeof LinkType.OUT
           link?: string | undefined
-          prototol?: 'http' | 'https' | undefined
+          prototol?: LinkProtocol | undefined
 
           slugId?: never
       }
@@ -40,11 +41,12 @@ export type LinkValue =
 interface LinkSelectProps {
     value: LinkValue
     onChange(value: LinkValue): void
+    error?: boolean
 }
 
-const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
+const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
     // const [q, setQ] = useState('')
-    const slugs = useQuery(['slugs-simple'], () => getSlugsSimple(), { enabled: value.type === 'IN' })
+    const slugs = useQuery(['slugs-simple'], () => getSlugsSimple(), { enabled: value.type === LinkType.IN })
 
     const options = slugs.data?.map((slug) => ({
         value: slug.id,
@@ -71,25 +73,29 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
     }))
 
     const onPageChange = (slugId: ObjectId | undefined) =>
-        value.type === 'IN' && onChange({ ...value, slugId })
+        value.type === LinkType.IN && onChange({ ...value, slugId })
 
-    const onTypeChange = (type: 'IN' | 'OUT') => {
-        if (type === 'IN') {
+    const onTypeChange = (type: LinkType) => {
+        if (type === LinkType.IN) {
             onChange({
-                type: 'IN',
+                type: LinkType.IN,
                 slugId: undefined,
             })
         } else {
             onChange({
-                type: 'OUT',
-                link: '',
-                prototol: 'https',
+                type: LinkType.OUT,
+                link: undefined,
+                prototol: LinkProtocol.HTTPS,
             })
         }
     }
 
-    const onProtocolChange = (prototol: 'http' | 'https') =>
-        value.type === 'OUT' && onChange({ ...value, prototol })
+    const onProtocolChange = (prototol: LinkProtocol) =>
+        value.type === LinkType.OUT &&
+        onChange({
+            ...value,
+            prototol,
+        })
 
     const onLinkChange = (link: string) => value.type === 'OUT' && onChange({ ...value, link })
 
@@ -118,6 +124,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                     /> */}
                     <TreeSelect
                         // showSearch
+                        status={error ? 'error' : undefined}
                         size="small"
                         placeholder="Please select"
                         className="link-select-tree"
@@ -127,7 +134,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                         onChange={onPageChange}
                         treeData={[
                             {
-                                value: 'HOME',
+                                value: PageType.HOMEPAGE,
                                 label: (
                                     <Space>
                                         <HomeOutlined rev={undefined} />
@@ -136,7 +143,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                                 ),
                             },
                             {
-                                value: 'SIGNIN',
+                                value: PageType.SIGNIN,
                                 label: (
                                     <Space>
                                         <LoginOutlined rev={undefined} />
@@ -154,6 +161,7 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
             ) : (
                 <Input
                     value={value.link}
+                    status={error ? 'error' : undefined}
                     onChange={(e) => onLinkChange(e.target.value)}
                     addonBefore={selectBefore}
                     size="small"
@@ -162,11 +170,17 @@ const LinkSelect = ({ value, onChange }: LinkSelectProps) => {
                     allowClear
                 />
             )}
-            <Select size="small" value={value.type} onChange={onTypeChange} className="link-select-select">
-                <Option value="IN">
+            <Select
+                status={error ? 'error' : undefined}
+                size="small"
+                value={value.type}
+                onChange={onTypeChange}
+                className="link-select-select"
+            >
+                <Option value={LinkType.IN}>
                     <LinkOutlined rev={undefined} />
                 </Option>
-                <Option value="OUT">
+                <Option value={LinkType.OUT}>
                     <GlobalOutlined rev={undefined} />
                 </Option>
             </Select>

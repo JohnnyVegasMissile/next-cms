@@ -1,242 +1,69 @@
-'use client'
+import { SectionType, SettingType } from '@prisma/client'
+import { notFound } from 'next/navigation'
+import { prisma } from '~/utilities/prisma'
+import Form from './Form'
 
-import { Section } from '@prisma/client'
-import { useMutation } from '@tanstack/react-query'
-import { FloatButton, message } from 'antd'
-import {
-    MenuOutlined,
-    CloseOutlined,
-    CheckOutlined,
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-    LoadingOutlined,
-} from '@ant-design/icons'
-import { useFormik } from 'formik'
-import { useEffect, useState } from 'react'
-import { getPageSections, updatePageSections } from '~/network/pages'
-import SectionCreation, { SectionCreationCleaned } from '~/types/sectionCreation'
-import { ObjectId } from '~/types'
-import blocks, { BlockKey } from '~/blocks'
-import styles from './page.module.scss'
-import classNames from 'classnames'
-import SectionsManager from '~/components/SectionsManager'
-import useSidebarSettings from '~/hooks/useSidebarSettings'
-import FullScreenLoading from '~/components/FullScreenLoading'
-import { useRouter } from 'next/navigation'
+const getSections = async (pageId: string) => {
+    const page = await prisma.page.findUnique({ where: { id: pageId } })
+    if (!page) return null
 
-const validate = (values: { content: SectionCreation[]; sidebar: SectionCreation[] }) => {
-    let errors: any = {}
-
-    for (const section of values.content) {
-        const validate = blocks[section.block].validate
-
-        if (!!validate) {
-            const sectionErrors = validate(section)
-
-            if (!!Object.keys(sectionErrors).length) {
-                if (!!errors.content) errors.content = new Array()
-
-                errors.content[section.position] = sectionErrors
-            }
-        }
-    }
-
-    for (const section of values.sidebar) {
-        const validate = blocks[section.block].validate
-
-        if (!!validate) {
-            const sectionErrors = validate(section)
-
-            if (!!Object.keys(sectionErrors).length) {
-                if (!!errors.sidebar) errors.sidebar = new Array()
-
-                errors.sidebar[section.position] = sectionErrors
-            }
-        }
-    }
-
-    return errors
-}
-
-const cleanDetails = (values: {
-    content: Section[]
-    sidebar: Section[]
-}): { content: SectionCreation[]; sidebar: SectionCreation[] } => {
-    const content = values.content.map((section) => ({
-        id: section.id,
-        type: section.type,
-        block: section.block as BlockKey,
-        position: section.position,
-        content: section.content as any,
-        pageId: section.pageId!,
-
-        medias: new Map(),
-        forms: new Map(),
-    }))
-
-    const sidebar = values.sidebar.map((section) => ({
-        id: section.id,
-        type: section.type,
-        block: section.block as BlockKey,
-        position: section.position,
-        content: section.content as any,
-        pageId: section.pageId!,
-
-        medias: new Map(),
-        forms: new Map(),
-    }))
-
-    return { content, sidebar }
-}
-
-const cleanBeforeSend = (values: { content: SectionCreation[]; sidebar: SectionCreation[] }) => {
-    const content = values.content.map((section) => {
-        const medias: ObjectId[] = []
-        const forms: ObjectId[] = []
-
-        const stringifiedContent = JSON.stringify(section.content)
-
-        section.medias.forEach((_, key) => {
-            if (stringifiedContent.includes(`"${key}"`)) medias.push(key)
-        })
-
-        section.forms.forEach((_, key) => {
-            if (stringifiedContent.includes(`"${key}"`)) forms.push(key)
-        })
-
-        return {
-            ...section,
-            medias,
-            forms,
-            tempId: undefined,
-        }
+    const content = await prisma.section.findMany({
+        where: { pageId, type: SectionType.PAGE },
+        orderBy: { position: 'asc' },
     })
 
-    const sidebar = values.sidebar.map((section) => {
-        const medias: ObjectId[] = []
-        const forms: ObjectId[] = []
-
-        const stringifiedContent = JSON.stringify(section.content)
-
-        section.medias.forEach((_, key) => {
-            if (stringifiedContent.includes(`"${key}"`)) medias.push(key)
-        })
-
-        section.forms.forEach((_, key) => {
-            if (stringifiedContent.includes(`"${key}"`)) forms.push(key)
-        })
-
-        return {
-            ...section,
-            medias,
-            forms,
-            tempId: undefined,
-        }
+    const sidebar = await prisma.section.findMany({
+        where: { pageId, type: SectionType.PAGE_SIDEBAR },
+        orderBy: { position: 'asc' },
     })
 
     return { content, sidebar }
 }
 
-const PageSections = ({ params }: any) => {
-    const { pageId } = params
-    const router = useRouter()
-    const [showSidebar, setShowSidebar] = useState(false)
-    const formik = useFormik<{ content: SectionCreation[]; sidebar: SectionCreation[] }>({
-        initialValues: { content: [], sidebar: [] },
-        validate,
-        validateOnChange: false,
-        validateOnBlur: false,
-        validateOnMount: false,
-        onSubmit: (values) => submit.mutate(cleanBeforeSend(values)),
-    })
-
-    const details = useMutation(() => getPageSections(pageId), {
-        onSuccess: (data) => formik.setValues(cleanDetails(data)),
-    })
-
-    const submit = useMutation(
-        (values: { content: SectionCreationCleaned[]; sidebar: SectionCreationCleaned[] }) =>
-            updatePageSections(pageId, values),
-        {
-            onSuccess: () => {
-                message.success(`Sections modified with success.`)
-                router.push('/admin/pages')
+const getSidebar = async () => {
+    const sidebar = await prisma.setting.findMany({
+        where: {
+            type: {
+                in: [
+                    SettingType.SIDEBAR_IS_ACTIVE,
+                    SettingType.SIDEBAR_WIDTH,
+                    SettingType.SIDEBAR_UNIT,
+                    SettingType.SIDEBAR_COLOR,
+                    SettingType.SIDEBAR_POSITION,
+                    SettingType.SIDEBAR_BREAKPOINT_SIZE,
+                ],
             },
-            onError: () => message.error('Something went wrong, try again later.'),
-        }
-    )
+        },
+    })
 
-    const sidebar = useSidebarSettings(() => setShowSidebar(true))
+    const isActive = sidebar.find((e) => e.type === SettingType.SIDEBAR_IS_ACTIVE)?.value === 'true'
+    const width = `${sidebar.find((e) => e.type === SettingType.SIDEBAR_WIDTH)?.value || '0'}${
+        sidebar.find((e) => e.type === SettingType.SIDEBAR_UNIT)?.value || 'rem'
+    }`
 
-    useEffect(() => {
-        details.mutate()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    const backgroundColor = sidebar.find((e) => e.type === SettingType.SIDEBAR_COLOR)?.value || '#ef476f'
+    const breakpointClass =
+        sidebar.find((e) => e.type === SettingType.SIDEBAR_BREAKPOINT_SIZE)?.value || 'medium'
+    const position = sidebar.find((e) => e.type === SettingType.SIDEBAR_POSITION)?.value || 'left'
 
-    if (details.isLoading || sidebar.isLoading) return <FullScreenLoading label="Loading sections..." />
-
-    return (
-        <>
-            <div className={classNames(styles['content-wrap'], sidebar.position, sidebar.breakpointClass)}>
-                {sidebar.isActive && (
-                    <aside
-                        className={classNames(styles['aside'], { [styles['open']!]: showSidebar })}
-                        style={{ width: sidebar.width, backgroundColor: sidebar.backgroundColor }}
-                    >
-                        <SectionsManager
-                            name="sidebar"
-                            sections={formik.values.sidebar}
-                            onChange={formik.setFieldValue}
-                            error={formik.errors.sidebar}
-                        />
-                    </aside>
-                )}
-                <div className={styles['content']}>
-                    <SectionsManager
-                        name="content"
-                        sections={formik.values.content}
-                        onChange={formik.setFieldValue}
-                        error={formik.errors.content}
-                    />
-                </div>
-            </div>
-
-            <FloatButton.Group
-                trigger="hover"
-                type="primary"
-                style={{ right: '2.5rem', opacity: 1 }}
-                icon={
-                    submit.isLoading ? <LoadingOutlined rev={undefined} /> : <MenuOutlined rev={undefined} />
-                }
-            >
-                {!submit.isLoading && (
-                    <>
-                        {sidebar.isActive && (
-                            <FloatButton
-                                icon={
-                                    showSidebar ? (
-                                        <MenuFoldOutlined rev={undefined} />
-                                    ) : (
-                                        <MenuUnfoldOutlined rev={undefined} />
-                                    )
-                                }
-                                onClick={() => setShowSidebar(!showSidebar)}
-                            />
-                        )}
-                        <FloatButton
-                            icon={<CloseOutlined rev={undefined} />}
-                            onClick={() => formik.setValues(cleanDetails(details.data!))}
-                        />
-                        <FloatButton
-                            type="primary"
-                            icon={<CheckOutlined rev={undefined} />}
-                            onClick={() => formik.submitForm()}
-                        />
-                    </>
-                )}
-            </FloatButton.Group>
-        </>
-    )
+    return {
+        isActive,
+        width,
+        backgroundColor,
+        breakpointClass,
+        position,
+    }
 }
 
-export default PageSections
+const EditPageSections = async ({ params }: any) => {
+    const layout = await getSections(params.pageId)
+    const sidebar = await getSidebar()
+
+    if (!layout) notFound()
+
+    return <Form pageId={params.pageId} layout={layout} sidebar={sidebar} />
+}
+
+export const dynamic = 'force-dynamic'
+
+export default EditPageSections

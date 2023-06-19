@@ -103,7 +103,7 @@ const Form = ({ layout, sidebar }: LayoutFormProps) => {
                             />
 
                             <div className={styles['placeholder']}>
-                                <Tooltip title="Content coming from child pages will be placed here">
+                                <Tooltip title="Content coming from child sidebar will be placed here">
                                     <Text strong type="secondary">
                                         Sidebar content
                                     </Text>
@@ -129,7 +129,7 @@ const Form = ({ layout, sidebar }: LayoutFormProps) => {
                         />
 
                         <div className={styles['placeholder']}>
-                            <Tooltip title="Content coming from child sidebar will be placed here">
+                            <Tooltip title="Content coming from child pages will be placed here">
                                 <Text strong type="secondary">
                                     Page content
                                 </Text>

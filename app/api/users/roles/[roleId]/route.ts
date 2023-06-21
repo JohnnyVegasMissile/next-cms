@@ -4,19 +4,6 @@ import { prisma } from '~/utilities/prisma'
 import { RightType } from '@prisma/client'
 import RoleCreation from '~/types/roleCreation'
 
-export async function GET(_: NextRequest, context: any) {
-    const { roleId } = context.params
-
-    const role = await prisma.role.findUnique({
-        where: { id: roleId },
-    })
-
-    if (!role) NextResponse.json({ message: "Role doesn't exist" }, { status: 404 })
-
-    // NextResponse extends the Web Response API
-    return NextResponse.json(role)
-}
-
 export async function PUT(request: Request, context: any) {
     const { roleId } = context.params
     const { name, rights, limitUpload } = (await request.json()) as RoleCreation

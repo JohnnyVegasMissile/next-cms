@@ -3,21 +3,31 @@ import { notFound } from 'next/navigation'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
 
-const getSections = async (pageId: string) => {
-    const exist = await prisma.page.findUnique({ where: { id: pageId } })
+const getSections = async (containerId: string) => {
+    const exist = await prisma.container.findUnique({ where: { id: containerId } })
     if (!exist) return null
 
-    const content = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE },
+    const contentTop = await prisma.section.findMany({
+        where: { containerId, type: SectionType.TEMPLATE_TOP },
         orderBy: { position: 'asc' },
     })
 
-    const sidebar = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE_SIDEBAR },
+    const contentBottom = await prisma.section.findMany({
+        where: { containerId, type: SectionType.TEMPLATE_BOTTOM },
         orderBy: { position: 'asc' },
     })
 
-    return { content, sidebar }
+    const sidebarTop = await prisma.section.findMany({
+        where: { containerId, type: SectionType.TEMPLATE_SIDEBAR_TOP },
+        orderBy: { position: 'asc' },
+    })
+
+    const sidebarBottom = await prisma.section.findMany({
+        where: { containerId, type: SectionType.TEMPLATE_SIDEBAR_BOTTOM },
+        orderBy: { position: 'asc' },
+    })
+
+    return { contentTop, contentBottom, sidebarTop, sidebarBottom }
 }
 
 const getSidebar = async () => {
@@ -55,15 +65,15 @@ const getSidebar = async () => {
     }
 }
 
-const EditPageSections = async ({ params }: any) => {
-    const layout = await getSections(params.pageId)
+const ContentSections = async ({ params }: any) => {
+    const layout = await getSections(params.containerId)
     const sidebar = await getSidebar()
 
     if (!layout) notFound()
 
-    return <Form pageId={params.pageId} layout={layout} sidebar={sidebar} />
+    return <Form containerId={params.containerId} layout={layout} sidebar={sidebar} />
 }
 
 export const dynamic = 'force-dynamic'
 
-export default EditPageSections
+export default ContentSections

@@ -5,20 +5,6 @@ import { ObjectId } from '~/types'
 import ContentCreation from '~/types/contentCreation'
 import { prisma } from '~/utilities/prisma'
 
-export async function GET(_: NextRequest, context: any) {
-    const { contentId } = context.params
-
-    const content = await prisma.content.findUnique({
-        where: { id: contentId },
-        include: { slug: true, metadatas: true, fields: true },
-    })
-
-    if (!content) NextResponse.json({ message: "Page doesn't exist" }, { status: 404 })
-
-    // NextResponse extends the Web Response API
-    return NextResponse.json(content)
-}
-
 export async function PUT(request: Request, context: any) {
     const { contentId } = context.params
     const { name, slug, published, metadatas, fields } = (await request.json()) as ContentCreation<Date>

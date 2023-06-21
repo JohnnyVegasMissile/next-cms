@@ -1,23 +1,7 @@
 /* eslint-disable @next/next/no-server-import-in-page */
-import { NextResponse, NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '~/utilities/prisma'
 import UserCreation from '~/types/userCreation'
-
-export async function GET(_: NextRequest, context: any) {
-    const { userId } = context.params
-
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-            login: { select: { email: true, roleId: true } },
-        },
-    })
-
-    if (!user) NextResponse.json({ message: "User doesn't exist" }, { status: 404 })
-
-    // NextResponse extends the Web Response API
-    return NextResponse.json(user)
-}
 
 export async function PUT(request: Request, context: any) {
     const { userId } = context.params

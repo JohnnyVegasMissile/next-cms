@@ -1,24 +1,10 @@
 /* eslint-disable @next/next/no-server-import-in-page */
-import { NextResponse, NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { ObjectId } from '~/types'
 import PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 import { revalidatePath } from 'next/cache'
 import { PageType } from '@prisma/client'
-
-export async function GET(_: NextRequest, context: any) {
-    const { pageId } = context.params
-
-    const page = await prisma.page.findUnique({
-        where: { id: pageId },
-        include: { slug: true, metadatas: true },
-    })
-
-    if (!page) NextResponse.json({ message: "Page doesn't exist" }, { status: 404 })
-
-    // NextResponse extends the Web Response API
-    return NextResponse.json(page)
-}
 
 export async function PUT(request: Request, context: any) {
     const { pageId } = context.params

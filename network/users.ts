@@ -27,24 +27,6 @@ export const getUsers = (
         params: { page, q, sort },
     })
 
-export const getUser = (
-    id: ObjectId
-): Promise<
-    User & {
-        login: {
-            roleId: string | null
-            email: string
-        } | null
-    }
-> =>
-    INSTANCE({
-        method: 'GET',
-        url: `/api/users/${id}`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-
 export const postUser = (data: UserCreation): Promise<User> =>
     INSTANCE({
         method: 'POST',

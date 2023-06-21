@@ -2,15 +2,7 @@
 // import { prisma } from '~/utilities/prisma'
 
 const nextConfig = {
-    images: {
-        remotePatterns: [
-            {
-                protocol: 'https',
-                hostname: 'images.unsplash.com',
-                port: '',
-            },
-        ],
-    },
+    experimental: { serverActions: true },
 }
 
 module.exports = nextConfig

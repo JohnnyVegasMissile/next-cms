@@ -104,3 +104,21 @@ export const updateContainerSections = (
         },
         data,
     })
+
+export const updateContainerTemplateSections = (
+    id: ObjectId,
+    data: {
+        contentTop: SectionCreationCleaned[]
+        contentBottom: SectionCreationCleaned[]
+        sidebarTop: SectionCreationCleaned[]
+        sidebarBottom: SectionCreationCleaned[]
+    }
+): Promise<Section[]> =>
+    INSTANCE({
+        method: 'PUT',
+        url: `/api/containers/${id}/template/sections`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        data,
+    })

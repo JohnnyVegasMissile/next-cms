@@ -3,26 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Section, SectionType } from '@prisma/client'
 import { SectionCreationCleaned } from '~/types/sectionCreation'
 import { prisma } from '~/utilities/prisma'
-
-export async function GET(_: NextRequest, context: any) {
-    const { pageId } = context.params
-
-    const content = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE },
-        orderBy: { position: 'asc' },
-    })
-
-    const sidebar = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE_SIDEBAR },
-        orderBy: { position: 'asc' },
-    })
-
-    // NextResponse extends the Web Response API
-    return NextResponse.json({ content, sidebar })
-}
+import { revalidatePath } from 'next/cache'
 
 export async function PUT(request: NextRequest, context: any) {
-    const { pageId } = context.params
+    const { containerId } = context.params
     const newSections = (await request.json()) as {
         content: SectionCreationCleaned[]
         sidebar: SectionCreationCleaned[]
@@ -46,8 +30,8 @@ export async function PUT(request: NextRequest, context: any) {
         } else {
             const created = await prisma.section.create({
                 data: {
-                    pageId,
-                    type: SectionType.PAGE,
+                    containerId,
+                    type: SectionType.CONTAINER,
                     block: section.block,
                     position: section.position,
                     content: section.content,
@@ -76,8 +60,8 @@ export async function PUT(request: NextRequest, context: any) {
         } else {
             const created = await prisma.section.create({
                 data: {
-                    pageId,
-                    type: SectionType.PAGE_SIDEBAR,
+                    containerId,
+                    type: SectionType.CONTAINER_SIDEBAR,
                     block: section.block,
                     position: section.position,
                     content: section.content,
@@ -89,9 +73,27 @@ export async function PUT(request: NextRequest, context: any) {
     }
 
     await prisma.section.deleteMany({
-        where: { id: { notIn: [...content, ...sidebar].map((e) => e.id) }, pageId },
+        where: {
+            id: { notIn: [...content, ...sidebar].map((e) => e.id) },
+            type: {
+                in: [SectionType.CONTAINER, SectionType.CONTAINER_SIDEBAR],
+            },
+            containerId,
+        },
+    })
+
+    const container = await prisma.container.findUnique({
+        where: { id: containerId },
+        include: { slug: true },
+    })
+
+    if (container?.slug) revalidatePath(`/${container?.slug.full as string}`)
+
+    await prisma.slug.update({
+        where: { containerId },
+        data: { revalidatedAt: new Date() },
     })
 
     // NextResponse extends the Web Response API
-    return NextResponse.json({ content })
+    return NextResponse.json({ content, sidebar })
 }

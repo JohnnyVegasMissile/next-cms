@@ -5,23 +5,6 @@ import { SectionCreationCleaned } from '~/types/sectionCreation'
 import { prisma } from '~/utilities/prisma'
 import { revalidatePath } from 'next/cache'
 
-export async function GET(_: NextRequest, context: any) {
-    const { pageId } = context.params
-
-    const content = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE },
-        orderBy: { position: 'asc' },
-    })
-
-    const sidebar = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE_SIDEBAR },
-        orderBy: { position: 'asc' },
-    })
-
-    // NextResponse extends the Web Response API
-    return NextResponse.json({ content, sidebar })
-}
-
 export async function PUT(request: NextRequest, context: any) {
     const { pageId } = context.params
     const newSections = (await request.json()) as {
@@ -131,5 +114,5 @@ export async function PUT(request: NextRequest, context: any) {
     }
 
     // NextResponse extends the Web Response API
-    return NextResponse.json({ content })
+    return NextResponse.json({ content, sidebar })
 }

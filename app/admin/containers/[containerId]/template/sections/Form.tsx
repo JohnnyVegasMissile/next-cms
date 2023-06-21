@@ -2,10 +2,9 @@
 
 import { Section } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
-import { message } from 'antd'
+import { message, Tooltip, Typography } from 'antd'
 import { useFormik } from 'formik'
 import { useState } from 'react'
-import { updatePageSections } from '~/network/pages'
 import SectionCreation, { SectionCreationCleaned } from '~/types/sectionCreation'
 import styles from './Form.module.scss'
 import classNames from 'classnames'
@@ -17,20 +16,27 @@ import {
     sectionToSectionCreation,
     validateSections,
 } from '~/utilities/validateSections'
+import { updateContainerTemplateSections } from '~/network/containers'
+
+const { Text } = Typography
 
 type Layout = {
-    content: Section[]
-    sidebar: Section[]
+    contentTop: Section[]
+    contentBottom: Section[]
+    sidebarTop: Section[]
+    sidebarBottom: Section[]
 }
 type LayoutCreation = {
-    content: SectionCreation[]
-    sidebar: SectionCreation[]
+    contentTop: SectionCreation[]
+    contentBottom: SectionCreation[]
+    sidebarTop: SectionCreation[]
+    sidebarBottom: SectionCreation[]
 }
 
 const validate = (values: LayoutCreation) => validateSections(values)
 
 interface FormProps {
-    pageId: string
+    containerId: string
     layout: Layout
     sidebar: {
         isActive: boolean
@@ -41,7 +47,7 @@ interface FormProps {
     }
 }
 
-const Form = ({ pageId, layout, sidebar }: FormProps) => {
+const Form = ({ containerId, layout, sidebar }: FormProps) => {
     const router = useRouter()
     const [showSidebar, setShowSidebar] = useState(sidebar.isActive)
     const formik = useFormik<LayoutCreation>({
@@ -54,12 +60,16 @@ const Form = ({ pageId, layout, sidebar }: FormProps) => {
     })
 
     const submit = useMutation(
-        (values: { content: SectionCreationCleaned[]; sidebar: SectionCreationCleaned[] }) =>
-            updatePageSections(pageId, values),
+        (values: {
+            contentTop: SectionCreationCleaned[]
+            contentBottom: SectionCreationCleaned[]
+            sidebarTop: SectionCreationCleaned[]
+            sidebarBottom: SectionCreationCleaned[]
+        }) => updateContainerTemplateSections(containerId, values),
         {
             onSuccess: () => {
                 message.success(`Sections modified with success.`)
-                router.push('/admin/pages')
+                router.push('/admin/containers')
             },
             onError: () => message.error('Something went wrong, try again later.'),
         }
@@ -74,19 +84,49 @@ const Form = ({ pageId, layout, sidebar }: FormProps) => {
                         style={{ width: sidebar.width, backgroundColor: sidebar.backgroundColor }}
                     >
                         <SectionsManager
-                            name="sidebar"
-                            sections={formik.values.sidebar}
+                            name="sidebarTop"
+                            sections={formik.values.sidebarTop}
                             onChange={formik.setFieldValue}
-                            error={formik.errors.sidebar}
+                            error={formik.errors.sidebarTop}
+                        />
+
+                        <div className={styles['placeholder']}>
+                            <Tooltip title="Content coming from child sidebar will be placed here">
+                                <Text strong type="secondary">
+                                    Sidebar content
+                                </Text>
+                            </Tooltip>
+                        </div>
+
+                        <SectionsManager
+                            name="sidebarBottom"
+                            sections={formik.values.sidebarBottom}
+                            onChange={formik.setFieldValue}
+                            error={formik.errors.sidebarBottom}
                         />
                     </aside>
                 )}
                 <div className={styles['content']}>
                     <SectionsManager
-                        name="content"
-                        sections={formik.values.content}
+                        name="contentTop"
+                        sections={formik.values.contentTop}
                         onChange={formik.setFieldValue}
-                        error={formik.errors.content}
+                        error={formik.errors.contentTop}
+                    />
+
+                    <div className={styles['placeholder']}>
+                        <Tooltip title="Content coming from child sidebar will be placed here">
+                            <Text strong type="secondary">
+                                Sidebar content
+                            </Text>
+                        </Tooltip>
+                    </div>
+
+                    <SectionsManager
+                        name="contentBottom"
+                        sections={formik.values.contentBottom}
+                        onChange={formik.setFieldValue}
+                        error={formik.errors.contentBottom}
                     />
                 </div>
             </div>

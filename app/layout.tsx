@@ -121,4 +121,5 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 }
 
 export const revalidate = 'force-cache'
+
 export default Layout

@@ -58,15 +58,6 @@ export const updateContent = (id: ObjectId, data: ContentCreation<string>): Prom
         data,
     })
 
-export const getContentSections = (id: ObjectId): Promise<{ content: Section[]; sidebar: Section[] }> =>
-    INSTANCE({
-        method: 'GET',
-        url: `/api/contents/${id}/sections`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-
 export const updateContentSections = (
     id: ObjectId,
     data: { content: SectionCreationCleaned[]; sidebar: SectionCreationCleaned[] }

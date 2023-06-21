@@ -3,17 +3,17 @@ import { notFound } from 'next/navigation'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
 
-const getSections = async (pageId: string) => {
-    const exist = await prisma.page.findUnique({ where: { id: pageId } })
+const getSections = async (contentId: string) => {
+    const exist = await prisma.content.findUnique({ where: { id: contentId } })
     if (!exist) return null
 
     const content = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE },
+        where: { contentId: contentId, type: SectionType.CONTENT },
         orderBy: { position: 'asc' },
     })
 
     const sidebar = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE_SIDEBAR },
+        where: { contentId: contentId, type: SectionType.CONTENT_SIDEBAR },
         orderBy: { position: 'asc' },
     })
 
@@ -55,15 +55,15 @@ const getSidebar = async () => {
     }
 }
 
-const EditPageSections = async ({ params }: any) => {
-    const layout = await getSections(params.pageId)
+const ContentSections = async ({ params }: any) => {
+    const layout = await getSections(params.contentId)
     const sidebar = await getSidebar()
 
     if (!layout) notFound()
 
-    return <Form pageId={params.pageId} layout={layout} sidebar={sidebar} />
+    return <Form contentId={params.contentId} layout={layout} sidebar={sidebar} />
 }
 
 export const dynamic = 'force-dynamic'
 
-export default EditPageSections
+export default ContentSections

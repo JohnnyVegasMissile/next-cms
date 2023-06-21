@@ -5,7 +5,6 @@ import { useMutation } from '@tanstack/react-query'
 import { message } from 'antd'
 import { useFormik } from 'formik'
 import { useState } from 'react'
-import { updatePageSections } from '~/network/pages'
 import SectionCreation, { SectionCreationCleaned } from '~/types/sectionCreation'
 import styles from './Form.module.scss'
 import classNames from 'classnames'
@@ -17,6 +16,7 @@ import {
     sectionToSectionCreation,
     validateSections,
 } from '~/utilities/validateSections'
+import { updateContentSections } from '~/network/contents'
 
 type Layout = {
     content: Section[]
@@ -30,7 +30,7 @@ type LayoutCreation = {
 const validate = (values: LayoutCreation) => validateSections(values)
 
 interface FormProps {
-    pageId: string
+    contentId: string
     layout: Layout
     sidebar: {
         isActive: boolean
@@ -41,7 +41,7 @@ interface FormProps {
     }
 }
 
-const Form = ({ pageId, layout, sidebar }: FormProps) => {
+const Form = ({ contentId, layout, sidebar }: FormProps) => {
     const router = useRouter()
     const [showSidebar, setShowSidebar] = useState(sidebar.isActive)
     const formik = useFormik<LayoutCreation>({
@@ -55,11 +55,11 @@ const Form = ({ pageId, layout, sidebar }: FormProps) => {
 
     const submit = useMutation(
         (values: { content: SectionCreationCleaned[]; sidebar: SectionCreationCleaned[] }) =>
-            updatePageSections(pageId, values),
+            updateContentSections(contentId, values),
         {
             onSuccess: () => {
                 message.success(`Sections modified with success.`)
-                router.push('/admin/pages')
+                router.push('/admin/contents')
             },
             onError: () => message.error('Something went wrong, try again later.'),
         }

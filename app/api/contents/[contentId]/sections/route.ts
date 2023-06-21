@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Section, SectionType } from '@prisma/client'
 import { SectionCreationCleaned } from '~/types/sectionCreation'
 import { prisma } from '~/utilities/prisma'
+import { revalidatePath } from 'next/cache'
 
 export async function GET(_: NextRequest, context: any) {
     const { pageId } = context.params
@@ -22,7 +23,7 @@ export async function GET(_: NextRequest, context: any) {
 }
 
 export async function PUT(request: NextRequest, context: any) {
-    const { pageId } = context.params
+    const { contentId } = context.params
     const newSections = (await request.json()) as {
         content: SectionCreationCleaned[]
         sidebar: SectionCreationCleaned[]
@@ -46,8 +47,8 @@ export async function PUT(request: NextRequest, context: any) {
         } else {
             const created = await prisma.section.create({
                 data: {
-                    pageId,
-                    type: SectionType.PAGE,
+                    contentId,
+                    type: SectionType.CONTENT,
                     block: section.block,
                     position: section.position,
                     content: section.content,
@@ -76,8 +77,8 @@ export async function PUT(request: NextRequest, context: any) {
         } else {
             const created = await prisma.section.create({
                 data: {
-                    pageId,
-                    type: SectionType.PAGE_SIDEBAR,
+                    contentId,
+                    type: SectionType.CONTENT_SIDEBAR,
                     block: section.block,
                     position: section.position,
                     content: section.content,
@@ -89,7 +90,19 @@ export async function PUT(request: NextRequest, context: any) {
     }
 
     await prisma.section.deleteMany({
-        where: { id: { notIn: [...content, ...sidebar].map((e) => e.id) }, pageId },
+        where: { id: { notIn: [...content, ...sidebar].map((e) => e.id) }, contentId },
+    })
+
+    const cnt = await prisma.content.findUnique({
+        where: { id: contentId },
+        include: { slug: true },
+    })
+
+    if (cnt?.slug) revalidatePath(`/${cnt?.slug.full as string}`)
+
+    await prisma.slug.update({
+        where: { contentId },
+        data: { revalidatedAt: new Date() },
     })
 
     // NextResponse extends the Web Response API

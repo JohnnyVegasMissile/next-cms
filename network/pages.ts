@@ -27,15 +27,6 @@ export const getPages = (
         params: { page, q, sort, ...others },
     })
 
-export const getPage = (id: ObjectId): Promise<PageResponse> =>
-    INSTANCE({
-        method: 'GET',
-        url: `/api/pages/${id}`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-
 export const postPages = (data: PageCreation): Promise<PageResponse> =>
     INSTANCE({
         method: 'POST',
@@ -54,15 +45,6 @@ export const updatePage = (id: ObjectId, data: PageCreation): Promise<PageRespon
             'Content-Type': 'application/json',
         },
         data,
-    })
-
-export const getPageSections = (id: ObjectId): Promise<{ content: Section[]; sidebar: Section[] }> =>
-    INSTANCE({
-        method: 'GET',
-        url: `/api/pages/${id}/sections`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
     })
 
 export const updatePageSections = (

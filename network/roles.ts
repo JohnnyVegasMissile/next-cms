@@ -35,15 +35,6 @@ export const getRolesSimple = (): Promise<{ id: ObjectId; name: string }[]> =>
         // },
     })
 
-export const getRole = (id: ObjectId): Promise<Role> =>
-    INSTANCE({
-        method: 'GET',
-        url: `/api/users/roles/${id}`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-
 export const postRole = (data: RoleCreation): Promise<Role> =>
     INSTANCE({
         method: 'POST',

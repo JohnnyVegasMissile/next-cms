@@ -55,31 +55,51 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 const getSections = async (slug: string) => {
-    const existingSlug = await prisma.slug.findFirst({ where: { full: slug } })
-
-    if (!existingSlug) return null
-
-    const pageSections = await prisma.section.findMany({
-        where: { page: { slug: { full: slug } }, type: SectionType.PAGE },
-        orderBy: { position: 'asc' },
+    const exist = await prisma.slug.findFirst({
+        where: { full: slug },
+        include: {
+            page: { select: { published: true } },
+            container: { select: { published: true } },
+            content: { select: { containerId: true, published: true } },
+        },
     })
 
-    const contentSections = await prisma.section.findMany({
-        where: { linkedContent: { slug: { full: slug } }, type: SectionType.CONTENT },
-        orderBy: { position: 'asc' },
-    })
+    if (!exist) return null
 
-    const containerTopSections = await prisma.section.findMany({
-        where: { container: { slug: { full: slug } }, type: SectionType.TEMPLATE_TOP },
-        orderBy: { position: 'asc' },
-    })
+    if (!!exist.pageId && exist.page?.published) {
+        const pageSections = await prisma.section.findMany({
+            where: { pageId: exist.pageId, type: SectionType.PAGE },
+            orderBy: { position: 'asc' },
+        })
 
-    const containerBottomSections = await prisma.section.findMany({
-        where: { container: { slug: { full: slug } }, type: SectionType.TEMPLATE_BOTTOM },
-        orderBy: { position: 'asc' },
-    })
+        return pageSections
+    } else if (!!exist.containerId && exist.container?.published) {
+        const containerSections = await prisma.section.findMany({
+            where: { containerId: exist.containerId, type: SectionType.CONTAINER },
+            orderBy: { position: 'asc' },
+        })
 
-    return [...containerTopSections, ...pageSections, ...contentSections, ...containerBottomSections]
+        return containerSections
+    } else if (!!exist.contentId && exist.content?.published) {
+        const contentSections = await prisma.section.findMany({
+            where: { contentId: exist.contentId, type: SectionType.CONTENT },
+            orderBy: { position: 'asc' },
+        })
+
+        const containerTopSections = await prisma.section.findMany({
+            where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_TOP },
+            orderBy: { position: 'asc' },
+        })
+
+        const containerBottomSections = await prisma.section.findMany({
+            where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_BOTTOM },
+            orderBy: { position: 'asc' },
+        })
+
+        return [...containerTopSections, ...contentSections, ...containerBottomSections]
+    }
+
+    return null
 }
 
 const Content = async ({ params }: { params: { slug: string } }) => {

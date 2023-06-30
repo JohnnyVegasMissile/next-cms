@@ -3,6 +3,11 @@ import { notFound } from 'next/navigation'
 import PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
+import { Metadata as NextMetadata } from 'next'
+
+export const generateMetadata = async ({ params }: any): Promise<NextMetadata> => ({
+    title: `${params.pageId === 'create' ? 'Create' : 'Edit'} page`,
+})
 
 const initialValues: PageCreation = {
     name: '',

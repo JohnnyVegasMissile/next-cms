@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ReactNode, Suspense } from 'react'
 import classNames from 'classnames'
 import localFont from 'next/font/local'
 import { PageType, SectionType, SettingType } from '@prisma/client'
@@ -20,7 +20,7 @@ export async function generateMetadata() {
 
     return {
         title: {
-            default: appName?.value,
+            default: appName?.value || '',
             template: `%s | ${appName?.value}`,
         },
     }
@@ -43,36 +43,99 @@ const getSettings = async () => {
 const getSections = async () => {
     const layoutHeader = await prisma.section.findMany({
         where: { type: SectionType.LAYOUT_HEADER },
+        include: {
+            medias: {
+                include: {
+                    media: true,
+                    form: { include: { fields: true } },
+                    link: true,
+                },
+            },
+        },
         orderBy: { position: 'asc' },
     })
 
     const layoutFooter = await prisma.section.findMany({
         where: { type: SectionType.LAYOUT_FOOTER },
+        include: {
+            medias: {
+                include: {
+                    media: true,
+                    form: { include: { fields: true } },
+                    link: true,
+                },
+            },
+        },
         orderBy: { position: 'asc' },
     })
 
     const layoutSidebarHeader = await prisma.section.findMany({
         where: { type: SectionType.LAYOUT_SIDEBAR_TOP },
+        include: {
+            medias: {
+                include: {
+                    media: true,
+                    form: { include: { fields: true } },
+                    link: true,
+                },
+            },
+        },
         orderBy: { position: 'asc' },
     })
 
     const layoutSidebarFooter = await prisma.section.findMany({
         where: { type: SectionType.LAYOUT_SIDEBAR_BOTTOM },
+        include: {
+            medias: {
+                include: {
+                    media: true,
+                    form: { include: { fields: true } },
+                    link: true,
+                },
+            },
+        },
         orderBy: { position: 'asc' },
     })
 
     const layoutContentHeader = await prisma.section.findMany({
         where: { type: SectionType.LAYOUT_CONTENT_TOP },
+        include: {
+            medias: {
+                include: {
+                    media: true,
+                    form: { include: { fields: true } },
+                    link: true,
+                },
+            },
+        },
         orderBy: { position: 'asc' },
     })
 
     const layoutContentFooter = await prisma.section.findMany({
         where: { type: SectionType.LAYOUT_CONTENT_BOTTOM },
+        include: {
+            medias: {
+                include: {
+                    media: true,
+                    form: { include: { fields: true } },
+                    link: true,
+                },
+            },
+        },
         orderBy: { position: 'asc' },
     })
 
     const maintenanceSections = await prisma.section.findMany({
         where: { page: { type: PageType.MAINTENANCE } },
+        include: {
+            medias: {
+                include: {
+                    media: true,
+                    form: { include: { fields: true } },
+                    link: true,
+                },
+            },
+        },
         orderBy: { position: 'asc' },
     })
 
@@ -115,7 +178,10 @@ const Layout = async ({
         return (
             <>
                 {maintenanceSections.map((section) => (
-                    <DisplaySection key={section.id} section={section} />
+                    <Suspense key={section.id}>
+                        {/* @ts-expect-error Server Component */}
+                        <DisplaySection section={section} />
+                    </Suspense>
                 ))}
             </>
         )
@@ -124,7 +190,10 @@ const Layout = async ({
         <>
             <header>
                 {layoutHeader.map((section) => (
-                    <DisplaySection key={section.id} section={section} />
+                    <Suspense key={section.id}>
+                        {/* @ts-expect-error Server Component */}
+                        <DisplaySection section={section} />
+                    </Suspense>
                 ))}
             </header>
 
@@ -134,29 +203,44 @@ const Layout = async ({
                     [styles['right']!]: position === 'right',
                 })}
             >
-                <aside className={classNames(styles['aside'], styles[brSize!])}>
+                <div className={classNames(styles['aside'], styles[brSize!])}>
                     {layoutSidebarHeader.map((section) => (
-                        <DisplaySection key={section.id} section={section} />
+                        <Suspense key={section.id}>
+                            {/* @ts-expect-error Server Component */}
+                            <DisplaySection section={section} />
+                        </Suspense>
                     ))}
                     {sidebar}
                     {layoutSidebarFooter.map((section) => (
-                        <DisplaySection key={section.id} section={section} />
+                        <Suspense key={section.id}>
+                            {/* @ts-expect-error Server Component */}
+                            <DisplaySection section={section} />
+                        </Suspense>
                     ))}
-                </aside>
+                </div>
                 <main className={styles['content']}>
                     {layoutContentHeader.map((section) => (
-                        <DisplaySection key={section.id} section={section} />
+                        <Suspense key={section.id}>
+                            {/* @ts-expect-error Server Component */}
+                            <DisplaySection section={section} />
+                        </Suspense>
                     ))}
                     {children}
                     {layoutContentFooter.map((section) => (
-                        <DisplaySection key={section.id} section={section} />
+                        <Suspense key={section.id}>
+                            {/* @ts-expect-error Server Component */}
+                            <DisplaySection section={section} />
+                        </Suspense>
                     ))}
                 </main>
             </div>
 
             <footer>
                 {layoutFooter.map((section) => (
-                    <DisplaySection key={section.id} section={section} />
+                    <Suspense key={section.id}>
+                        {/* @ts-expect-error Server Component */}
+                        <DisplaySection section={section} />
+                    </Suspense>
                 ))}
             </footer>
         </>

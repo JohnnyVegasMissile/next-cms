@@ -16,6 +16,10 @@ export async function PUT(request: NextRequest, context: any) {
 
     for (const section of newSections.content) {
         if (section.id) {
+            await prisma.linkedToSection.deleteMany({
+                where: { sectionId: section.id },
+            })
+
             const modified = await prisma.section.update({
                 where: {
                     id: section.id,
@@ -23,6 +27,15 @@ export async function PUT(request: NextRequest, context: any) {
                 data: {
                     position: parseInt(section.position as unknown as string),
                     content: section.content,
+
+                    medias: {
+                        createMany: {
+                            data: [
+                                ...section.medias.map((mediaId) => ({ mediaId })),
+                                ...section.forms.map((formId) => ({ formId })),
+                            ],
+                        },
+                    },
                 },
             })
 
@@ -35,6 +48,15 @@ export async function PUT(request: NextRequest, context: any) {
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
                     content: section.content,
+
+                    medias: {
+                        createMany: {
+                            data: [
+                                ...section.medias.map((mediaId) => ({ mediaId })),
+                                ...section.forms.map((formId) => ({ formId })),
+                            ],
+                        },
+                    },
                 },
             })
 
@@ -46,6 +68,10 @@ export async function PUT(request: NextRequest, context: any) {
 
     for (const section of newSections.sidebar) {
         if (section.id) {
+            await prisma.linkedToSection.deleteMany({
+                where: { sectionId: section.id },
+            })
+
             const modified = await prisma.section.update({
                 where: {
                     id: section.id,
@@ -53,6 +79,15 @@ export async function PUT(request: NextRequest, context: any) {
                 data: {
                     position: parseInt(section.position as unknown as string),
                     content: section.content,
+
+                    medias: {
+                        createMany: {
+                            data: [
+                                ...section.medias.map((mediaId) => ({ mediaId })),
+                                ...section.forms.map((formId) => ({ formId })),
+                            ],
+                        },
+                    },
                 },
             })
 
@@ -65,6 +100,15 @@ export async function PUT(request: NextRequest, context: any) {
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
                     content: section.content,
+
+                    medias: {
+                        createMany: {
+                            data: [
+                                ...section.medias.map((mediaId) => ({ mediaId })),
+                                ...section.forms.map((formId) => ({ formId })),
+                            ],
+                        },
+                    },
                 },
             })
 

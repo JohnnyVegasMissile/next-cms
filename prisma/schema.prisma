@@ -220,25 +220,31 @@ enum FormFieldType {
   CONTENT
 }
 
+enum FormButtonType {
+  SUBMIT
+  RESET
+  LINK
+}
+
 model FormField {
   id String @id @default(cuid())
 
   formId      String
-  form        Form          @relation(fields: [formId], references: [id])
-  name        String?
+  form        Form          @relation(fields: [formId], references: [id], onDelete: Cascade)
   type        FormFieldType
   label       String
   placeholder String?
 
   containerId String?
-  container   Container? @relation(fields: [containerId], references: [id])
+  container   Container? @relation(fields: [containerId], references: [id], onDelete: Cascade)
 
   position Int
   line     Int
 
   messageFields MessageField[]
 
-  options Json?
+  options    Json?
+  buttonType FormButtonType?
 
   min Float?
   max Float?
@@ -269,10 +275,10 @@ model MessageField {
   id String @id @default(cuid())
 
   messageId String
-  message   Message @relation(fields: [messageId], references: [id])
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   formFieldId String
-  formField   FormField @relation(fields: [formFieldId], references: [id])
+  formField   FormField @relation(fields: [formFieldId], references: [id], onDelete: Cascade)
 
   valueText    String?
   valueNumber  Int?
@@ -433,12 +439,15 @@ model LinkedToSection {
 
   sectionId String
   section   Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  mediaId   String?
-  media     Media?  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  formId    String?
-  form      Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
 
-  @@unique([sectionId, mediaId])
+  mediaId String?
+  media   Media?  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  formId  String?
+  form    Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
+  linkId  String?
+  link    Link?   @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@unique([sectionId, mediaId, formId, linkId])
 }
 
 // PAGES
@@ -688,5 +697,6 @@ model Link {
   link     String?
   prototol LinkProtocol?
 
-  menuChild MenuChild[]
+  usedInSections LinkedToSection[]
+  menuChild      MenuChild[]
 }

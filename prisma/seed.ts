@@ -3,14 +3,14 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
-    const root = await prisma.login.findFirst({
+    let root = await prisma.login.findFirst({
         where: { root: true },
     })
 
     if (!root) {
         const hash = await bcrypt.hash(process.env['ROOT_USER_PASS'] || 'root', 10)
 
-        await prisma.user.create({
+        let newRoot = await prisma.user.create({
             data: {
                 name: process.env['ROOT_USER_NAME'] || 'root',
                 login: {
@@ -21,7 +21,10 @@ async function main() {
                     },
                 },
             },
+            include: { login: true },
         })
+
+        root = newRoot.login
     }
 
     const newSettings = [
@@ -57,9 +60,7 @@ async function main() {
     ]
 
     for (const { type, value, visible } of newSettings) {
-        const setting = await prisma.setting.findUnique({
-            where: { type },
-        })
+        const setting = await prisma.setting.findUnique({ where: { type } })
 
         if (!setting) {
             await prisma.setting.create({
@@ -81,15 +82,14 @@ async function main() {
     ]
 
     for (const { name, type } of newPage) {
-        const pages = await prisma.page.findMany({
-            where: { type },
-        })
+        const pages = await prisma.page.findMany({ where: { type } })
 
         if (!pages.length) {
             await prisma.page.create({
                 data: {
                     name,
                     type,
+                    createdByUserId: root?.userId,
                 },
             })
         }

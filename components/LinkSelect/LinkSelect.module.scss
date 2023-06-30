@@ -1,0 +1,30 @@
+$width: 250px;
+
+.link-select {
+    width: 100%;
+
+    & .icon {
+        height: 22px;
+        width: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    & .protocol {
+        min-width: 83px;
+        text-align: left;
+    }
+
+    & .tree {
+        flex: 1;
+    }
+
+    & .input {
+        flex: 1;
+
+        & > span > span:last-child {
+            border-radius: 0;
+        }
+    }
+}

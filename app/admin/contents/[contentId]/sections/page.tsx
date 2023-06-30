@@ -1,5 +1,6 @@
 import { SectionType, SettingType } from '@prisma/client'
 import { notFound } from 'next/navigation'
+import getSection from '~/utilities/getSection'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
 
@@ -7,15 +8,8 @@ const getSections = async (contentId: string) => {
     const exist = await prisma.content.findUnique({ where: { id: contentId } })
     if (!exist) return null
 
-    const content = await prisma.section.findMany({
-        where: { contentId: contentId, type: SectionType.CONTENT },
-        orderBy: { position: 'asc' },
-    })
-
-    const sidebar = await prisma.section.findMany({
-        where: { contentId: contentId, type: SectionType.CONTENT_SIDEBAR },
-        orderBy: { position: 'asc' },
-    })
+    const content = await getSection({ contentId: contentId, type: SectionType.CONTENT })
+    const sidebar = await getSection({ contentId: contentId, type: SectionType.CONTENT_SIDEBAR })
 
     return { content, sidebar }
 }

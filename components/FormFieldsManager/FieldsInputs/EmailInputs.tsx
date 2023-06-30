@@ -41,7 +41,7 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
-                    <WithLabel label="Default" error={errors.default}>
+                    <WithLabel label="Default" error={errors?.default}>
                         <Input
                             size="small"
                             value={field.default}

@@ -2,6 +2,7 @@ import { prisma } from '~/utilities/prisma'
 import { notFound } from 'next/navigation'
 import { SectionType } from '@prisma/client'
 import DisplaySection from '~/components/DisplaySection'
+import { Suspense } from 'react'
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
     const full = Array.isArray(params.slug) ? params.slug.join('/') : params.slug
@@ -69,6 +70,15 @@ const getSections = async (slug: string) => {
     if (!!exist.pageId && exist.page?.published) {
         const pageSections = await prisma.section.findMany({
             where: { pageId: exist.pageId, type: SectionType.PAGE },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
@@ -76,6 +86,15 @@ const getSections = async (slug: string) => {
     } else if (!!exist.containerId && exist.container?.published) {
         const containerSections = await prisma.section.findMany({
             where: { containerId: exist.containerId, type: SectionType.CONTAINER },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
@@ -83,16 +102,43 @@ const getSections = async (slug: string) => {
     } else if (!!exist.contentId && exist.content?.published) {
         const contentSections = await prisma.section.findMany({
             where: { contentId: exist.contentId, type: SectionType.CONTENT },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
         const containerTopSections = await prisma.section.findMany({
             where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_TOP },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
         const containerBottomSections = await prisma.section.findMany({
             where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_BOTTOM },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
@@ -110,7 +156,10 @@ const Content = async ({ params }: { params: { slug: string } }) => {
     return (
         <>
             {sections.map((section) => (
-                <DisplaySection key={section.id} section={section} />
+                <Suspense key={section.id}>
+                    {/* @ts-expect-error Server Component */}
+                    <DisplaySection section={section} />
+                </Suspense>
             ))}
         </>
     )

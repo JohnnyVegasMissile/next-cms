@@ -2,22 +2,24 @@ import { SectionType, SettingType } from '@prisma/client'
 import { notFound } from 'next/navigation'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
+import { Metadata } from 'next'
+import getSection from '~/utilities/getSection'
+
+export const metadata: Metadata = {
+    title: 'Edit page sections',
+}
 
 const getSections = async (pageId: string) => {
     const exist = await prisma.page.findUnique({ where: { id: pageId } })
     if (!exist) return null
 
-    const content = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE },
-        orderBy: { position: 'asc' },
-    })
+    const content = await getSection({ pageId, type: SectionType.PAGE })
+    const sidebar = await getSection({ pageId, type: SectionType.PAGE_SIDEBAR })
 
-    const sidebar = await prisma.section.findMany({
-        where: { pageId, type: SectionType.PAGE_SIDEBAR },
-        orderBy: { position: 'asc' },
-    })
-
-    return { content, sidebar }
+    return {
+        content,
+        sidebar,
+    }
 }
 
 const getSidebar = async () => {

@@ -1,14 +1,14 @@
 import SectionCreation from '~/types/sectionCreation'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
-import { Form, Media } from '@prisma/client'
+import FormBlock from './FormBlock'
+import { Form, FormField, Media } from '@prisma/client'
+import { ObjectId } from '~/types'
 
 export type ViewBlockProps = {
     content: any
-    images: Media[]
-    files: Media[]
-    videos: Media[]
-    forms: Form[]
+    medias: Map<ObjectId, Media>
+    forms: Map<ObjectId, Form & { fields: FormField[] }>
 }
 
 export type EditBlockProps = {
@@ -25,7 +25,7 @@ export type BlockDetails = {
     validate?: (section: SectionCreation) => any
 }
 
-export type BlockKey = 'ImageBlock' | 'TextBlock'
+export type BlockKey = 'ImageBlock' | 'TextBlock' | 'FormBlock'
 
 type BlocksSection = {
     [key in BlockKey]: BlockDetails
@@ -34,6 +34,7 @@ type BlocksSection = {
 const blocks: BlocksSection = {
     ImageBlock,
     TextBlock,
+    FormBlock,
 }
 
 export default blocks

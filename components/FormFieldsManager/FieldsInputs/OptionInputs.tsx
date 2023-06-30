@@ -1,7 +1,9 @@
-import { Col, Row, Input, Divider, Radio, Space, Button, Select } from 'antd'
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { Col, Row, Input, Divider, Radio, Space, Button, Select, Typography, Tooltip } from 'antd'
+import { DeleteOutlined, PlusOutlined, ClearOutlined } from '@ant-design/icons'
 import { FieldInputsProps } from '.'
 import WithLabel from '~/components/WithLabel'
+
+const { Text } = Typography
 
 const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
     return (
@@ -42,19 +44,45 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
-                    <WithLabel label="Options" error={errors?.options}>
+                    <WithLabel
+                        label={
+                            <Space>
+                                <Text>Options</Text>
+                                <Tooltip title="Clear default">
+                                    <Button
+                                        icon={<ClearOutlined rev={undefined} />}
+                                        type="dashed"
+                                        size="small"
+                                        disabled={!field.default}
+                                        onClick={() => onChange('default', undefined)}
+                                    />
+                                </Tooltip>
+                            </Space>
+                        }
+                        error={errors?.options}
+                    >
                         <Space direction="vertical" style={{ width: '100%' }}>
                             {field.options?.map((option, idx) => (
                                 <Space.Compact key={idx} size="small" style={{ width: '100%' }}>
+                                    <Radio
+                                        checked={!!option.value && option.value === field.default}
+                                        disabled={!option.value}
+                                        onClick={() => onChange('default', option.value)}
+                                    />
                                     <Input
                                         size="small"
                                         placeholder="Value"
                                         value={option.value}
-                                        onChange={(e) => onChange(`options.${idx}.value`, e.target.value)}
+                                        onChange={(e) => {
+                                            const value = e.target.value
+                                            onChange(`options.${idx}.value`, value)
+
+                                            if (option.value === field.default) onChange('default', value)
+                                        }}
                                     />
                                     <Input
                                         size="small"
-                                        placeholder="Name"
+                                        placeholder="Name*"
                                         value={option.label}
                                         onChange={(e) => onChange(`options.${idx}.label`, e.target.value)}
                                     />
@@ -67,6 +95,8 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
 
                                             optionsCopy.splice(idx, 1)
                                             onChange('options', optionsCopy)
+
+                                            if (option.value === field.default) onChange('default', undefined)
                                         }}
                                     />
                                 </Space.Compact>
@@ -86,26 +116,6 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                                 Add
                             </Button>
                         </Space>
-                    </WithLabel>
-                </Col>
-                <Col span={8}>
-                    <WithLabel label="Default" error={errors?.default}>
-                        <Select
-                            allowClear
-                            size="small"
-                            style={{ width: '100%' }}
-                            options={field.options
-                                ?.filter((option) => !!option.value)
-                                .map((option) => ({
-                                    value: option.value,
-                                    label: option.label || option.value,
-                                }))}
-                            value={field.default}
-                            onChange={(e) => {
-                                onChange('default', e)
-                                console.log('default', e)
-                            }}
-                        />
                     </WithLabel>
                 </Col>
             </Row>

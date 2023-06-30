@@ -1,6 +1,5 @@
 'use client'
 
-import { Section } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
 import { message, Tooltip, Typography } from 'antd'
 import { useFormik } from 'formik'
@@ -17,15 +16,17 @@ import {
     validateSections,
 } from '~/utilities/validateSections'
 import { updateContainerTemplateSections } from '~/network/containers'
+import { SectionResponse } from '~/utilities/getSection'
 
 const { Text } = Typography
 
-type Layout = {
-    contentTop: Section[]
-    contentBottom: Section[]
-    sidebarTop: Section[]
-    sidebarBottom: Section[]
+export type Layout = {
+    contentTop: SectionResponse[]
+    contentBottom: SectionResponse[]
+    sidebarTop: SectionResponse[]
+    sidebarBottom: SectionResponse[]
 }
+
 type LayoutCreation = {
     contentTop: SectionCreation[]
     contentBottom: SectionCreation[]
@@ -79,7 +80,7 @@ const Form = ({ containerId, layout, sidebar }: FormProps) => {
         <>
             <div className={classNames(styles['content-wrap'], sidebar.position, sidebar.breakpointClass)}>
                 {sidebar.isActive && (
-                    <aside
+                    <div
                         className={classNames(styles['aside'], { [styles['open']!]: showSidebar })}
                         style={{ width: sidebar.width, backgroundColor: sidebar.backgroundColor }}
                     >
@@ -104,7 +105,7 @@ const Form = ({ containerId, layout, sidebar }: FormProps) => {
                             onChange={formik.setFieldValue}
                             error={formik.errors.sidebarBottom}
                         />
-                    </aside>
+                    </div>
                 )}
                 <div className={styles['content']}>
                     <SectionsManager

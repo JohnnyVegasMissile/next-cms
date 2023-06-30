@@ -1,6 +1,7 @@
-import type { Form, Media, SectionType } from '@prisma/client'
+import type { Link, Media, Section, SectionType } from '@prisma/client'
 import { ObjectId } from '.'
 import { BlockKey } from '~/blocks'
+import { FormSimple } from './formCreation'
 
 type SectionCreation = {
     tempId?: string
@@ -12,7 +13,7 @@ type SectionCreation = {
     pageId?: ObjectId
 
     medias: Map<ObjectId, Media>
-    forms: Map<ObjectId, Form>
+    forms: Map<ObjectId, FormSimple>
 }
 
 export type SectionCreationCleaned = {

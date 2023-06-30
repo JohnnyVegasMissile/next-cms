@@ -1,4 +1,5 @@
 import { PageType, SectionType } from '@prisma/client'
+import { Suspense } from 'react'
 import DisplaySection from '~/components/DisplaySection'
 import { prisma } from '~/utilities/prisma'
 
@@ -17,7 +18,10 @@ const SignInSidebar = async () => {
     return (
         <>
             {sections.map((section) => (
-                <DisplaySection key={section.id} section={section} />
+                <Suspense key={section.id}>
+                    {/* @ts-expect-error Server Component */}
+                    <DisplaySection section={section} />
+                </Suspense>
             ))}
         </>
     )

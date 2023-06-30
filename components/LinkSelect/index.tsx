@@ -8,11 +8,12 @@ import {
     ContainerOutlined,
     BookOutlined,
 } from '@ant-design/icons'
-import './styles.scss'
+// import './styles.scss'
 import { useQuery } from '@tanstack/react-query'
 import { getSlugsSimple } from '~/network/slugs'
 import { ObjectId } from '~/types'
-import { LinkType, LinkProtocol, PageType, Link } from '@prisma/client'
+import { LinkType, LinkProtocol, PageType } from '@prisma/client'
+import styles from './LinkSelect.module.scss'
 
 const { Option } = Select
 
@@ -100,64 +101,57 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
     const onLinkChange = (link: string) => value.type === 'OUT' && onChange({ ...value, link })
 
     const selectBefore = (
-        <Select value={value.prototol} onChange={onProtocolChange} size="small">
-            <Option value="http">http://</Option>
-            <Option value="https">https://</Option>
+        <Select
+            value={value.prototol}
+            onChange={onProtocolChange}
+            size="small"
+            className={styles['protocol']}
+            // style={{ minWidth: 83, textAlign: 'left' }}
+        >
+            <Option value={LinkProtocol.HTTP}>http://</Option>
+            <Option value={LinkProtocol.HTTPS}>https://</Option>
         </Select>
     )
 
     return (
-        <Space.Compact size="small">
+        <Space.Compact size="small" className={styles['link-select']}>
             {value.type === 'IN' ? (
-                <>
-                    {/* <Cascader
-                        size="small"
-                        value={value.slugId ? [value.slugId] : undefined}
-                        options={options}
-                        onChange={(e) => onPageChange(e?.[0] as ObjectId)}
-                        placeholder="Please select"
-                        className="link-select-cascader"
-                        changeOnSelect
-                        showSearch
-                        searchValue={q}
-                        onSearch={setQ}
-                    /> */}
-                    <TreeSelect
-                        // showSearch
-                        status={error ? 'error' : undefined}
-                        size="small"
-                        placeholder="Please select"
-                        className="link-select-tree"
-                        value={value.slugId}
-                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                        allowClear
-                        onChange={onPageChange}
-                        treeData={[
-                            {
-                                value: PageType.HOMEPAGE,
-                                label: (
-                                    <Space>
-                                        <HomeOutlined rev={undefined} />
-                                        Homepage
-                                    </Space>
-                                ),
-                            },
-                            {
-                                value: PageType.SIGNIN,
-                                label: (
-                                    <Space>
-                                        <LoginOutlined rev={undefined} />
-                                        Sign In
-                                    </Space>
-                                ),
-                            },
-                            ...(options || []),
-                        ]}
-                        autoClearSearchValue={false}
-                        // searchValue={q}
-                        // onSearch={setQ}
-                    />
-                </>
+                <TreeSelect
+                    treeLine
+                    // showSearch
+                    status={error ? 'error' : undefined}
+                    size="small"
+                    placeholder="Please select"
+                    value={value.slugId}
+                    className={styles['tree']}
+                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                    allowClear
+                    onChange={onPageChange}
+                    treeData={[
+                        {
+                            value: PageType.HOMEPAGE,
+                            label: (
+                                <Space>
+                                    <HomeOutlined rev={undefined} />
+                                    Homepage
+                                </Space>
+                            ),
+                        },
+                        {
+                            value: PageType.SIGNIN,
+                            label: (
+                                <Space>
+                                    <LoginOutlined rev={undefined} />
+                                    Sign In
+                                </Space>
+                            ),
+                        },
+                        ...(options || []),
+                    ]}
+                    autoClearSearchValue={false}
+                    // searchValue={q}
+                    // onSearch={setQ}
+                />
             ) : (
                 <Input
                     value={value.link}
@@ -165,8 +159,8 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
                     onChange={(e) => onLinkChange(e.target.value)}
                     addonBefore={selectBefore}
                     size="small"
+                    className={styles['input']}
                     placeholder="Please select"
-                    className="link-select-input"
                     allowClear
                 />
             )}
@@ -175,13 +169,16 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
                 size="small"
                 value={value.type}
                 onChange={onTypeChange}
-                className="link-select-select"
             >
                 <Option value={LinkType.IN}>
-                    <LinkOutlined rev={undefined} />
+                    <div className={styles['icon']}>
+                        <LinkOutlined rev={undefined} />
+                    </div>
                 </Option>
                 <Option value={LinkType.OUT}>
-                    <GlobalOutlined rev={undefined} />
+                    <div className={styles['icon']}>
+                        <GlobalOutlined rev={undefined} />
+                    </div>
                 </Option>
             </Select>
         </Space.Compact>

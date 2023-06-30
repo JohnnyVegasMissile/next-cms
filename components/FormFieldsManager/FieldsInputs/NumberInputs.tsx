@@ -55,17 +55,18 @@ const NumberInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                                 size="small"
                                 style={{ width: '50%' }}
                                 value={field.max}
-                                onChange={(e) => onChange('min', e)}
+                                onChange={(e) => onChange('max', e)}
                             />
                         </Space.Compact>
                     </WithLabel>
                 </Col>
                 <Col span={8}>
                     <WithLabel label="Default" error={errors?.default}>
-                        <Input
+                        <InputNumber
                             size="small"
-                            value={field.default}
-                            onChange={(e) => onChange('default', e.target.value)}
+                            style={{ width: '100%' }}
+                            value={field.default as number}
+                            onChange={(e) => onChange('default', e)}
                         />
                     </WithLabel>
                 </Col>

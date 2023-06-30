@@ -29,13 +29,14 @@ export const getContainers = (
         params: { page, q, sort, ...others },
     })
 
-export const getContainersSimple = (): Promise<{ id: ObjectId; name: string }[]> =>
+export const getContainersSimple = (q: string): Promise<{ id: ObjectId; name: string }[]> =>
     INSTANCE({
         method: 'GET',
         url: '/api/containers/simple',
         // headers: {
         //     'Content-Type': 'application/json',
         // },
+        params: { q },
     })
 
 export const getContainer = (id: ObjectId): Promise<ContainerResponse> =>

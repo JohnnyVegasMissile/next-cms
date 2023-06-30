@@ -1,6 +1,8 @@
 import { Section } from '@prisma/client'
+import { SectionResponse } from '~/app/admin/pages/[pageId]/sections/page'
 import blocks, { BlockKey } from '~/blocks'
 import { ObjectId } from '~/types'
+import { FormSimple } from '~/types/formCreation'
 import SectionCreation from '~/types/sectionCreation'
 
 export const validateSections = (values: { [key in string]: SectionCreation[] }) => {
@@ -25,7 +27,7 @@ export const validateSections = (values: { [key in string]: SectionCreation[] })
     return errors
 }
 
-export const sectionToSectionCreation = (values: { [key in string]: Section[] }) => {
+export const sectionToSectionCreation = (values: { [key in string]: SectionResponse[] }) => {
     let cleanSections: any = {}
 
     Object.keys(values).forEach((key) => {
@@ -36,11 +38,19 @@ export const sectionToSectionCreation = (values: { [key in string]: Section[] })
             position: section.position,
             content: section.content as any,
 
-            medias: new Map(),
-            forms: new Map(),
+            medias: new Map(
+                section.medias
+                    ?.filter((media) => !!media.media)
+                    .map((media) => [media.media?.id, media.media])
+            ),
+            forms: new Map(
+                section.medias
+                    ?.filter((media) => !!media.form)
+                    .map((media) => [media.form?.id, media.form as FormSimple])
+            ),
         }))
     })
-
+    console.log('cleanSections', cleanSections)
     return cleanSections
 }
 
@@ -56,10 +66,18 @@ export const cleanSectionCreation = (values: { [key in string]: SectionCreation[
 
             section.medias.forEach((_, key) => {
                 if (stringifiedContent.includes(`"${key}"`)) medias.push(key)
+
+                // if (!!findInObject(section.content, key)) {
+                //     medias.push(key)
+                // }
             })
 
             section.forms.forEach((_, key) => {
                 if (stringifiedContent.includes(`"${key}"`)) forms.push(key)
+
+                // if (!!findInObject(section.content, key)) {
+                //     forms.push(key)
+                // }
             })
 
             return {
@@ -72,4 +90,29 @@ export const cleanSectionCreation = (values: { [key in string]: SectionCreation[
     })
 
     return cleanValues
+}
+
+// function that get a object and a string and test in every values of the object if the string is included, it also test in nested object and arrays. return the path of the value if it's included in the object else return null
+
+function findInObject(obj: any, str: string): string | null {
+    let path = ''
+    let found = false
+
+    function find(obj: any, str: string) {
+        if (typeof obj === 'object') {
+            for (const key in obj) {
+                if (typeof obj[key] === 'object') {
+                    path += `${key}.`
+                    find(obj[key], str)
+                } else if (typeof obj[key] === 'string' && obj[key].includes(str)) {
+                    path += `${key}`
+                    found = true
+                }
+            }
+        }
+    }
+
+    find(obj, str)
+
+    return found ? path : null
 }

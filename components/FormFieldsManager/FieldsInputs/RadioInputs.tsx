@@ -1,7 +1,9 @@
-import { Button, Col, Row, Input, Space, Divider, Radio, Select } from 'antd'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Button, Col, Row, Input, Space, Divider, Radio, Select, Typography, Tooltip } from 'antd'
+import { PlusOutlined, DeleteOutlined, ClearOutlined } from '@ant-design/icons'
 import { FieldInputsProps } from '.'
 import WithLabel from '~/components/WithLabel'
+
+const { Text } = Typography
 
 const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
     return (
@@ -42,15 +44,41 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
-                    <WithLabel label="Options" error={errors?.options}>
+                    <WithLabel
+                        label={
+                            <Space>
+                                <Text>Options</Text>
+                                <Tooltip title="Clear default">
+                                    <Button
+                                        icon={<ClearOutlined rev={undefined} />}
+                                        type="dashed"
+                                        size="small"
+                                        disabled={!field.default}
+                                        onClick={() => onChange('default', undefined)}
+                                    />
+                                </Tooltip>
+                            </Space>
+                        }
+                        error={errors?.options}
+                    >
                         <Space direction="vertical" style={{ width: '100%' }}>
                             {field.options?.map((option, idx) => (
                                 <Space.Compact key={idx} size="small" style={{ width: '100%' }}>
+                                    <Radio
+                                        checked={!!option.value && option.value === field.default}
+                                        disabled={!option.value}
+                                        onClick={() => onChange('default', option.value)}
+                                    />
                                     <Input
                                         size="small"
                                         placeholder="Value"
                                         value={option.value}
-                                        onChange={(e) => onChange(`options.${idx}.value`, e.target.value)}
+                                        onChange={(e) => {
+                                            const value = e.target.value
+                                            onChange(`options.${idx}.value`, value)
+
+                                            if (option.value === field.default) onChange('default', value)
+                                        }}
                                     />
                                     <Input
                                         size="small"
@@ -67,6 +95,8 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
 
                                             optionsCopy.splice(idx, 1)
                                             onChange('options', optionsCopy)
+
+                                            if (option.value === field.default) onChange('default', undefined)
                                         }}
                                     />
                                 </Space.Compact>
@@ -88,7 +118,7 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                         </Space>
                     </WithLabel>
                 </Col>
-                <Col span={8}>
+                {/* <Col span={8}>
                     <WithLabel label="Default" error={errors?.default}>
                         <Select
                             allowClear
@@ -104,7 +134,7 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                             onChange={(e) => onChange('default', e)}
                         />
                     </WithLabel>
-                </Col>
+                </Col> */}
             </Row>
         </>
     )

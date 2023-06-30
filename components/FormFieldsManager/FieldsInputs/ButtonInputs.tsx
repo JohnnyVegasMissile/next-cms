@@ -2,6 +2,7 @@ import { Col, Row, Input, Divider, Select } from 'antd'
 import { FieldInputsProps } from '.'
 import WithLabel from '~/components/WithLabel'
 import LinkSelect from '~/components/LinkSelect'
+import { LinkProtocol, FormButtonType } from '@prisma/client'
 
 const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
     return (
@@ -27,24 +28,33 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                             size="small"
                             style={{ width: '100%' }}
                             options={[
-                                { key: 'submit', label: 'Submit' },
-                                { key: 'link', label: 'Link' },
+                                { value: FormButtonType.SUBMIT, label: 'Submit' },
+                                { value: FormButtonType.LINK, label: 'Link' },
+                                { value: FormButtonType.RESET, label: 'Reset', disabled: true },
                             ]}
                             value={field.buttonType}
-                            onChange={(e) => onChange('buttonType', e)}
-                        />
-                    </WithLabel>
-                </Col>
-                <Col span={8}>
-                    <WithLabel label="Link">
-                        <LinkSelect
-                            value={{
-                                type: 'OUT',
+                            onChange={(e) => {
+                                onChange('buttonType', e)
+
+                                if (e === 'link') {
+                                    onChange('link', {
+                                        type: 'OUT',
+                                        protocol: LinkProtocol.HTTPS,
+                                    })
+                                } else {
+                                    onChange('link', undefined)
+                                }
                             }}
-                            onChange={(e) => onChange('link', e)}
                         />
                     </WithLabel>
                 </Col>
+                {field.buttonType === 'link' && (
+                    <Col span={8}>
+                        <WithLabel label="Link">
+                            <LinkSelect value={field.link!} onChange={(e) => onChange('link', e)} />
+                        </WithLabel>
+                    </Col>
+                )}
             </Row>
         </>
     )

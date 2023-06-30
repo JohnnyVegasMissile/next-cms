@@ -90,7 +90,7 @@ const Form = ({ layout, sidebar }: LayoutFormProps) => {
                     className={classNames(styles['content-wrap'], sidebar.position, sidebar.breakpointClass)}
                 >
                     {sidebar.isActive && (
-                        <aside
+                        <div
                             className={classNames(styles['aside'], { [styles['open']!]: showSidebar })}
                             style={{ width: sidebar.width, backgroundColor: sidebar.backgroundColor }}
                         >
@@ -117,7 +117,7 @@ const Form = ({ layout, sidebar }: LayoutFormProps) => {
                                 error={formik.errors.bottomSidebar}
                                 label="bottom sidebar"
                             />
-                        </aside>
+                        </div>
                     )}
                     <div className={styles['content']}>
                         <SectionsManager

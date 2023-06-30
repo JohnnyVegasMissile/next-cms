@@ -1,4 +1,5 @@
 import { SectionType } from '@prisma/client'
+import { Suspense } from 'react'
 import DisplaySection from '~/components/DisplaySection'
 import { prisma } from '~/utilities/prisma'
 
@@ -17,6 +18,15 @@ const getSections = async (slug: string) => {
     if (!!exist.pageId && exist.page?.published) {
         const pageSections = await prisma.section.findMany({
             where: { pageId: exist.pageId, type: SectionType.PAGE_SIDEBAR },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
@@ -24,6 +34,15 @@ const getSections = async (slug: string) => {
     } else if (!!exist.containerId && exist.container?.published) {
         const containerSections = await prisma.section.findMany({
             where: { containerId: exist.containerId, type: SectionType.CONTAINER_SIDEBAR },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
@@ -31,16 +50,43 @@ const getSections = async (slug: string) => {
     } else if (!!exist.contentId && exist.content?.published) {
         const contentSections = await prisma.section.findMany({
             where: { contentId: exist.contentId, type: SectionType.CONTENT_SIDEBAR },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
         const containerTopSections = await prisma.section.findMany({
             where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_SIDEBAR_TOP },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
         const containerBottomSections = await prisma.section.findMany({
             where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_SIDEBAR_BOTTOM },
+            include: {
+                medias: {
+                    include: {
+                        media: true,
+                        form: { include: { fields: true } },
+                        link: true,
+                    },
+                },
+            },
             orderBy: { position: 'asc' },
         })
 
@@ -58,7 +104,10 @@ const Sidebar = async ({ params }: { params: { slug: string } }) => {
     return (
         <>
             {sections.map((section) => (
-                <DisplaySection key={section.id} section={section} />
+                <Suspense key={section.id}>
+                    {/* @ts-expect-error Server Component */}
+                    <DisplaySection section={section} />
+                </Suspense>
             ))}
         </>
     )

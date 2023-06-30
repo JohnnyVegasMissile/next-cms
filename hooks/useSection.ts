@@ -1,6 +1,7 @@
 import { Form, Media } from '@prisma/client'
 import { FormikErrors } from 'formik'
 import { createContext, useContext } from 'react'
+import { FormSimple } from '~/types/formCreation'
 import SectionCreation from '~/types/sectionCreation'
 
 interface UseProvideAuthProps {
@@ -17,7 +18,6 @@ export const SectionsContext = createContext<UseProvideAuthProps>({
 
 const useSection = (position: number) => {
     const { sections, setFieldValue } = useContext(SectionsContext)
-
     const section = sections[position]
 
     const onSetFieldValue = (name: string, value: any) => setFieldValue(`${position}.content.${name}`, value)
@@ -41,7 +41,7 @@ const useSection = (position: number) => {
             setFieldValue(`${position}.content.${name}`, form.id)
 
             const newFormSet = new Map(section?.forms)
-            newFormSet.set(form.id, form)
+            newFormSet.set(form.id, form as any as FormSimple)
             setFieldValue(`${position}.forms`, newFormSet)
         }
     }

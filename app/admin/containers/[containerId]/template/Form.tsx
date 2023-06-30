@@ -69,7 +69,7 @@ const Form = ({ containerId, layout, sidebar }: FormProps) => {
         <>
             <div className={classNames(styles['content-wrap'], sidebar.position, sidebar.breakpointClass)}>
                 {sidebar.isActive && (
-                    <aside
+                    <div
                         className={classNames(styles['aside'], { [styles['open']!]: showSidebar })}
                         style={{ width: sidebar.width, backgroundColor: sidebar.backgroundColor }}
                     >
@@ -79,7 +79,7 @@ const Form = ({ containerId, layout, sidebar }: FormProps) => {
                             onChange={formik.setFieldValue}
                             error={formik.errors.sidebar}
                         />
-                    </aside>
+                    </div>
                 )}
                 <div className={styles['content']}>
                     <SectionsManager

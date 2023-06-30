@@ -1,4 +1,4 @@
-import { FormFieldType } from '@prisma/client'
+import { FormButtonType, FormFieldType } from '@prisma/client'
 import { Button, Space, Typography, Collapse, InputNumber, Divider, Dropdown } from 'antd'
 import { PlusOutlined, EllipsisOutlined } from '@ant-design/icons'
 import FormCreation, { FormFieldCreation } from '~/types/formCreation'
@@ -26,7 +26,7 @@ const KEYS = {
     [FormFieldType.CHECKBOX]: { label: 'Checkbox', default: {} },
     [FormFieldType.MULTICHECKBOX]: { label: 'Multi checkbox', default: { required: true } },
     [FormFieldType.RADIO]: { label: 'Radio', default: { required: true } },
-    [FormFieldType.BUTTON]: { label: 'Button', default: {} },
+    [FormFieldType.BUTTON]: { label: 'Button', default: { buttonType: FormButtonType.SUBMIT } },
     [FormFieldType.CONTENT]: { label: 'Content', default: { required: true } },
 }
 

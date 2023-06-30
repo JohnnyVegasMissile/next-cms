@@ -27,9 +27,7 @@ const HomeSidebar = async () => {
     return (
         <>
             {sections.map((section) => (
-                // eslint-disable-next-line react/jsx-no-undef
                 <Suspense key={section.id}>
-                    {/* @ts-expect-error Server Component */}
                     <DisplaySection section={section} />
                 </Suspense>
             ))}
@@ -38,4 +36,5 @@ const HomeSidebar = async () => {
 }
 
 export const revalidate = 'force-cache'
+
 export default HomeSidebar

@@ -4,6 +4,7 @@ import { prisma } from '~/utilities/prisma'
 import './global.scss'
 import { SettingType } from '@prisma/client'
 import QueryClientWrapper from '~/components/QueryClientWrapper'
+import getSidebar from '~/utilities/getSidebar'
 
 // const getLang = async () => {
 //     const locales = await prisma.setting.findUnique({
@@ -43,24 +44,9 @@ const getTheme = async () => {
     })
 }
 
-const getSidebar = async () => {
-    return await prisma.setting.findMany({
-        where: {
-            type: {
-                in: [
-                    SettingType.SIDEBAR_IS_ACTIVE,
-                    SettingType.SIDEBAR_WIDTH,
-                    SettingType.SIDEBAR_UNIT,
-                    SettingType.SIDEBAR_COLOR,
-                ],
-            },
-        },
-    })
-}
-
 const Layout = async ({ children }: { children: React.ReactNode }) => {
     const themeSettings = await getTheme()
-    const sidebarSettings = await getSidebar()
+    const sidebar = await getSidebar()
 
     const backgroundColor =
         themeSettings.find((e) => e.type === SettingType.BACKGROUND_COLOR)?.value || '#e9ecef'
@@ -74,12 +60,6 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
     const darkColor = themeSettings.find((e) => e.type === SettingType.DARK_COLOR)?.value || '#000814'
     const lightColor = themeSettings.find((e) => e.type === SettingType.LIGHT_COLOR)?.value || '#e9ecef'
     const extraColor = themeSettings.find((e) => e.type === SettingType.EXTRA_COLOR)?.value || '#ef476f'
-
-    const sidebar = sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_IS_ACTIVE)?.value === 'true'
-    const sidebarValue = sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_WIDTH)?.value || '0'
-    const sidebarUnit = sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_UNIT)?.value || 'rem'
-
-    const sidebarColor = sidebarSettings.find((e) => e.type === SettingType.SIDEBAR_COLOR)?.value || '#ef476f'
 
     return (
         <html>
@@ -101,10 +81,10 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
     --light-color: ${lightColor};
     --extra-color: ${extraColor};
 
-    --sidebar-display: ${sidebar ? 'block' : 'none'};
-    --sidebar-width: ${sidebarValue}${sidebarUnit};
+    --sidebar-display: ${sidebar.isActive ? 'block' : 'none'};
+    --sidebar-width: ${sidebar.width};
 
-    --sidebar-background-color: ${sidebarColor};
+    --sidebar-background-color: ${sidebar.backgroundColor};
 }
                     `,
                     }}

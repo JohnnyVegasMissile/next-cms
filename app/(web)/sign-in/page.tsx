@@ -39,7 +39,6 @@ const SignInSidebar = async () => {
         <>
             {sections.map((section) => (
                 <Suspense key={section.id}>
-                    {/* @ts-expect-error Server Component */}
                     <DisplaySection section={section} />
                 </Suspense>
             ))}

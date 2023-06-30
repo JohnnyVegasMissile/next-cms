@@ -157,7 +157,6 @@ const Content = async ({ params }: { params: { slug: string } }) => {
         <>
             {sections.map((section) => (
                 <Suspense key={section.id}>
-                    {/* @ts-expect-error Server Component */}
                     <DisplaySection section={section} />
                 </Suspense>
             ))}

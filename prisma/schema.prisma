@@ -194,13 +194,12 @@ model Form {
   errorMessage   String?
   extraData      Json
 
-  messages     Message[]
-  fields       FormField[]
-  // sections       Section[]
-  // elements       Element[]
-  discontinued Boolean     @default(false)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  messages Message[]
+  fields   FormField[]
+
+  discontinued Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   usedInSection LinkedToSection[]
 }
@@ -446,8 +445,10 @@ model LinkedToSection {
   form    Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
   linkId  String?
   link    Link?   @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  menuId  String?
+  menu    Menu?   @relation(fields: [menuId], references: [id], onDelete: Cascade)
 
-  @@unique([sectionId, mediaId, formId, linkId])
+  @@unique([sectionId, mediaId, formId, linkId, menuId])
 }
 
 // PAGES
@@ -643,6 +644,10 @@ model Menu {
 
   name String
 
+  usedInSections LinkedToSection[]
+
+  childs MenuChild[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -654,6 +659,9 @@ enum OrderBy {
 
 model MenuChild {
   id String @id @default(cuid())
+
+  menuId String
+  menu   Menu   @relation(fields: [menuId], references: [id], onDelete: Cascade)
 
   type     MenuChildType
   parentId String?

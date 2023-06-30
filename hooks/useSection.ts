@@ -1,4 +1,4 @@
-import { Form, Media } from '@prisma/client'
+import { Form, Media, Menu } from '@prisma/client'
 import { FormikErrors } from 'formik'
 import { createContext, useContext } from 'react'
 import { FormSimple } from '~/types/formCreation'
@@ -46,6 +46,18 @@ const useSection = (position: number) => {
         }
     }
 
+    const addMenu = (name: string, menu: Menu | undefined) => {
+        if (!menu) {
+            setFieldValue(`${position}.content.${name}`, undefined)
+        } else {
+            setFieldValue(`${position}.content.${name}`, menu.id)
+
+            const newMenuSet = new Map(section?.menus)
+            newMenuSet.set(menu.id, menu)
+            setFieldValue(`${position}.menus`, newMenuSet)
+        }
+    }
+
     return {
         content: section?.content,
         setFieldValue: onSetFieldValue,
@@ -53,6 +65,8 @@ const useSection = (position: number) => {
         addMedia,
         forms: section?.forms,
         addForm,
+        menus: section?.menus,
+        addMenu,
     }
 }
 

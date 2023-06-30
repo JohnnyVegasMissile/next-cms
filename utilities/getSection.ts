@@ -1,4 +1,4 @@
-import { Form, FormField, Link, Media, Prisma, Section } from '@prisma/client'
+import { Form, FormField, Link, Media, Menu, MenuChild, Prisma, Section } from '@prisma/client'
 import { ObjectId } from '~/types'
 import { prisma } from './prisma'
 
@@ -17,11 +17,12 @@ export type SectionResponse = Section & {
               })
             | null
         link: Link | null
+        menu: (Menu & { childs: MenuChild & { childs: MenuChild & { childs: MenuChild[] } }[] }) | null
     }[]
 }
 
-const getSection = async (where: Prisma.SectionWhereInput | undefined): Promise<SectionResponse[]> =>
-    await prisma.section.findMany({
+const getSection = async (where: Prisma.SectionWhereInput | undefined): Promise<SectionResponse[]> => {
+    const sections = await prisma.section.findMany({
         where,
         include: {
             medias: {
@@ -47,10 +48,26 @@ const getSection = async (where: Prisma.SectionWhereInput | undefined): Promise<
                         },
                     },
                     link: true,
+                    menu: {
+                        include: {
+                            childs: {
+                                include: {
+                                    childs: {
+                                        include: {
+                                            childs: true,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
             },
         },
         orderBy: { position: 'asc' },
     })
+
+    return sections as SectionResponse[]
+}
 
 export default getSection

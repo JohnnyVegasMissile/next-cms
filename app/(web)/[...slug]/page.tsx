@@ -1,8 +1,9 @@
-import { prisma } from '~/utilities/prisma'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { SectionType } from '@prisma/client'
 import DisplaySection from '~/components/DisplaySection'
-import { Suspense } from 'react'
+import { prisma } from '~/utilities/prisma'
+import getSection from '~/utilities/getSection'
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
     const full = Array.isArray(params.slug) ? params.slug.join('/') : params.slug
@@ -15,20 +16,38 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         let metadata: any = {}
         page.metadatas.forEach((element) => (metadata[element.name] = element.content))
 
-        return { title: page.name, ...metadata }
+        return {
+            title: page.name,
+            openGraph: {
+                title: page.name,
+            },
+            ...metadata,
+        }
     }
 
     const content = await prisma.container.findFirst({
         where: { slug: { full } },
     })
 
-    if (!!content) return { title: content.name }
+    if (!!content)
+        return {
+            title: content.name,
+            openGraph: {
+                title: content.name,
+            },
+        }
 
     const container = await prisma.container.findFirst({
         where: { slug: { full } },
     })
 
-    if (!!container) return { title: container.name }
+    if (!!container)
+        return {
+            title: container.name,
+            openGraph: {
+                title: container.name,
+            },
+        }
 
     return {}
 
@@ -68,78 +87,25 @@ const getSections = async (slug: string) => {
     if (!exist) return null
 
     if (!!exist.pageId && exist.page?.published) {
-        const pageSections = await prisma.section.findMany({
-            where: { pageId: exist.pageId, type: SectionType.PAGE },
-            include: {
-                medias: {
-                    include: {
-                        media: true,
-                        form: { include: { fields: true } },
-                        link: true,
-                    },
-                },
-            },
-            orderBy: { position: 'asc' },
-        })
+        const pageSections = await getSection({ pageId: exist.pageId, type: SectionType.PAGE })
 
         return pageSections
     } else if (!!exist.containerId && exist.container?.published) {
-        const containerSections = await prisma.section.findMany({
-            where: { containerId: exist.containerId, type: SectionType.CONTAINER },
-            include: {
-                medias: {
-                    include: {
-                        media: true,
-                        form: { include: { fields: true } },
-                        link: true,
-                    },
-                },
-            },
-            orderBy: { position: 'asc' },
+        const containerSections = await getSection({
+            containerId: exist.containerId,
+            type: SectionType.CONTAINER,
         })
 
         return containerSections
     } else if (!!exist.contentId && exist.content?.published) {
-        const contentSections = await prisma.section.findMany({
-            where: { contentId: exist.contentId, type: SectionType.CONTENT },
-            include: {
-                medias: {
-                    include: {
-                        media: true,
-                        form: { include: { fields: true } },
-                        link: true,
-                    },
-                },
-            },
-            orderBy: { position: 'asc' },
+        const contentSections = await getSection({ contentId: exist.contentId, type: SectionType.CONTENT })
+        const containerTopSections = await getSection({
+            containerId: exist.content.containerId,
+            type: SectionType.TEMPLATE_TOP,
         })
-
-        const containerTopSections = await prisma.section.findMany({
-            where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_TOP },
-            include: {
-                medias: {
-                    include: {
-                        media: true,
-                        form: { include: { fields: true } },
-                        link: true,
-                    },
-                },
-            },
-            orderBy: { position: 'asc' },
-        })
-
-        const containerBottomSections = await prisma.section.findMany({
-            where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_BOTTOM },
-            include: {
-                medias: {
-                    include: {
-                        media: true,
-                        form: { include: { fields: true } },
-                        link: true,
-                    },
-                },
-            },
-            orderBy: { position: 'asc' },
+        const containerBottomSections = await getSection({
+            containerId: exist.content.containerId,
+            type: SectionType.TEMPLATE_BOTTOM,
         })
 
         return [...containerTopSections, ...contentSections, ...containerBottomSections]

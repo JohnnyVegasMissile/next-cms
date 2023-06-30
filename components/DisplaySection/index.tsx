@@ -15,16 +15,19 @@ interface DisplaySectionProps {
 }
 
 const DisplaySection = async ({ section }: DisplaySectionProps) => {
-    const View = blocksViews[section.block as BlockKey]
+    const { block, content, medias } = section
+    const View = blocksViews[block as BlockKey]
 
     if (!View) return null
 
+    console.log('DisplaySection', section)
+    console.log('View', View)
+
     return (
         <View
-            key={section.id}
-            content={section.content}
-            medias={new Map(section.medias?.filter((e) => !!e.media).map((e) => [e.media?.id!, e.media!]))}
-            forms={new Map(section.medias?.filter((e) => !!e.form).map((e) => [e.form?.id!, e.form!]))}
+            content={content}
+            medias={new Map(medias?.filter((e) => !!e.media).map((e) => [e.media?.id!, e.media!]))}
+            forms={new Map(medias?.filter((e) => !!e.form).map((e) => [e.form?.id!, e.form!]))}
         />
     )
 }

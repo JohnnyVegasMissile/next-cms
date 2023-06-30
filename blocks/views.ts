@@ -1,4 +1,6 @@
 import ViewTextBlock from './TextBlock/View'
+import ViewImageBlock from './ImageBlock/View'
+import ViewFormBlock from './FormBlock/View'
 import { BlockKey, ViewBlockProps } from '.'
 
 type BlocksViews = {
@@ -7,7 +9,8 @@ type BlocksViews = {
 
 export const blocksViews: BlocksViews = {
     TextBlock: ViewTextBlock,
-    ImageBlock: ViewTextBlock,
+    ImageBlock: ViewImageBlock,
+    FormBlock: ViewFormBlock,
 }
 
 export default blocksViews

@@ -17,6 +17,7 @@ import {
     message,
     ColorPicker,
     Upload,
+    Tabs,
 } from 'antd'
 import { UploadOutlined, CheckOutlined, ReloadOutlined, DownloadOutlined } from '@ant-design/icons'
 import { useFormik } from 'formik'
@@ -622,6 +623,40 @@ const Settings = ({ settings }: FormProps) => {
                         </Button>
                     </Space>
                 </div>
+
+                <Tabs
+                    style={{ marginTop: 16, marginBottom: -28 }}
+                    defaultActiveKey="1"
+                    type="card"
+                    size="small"
+                    items={[
+                        {
+                            key: 'general',
+                            label: 'General',
+                        },
+                        {
+                            key: 'theme',
+                            label: 'Theme',
+                        },
+                        {
+                            key: 'smtp',
+                            label: 'SMTP',
+                        },
+                        {
+                            key: 'grpd',
+                            label: 'GRPD',
+                        },
+                        {
+                            key: 'database',
+                            label: 'Database',
+                        },
+                        {
+                            key: 'other',
+                            label: 'Other',
+                            disabled: true,
+                        },
+                    ]}
+                />
             </Card>
             <Row gutter={[8, 8]} style={{ marginTop: -6 }}>
                 <Col span={12}>

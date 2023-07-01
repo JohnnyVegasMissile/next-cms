@@ -27,7 +27,7 @@ const SectionsManager = ({ name, sections, onChange, error, label }: SectionsMan
             type: 'group',
             children: Object.keys(blocks).map((key) => ({
                 key,
-                label: key,
+                label: blocks[key as BlockKey].title,
                 onClick: () =>
                     onChange(name, [
                         ...sections,

@@ -1,44 +1,35 @@
 import useSection from '~/hooks/useSection'
 import { EditBlockProps } from '..'
-import SectionWrap from '~/components/SectionWrap'
 import MediaModal from '~/components/MediaModal'
 import { MediaType } from '@prisma/client'
 import classNames from 'classnames'
 import styles from './ImageBlock.module.scss'
-import CustomImage from '~/components/CustomImage'
-import Link from 'next/link'
+import Image from 'next/image'
+import { ContentType } from '.'
 
 const ImageBlock = ({ position }: EditBlockProps) => {
-    const { content, /*setFieldValue,*/ medias, addMedia } = useSection(position)
-    const { title, mediaId, button } = content
+    const { errors, content, medias, addMedia } = useSection<ContentType>(position)
+    const { imageId } = content || {}
+
+    const img = medias?.get(imageId || '')
+
+    // console.log('errors', position, errors)
 
     return (
-        <SectionWrap
-            position={position}
-            panel={
-                <MediaModal
-                    value={medias?.get(content.mediaId)}
-                    onChange={(media) => addMedia('mediaId', media)}
-                    mediaType={MediaType.IMAGE}
-                />
-            }
-        >
-            <section className={classNames(styles['section'])}>
-                {title && <h1>Title</h1>}
-                <CustomImage media={medias?.get(mediaId)} height={400} width={600} />
-                {button && (
-                    <div
-                        className={classNames(styles['button'], {
-                            [styles['secondary']!]: button.type === 'secondary',
-                        })}
-                    >
-                        <Link href={button.label}>
-                            <span>{button.label}</span>
-                        </Link>
-                    </div>
+        <section className={classNames(styles['section'])}>
+            <div className={classNames(styles['image-wrapper'], { [styles['error']!]: !!errors?.imageId })}>
+                {!!img && (
+                    <Image fill className="" src={`/storage/images/${img.uri || ''}`} alt={img.alt || ''} />
                 )}
-            </section>
-        </SectionWrap>
+                <div className={classNames(styles['button'])}>
+                    <MediaModal
+                        value={medias?.get(imageId || '')}
+                        onChange={(media) => addMedia('imageId', media)}
+                        mediaType={MediaType.IMAGE}
+                    />
+                </div>
+            </div>
+        </section>
     )
 }
 

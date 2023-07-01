@@ -5,8 +5,8 @@ import FormBlock from './FormBlock'
 import { Form, FormField, Media } from '@prisma/client'
 import { ObjectId } from '~/types'
 
-export type ViewBlockProps = {
-    content: any
+export type ViewBlockProps<T> = {
+    content: T
     medias: Map<ObjectId, Media>
     forms: Map<ObjectId, Form & { fields: FormField[] }>
 }
@@ -16,13 +16,13 @@ export type EditBlockProps = {
 }
 
 export type BlockDetails = {
-    View: ({ content }: ViewBlockProps) => JSX.Element
+    View: ({ content }: ViewBlockProps<any>) => JSX.Element
     Edit: ({ position }: EditBlockProps) => JSX.Element
     title: string
     position: ('HEADER' | 'FOOTER' | 'SIDEBAR' | 'CONTENT')[]
     availableIn: ('LAYOUT' | 'PAGE' | 'CONTAINER' | 'TEMPLATE' | 'CONTENT' | 'ELEMENT')[]
     default?: any
-    validate?: (section: SectionCreation) => any
+    validate?: (section: any) => any
 }
 
 export type BlockKey = 'ImageBlock' | 'TextBlock' | 'FormBlock'

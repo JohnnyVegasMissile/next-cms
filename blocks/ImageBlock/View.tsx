@@ -1,27 +1,21 @@
-import Link from 'next/link'
+'use server'
+
 import styles from './ImageBlock.module.scss'
 import { ViewBlockProps } from '..'
 import classNames from 'classnames'
-// import CustomImage from '~/components/CustomImage'
+import Image from 'next/image'
+import { ContentType } from '.'
 
-const ImageBlock = ({ content }: ViewBlockProps) => {
-    const { title, button } = content
+const ImageBlock = ({ content, medias }: ViewBlockProps<ContentType>) => {
+    const { imageId } = content || {}
+
+    const img = medias?.get(imageId || '')
 
     return (
         <section className={classNames(styles['section'])}>
-            {title && <h1>Title</h1>}
-            {/* <CustomImage media={medias?.get(content.mediaId)} height={400} width={600} /> */}
-            {button && (
-                <div
-                    className={classNames(styles['button'], {
-                        [styles['secondary']!]: button.type === 'secondary',
-                    })}
-                >
-                    <Link href={button.label}>
-                        <span>{button.label}</span>
-                    </Link>
-                </div>
-            )}
+            <div className={classNames(styles['image-wrapper'])}>
+                <Image fill className="" src={`/storage/images/${img?.uri || ''}`} alt={img?.alt || ''} />
+            </div>
         </section>
     )
 }

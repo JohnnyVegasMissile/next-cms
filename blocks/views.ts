@@ -4,7 +4,7 @@ import ViewFormBlock from './FormBlock/View'
 import { BlockKey, ViewBlockProps } from '.'
 
 type BlocksViews = {
-    [key in BlockKey]?: ({ content }: ViewBlockProps) => JSX.Element
+    [key in BlockKey]?: ({ content }: ViewBlockProps<any>) => JSX.Element
 }
 
 export const blocksViews: BlocksViews = {

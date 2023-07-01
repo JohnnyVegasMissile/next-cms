@@ -1,9 +1,8 @@
-import { Section } from '@prisma/client'
-import { SectionResponse } from '~/app/admin/pages/[pageId]/sections/page'
 import blocks, { BlockKey } from '~/blocks'
 import { ObjectId } from '~/types'
-import { FormSimple } from '~/types/formCreation'
 import SectionCreation from '~/types/sectionCreation'
+import { SectionResponse } from './getSection'
+import set from 'lodash.set'
 
 export const validateSections = (values: { [key in string]: SectionCreation[] }) => {
     let errors: any = {}
@@ -13,13 +12,10 @@ export const validateSections = (values: { [key in string]: SectionCreation[] })
             const validate = blocks[section.block].validate
 
             if (!!validate) {
-                const sectionErrors = validate(section)
+                const sectionErrors = validate(section.content)
 
-                if (!!Object.keys(sectionErrors).length) {
-                    if (!!errors[key]) errors[key] = new Array()
-
-                    errors[key][section.position] = sectionErrors
-                }
+                if (!!Object.keys(sectionErrors).length)
+                    set(errors, `${key}.${section.position}`, sectionErrors)
             }
         })
     })
@@ -43,10 +39,13 @@ export const sectionToSectionCreation = (values: { [key in string]: SectionRespo
                     ?.filter((media) => !!media.media)
                     .map((media) => [media.media?.id, media.media])
             ),
+
             forms: new Map(
-                section.medias
-                    ?.filter((media) => !!media.form)
-                    .map((media) => [media.form?.id, media.form as FormSimple])
+                section.medias?.filter((media) => !!media.form).map((media) => [media.form?.id, media.form])
+            ),
+
+            menus: new Map(
+                section.medias?.filter((media) => !!media.menu).map((media) => [media.menu?.id, media.menu])
             ),
         }))
     })

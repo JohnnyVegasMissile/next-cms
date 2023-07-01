@@ -16,9 +16,10 @@ export const SectionsContext = createContext<UseProvideAuthProps>({
     errors: [],
 })
 
-const useSection = (position: number) => {
-    const { sections, setFieldValue } = useContext(SectionsContext)
+const useSection = <T>(position: number) => {
+    const { sections, setFieldValue, errors } = useContext(SectionsContext)
     const section = sections[position]
+    const sectionErrors = errors?.[position]
 
     const onSetFieldValue = (name: string, value: any) => setFieldValue(`${position}.content.${name}`, value)
 
@@ -59,7 +60,7 @@ const useSection = (position: number) => {
     }
 
     return {
-        content: section?.content,
+        content: section?.content as T,
         setFieldValue: onSetFieldValue,
         medias: section?.medias,
         addMedia,
@@ -67,6 +68,7 @@ const useSection = (position: number) => {
         addForm,
         menus: section?.menus,
         addMenu,
+        errors: sectionErrors as any,
     }
 }
 

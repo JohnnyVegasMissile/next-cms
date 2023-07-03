@@ -3,11 +3,10 @@ import styles from './TextBlock.module.scss'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ViewBlockProps } from '..'
+import { ContentType } from '.'
 
-const View = ({ content, medias }: ViewBlockProps) => {
-    const { title, subtitle, text, buttons, image, switched } = content || {}
-
-    console.log('form view', medias?.get(content.mediaId))
+const View = ({ content, medias }: ViewBlockProps<ContentType>) => {
+    const { formId } = content || {}
 
     return (
         <section className={classNames(styles['section'], { [styles['switch']!]: !!switched })}>

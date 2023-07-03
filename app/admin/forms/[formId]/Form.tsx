@@ -124,7 +124,7 @@ const Form = ({ formId, isUpdate, form }: FormProps) => {
                         </WithLabel>
                     </Col>
                     <Col span={12}>
-                        <WithLabel label="Success message" error={formik.errors.errorMessage}>
+                        <WithLabel label="Error message" error={formik.errors.errorMessage}>
                             <Input.TextArea
                                 rows={4}
                                 size="small"

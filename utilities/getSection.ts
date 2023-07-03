@@ -43,7 +43,7 @@ const getSection = async (where: Prisma.SectionWhereInput | undefined): Promise<
                                         },
                                     },
                                 },
-                                orderBy: [{ position: 'desc' }, { line: 'desc' }],
+                                orderBy: [{ position: 'asc' }, { line: 'asc' }],
                             },
                         },
                     },

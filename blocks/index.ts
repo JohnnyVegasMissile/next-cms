@@ -2,7 +2,7 @@ import SectionCreation from '~/types/sectionCreation'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
 import FormBlock from './FormBlock'
-import { Form, FormField, Media } from '@prisma/client'
+import { Form, FormField, Media, SectionType } from '@prisma/client'
 import { ObjectId } from '~/types'
 
 export type ViewBlockProps<T> = {
@@ -20,7 +20,7 @@ export type BlockDetails = {
     Edit: ({ position }: EditBlockProps) => JSX.Element
     title: string
     position: ('HEADER' | 'FOOTER' | 'SIDEBAR' | 'CONTENT')[]
-    availableIn: ('LAYOUT' | 'PAGE' | 'CONTAINER' | 'TEMPLATE' | 'CONTENT' | 'ELEMENT')[]
+    availableIn: SectionType[]
     default?: any
     validate?: (section: any) => any
 }

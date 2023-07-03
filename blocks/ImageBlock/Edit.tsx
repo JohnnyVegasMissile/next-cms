@@ -13,8 +13,6 @@ const ImageBlock = ({ position }: EditBlockProps) => {
 
     const img = medias?.get(imageId || '')
 
-    // console.log('errors', position, errors)
-
     return (
         <section className={classNames(styles['section'])}>
             <div className={classNames(styles['image-wrapper'], { [styles['error']!]: !!errors?.imageId })}>

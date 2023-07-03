@@ -50,7 +50,7 @@ export const GET = async (request: NextRequest) => {
 
                     required: true,
                 },
-                orderBy: [{ position: 'desc' }, { line: 'desc' }],
+                orderBy: [{ position: 'asc' }, { line: 'asc' }],
             },
         }
 

@@ -1,4 +1,3 @@
-// eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '~/utilities/prisma'
 import { PAGE_SIZE } from '~/utilities/constants'
@@ -22,11 +21,7 @@ export const GET = async (request: NextRequest) => {
     if (!!sort) {
         const parsedSort = sort.split(',')
 
-        if (parsedSort[0] === 'slug') {
-            orderBy = { slug: { full: parsedSort[1] } }
-        } else {
-            orderBy = { [`${parsedSort[0]}`]: parsedSort[1] }
-        }
+        orderBy = { [`${parsedSort[0]}`]: parsedSort[1] }
     }
 
     const count = await prisma.form.count({ where })

@@ -155,7 +155,7 @@ const CreateMenu = ({ params }: any) => {
 
                     <Button
                         type="primary"
-                        icon={<CheckOutlined rev={undefined} />}
+                        icon={<CheckOutlined />}
                         size="small"
                         onClick={() => formik.handleSubmit()}
                         // loading={submit.isLoading}
@@ -329,7 +329,7 @@ const CreateMenu = ({ params }: any) => {
                                         size="small"
                                         type="primary"
                                         danger
-                                        icon={<DeleteOutlined rev={undefined} />}
+                                        icon={<DeleteOutlined />}
                                         onClick={onDelete}
                                     />
                                 }
@@ -474,7 +474,7 @@ const CreateMenu = ({ params }: any) => {
                                                 <Button
                                                     type="primary"
                                                     danger
-                                                    icon={<DeleteOutlined rev={undefined} />}
+                                                    icon={<DeleteOutlined />}
                                                     onClick={() => {
                                                         const extras = [...selectedMenu.extras]
 
@@ -486,7 +486,7 @@ const CreateMenu = ({ params }: any) => {
                                         ))}
 
                                         <Button
-                                            icon={<PlusOutlined rev={undefined} />}
+                                            icon={<PlusOutlined />}
                                             type="primary"
                                             size="small"
                                             onClick={() =>

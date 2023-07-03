@@ -100,7 +100,7 @@ const Form = ({ roleId, isUpdate, role }: FormUserProps) => {
                         type="primary"
                         loading={submit.isLoading}
                         onClick={() => formik.handleSubmit()}
-                        icon={<CheckOutlined rev={undefined} />}
+                        icon={<CheckOutlined />}
                     >
                         {isUpdate ? 'Update role' : 'Create new'}
                     </Button>
@@ -809,7 +809,7 @@ const RightSelect = ({
             </Space>
             {info && (
                 <Tooltip title={info}>
-                    <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
+                    <InfoCircleOutlined style={{ color: '#aaa' }} />
                 </Tooltip>
             )}
         </Space>
@@ -855,7 +855,7 @@ const SimpleRightSelect = ({
         <Text>{label}</Text>
         {info && (
             <Tooltip title={info}>
-                <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
+                <InfoCircleOutlined style={{ color: '#aaa' }} />
             </Tooltip>
         )}
     </Space>

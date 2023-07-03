@@ -28,6 +28,7 @@ import { SettingType } from '@prisma/client'
 import { revalidateAll } from '~/network/api'
 import { exportDB, importDB } from '~/network/db'
 import { RcFile } from 'antd/es/upload'
+import { ReactNode, useState } from 'react'
 
 const { Text } = Typography
 
@@ -68,21 +69,9 @@ const Settings = ({ settings }: FormProps) => {
         onError: () => message.error('Something went wrong, try again later.'),
     })
 
-    const general = [
+    const generalLeft = [
         {
             key: '1',
-            title: 'Favicon',
-            element: (
-                <Space>
-                    <Avatar shape="square" />
-                    <Button icon={<UploadOutlined rev={undefined} />} size="small" type="primary">
-                        Upload
-                    </Button>
-                </Space>
-            ),
-        },
-        {
-            key: '2',
             title: 'App name',
             element: (
                 <Input
@@ -95,7 +84,37 @@ const Settings = ({ settings }: FormProps) => {
             ),
         },
         {
-            key: '4',
+            key: '2',
+            title: 'Favicon',
+            element: (
+                <Space>
+                    <Avatar src="/storage/favicon.ico" shape="square" size="small" />
+                    <Button icon={<UploadOutlined />} size="small" type="primary">
+                        Upload
+                    </Button>
+                </Space>
+            ),
+        },
+        {
+            key: '3',
+            title: 'Fallback image',
+            element: (
+                <Space>
+                    <Image
+                        alt="fallback"
+                        width={22}
+                        src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                    />
+                    <Button icon={<UploadOutlined />} size="small" type="primary">
+                        Upload
+                    </Button>
+                </Space>
+            ),
+        },
+    ]
+    const generalRight = [
+        {
+            key: '5',
             title: 'Maintenance',
             element: (
                 <Switch
@@ -105,22 +124,6 @@ const Settings = ({ settings }: FormProps) => {
                     checked={formik.values[SettingType.MAINTENANCE_MODE]}
                     onChange={(e) => formik.setFieldValue(SettingType.MAINTENANCE_MODE, e)}
                 />
-            ),
-        },
-        {
-            key: '5',
-            title: 'Fallback image',
-            element: (
-                <Space>
-                    <Image
-                        alt="fallback"
-                        width={32}
-                        src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-                    />
-                    <Button icon={<UploadOutlined rev={undefined} />} size="small" type="primary">
-                        Upload
-                    </Button>
-                </Space>
             ),
         },
         {
@@ -138,7 +141,7 @@ const Settings = ({ settings }: FormProps) => {
         },
         {
             key: '7',
-            title: 'App name',
+            title: 'Site URL',
             element: (
                 <Input
                     size="small"
@@ -293,7 +296,7 @@ const Settings = ({ settings }: FormProps) => {
         },
     ]
 
-    const email = [
+    const emailLeft = [
         {
             key: '1',
             title: 'Host',
@@ -312,6 +315,8 @@ const Settings = ({ settings }: FormProps) => {
                 />
             ),
         },
+    ]
+    const emailRight = [
         {
             key: '3',
             title: 'Username',
@@ -493,7 +498,7 @@ const Settings = ({ settings }: FormProps) => {
                 <Button
                     size="small"
                     type="primary"
-                    icon={<DownloadOutlined rev={undefined} />}
+                    icon={<DownloadOutlined />}
                     loading={dbExport.isLoading}
                     onClick={() => dbExport.mutate()}
                 >
@@ -515,11 +520,7 @@ const Settings = ({ settings }: FormProps) => {
                         return false
                     }}
                 >
-                    <Button
-                        loading={dbImport.isLoading}
-                        size="small"
-                        icon={<UploadOutlined rev={undefined} />}
-                    >
+                    <Button loading={dbImport.isLoading} size="small" icon={<UploadOutlined />}>
                         Import
                     </Button>
                 </Upload>
@@ -547,7 +548,7 @@ const Settings = ({ settings }: FormProps) => {
     //                     <Space>
     //                         <Text>{item.title}</Text>
     //                         <Tooltip title={item.description}>
-    //                             <InfoCircleOutlined rev={undefined} style={{ color: '#aaa' }} />
+    //                             <InfoCircleOutlined  style={{ color: '#aaa' }} />
     //                         </Tooltip>
     //                     </Space>
     //                 )}
@@ -573,6 +574,8 @@ const Settings = ({ settings }: FormProps) => {
     //         ),
     //     },
     // ]
+
+    const [tabKey, setTabKey] = useState('general')
 
     const grpd = [
         {
@@ -604,7 +607,7 @@ const Settings = ({ settings }: FormProps) => {
 
                     <Space>
                         <Button
-                            icon={<ReloadOutlined rev={undefined} />}
+                            icon={<ReloadOutlined />}
                             size="small"
                             onClick={() => revalidate.mutate()}
                             disabled={submit.isLoading}
@@ -614,7 +617,7 @@ const Settings = ({ settings }: FormProps) => {
                         </Button>
                         <Button
                             type="primary"
-                            icon={<CheckOutlined rev={undefined} />}
+                            icon={<CheckOutlined />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
                             loading={submit.isLoading}
@@ -623,160 +626,81 @@ const Settings = ({ settings }: FormProps) => {
                         </Button>
                     </Space>
                 </div>
-
-                <Tabs
-                    style={{ marginTop: 16, marginBottom: -28 }}
-                    defaultActiveKey="1"
-                    type="card"
-                    size="small"
-                    items={[
-                        {
-                            key: 'general',
-                            label: 'General',
-                        },
-                        {
-                            key: 'theme',
-                            label: 'Theme',
-                        },
-                        {
-                            key: 'smtp',
-                            label: 'SMTP',
-                        },
-                        {
-                            key: 'grpd',
-                            label: 'GRPD',
-                        },
-                        {
-                            key: 'database',
-                            label: 'Database',
-                        },
-                        {
-                            key: 'other',
-                            label: 'Other',
-                            disabled: true,
-                        },
-                    ]}
-                />
             </Card>
-            <Row gutter={[8, 8]} style={{ marginTop: -6 }}>
-                <Col span={12}>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        <Card size="small" title="General">
-                            <List
-                                size="small"
-                                itemLayout="horizontal"
-                                dataSource={general}
-                                renderItem={(item) => (
-                                    <List.Item key={item.key} style={{ padding: 16 }}>
-                                        <Text strong>{item.title} :</Text>
-                                        {item.element}
-                                    </List.Item>
-                                )}
-                            />
-                        </Card>
+            <Tabs
+                style={{ marginBottom: -32, paddingLeft: 14 }}
+                activeKey={tabKey}
+                onChange={(e) => setTabKey(e)}
+                type="card"
+                size="small"
+                items={[
+                    {
+                        key: 'general',
+                        label: 'General',
+                    },
+                    {
+                        key: 'theme',
+                        label: 'Theme',
+                    },
+                    {
+                        key: 'sidebar',
+                        label: 'Sidebar',
+                    },
 
-                        <Card size="small" title="SMTP">
-                            <List
-                                size="small"
-                                itemLayout="horizontal"
-                                dataSource={email}
-                                renderItem={(item) => (
-                                    <List.Item key={item.key} style={{ padding: 16 }}>
-                                        <Text strong>{item.title} :</Text>
-                                        {item.element}
-                                    </List.Item>
-                                )}
-                            />
-                        </Card>
-
-                        <Card size="small" title="GRPD">
-                            <List
-                                size="small"
-                                itemLayout="horizontal"
-                                dataSource={grpd}
-                                renderItem={(item) => (
-                                    <List.Item key={item.key} style={{ padding: 16 }}>
-                                        <Text strong>{item.title} :</Text>
-                                        {item.element}
-                                    </List.Item>
-                                )}
-                            />
-                        </Card>
-
-                        <Card size="small" title="Database">
-                            <List
-                                size="small"
-                                itemLayout="horizontal"
-                                dataSource={database}
-                                renderItem={(item) => (
-                                    <List.Item key={item.key} style={{ padding: 16 }}>
-                                        <Text strong>{item.title} :</Text>
-                                        {item.element}
-                                    </List.Item>
-                                )}
-                            />
-                        </Card>
-                    </Space>
-                </Col>
-                <Col span={12}>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        <Card size="small" title="Theme" bodyStyle={{ display: 'flex' }}>
-                            <List
-                                style={{ flex: 1, marginRight: 16 }}
-                                size="small"
-                                itemLayout="horizontal"
-                                dataSource={themeLeft}
-                                renderItem={(item) => (
-                                    <List.Item key={item.key} style={{ padding: 16 }}>
-                                        <Text strong>{item.title} :</Text>
-                                        {item.element}
-                                    </List.Item>
-                                )}
-                            />
-                            <List
-                                style={{ flex: 1 }}
-                                size="small"
-                                itemLayout="horizontal"
-                                dataSource={themeRight}
-                                renderItem={(item) => (
-                                    <List.Item key={item.key} style={{ padding: 16 }}>
-                                        <Text strong>{item.title} :</Text>
-                                        {item.element}
-                                    </List.Item>
-                                )}
-                            />
-                        </Card>
-
-                        <Card size="small" title="Sidebar">
-                            <List
-                                size="small"
-                                itemLayout="horizontal"
-                                dataSource={sidebar}
-                                renderItem={(item) => (
-                                    <List.Item key={item.key} style={{ padding: 16 }}>
-                                        <Text strong>{item.title} :</Text>
-                                        {item.element}
-                                    </List.Item>
-                                )}
-                            />
-                        </Card>
-
-                        {/* <Card size="small" title="Internationalization">
-                            <List
-                                size="small"
-                                itemLayout="horizontal"
-                                dataSource={language}
-                                renderItem={(item) => (
-                                    <List.Item key={item.key} style={{ padding: 16 }}>
-                                        <Text strong>{item.title} :</Text>
-                                        {item.element}
-                                    </List.Item>
-                                )}
-                            />
-                        </Card> */}
-                    </Space>
-                </Col>
-            </Row>
+                    {
+                        key: 'smtp',
+                        label: 'SMTP',
+                    },
+                    {
+                        key: 'grpd',
+                        label: 'GRPD',
+                    },
+                    {
+                        key: 'database',
+                        label: 'Database',
+                    },
+                    {
+                        key: 'other',
+                        label: 'Other',
+                        disabled: true,
+                    },
+                ]}
+            />
+            <Card size="small">
+                {tabKey === 'general' && (
+                    <Row gutter={[8, 8]}>
+                        <CustomList list={generalLeft} />
+                        <CustomList list={generalRight} />
+                    </Row>
+                )}
+                {tabKey === 'sidebar' && (
+                    <Row gutter={[8, 8]}>
+                        <CustomList list={sidebar} />
+                    </Row>
+                )}
+                {tabKey === 'theme' && (
+                    <Row gutter={[8, 8]}>
+                        <CustomList list={themeLeft} />
+                        <CustomList list={themeRight} />
+                    </Row>
+                )}
+                {tabKey === 'smtp' && (
+                    <Row gutter={[8, 8]}>
+                        <CustomList list={emailLeft} />
+                        <CustomList list={emailRight} />
+                    </Row>
+                )}
+                {tabKey === 'grpd' && (
+                    <Row gutter={[8, 8]}>
+                        <CustomList list={grpd} />
+                    </Row>
+                )}
+                {tabKey === 'database' && (
+                    <Row gutter={[8, 8]}>
+                        <CustomList list={database} />
+                    </Row>
+                )}
+            </Card>
         </>
     )
 }
@@ -784,3 +708,27 @@ const Settings = ({ settings }: FormProps) => {
 export const dynamic = 'force-dynamic'
 
 export default Settings
+
+const CustomList = ({
+    list,
+}: {
+    list: {
+        key: string
+        title: string
+        element: ReactNode
+    }[]
+}) => (
+    <Col span={12}>
+        <List
+            size="small"
+            itemLayout="horizontal"
+            dataSource={list}
+            renderItem={(item) => (
+                <List.Item key={item.key} style={{ padding: 16 }}>
+                    <Text strong>{item.title} :</Text>
+                    {item.element}
+                </List.Item>
+            )}
+        />
+    </Col>
+)

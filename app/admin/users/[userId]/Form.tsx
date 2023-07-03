@@ -73,7 +73,7 @@ const Form = ({ userId, isUpdate, user }: FormUserProps) => {
 
                     <Button
                         type="primary"
-                        icon={<CheckOutlined rev={undefined} />}
+                        icon={<CheckOutlined />}
                         size="small"
                         onClick={() => formik.handleSubmit()}
                         loading={submit.isLoading}

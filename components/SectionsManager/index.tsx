@@ -18,7 +18,7 @@ const SectionsManager = ({ name, sections, onChange, error, label }: SectionsMan
         {
             key: 'elements',
             label: 'Elements',
-            icon: <PicCenterOutlined rev={undefined} />,
+            icon: <PicCenterOutlined />,
             children: Object.keys(blocks).map((key) => ({ key, label: key })),
         },
         {
@@ -64,7 +64,7 @@ const SectionsManager = ({ name, sections, onChange, error, label }: SectionsMan
             </SectionsContext.Provider>
             <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
                 <Dropdown menu={{ items }}>
-                    <Button size="small" type="primary" icon={<PlusOutlined rev={undefined} />}>
+                    <Button size="small" type="primary" icon={<PlusOutlined />}>
                         Add {label ? label : 'section'}
                     </Button>
                 </Dropdown>

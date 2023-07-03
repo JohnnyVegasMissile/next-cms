@@ -40,8 +40,8 @@ const MenuLine = ({
     return (
         <div className={styles['wrapper']} style={{ marginLeft: `${level * 3}rem` }}>
             <Space align="center" direction="vertical" size={1}>
-                <Button size="small" type="primary" icon={<CaretUpOutlined rev={undefined} />} />
-                <Button size="small" type="primary" icon={<CaretDownOutlined rev={undefined} />} />
+                <Button size="small" type="primary" icon={<CaretUpOutlined />} />
+                <Button size="small" type="primary" icon={<CaretDownOutlined />} />
             </Space>
             <Card
                 size="small"
@@ -68,12 +68,7 @@ const MenuLine = ({
                         {!!addChild && (
                             <Tooltip title="Add children">
                                 <Dropdown menu={{ items }} trigger={['click']}>
-                                    <Button
-                                        size="small"
-                                        type="primary"
-                                        icon={<PlusOutlined rev={undefined} />}
-                                        ghost
-                                    />
+                                    <Button size="small" type="primary" icon={<PlusOutlined />} ghost />
                                 </Dropdown>
                             </Tooltip>
                         )}
@@ -101,7 +96,7 @@ const Add = ({ title = 'Add new', onClick }: AddProps) => {
             <Card size="small" className={classNames(styles['line'], styles['add'])}>
                 <div className={styles['body']}>
                     <Text type="secondary">
-                        <PlusOutlined className={styles['icon']} rev={undefined} />
+                        <PlusOutlined className={styles['icon']} />
                         {title}
                     </Text>
                 </div>

@@ -1,55 +1,127 @@
 'use client'
 
-import classNames from 'classnames'
-import styles from './TextBlock.module.scss'
-import Image from 'next/image'
 import Link from 'next/link'
-import useSection from '~/hooks/useSection'
-import { EditBlockProps } from '..'
-import SectionWrap from '~/components/SectionWrap'
-import { FormFieldType } from '@prisma/client'
-import WithLabel from '~/components/WithLabel'
-import ListSelect from '~/components/ListSelect'
-import { Typography } from 'antd'
-import { ContentType } from '.'
-import { FormSimple } from '~/types/formCreation'
+import { Form, FormField, FormFieldType } from '@prisma/client'
 import { Fragment } from 'react'
+import { useFormik } from 'formik'
+import { ObjectId } from '~/types'
+import set from 'lodash.set'
+import { useMutation } from '@tanstack/react-query'
+import { error } from 'console'
+import { isEmail } from '~/utilities'
+import { postMessage } from '~/network/messages'
 
-const { Text } = Typography
+type FormExtended = Form & {
+    fields:
+        | (FormField & {
+              container: {
+                  id: ObjectId
+                  name: string
+                  contents: { id: ObjectId; name: string }[]
+              } | null
+          })[]
+}
+type ValuesType = { [key in string]: string | number | string[] }
 
-const Edit = ({ position }: EditBlockProps) => {
-    const { content, forms, addForm } = useSection<ContentType>(position)
-    const { formId } = content || {}
+const getInitialValues = (form: FormExtended | undefined) => {
+    if (!form) return {}
 
-    const form = forms?.get(formId || '')
+    const values = {}
 
-    return (
-        <SectionWrap
-            position={position}
-            panel={
-                <WithLabel label="Form">
-                    <ListSelect.Form value={formId} onChange={(_, form) => addForm('formId', form)} />
-                </WithLabel>
-            }
-        >
-            <section className={classNames(styles['section'])}>
-                {!form ? <Text>Choose a form</Text> : <DisplayFormInputs form={form} />}
-            </section>
-        </SectionWrap>
-    )
+    form.fields.forEach((field) => {
+        const defaultValue = field.defaultText || field.defaultNumber || field.defaultMultiple
+
+        if (!!defaultValue) set(values, field.id, defaultValue)
+    })
+
+    return values
 }
 
-export default Edit
+const validate = (values: ValuesType, form: FormExtended | undefined) => {
+    let error: ValuesType = {}
+
+    form?.fields?.forEach((field) => {
+        if (field.type !== FormFieldType.BUTTON && field.type !== FormFieldType.TITLE) {
+            const fieldValue = values[field.id]
+
+            if (field.required && !fieldValue && isNaN(fieldValue as number)) {
+                error[field.id] = 'Required'
+            } else if (field.type === FormFieldType.EMAIL && !isEmail(fieldValue as string)) {
+                error[field.id] = 'Email not valid'
+            } else if (field.type === FormFieldType.NUMBER && !isNaN(fieldValue as number)) {
+                if (
+                    !isNaN(parseFloat(`${field.min}`)) &&
+                    parseFloat(fieldValue as string) < parseFloat(`${field.min}`)
+                ) {
+                    error[field.id] = 'Too low'
+                } else if (
+                    !isNaN(parseFloat(`${field.max}`)) &&
+                    parseFloat(fieldValue as string) > parseFloat(`${field.max}`)
+                ) {
+                    error[field.id] = 'Too high'
+                }
+            }
+        }
+    })
+
+    return error
+}
+
+const useForm = (form: FormExtended | undefined, onSuccess?: () => void, onError?: () => void) => {
+    const { mutate, isSuccess, isError, isLoading, reset } = useMutation(
+        (v: ValuesType) => postMessage(form?.id!, v),
+        { onSuccess, onError }
+    )
+
+    const { resetForm, values, setFieldValue, handleSubmit, setFieldTouched } = useFormik<ValuesType>({
+        initialValues: getInitialValues(form),
+        validate: (v) => validate(v, form),
+        validateOnChange: false,
+        validateOnBlur: true,
+        validateOnMount: false,
+        onSubmit: (v) => mutate(v),
+    })
+
+    return {
+        resetForm,
+        values,
+        setFieldValue,
+        setFieldTouched,
+        handleSubmit,
+        isSuccess,
+        isError,
+        isLoading,
+        reset,
+    }
+}
 
 interface DisplayFormInputsProps {
-    form: FormSimple
+    form: FormExtended
 }
 
 const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
     const { fields } = form
 
+    const { resetForm, values, setFieldValue, handleSubmit, isSuccess, isError, isLoading, reset } =
+        useForm(form)
+
+    if (isSuccess) return <span>{form.successMessage}</span>
+    if (isError)
+        return (
+            <>
+                <span>{form.errorMessage}</span>
+                <button onClick={reset}>Retry</button>
+            </>
+        )
+    if (isLoading) return <span>Sending...</span>
+
     return (
-        <>
+        <form
+            onSubmit={(e) => {
+                e.preventDefault()
+                handleSubmit(e)
+            }}
+        >
             {fields.map((field) => {
                 switch (field.type) {
                     case FormFieldType.TEXT:
@@ -57,7 +129,10 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                             <Fragment key={field.id}>
                                 <div>
                                     <label>{field.label}</label>
-                                    <input />
+                                    <input
+                                        value={values[field.id]}
+                                        onChange={(e) => setFieldValue(field.id, e.target.value)}
+                                    />
                                 </div>
                             </Fragment>
                         )
@@ -66,7 +141,11 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                             <Fragment key={field.id}>
                                 <div>
                                     <label>{field.label}</label>
-                                    <input type="number" />
+                                    <input
+                                        type="number"
+                                        value={values[field.id]}
+                                        onChange={(e) => setFieldValue(field.id, parseFloat(e.target.value))}
+                                    />
                                 </div>
                             </Fragment>
                         )
@@ -75,7 +154,11 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                             <Fragment key={field.id}>
                                 <div>
                                     <label>{field.label}</label>
-                                    <input type="email" />
+                                    <input
+                                        type="email"
+                                        value={values[field.id]}
+                                        onChange={(e) => setFieldValue(field.id, e.target.value)}
+                                    />
                                 </div>
                             </Fragment>
                         )
@@ -84,7 +167,11 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                             <Fragment key={field.id}>
                                 <div>
                                     <label>{field.label}</label>
-                                    <input type="password" />
+                                    <input
+                                        type="password"
+                                        value={values[field.id]}
+                                        onChange={(e) => setFieldValue(field.id, e.target.value)}
+                                    />
                                 </div>
                             </Fragment>
                         )
@@ -93,7 +180,10 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                             <Fragment key={field.id}>
                                 <div>
                                     <label>{field.label}</label>
-                                    <textarea />
+                                    <textarea
+                                        value={values[field.id]}
+                                        onChange={(e) => setFieldValue(field.id, e.target.value)}
+                                    />
                                 </div>
                             </Fragment>
                         )
@@ -103,11 +193,13 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                                 <div>
                                     <label>{field.label}</label>
                                     <select id={field.id} name={field.id}>
-                                        {field.options.map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.name}
-                                            </option>
-                                        ))}
+                                        {(field.options as { value: string; name: string }[])?.map(
+                                            (option) => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.name}
+                                                </option>
+                                            )
+                                        )}
                                     </select>
                                 </div>
                             </Fragment>
@@ -133,7 +225,7 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                                 <div>
                                     <span>{field.label} </span>
 
-                                    {field.options.map((option) => (
+                                    {(field.options as { value: string; name: string }[])?.map((option) => (
                                         <Fragment key={option.value}>
                                             <input
                                                 type="checkbox"
@@ -154,7 +246,7 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                                 <div>
                                     <span>{field.label} </span>
 
-                                    {field.options.map((option) => (
+                                    {(field.options as { value: string; name: string }[])?.map((option) => (
                                         <Fragment key={option.value}>
                                             <input
                                                 type="radio"
@@ -182,7 +274,14 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                                 )
 
                             case 'RESET':
-                                return <button key={field.id}>{field.label}</button>
+                                return (
+                                    <button onClick={() => resetForm()} key={field.id}>
+                                        {field.label}
+                                    </button>
+                                )
+
+                            default:
+                                return <Fragment />
                         }
                     }
 
@@ -195,7 +294,7 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                                 <div>
                                     <label>{field.label}</label>
                                     <select id={field.id} name={field.id}>
-                                        {field.container.contents.map((content) => (
+                                        {field.container?.contents.map((content) => (
                                             <option key={content.id} value={content.id}>
                                                 {content.name}
                                             </option>
@@ -213,6 +312,8 @@ const DisplayFormInputs = ({ form }: DisplayFormInputsProps) => {
                         )
                 }
             })}
-        </>
+        </form>
     )
 }
+
+export default DisplayFormInputs

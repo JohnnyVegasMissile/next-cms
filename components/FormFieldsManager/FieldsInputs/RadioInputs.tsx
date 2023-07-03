@@ -50,7 +50,7 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                                 <Text>Options</Text>
                                 <Tooltip title="Clear default">
                                     <Button
-                                        icon={<ClearOutlined rev={undefined} />}
+                                        icon={<ClearOutlined />}
                                         type="dashed"
                                         size="small"
                                         disabled={!field.default}
@@ -89,7 +89,7 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                                     <Button
                                         type="primary"
                                         danger
-                                        icon={<DeleteOutlined rev={undefined} />}
+                                        icon={<DeleteOutlined />}
                                         onClick={() => {
                                             const optionsCopy = [...(field.options || [])]
 
@@ -103,7 +103,7 @@ const TextInputs = ({ field, errors, onChange }: FieldInputsProps) => {
                             ))}
 
                             <Button
-                                icon={<PlusOutlined rev={undefined} />}
+                                icon={<PlusOutlined />}
                                 type="primary"
                                 size="small"
                                 onClick={() =>

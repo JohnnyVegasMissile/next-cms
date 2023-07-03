@@ -79,11 +79,7 @@ const FormFieldsManager = ({ value, onChange, errors }: FormFieldsManagerProps) 
                                     onDelete={() => {}}
                                     alert={!!field.id}
                                 >
-                                    <Button
-                                        type="ghost"
-                                        size="small"
-                                        icon={<EllipsisOutlined rev={undefined} />}
-                                    />
+                                    <Button type="ghost" size="small" icon={<EllipsisOutlined />} />
                                 </PopOptions>
                             </Space>
                         }
@@ -98,7 +94,7 @@ const FormFieldsManager = ({ value, onChange, errors }: FormFieldsManagerProps) 
             ))}
 
             <Dropdown menu={{ items }} trigger={['click']}>
-                <Button size="small" type="primary" icon={<PlusOutlined rev={undefined} />}>
+                <Button size="small" type="primary" icon={<PlusOutlined />}>
                     Add field
                 </Button>
             </Dropdown>

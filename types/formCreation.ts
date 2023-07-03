@@ -1,4 +1,4 @@
-import { FormButtonType, FormFieldType, Prisma } from '@prisma/client'
+import { FormButtonType, FormFieldType } from '@prisma/client'
 import { ObjectId } from '.'
 import { LinkValue } from '~/components/LinkSelect'
 
@@ -48,20 +48,20 @@ type FieldSimple = {
         contents: { id: string; name: string }[]
     }
 
-    position: true
-    line: true
+    position: number
+    line: number
 
-    options: true
-    buttonType: true
+    options: { name: string; value: string }[]
+    buttonType: 'SUBMIT' | 'RESET' | 'LINK'
 
-    min: true
+    min: number
     max: true
 
-    defaultText: true
-    defaultNumber: true
-    defaultMultiple: true
+    defaultText: string
+    defaultNumber: number
+    defaultMultiple: string[]
 
-    required: true
+    required: boolean
 }
 
 export type FormSimple = {

@@ -28,7 +28,7 @@ export const getForms = (
     })
 
 export const getFormsSimple = (
-    q: string,
+    q: string | undefined,
     showFull?: boolean
 ): Promise<{ id: ObjectId; name: string; fields: any[] }[]> =>
     INSTANCE({

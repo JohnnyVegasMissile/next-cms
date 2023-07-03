@@ -1,12 +1,23 @@
 import { Form, FormField, Link, Media, Section } from '@prisma/client'
 import { BlockKey } from '~/blocks'
 import blocksViews from '~/blocks/views'
+import { ObjectId } from '~/types'
 
 interface DisplaySectionProps {
     section: Section & {
         medias?:
             | {
-                  form: (Form & { fields: FormField[] }) | null
+                  form:
+                      | (Form & {
+                            fields: (FormField & {
+                                container: {
+                                    id: ObjectId
+                                    name: string
+                                    contents: { id: ObjectId; name: string }[]
+                                } | null
+                            })[]
+                        })
+                      | null
                   media: Media | null
                   link: Link | null
               }[]
@@ -19,9 +30,6 @@ const DisplaySection = async ({ section }: DisplaySectionProps) => {
     const View = blocksViews[block as BlockKey]
 
     if (!View) return null
-
-    console.log('DisplaySection', section)
-    console.log('View', View)
 
     return (
         <View

@@ -33,7 +33,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
                                 onUp()
                                 setOpen(false)
                             }}
-                            icon={<CaretUpOutlined rev={undefined} />}
+                            icon={<CaretUpOutlined />}
                             type="primary"
                         />
                         <Button
@@ -44,7 +44,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
                                 onDown()
                                 setOpen(false)
                             }}
-                            icon={<CaretDownOutlined rev={undefined} />}
+                            icon={<CaretDownOutlined />}
                             type="primary"
                         />
                         <Divider style={{ margin: 0 }} />
@@ -64,7 +64,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
                             >
                                 <Button
                                     size="small"
-                                    icon={<DeleteOutlined rev={undefined} />}
+                                    icon={<DeleteOutlined />}
                                     danger
                                     type="primary"
                                     onClick={(e) => e.stopPropagation()}
@@ -73,7 +73,7 @@ const PopOptions = ({ onUp, disableUp, onDown, disableDown, onDelete, alert, chi
                         ) : (
                             <Button
                                 size="small"
-                                icon={<DeleteOutlined rev={undefined} />}
+                                icon={<DeleteOutlined />}
                                 danger
                                 type="primary"
                                 onClick={(e) => {

@@ -53,12 +53,12 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
         value: slug.id,
         label: !!slug.page ? (
             <Space>
-                <FileOutlined rev={undefined} />
+                <FileOutlined />
                 {slug.page?.name}
             </Space>
         ) : (
             <Space>
-                <ContainerOutlined rev={undefined} />
+                <ContainerOutlined />
                 {slug.container?.name}
             </Space>
         ),
@@ -66,7 +66,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
             value: child.id,
             label: (
                 <Space>
-                    <BookOutlined rev={undefined} />
+                    <BookOutlined />
                     {child.content?.name}
                 </Space>
             ),
@@ -132,7 +132,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
                             value: PageType.HOMEPAGE,
                             label: (
                                 <Space>
-                                    <HomeOutlined rev={undefined} />
+                                    <HomeOutlined />
                                     Homepage
                                 </Space>
                             ),
@@ -141,7 +141,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
                             value: PageType.SIGNIN,
                             label: (
                                 <Space>
-                                    <LoginOutlined rev={undefined} />
+                                    <LoginOutlined />
                                     Sign In
                                 </Space>
                             ),
@@ -172,12 +172,12 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
             >
                 <Option value={LinkType.IN}>
                     <div className={styles['icon']}>
-                        <LinkOutlined rev={undefined} />
+                        <LinkOutlined />
                     </div>
                 </Option>
                 <Option value={LinkType.OUT}>
                     <div className={styles['icon']}>
-                        <GlobalOutlined rev={undefined} />
+                        <GlobalOutlined />
                     </div>
                 </Option>
             </Select>

@@ -43,7 +43,7 @@ const columns: ColumnsType<DataType> = [
                 <Link href={`/admin/messages?formId=${form.id}`} prefetch={false}>
                     <Button size="small" type="link">
                         See all
-                        <CaretRightOutlined rev={undefined} />
+                        <CaretRightOutlined />
                     </Button>
                 </Link>
             </Space>
@@ -61,18 +61,13 @@ const columns: ColumnsType<DataType> = [
         render: (role: DataType) => (
             <Space>
                 {false ? (
-                    <Button
-                        type="primary"
-                        icon={<EditOutlined rev={undefined} />}
-                        size="small"
-                        disabled={true}
-                    >
+                    <Button type="primary" icon={<EditOutlined />} size="small" disabled={true}>
                         Edit
                     </Button>
                 ) : (
                     <Link href={`/admin/forms/${role.id}`} prefetch={false}>
                         <Tooltip title="Edit">
-                            <Button type="primary" icon={<EditOutlined rev={undefined} />} size="small">
+                            <Button type="primary" icon={<EditOutlined />} size="small">
                                 Edit
                             </Button>
                         </Tooltip>
@@ -90,13 +85,7 @@ const columns: ColumnsType<DataType> = [
                     disabled={false}
                 >
                     <Tooltip title="Delete">
-                        <Button
-                            disabled={false}
-                            type="primary"
-                            danger
-                            icon={<DeleteOutlined rev={undefined} />}
-                            size="small"
-                        >
+                        <Button disabled={false} type="primary" danger icon={<DeleteOutlined />} size="small">
                             Delete
                         </Button>
                     </Tooltip>

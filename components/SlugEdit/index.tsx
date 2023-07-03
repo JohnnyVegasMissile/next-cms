@@ -65,13 +65,13 @@ const SlugEdit = ({ value, onChange, errors, paramsId }: SlugEditProps) => {
                                 <Button
                                     size="small"
                                     onClick={removeSlug}
-                                    icon={<MinusOutlined rev={undefined} />}
+                                    icon={<MinusOutlined />}
                                     disabled={value.length < 2}
                                 />
                                 <Button
                                     size="small"
                                     type="primary"
-                                    icon={<PlusOutlined rev={undefined} />}
+                                    icon={<PlusOutlined />}
                                     onClick={addSlug}
                                     disabled={value.length > MAX_SLUG_SIZE}
                                 />

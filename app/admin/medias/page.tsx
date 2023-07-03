@@ -49,10 +49,10 @@ const columns = [
                     />
                 )}
                 {media.type === MediaType.VIDEO && (
-                    <VideoCameraOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} rev={undefined} />
+                    <VideoCameraOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
                 )}
                 {media.type === MediaType.FILE && (
-                    <FilePdfOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} rev={undefined} />
+                    <FilePdfOutlined style={{ fontSize: 21, color: 'rgba(0,0,0,.45)' }} />
                 )}
                 <Text>
                     <Link href={`/storage/${media.type.toLocaleLowerCase()}s/${media.uri}`} target="_blank">
@@ -61,7 +61,7 @@ const columns = [
                 </Text>
                 {!media._count.usedInSections && (
                     <Tooltip title="This media is not used anywhere">
-                        <Tag color="red" icon={<StopOutlined rev={undefined} />}>
+                        <Tag color="red" icon={<StopOutlined />}>
                             Unused
                         </Tag>
                     </Tooltip>
@@ -87,7 +87,7 @@ const columns = [
                 <Text type={tooBig ? 'danger' : undefined}>
                     {tooBig && (
                         <>
-                            <WarningOutlined rev={undefined} />
+                            <WarningOutlined />
                             &nbsp;
                         </>
                     )}
@@ -116,7 +116,7 @@ const columns = [
                 cancelText="Cancel"
             >
                 <Tooltip title="Delete">
-                    <Button type="primary" danger icon={<DeleteOutlined rev={undefined} />} size="small">
+                    <Button type="primary" danger icon={<DeleteOutlined />} size="small">
                         Delete
                     </Button>
                 </Tooltip>
@@ -171,7 +171,7 @@ const EditAlt = ({ id, alt }: { id: ObjectId; alt: string | null }) => {
                 <Button
                     disabled={isDiff || mutation.isLoading}
                     type="primary"
-                    icon={<CloseOutlined rev={undefined} />}
+                    icon={<CloseOutlined />}
                     danger
                     size="small"
                     onClick={() => setNewAlt(alt || '')}
@@ -179,7 +179,7 @@ const EditAlt = ({ id, alt }: { id: ObjectId; alt: string | null }) => {
                 <Button
                     disabled={isDiff || mutation.isLoading}
                     type="primary"
-                    icon={<CheckOutlined rev={undefined} />}
+                    icon={<CheckOutlined />}
                     size="small"
                     onClick={() => mutation.mutate(newAlt)}
                 />
@@ -203,14 +203,14 @@ const Settings = () => {
                         {
                             label: 'Images',
                             value: MediaType.IMAGE,
-                            icon: <PictureOutlined rev={undefined} />,
+                            icon: <PictureOutlined />,
                         },
                         {
                             label: 'Videos',
                             value: MediaType.VIDEO,
-                            icon: <VideoCameraOutlined rev={undefined} />,
+                            icon: <VideoCameraOutlined />,
                         },
-                        { label: 'Files', value: MediaType.FILE, icon: <FilePdfOutlined rev={undefined} /> },
+                        { label: 'Files', value: MediaType.FILE, icon: <FilePdfOutlined /> },
                     ],
                 },
             ]}

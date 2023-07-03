@@ -16,7 +16,7 @@ const Homepage = () => (
             gap: '1rem',
         }}
     >
-        <HomeOutlined style={{ color: '#1677ff', fontSize: 42 }} rev={undefined} />
+        <HomeOutlined style={{ color: '#1677ff', fontSize: 42 }} />
         <Text>Welcome, sign in first to update the homepage</Text>
         <Link href="/sign-in">
             <Button size="small" type="primary">

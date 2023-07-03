@@ -15,7 +15,7 @@ const BreadcrumdLink = ({ url }: { url: string }) => {
                                     <QRCode value={`${window.location.origin}/${url}`} bordered={false} />
                                 }
                             >
-                                <LinkOutlined rev={undefined} />
+                                <LinkOutlined />
                             </Popover>
                         ),
                     },

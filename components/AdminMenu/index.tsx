@@ -24,8 +24,9 @@ import {
 } from '@ant-design/icons'
 import { usePathname, useRouter } from 'next/navigation'
 import styles from './AdminMenu.module.scss'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { revalidateAll } from '~/network/api'
+import { getUnreadMessages } from '~/network/messages'
 
 const AdminMenu = () => {
     const router = useRouter()
@@ -34,6 +35,12 @@ const AdminMenu = () => {
     const revalidate = useMutation(() => revalidateAll(), {
         onSuccess: () => message.success('All pages revalidated with success.'),
         onError: () => message.error('Something went wrong, try again later.'),
+    })
+
+    const messagesUnread = useQuery(['messages-unread'], () => getUnreadMessages(), {
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        refetchInterval: 60000,
     })
 
     const onClick = (e: any) => {
@@ -55,29 +62,29 @@ const AdminMenu = () => {
         {
             key: '/',
             label: 'Home',
-            icon: <HomeOutlined rev={undefined} />,
+            icon: <HomeOutlined />,
         },
         {
             key: '/admin/pages',
             label: 'Pages',
-            icon: <FileOutlined rev={undefined} />,
+            icon: <FileOutlined />,
             children: [
                 {
                     key: '/admin/pages/create',
                     label: 'Create a page',
-                    icon: <PlusSquareOutlined rev={undefined} />,
+                    icon: <PlusSquareOutlined />,
                 },
             ],
         },
         {
             key: '/admin/containers',
             label: 'Containers',
-            icon: <ContainerOutlined rev={undefined} />,
+            icon: <ContainerOutlined />,
             children: [
                 {
                     key: '/admin/containers/create',
                     label: 'Create a container',
-                    icon: <PlusSquareOutlined rev={undefined} />,
+                    icon: <PlusSquareOutlined />,
                 },
                 {
                     type: 'divider',
@@ -85,36 +92,36 @@ const AdminMenu = () => {
                 {
                     key: '/admin/contents',
                     label: 'Contents',
-                    icon: <BookOutlined rev={undefined} />,
+                    icon: <BookOutlined />,
                 },
                 {
                     key: '/admin/contents/create',
                     label: 'Create a content',
-                    icon: <PlusSquareOutlined rev={undefined} />,
+                    icon: <PlusSquareOutlined />,
                 },
             ],
         },
         {
             key: '/admin/elements',
             label: 'Elements',
-            icon: <PicCenterOutlined rev={undefined} />,
+            icon: <PicCenterOutlined />,
             children: [
                 {
                     key: '/admin/elements/create',
                     label: 'Create an element',
-                    icon: <PlusSquareOutlined rev={undefined} />,
+                    icon: <PlusSquareOutlined />,
                 },
             ],
         },
         {
             key: '/admin/users',
             label: 'Users',
-            icon: <TeamOutlined rev={undefined} />,
+            icon: <TeamOutlined />,
             children: [
                 {
                     key: '/admin/users/create',
                     label: 'Create an user',
-                    icon: <PlusSquareOutlined rev={undefined} />,
+                    icon: <PlusSquareOutlined />,
                 },
                 {
                     type: 'divider',
@@ -122,20 +129,20 @@ const AdminMenu = () => {
                 {
                     key: '/admin/users/roles',
                     label: 'Roles',
-                    icon: <IdcardOutlined rev={undefined} />,
+                    icon: <IdcardOutlined />,
                 },
             ],
         },
         {
             key: '/admin/forms',
             label: 'Forms',
-            number: 5,
-            icon: <FormOutlined rev={undefined} />,
+            number: messagesUnread.data?.count || 0,
+            icon: <FormOutlined />,
             children: [
                 {
                     key: '/admin/forms/create',
                     label: 'Create an form',
-                    icon: <PlusSquareOutlined rev={undefined} />,
+                    icon: <PlusSquareOutlined />,
                 },
                 {
                     type: 'divider',
@@ -144,8 +151,8 @@ const AdminMenu = () => {
                     key: '/admin/messages',
                     label: 'Messages',
                     icon: (
-                        <Badge size="small" count={5}>
-                            <MailOutlined rev={undefined} />
+                        <Badge size="small" count={messagesUnread.data?.count || 0}>
+                            <MailOutlined />
                         </Badge>
                     ),
                 },
@@ -154,24 +161,24 @@ const AdminMenu = () => {
         {
             key: '/admin/menus',
             label: 'Menus',
-            icon: <MenuUnfoldOutlined rev={undefined} />,
+            icon: <MenuUnfoldOutlined />,
             children: [
                 {
                     key: '/admin/menus/create',
                     label: 'Create an menu',
-                    icon: <PlusSquareOutlined rev={undefined} />,
+                    icon: <PlusSquareOutlined />,
                 },
             ],
         },
         {
             key: '/admin/medias',
             label: 'Medias',
-            icon: <FileImageOutlined rev={undefined} />,
+            icon: <FileImageOutlined />,
         },
         {
             key: '/admin/layout',
             label: 'Layout',
-            icon: <LayoutOutlined rev={undefined} />,
+            icon: <LayoutOutlined />,
         },
     ]
 
@@ -179,16 +186,12 @@ const AdminMenu = () => {
         {
             key: '/admin',
             label: 'Settings',
-            icon: <SettingOutlined rev={undefined} />,
+            icon: <SettingOutlined />,
         },
         {
             key: 'revalidate',
             label: 'Revalidate all',
-            icon: revalidate.isLoading ? (
-                <LoadingOutlined rev={undefined} />
-            ) : (
-                <ReloadOutlined rev={undefined} />
-            ),
+            icon: revalidate.isLoading ? <LoadingOutlined /> : <ReloadOutlined />,
         },
         {
             type: 'divider',
@@ -197,7 +200,7 @@ const AdminMenu = () => {
             key: 'signout',
             danger: true,
             label: 'disconnect',
-            icon: <LogoutOutlined rev={undefined} />,
+            icon: <LogoutOutlined />,
         },
     ]
 
@@ -240,7 +243,7 @@ const AdminMenu = () => {
                     ))}
                 </Space>
                 <Dropdown menu={{ items: profileItems as any, onClick }} placement="bottomLeft">
-                    <Button size="small" icon={<UserOutlined rev={undefined} />}>
+                    <Button size="small" icon={<UserOutlined />}>
                         {'username'}
                     </Button>
                 </Dropdown>

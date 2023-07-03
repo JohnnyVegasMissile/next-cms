@@ -51,18 +51,13 @@ const columns: ColumnsType<DataType> = [
         render: (user: DataType) => (
             <Space>
                 {false ? (
-                    <Button
-                        type="primary"
-                        icon={<EditOutlined rev={undefined} />}
-                        size="small"
-                        disabled={true}
-                    >
+                    <Button type="primary" icon={<EditOutlined />} size="small" disabled={true}>
                         Edit
                     </Button>
                 ) : (
                     <Link href={`/admin/users/${user.id}`} prefetch={false}>
                         <Tooltip title="Edit">
-                            <Button type="primary" icon={<EditOutlined rev={undefined} />} size="small">
+                            <Button type="primary" icon={<EditOutlined />} size="small">
                                 Edit
                             </Button>
                         </Tooltip>
@@ -80,13 +75,7 @@ const columns: ColumnsType<DataType> = [
                     disabled={false}
                 >
                     <Tooltip title="Delete">
-                        <Button
-                            disabled={false}
-                            type="primary"
-                            danger
-                            icon={<DeleteOutlined rev={undefined} />}
-                            size="small"
-                        >
+                        <Button disabled={false} type="primary" danger icon={<DeleteOutlined />} size="small">
                             Delete
                         </Button>
                     </Tooltip>
@@ -106,6 +95,7 @@ const Users = () => {
                 {
                     type: 'select',
                     key: 'roleId',
+                    placeholder: 'Role',
                     name: 'roles-simple',
                     request: getRolesSimple,
                 },

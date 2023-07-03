@@ -36,15 +36,9 @@ const SectionWrap = ({ children, panel }: SectionWrapProps) => {
                         disableDown={true}
                         onDelete={() => {}}
                     >
-                        <Button size="small" type="primary" icon={<SettingOutlined rev={undefined} />} />
+                        <Button size="small" type="primary" icon={<SettingOutlined />} />
                     </PopOptions>
-                    {!!panel && (
-                        <Button
-                            size="small"
-                            onClick={() => setOpen(true)}
-                            icon={<MenuOutlined rev={undefined} />}
-                        />
-                    )}
+                    {!!panel && <Button size="small" onClick={() => setOpen(true)} icon={<MenuOutlined />} />}
                 </Space.Compact>
 
                 {children}

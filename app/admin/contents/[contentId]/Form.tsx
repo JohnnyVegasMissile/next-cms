@@ -297,19 +297,14 @@ const CreateContent = ({ contentId, isUpdate, content }: CreateContentProps) => 
 
                     <Space>
                         {isUpdate && (
-                            <Button
-                                icon={<PicCenterOutlined rev={undefined} />}
-                                key="1"
-                                size="small"
-                                type="dashed"
-                            >
+                            <Button icon={<PicCenterOutlined />} key="1" size="small" type="dashed">
                                 Custom sections
                             </Button>
                         )}
 
                         <Button
                             type="primary"
-                            icon={<CheckOutlined rev={undefined} />}
+                            icon={<CheckOutlined />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
                             loading={submit.isLoading}

@@ -106,7 +106,7 @@ const MetadatasList = ({ name, value, onChange, errors }: MetadatasListProps) =>
                         size="small"
                         type="primary"
                         danger
-                        icon={<DeleteOutlined rev={undefined} />}
+                        icon={<DeleteOutlined />}
                         onClick={() => handleRemove(idx)}
                     />
                 </Space.Compact>
@@ -115,7 +115,7 @@ const MetadatasList = ({ name, value, onChange, errors }: MetadatasListProps) =>
             <Button
                 size="small"
                 type="primary"
-                icon={<PlusOutlined rev={undefined} />}
+                icon={<PlusOutlined />}
                 onClick={() => handleChange(value.length, initialMetadata)}
             >
                 Add metadata

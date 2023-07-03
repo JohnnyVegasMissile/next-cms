@@ -26,6 +26,7 @@ type FiltersType =
           key: string
           type: 'select' | 'input' | 'radio'
           default?: string
+          placeholder?: string
           options: { value: string; label: string; icon?: JSX.Element }[]
 
           name?: never
@@ -38,15 +39,17 @@ type FiltersType =
           request: () => Promise<{ id: ObjectId; name: string }[]>
 
           default?: never
+          placeholder?: string
           options?: never
       }
 
 interface AdminTableProps<T> {
+    noQ?: boolean
     name: string
     columns: ColumnsType<T>
     request(
         page: number,
-        q: string,
+        q: string | undefined,
         sort: `${string},${'asc' | 'desc'}` | undefined,
         others: any
     ): Promise<{ results: T[]; count: number }>
@@ -57,6 +60,7 @@ interface AdminTableProps<T> {
 }
 
 const AdminTable = <T,>({
+    noQ,
     name,
     columns,
     request,
@@ -69,7 +73,9 @@ const AdminTable = <T,>({
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [page, setPage] = useState(1)
-    const [q, setQ] = useState<string>(searchParams?.has('q') ? searchParams.get('q')! : '')
+    const [q, setQ] = useState<string | undefined>(
+        !!noQ ? undefined : searchParams?.has('q') ? searchParams.get('q')! : ''
+    )
     const [sort, setSort] = useState<`${string},${'asc' | 'desc'}`>()
     const [extraFilters, setExtraFilters] = useState<any>({})
 
@@ -136,7 +142,8 @@ const AdminTable = <T,>({
         if (!filters || !searchParams) return
 
         let filtersFromSearch: any = {}
-        const params = new URLSearchParams(searchParams)
+
+        const params = new URLSearchParams(searchParams.toString())
 
         for (const filter of filters) {
             if (searchParams?.has(filter.key)) {
@@ -155,7 +162,7 @@ const AdminTable = <T,>({
     const onQChange = (value: string) => {
         setQ(value)
         if (!!searchParams) {
-            const params = new URLSearchParams(searchParams)
+            const params = new URLSearchParams(searchParams.toString())
             if (!!value) {
                 params.set('q', value)
             } else {
@@ -168,7 +175,7 @@ const AdminTable = <T,>({
     const onFilterChange = (key: string, value: string) => {
         setExtraFilters({ ...extraFilters, [key]: value })
         if (!!searchParams) {
-            const params = new URLSearchParams(searchParams)
+            const params = new URLSearchParams(searchParams.toString())
             if (!!value) {
                 params.set(key, value)
             } else {
@@ -183,7 +190,7 @@ const AdminTable = <T,>({
         _: any,
         sorter: SorterResult<any> | SorterResult<any>[]
     ) => {
-        const params = new URLSearchParams(searchParams!)
+        const params = new URLSearchParams(searchParams!.toString())
 
         if (!Array.isArray(sorter) && !!sorter.columnKey && !!sorter.order) {
             setSort(`${sorter.columnKey},${sorter.order === 'ascend' ? 'asc' : 'desc'}`)
@@ -204,15 +211,17 @@ const AdminTable = <T,>({
             <Card size="small">
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Space>
-                        <Input
-                            allowClear
-                            size="small"
-                            prefix={<SearchOutlined rev={undefined} />}
-                            placeholder="Search by name"
-                            style={{ width: 190 }}
-                            value={q}
-                            onChange={(e) => onQChange(e.target.value)}
-                        />
+                        {!noQ && (
+                            <Input
+                                allowClear
+                                size="small"
+                                prefix={<SearchOutlined />}
+                                placeholder="Search by name"
+                                style={{ width: 190 }}
+                                value={q}
+                                onChange={(e) => onQChange(e.target.value)}
+                            />
+                        )}
                         {filters?.map((filter) => {
                             switch (filter.type) {
                                 case 'select':
@@ -222,6 +231,7 @@ const AdminTable = <T,>({
                                                 key={filter.key}
                                                 name={filter.name}
                                                 request={filter.request}
+                                                placeholder={filter.placeholder}
                                                 value={extraFilters[filter.key]}
                                                 onChange={(e) => onFilterChange(filter.key, e)}
                                             />
@@ -234,6 +244,7 @@ const AdminTable = <T,>({
                                             key={filter.key}
                                             style={{ width: 190 }}
                                             options={filter.options}
+                                            placeholder={filter.placeholder}
                                             value={extraFilters[filter.key]}
                                             onChange={(e) => onFilterChange(filter.key, e)}
                                         />
@@ -245,6 +256,7 @@ const AdminTable = <T,>({
                                             size="small"
                                             key={filter.key}
                                             style={{ width: 190 }}
+                                            placeholder={filter.placeholder}
                                             value={extraFilters[filter.key]}
                                             onChange={(e) => onFilterChange(filter.key, e.target.value)}
                                         />
@@ -259,7 +271,7 @@ const AdminTable = <T,>({
                                             onChange={(e) => onFilterChange(filter.key, e.target.value)}
                                         >
                                             {filter.options?.map((option) => (
-                                                <Radio.Button key={option.value} value={option.value}>
+                                                <Radio.Button key={`${option.value}`} value={option.value}>
                                                     <Space align="center">
                                                         {option.icon}
                                                         {option.label}
@@ -294,13 +306,7 @@ const AdminTable = <T,>({
                                         size="small"
                                         loading={container.isFetching}
                                         disabled={!containerId || container.data?.fields?.length === 0}
-                                        icon={
-                                            advancedOpen ? (
-                                                <CaretUpOutlined rev={undefined} />
-                                            ) : (
-                                                <CaretDownOutlined rev={undefined} />
-                                            )
-                                        }
+                                        icon={advancedOpen ? <CaretUpOutlined /> : <CaretDownOutlined />}
                                         onClick={() => setAdvancedOpen(!advancedOpen)}
                                     >
                                         Advanced
@@ -314,7 +320,7 @@ const AdminTable = <T,>({
                         extra
                     ) : (
                         <Link href={`${pathname}/create`} prefetch={false}>
-                            <Button type="primary" icon={<PlusOutlined rev={undefined} />} size="small">
+                            <Button type="primary" icon={<PlusOutlined />} size="small">
                                 Create new
                             </Button>
                         </Link>
@@ -326,7 +332,7 @@ const AdminTable = <T,>({
                             <Button
                                 type="link"
                                 size="small"
-                                icon={<ClearOutlined rev={undefined} />}
+                                icon={<ClearOutlined />}
                                 danger
                                 onClick={clearAdvacedFilters}
                             >
@@ -400,11 +406,12 @@ export default AdminTable
 interface RequestSelectProps {
     name: string
     value: string
+    placeholder?: string
     onChange: (value: string) => void
     request: () => Promise<{ id: ObjectId; name: string }[]>
 }
 
-const RequestSelect = ({ name, value, onChange, request }: RequestSelectProps) => {
+const RequestSelect = ({ name, value, onChange, request, placeholder }: RequestSelectProps) => {
     const data = useQuery([name], request)
 
     return (
@@ -412,6 +419,7 @@ const RequestSelect = ({ name, value, onChange, request }: RequestSelectProps) =
             loading={data.isFetching}
             options={data.data}
             fieldNames={{ label: 'name', value: 'id' }}
+            placeholder={placeholder}
             allowClear
             size="small"
             style={{ width: 190 }}

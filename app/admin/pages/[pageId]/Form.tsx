@@ -80,7 +80,7 @@ const Form = ({ pageId, isUpdate, page, type }: FormPageProps) => {
                                 okText="Continue"
                             >
                                 <Button
-                                    icon={<PicCenterOutlined rev={undefined} />}
+                                    icon={<PicCenterOutlined />}
                                     size="small"
                                     type="dashed"
                                     disabled={submit.isLoading}
@@ -92,7 +92,7 @@ const Form = ({ pageId, isUpdate, page, type }: FormPageProps) => {
 
                         <Button
                             type="primary"
-                            icon={<CheckOutlined rev={undefined} />}
+                            icon={<CheckOutlined />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
                             loading={submit.isLoading}

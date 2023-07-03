@@ -11,7 +11,7 @@ const Details: BlockDetails = {
     View,
     Edit,
     title: 'Form',
-    position: ['HEADER', 'FOOTER', 'SIDEBAR', 'CONTENT'],
+    // position: ['HEADER', 'FOOTER', 'SIDEBAR', 'CONTENT'],
     availableIn: [SectionType.CONTENT, SectionType.PAGE],
     default: {},
     validate: (content: ContentType) => {

@@ -65,7 +65,7 @@ const Form = ({ formId, isUpdate, form }: FormProps) => {
                     <Button
                         size="small"
                         type="primary"
-                        icon={<CheckOutlined rev={undefined} />}
+                        icon={<CheckOutlined />}
                         onClick={() => formik.handleSubmit()}
                     >
                         Save form
@@ -195,7 +195,7 @@ const Form = ({ formId, isUpdate, form }: FormProps) => {
                                     <Button
                                         type="primary"
                                         danger
-                                        icon={<DeleteOutlined rev={undefined} />}
+                                        icon={<DeleteOutlined />}
                                         onClick={() => {
                                             const extras = [...(formik.values.extraData || [])]
 
@@ -207,7 +207,7 @@ const Form = ({ formId, isUpdate, form }: FormProps) => {
                             ))}
 
                             <Button
-                                icon={<PlusOutlined rev={undefined} />}
+                                icon={<PlusOutlined />}
                                 type="primary"
                                 size="small"
                                 onClick={() =>

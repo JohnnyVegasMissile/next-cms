@@ -87,7 +87,7 @@ const columns: ColumnsType<DataType> = [
             <Space>
                 <Link href={`/admin/pages/${page.id}/sections`} prefetch={false}>
                     <Tooltip title="Custom sections">
-                        <Button icon={<PicCenterOutlined rev={undefined} />} size="small" type="dashed" />
+                        <Button icon={<PicCenterOutlined />} size="small" type="dashed" />
                     </Tooltip>
                 </Link>
                 <Divider type="vertical" style={{ margin: 0 }} />
@@ -99,22 +99,17 @@ const columns: ColumnsType<DataType> = [
                     prefetch={false}
                 >
                     <Tooltip title="Duplicate">
-                        <Button icon={<CopyOutlined rev={undefined} />} size="small" />
+                        <Button icon={<CopyOutlined />} size="small" />
                     </Tooltip>
                 </Link>
                 {page.type !== PageType.HOMEPAGE && page.type !== PageType.PAGE ? (
-                    <Button
-                        type="primary"
-                        icon={<EditOutlined rev={undefined} />}
-                        size="small"
-                        disabled={true}
-                    >
+                    <Button type="primary" icon={<EditOutlined />} size="small" disabled={true}>
                         Edit
                     </Button>
                 ) : (
                     <Link href={`/admin/pages/${page.id}`} prefetch={false}>
                         <Tooltip title="Edit">
-                            <Button type="primary" icon={<EditOutlined rev={undefined} />} size="small">
+                            <Button type="primary" icon={<EditOutlined />} size="small">
                                 Edit
                             </Button>
                         </Tooltip>
@@ -135,7 +130,7 @@ const columns: ColumnsType<DataType> = [
                             disabled={page.type !== PageType.PAGE}
                             type="primary"
                             danger
-                            icon={<DeleteOutlined rev={undefined} />}
+                            icon={<DeleteOutlined />}
                             size="small"
                         >
                             Delete
@@ -157,6 +152,7 @@ const Pages = () => {
                 {
                     type: 'select',
                     key: 'type',
+                    placeholder: 'Type',
                     options: [
                         { label: 'Page', value: PageType.PAGE },
                         { label: 'Homepage', value: PageType.HOMEPAGE },

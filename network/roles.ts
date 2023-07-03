@@ -26,7 +26,7 @@ export const getRoles = (
         params: { page, q, sort },
     })
 
-export const getRolesSimple = (q: string): Promise<{ id: ObjectId; name: string }[]> =>
+export const getRolesSimple = (q?: string): Promise<{ id: ObjectId; name: string }[]> =>
     INSTANCE({
         method: 'GET',
         url: '/api/users/roles/simple',

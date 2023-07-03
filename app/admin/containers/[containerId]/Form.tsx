@@ -70,12 +70,7 @@ const Form = ({ containerId, isUpdate, container }: FormProps) => {
                     <Space>
                         {isUpdate && (
                             <>
-                                <Button
-                                    icon={<PicCenterOutlined rev={undefined} />}
-                                    key="1"
-                                    size="small"
-                                    type="dashed"
-                                >
+                                <Button icon={<PicCenterOutlined />} key="1" size="small" type="dashed">
                                     Custom sections
                                 </Button>
 
@@ -88,12 +83,7 @@ const Form = ({ containerId, isUpdate, container }: FormProps) => {
                                     okText="Save before"
                                     cancelText="Without saving"
                                 >
-                                    <Button
-                                        icon={<PicLeftOutlined rev={undefined} />}
-                                        key="2"
-                                        size="small"
-                                        type="dashed"
-                                    >
+                                    <Button icon={<PicLeftOutlined />} key="2" size="small" type="dashed">
                                         Custom template sections
                                     </Button>
                                 </Popconfirm>
@@ -102,7 +92,7 @@ const Form = ({ containerId, isUpdate, container }: FormProps) => {
 
                         <Button
                             type="primary"
-                            icon={<CheckOutlined rev={undefined} />}
+                            icon={<CheckOutlined />}
                             size="small"
                             onClick={() => formik.handleSubmit()}
                             loading={submit.isLoading}

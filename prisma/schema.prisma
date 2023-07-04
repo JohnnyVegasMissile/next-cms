@@ -555,7 +555,7 @@ model ContainerField {
   defaultMultipleJsonValue   Json[]
 
   releatedFields ContentField[]
-  orderByInMenu  MenuChild[]
+  // orderByInMenu  MenuChild[]
 
   containerId String
   container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
@@ -672,11 +672,13 @@ model MenuChild {
   parent   MenuChild?    @relation(fields: [parentId], references: [id], name: "childs", onDelete: Cascade)
   childs   MenuChild[]   @relation(name: "childs")
 
+  position Int
+
   containerId    String?
-  container      Container?      @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  container      Container? @relation(fields: [containerId], references: [id], onDelete: Cascade)
   filters        Json?
   orderByFieldId String?
-  orderByField   ContainerField? @relation(fields: [orderByFieldId], references: [id], onDelete: Cascade)
+  // orderByField   ContainerField? @relation(fields: [orderByFieldId], references: [id], onDelete: Cascade)
   orderBy        OrderBy?
 
   linkId String?

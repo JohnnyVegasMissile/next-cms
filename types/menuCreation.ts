@@ -13,20 +13,19 @@ export type MenuChild<T> = {
         | Map<
               string,
               {
-                  operator?: string | undefined
-                  value?: any
+                  [key: ObjectId]: { operator: 'contains' | 'equals' | 'gt' | 'lt'; value: any }
               }
           >
         | undefined
-    orderByField?: ObjectId | undefined
+    orderByFieldId?: ObjectId | undefined
     orderBy?: LinkProtocol | undefined
 
-    childrens: T
+    childs: T
 }
 
 type MenuCreation = {
     name: string
-    menuItems: MenuChild<MenuChild<MenuChild<undefined>[]>[] | undefined>[]
+    childs: MenuChild<MenuChild<MenuChild<undefined>[]>[] | undefined>[]
 }
 
 export default MenuCreation

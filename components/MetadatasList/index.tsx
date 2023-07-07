@@ -1,4 +1,4 @@
-import { Button, Divider, Input, Select, Space, Typography } from 'antd'
+import { Button, Card, Divider, Input, Select, Space, Typography } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Fragment, useMemo } from 'react'
 import LinkSelect, { LinkValue } from '~/components/LinkSelect'
@@ -205,34 +205,42 @@ const MetaInput = ({ types, onTypeChange, values, onValuesChange, errors, onDele
     }, [types])
 
     return (
-        <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
-                <div style={{ width: 45 }}>
-                    <Text type="secondary">Type :</Text>
+        <Card bodyStyle={{ padding: 8 }}>
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
+                    <div style={{ width: 45 }}>
+                        <Text type="secondary">Type :</Text>
+                    </div>
+                    <Space.Compact size="small" style={{ width: '100%', flex: 1 }}>
+                        <Select
+                            allowClear
+                            size="small"
+                            style={{ width: 'calc(100% - 24px)' }}
+                            mode="multiple"
+                            maxTagCount="responsive"
+                            value={types}
+                            onChange={onTypeChange}
+                            options={options}
+                        />
+                        <Button
+                            size="small"
+                            type="primary"
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={onDelete}
+                        />
+                    </Space.Compact>
                 </div>
-                <Space.Compact size="small" style={{ width: '100%', flex: 1 }}>
-                    <Select
-                        allowClear
-                        size="small"
-                        style={{ width: 'calc(100% - 24px)' }}
-                        mode="multiple"
-                        maxTagCount="responsive"
-                        value={types}
-                        onChange={onTypeChange}
-                        options={options}
-                    />
-                    <Button size="small" type="primary" danger icon={<DeleteOutlined />} onClick={onDelete} />
-                </Space.Compact>
-            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
-                <div style={{ width: 45 }}>
-                    <Text type="secondary">Value :</Text>
+                <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
+                    <div style={{ width: 45 }}>
+                        <Text type="secondary">Value :</Text>
+                    </div>
+                    <div style={{ flex: 1 }}>{element}</div>
                 </div>
-                <div style={{ flex: 1 }}>{element}</div>
-            </div>
 
-            <Divider style={{ margin: 0 }} />
-        </Space>
+                {/* <Divider style={{ margin: 0 }} /> */}
+            </Space>
+        </Card>
     )
 }

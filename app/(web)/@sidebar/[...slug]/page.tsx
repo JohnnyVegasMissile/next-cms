@@ -19,7 +19,7 @@ const getSections = async (slug: string) => {
         const pageSections = await prisma.section.findMany({
             where: { pageId: exist.pageId, type: SectionType.PAGE_SIDEBAR },
             include: {
-                medias: {
+                linkedData: {
                     include: {
                         media: true,
                         form: { include: { fields: true } },
@@ -35,7 +35,7 @@ const getSections = async (slug: string) => {
         const containerSections = await prisma.section.findMany({
             where: { containerId: exist.containerId, type: SectionType.CONTAINER_SIDEBAR },
             include: {
-                medias: {
+                linkedData: {
                     include: {
                         media: true,
                         form: { include: { fields: true } },
@@ -51,7 +51,7 @@ const getSections = async (slug: string) => {
         const contentSections = await prisma.section.findMany({
             where: { contentId: exist.contentId, type: SectionType.CONTENT_SIDEBAR },
             include: {
-                medias: {
+                linkedData: {
                     include: {
                         media: true,
                         form: { include: { fields: true } },
@@ -65,7 +65,7 @@ const getSections = async (slug: string) => {
         const containerTopSections = await prisma.section.findMany({
             where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_SIDEBAR_TOP },
             include: {
-                medias: {
+                linkedData: {
                     include: {
                         media: true,
                         form: { include: { fields: true } },
@@ -79,7 +79,7 @@ const getSections = async (slug: string) => {
         const containerBottomSections = await prisma.section.findMany({
             where: { containerId: exist.content.containerId, type: SectionType.TEMPLATE_SIDEBAR_BOTTOM },
             include: {
-                medias: {
+                linkedData: {
                     include: {
                         media: true,
                         form: { include: { fields: true } },

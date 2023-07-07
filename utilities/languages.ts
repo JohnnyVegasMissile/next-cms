@@ -1,153 +1,22 @@
-export const locales = [
-    'af',
-    'sq',
-    'ar',
-    'eu',
-    'be',
-    'bg',
-    'ca',
-    'zh',
-    'hr',
-    'cs',
-    'da',
-    'nl',
-    'en',
-    'et',
-    'fo',
-    'fa',
-    'fi',
-    'fr',
-    'gd',
-    'de',
-    'el',
-    'he',
-    'hi',
-    'hu',
-    'is',
-    'id',
-    'ga',
-    'it',
-    'ja',
-    'ko',
-    'ku',
-    'lv',
-    'lt',
-    'mk',
-    'ml',
-    'ms',
-    'mt',
-    'no',
-    'nb',
-    'nn',
-    'pl',
-    'pt',
-    'pa',
-    'rm',
-    'ro',
-    'ru',
-    'sr',
-    'sk',
-    'sl',
-    'sb',
-    'es',
-    'sv',
-    'th',
-    'ts',
-    'tn',
-    'tr',
-    'ua',
-    'ur',
-    've',
-    'vi',
-    'cy',
-    'xh',
-    'ji',
-    'zu',
-]
+import { CodeLanguage } from '@prisma/client'
 
-export type LanguageKey =
-    | 'AF'
-    | 'SQ'
-    | 'AR'
-    | 'EU'
-    | 'BE'
-    | 'BG'
-    | 'CA'
-    | 'ZH'
-    | 'HR'
-    | 'CS'
-    | 'DA'
-    | 'NL'
-    | 'EN'
-    | 'ET'
-    | 'FO'
-    | 'FA'
-    | 'FI'
-    | 'FR'
-    | 'GD'
-    | 'DE'
-    | 'EL'
-    | 'HE'
-    | 'HI'
-    | 'HU'
-    | 'IS'
-    | 'ID'
-    | 'GA'
-    | 'IT'
-    | 'JA'
-    | 'KO'
-    | 'KU'
-    | 'LV'
-    | 'LT'
-    | 'MK'
-    | 'ML'
-    | 'MS'
-    | 'MT'
-    | 'NO'
-    | 'NB'
-    | 'NN'
-    | 'PL'
-    | 'PT'
-    | 'PA'
-    | 'RM'
-    | 'RO'
-    | 'RU'
-    | 'SR'
-    | 'SK'
-    | 'SL'
-    | 'SB'
-    | 'ES'
-    | 'SV'
-    | 'TH'
-    | 'TS'
-    | 'TN'
-    | 'TR'
-    | 'UA'
-    | 'UR'
-    | 'VE'
-    | 'VI'
-    | 'CY'
-    | 'XH'
-    | 'JI'
-    | 'ZU'
-
-type LanguagesType = { [key in LanguageKey]: { name: string; code: string; en: string } }
+type LanguagesType = { [key in CodeLanguage]: { name: string; code: string; en: string } }
 
 const languages: LanguagesType = {
     AF: { name: 'Afrikaans', code: 'af', en: 'Afrikaans' },
-    SQ: { name: 'Albanian', code: 'sq', en: 'Albanian' },
-    AR: { name: 'Arabic', code: 'ar', en: 'Arabic' },
-    EU: { name: 'Basque', code: 'eu', en: 'Basque' },
-    BE: { name: 'Belarusian', code: 'be', en: 'Belarusian' },
-    BG: { name: 'Bulgarian', code: 'bg', en: 'Bulgarian' },
-    CA: { name: 'Catalan', code: 'ca', en: 'Catalan' },
-    ZH: { name: 'Chinese', code: 'zh', en: 'Chinese' },
-    HR: { name: 'Croatian', code: 'hr', en: 'Croatian' },
-    CS: { name: 'Czech', code: 'cs', en: 'Czech' },
-    DA: { name: 'Danish', code: 'da', en: 'Danish' },
-    NL: { name: 'Dutch', code: 'nl', en: 'Dutch' },
+    SQ: { name: 'Albanian', code: 'sq', en: 'Shqiptare' },
+    AR: { name: 'Arabic', code: 'ar', en: 'عربي' },
+    EU: { name: 'Basque', code: 'eu', en: 'Euskara' },
+    BE: { name: 'Belarusian', code: 'be', en: 'беларускі' },
+    BG: { name: 'Bulgarian', code: 'bg', en: 'български' },
+    CA: { name: 'Catalan', code: 'ca', en: 'Català' },
+    ZH: { name: 'Chinese', code: 'zh', en: '中文' },
+    HR: { name: 'Croatian', code: 'hr', en: 'Hrvatski' },
+    CS: { name: 'Czech', code: 'cs', en: 'Čeština' },
+    DA: { name: 'Danish', code: 'da', en: 'Dansk' },
+    NL: { name: 'Dutch', code: 'nl', en: 'Nederlands' },
     EN: { name: 'English', code: 'en', en: 'English' },
-    ET: { name: 'Estonian', code: 'et', en: 'Estonian' },
+    ET: { name: 'Estonian', code: 'et', en: 'Eesti keel' },
     FO: { name: 'Faeroese', code: 'fo', en: 'Faeroese' },
     FA: { name: 'Farsi', code: 'fa', en: 'Farsi' },
     FI: { name: 'Finnish', code: 'fi', en: 'Finnish' },

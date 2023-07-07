@@ -3,7 +3,7 @@ import { ObjectId } from '~/types'
 import { prisma } from './prisma'
 
 export type SectionResponse = Section & {
-    medias: {
+    linkedData: {
         media: Media | null
         form:
             | (Form & {
@@ -25,7 +25,7 @@ const getSection = async (where: Prisma.SectionWhereInput | undefined): Promise<
     const sections = await prisma.section.findMany({
         where,
         include: {
-            medias: {
+            linkedData: {
                 include: {
                     media: true,
                     form: {

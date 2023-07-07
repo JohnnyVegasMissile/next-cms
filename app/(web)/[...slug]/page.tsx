@@ -1,28 +1,129 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
-import { SectionType } from '@prisma/client'
+import { Link, LinkType, SectionType, SettingType } from '@prisma/client'
 import DisplaySection from '~/components/DisplaySection'
 import { prisma } from '~/utilities/prisma'
 import getSection from '~/utilities/getSection'
+import {
+    appLinks,
+    appleWebApp,
+    formatDetection,
+    general,
+    iTunes,
+    icons,
+    openGraph,
+    twitter,
+} from '~/components/MetadatasList/metadataLists'
+import { LinkValue } from '~/components/LinkSelect'
+import { ObjectId } from '~/types'
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+const getLangMetas = async (url: string) => {
+    const locales =
+        (
+            await prisma.setting.findUnique({
+                where: { type: SettingType.LANGUAGE_LOCALES },
+            })
+        )?.value.split(', ') || []
+
+    const preferred = (
+        await prisma.setting.findUnique({
+            where: { type: SettingType.LANGUAGE_PREFERRED },
+        })
+    )?.value
+
+    const sideUrl = (
+        await prisma.setting.findUnique({
+            where: { type: SettingType.SITE_URL },
+        })
+    )?.value!
+
+    const canonical = `/${url}`
+    const languages: any = {}
+
+    for (const locale of locales) {
+        if (locale !== preferred) {
+            languages[locale.toLocaleLowerCase()!] = `/${locale}/${url}`
+        }
+    }
+
+    const metadataBase = new URL(sideUrl)
+    const alternates = {
+        canonical,
+        languages,
+    }
+
+    return {
+        metadataBase,
+        alternates,
+    }
+}
+
+const linkToLinkValue = (link: Link): LinkValue => {
+    if (link.type === LinkType.IN) {
+        return {
+            type: link.type,
+            slugId: link.slugId as ObjectId,
+        }
+    } else {
+        return {
+            type: link.type,
+            link: link.link!,
+            prototol: link.prototol!,
+        }
+    }
+}
+
+export const generateMetadata = async ({ params }: { params: { slug: string } }) => {
     const full = Array.isArray(params.slug) ? params.slug.join('/') : params.slug
+
+    const langMetas = await getLangMetas(full)
+
+    const options = [
+        ...general,
+        ...formatDetection,
+        ...openGraph,
+        ...icons,
+        ...twitter,
+        ...iTunes,
+        ...appleWebApp,
+        ...appLinks,
+    ]
+
     const page = await prisma.page.findFirst({
         where: { slug: { full } },
-        include: { metadatas: true },
+        include: { metadatas: { include: { values: { include: { link: true } } } } },
     })
 
     if (!!page) {
-        let metadata: any = {}
-        page.metadatas.forEach((element) => (metadata[element.name] = element.content))
-
-        return {
-            title: page.name,
-            openGraph: {
-                title: page.name,
-            },
-            ...metadata,
+        let metadatas: any = {
+            ...langMetas,
+            openGraph: { title: page.name },
+            twitter: { title: page.name },
+            appleWebApp: { title: page.name },
         }
+
+        page.metadatas.forEach((metadata) => {
+            metadata.types.forEach((type) => {
+                const opt = options.find((e) => e.value === type)
+
+                if (!opt || !opt.toValue) return
+
+                const cleanValues = metadata.values.map(
+                    (e) =>
+                        (e.string === null ? undefined : e.string) ||
+                        (e.number === null ? undefined : e.number) ||
+                        (e.boolean === null ? undefined : e.boolean) ||
+                        (e.link === null ? undefined : linkToLinkValue(e.link)) ||
+                        ''
+                )
+
+                metadatas = opt.toValue(cleanValues, metadatas)
+            })
+        })
+
+        console.log('metadatas', metadatas)
+
+        return metadatas
     }
 
     const content = await prisma.container.findFirst({
@@ -32,6 +133,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     if (!!content)
         return {
             title: content.name,
+            ...langMetas,
             openGraph: {
                 title: content.name,
             },
@@ -44,6 +146,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     if (!!container)
         return {
             title: container.name,
+            ...langMetas,
             openGraph: {
                 title: container.name,
             },
@@ -130,6 +233,6 @@ const Content = async ({ params }: { params: { slug: string } }) => {
     )
 }
 
-export const revalidate = 'force-cache'
+export const revalidate = Infinity
 
 export default Content

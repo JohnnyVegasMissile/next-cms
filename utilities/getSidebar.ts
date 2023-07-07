@@ -1,3 +1,4 @@
+import defaultColor from '~/utilities/defaultColors.json'
 import { SettingType } from '@prisma/client'
 import { prisma } from './prisma'
 
@@ -22,7 +23,8 @@ const getSidebar = async () => {
         sidebar.find((e) => e.type === SettingType.SIDEBAR_UNIT)?.value || 'rem'
     }`
 
-    const backgroundColor = sidebar.find((e) => e.type === SettingType.SIDEBAR_COLOR)?.value || '#ef476f'
+    const backgroundColor =
+        sidebar.find((e) => e.type === SettingType.SIDEBAR_COLOR)?.value || defaultColor.sidebarColor
     const breakpointClass =
         sidebar.find((e) => e.type === SettingType.SIDEBAR_BREAKPOINT_SIZE)?.value || 'medium'
     const position = sidebar.find((e) => e.type === SettingType.SIDEBAR_POSITION)?.value || 'left'

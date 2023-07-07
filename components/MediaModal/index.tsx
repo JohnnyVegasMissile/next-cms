@@ -330,9 +330,25 @@ const MediaModal = ({ mediaType, value, onChange }: MediaModalProps) => {
 
     return (
         <>
-            <Button size="small" type="primary" icon={<SelectOutlined />} onClick={() => setOpen(true)}>
-                {`Select a${typeLabel}`}
-            </Button>
+            <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                <Button size="small" type="primary" icon={<SelectOutlined />} onClick={() => setOpen(true)}>
+                    {`Select a${typeLabel}`}
+                </Button>
+                {!!value && (
+                    <>
+                        <div style={{ flex: 1 }}>
+                            <Text>{value.name}</Text>
+                        </div>
+                        <Button
+                            size="small"
+                            danger
+                            type="primary"
+                            icon={<SelectOutlined />}
+                            onClick={() => onChange(undefined)}
+                        />
+                    </>
+                )}
+            </div>
 
             <Modal
                 open={open}

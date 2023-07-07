@@ -1,4 +1,3 @@
-// eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextRequest, NextResponse } from 'next/server'
 import { PageType, Section, SectionType } from '@prisma/client'
 import { SectionCreationCleaned } from '~/types/sectionCreation'
@@ -26,9 +25,9 @@ export async function PUT(request: NextRequest, context: any) {
                 },
                 data: {
                     position: parseInt(section.position as unknown as string),
-                    content: section.content,
+                    content: section.value,
 
-                    medias: {
+                    linkedData: {
                         createMany: {
                             data: [
                                 ...section.medias.map((mediaId) => ({ mediaId })),
@@ -47,9 +46,9 @@ export async function PUT(request: NextRequest, context: any) {
                     type: SectionType.PAGE,
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
-                    content: section.content,
+                    content: section.value,
 
-                    medias: {
+                    linkedData: {
                         createMany: {
                             data: [
                                 ...section.medias.map((mediaId) => ({ mediaId })),
@@ -78,9 +77,9 @@ export async function PUT(request: NextRequest, context: any) {
                 },
                 data: {
                     position: parseInt(section.position as unknown as string),
-                    content: section.content,
+                    content: section.value,
 
-                    medias: {
+                    linkedData: {
                         createMany: {
                             data: [
                                 ...section.medias.map((mediaId) => ({ mediaId })),
@@ -99,9 +98,9 @@ export async function PUT(request: NextRequest, context: any) {
                     type: SectionType.PAGE_SIDEBAR,
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
-                    content: section.content,
+                    content: section.value,
 
-                    medias: {
+                    linkedData: {
                         createMany: {
                             data: [
                                 ...section.medias.map((mediaId) => ({ mediaId })),

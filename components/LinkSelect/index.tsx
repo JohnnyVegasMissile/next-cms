@@ -14,6 +14,7 @@ import { getSlugsSimple } from '~/network/slugs'
 import { ObjectId } from '~/types'
 import { LinkType, LinkProtocol, PageType } from '@prisma/client'
 import styles from './LinkSelect.module.scss'
+import { useEffect } from 'react'
 
 const { Option } = Select
 
@@ -38,6 +39,7 @@ export type LinkValue =
 
           slugId?: never
       }
+    | undefined
 
 interface LinkSelectProps {
     value: LinkValue
@@ -47,7 +49,13 @@ interface LinkSelectProps {
 
 const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
     // const [q, setQ] = useState('')
-    const slugs = useQuery(['slugs-simple'], () => getSlugsSimple(), { enabled: value.type === LinkType.IN })
+    const slugs = useQuery(['slugs-simple'], () => getSlugsSimple(), { enabled: value?.type === LinkType.IN })
+
+    useEffect(() => {
+        if (!value) onChange({ type: LinkType.OUT, slugId: undefined })
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const options = slugs.data?.map((slug) => ({
         value: slug.id,
@@ -74,7 +82,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
     }))
 
     const onPageChange = (slugId: ObjectId | undefined) =>
-        value.type === LinkType.IN && onChange({ ...value, slugId })
+        value?.type === LinkType.IN && onChange({ ...value, slugId })
 
     const onTypeChange = (type: LinkType) => {
         if (type === LinkType.IN) {
@@ -92,17 +100,17 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
     }
 
     const onProtocolChange = (prototol: LinkProtocol) =>
-        value.type === LinkType.OUT &&
+        value?.type === LinkType.OUT &&
         onChange({
             ...value,
             prototol,
         })
 
-    const onLinkChange = (link: string) => value.type === 'OUT' && onChange({ ...value, link })
+    const onLinkChange = (link: string) => value?.type === 'OUT' && onChange({ ...value, link })
 
     const selectBefore = (
         <Select
-            value={value.prototol}
+            value={value?.prototol}
             onChange={onProtocolChange}
             size="small"
             className={styles['protocol']}
@@ -115,14 +123,14 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
 
     return (
         <Space.Compact size="small" className={styles['link-select']}>
-            {value.type === 'IN' ? (
+            {value?.type === 'IN' ? (
                 <TreeSelect
                     treeLine
                     // showSearch
                     status={error ? 'error' : undefined}
                     size="small"
                     placeholder="Please select"
-                    value={value.slugId}
+                    value={value?.slugId}
                     className={styles['tree']}
                     dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                     allowClear
@@ -154,7 +162,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
                 />
             ) : (
                 <Input
-                    value={value.link}
+                    value={value?.link}
                     status={error ? 'error' : undefined}
                     onChange={(e) => onLinkChange(e.target.value)}
                     addonBefore={selectBefore}
@@ -167,7 +175,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
             <Select
                 status={error ? 'error' : undefined}
                 size="small"
-                value={value.type}
+                value={value?.type}
                 onChange={onTypeChange}
             >
                 <Option value={LinkType.IN}>

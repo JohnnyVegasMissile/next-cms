@@ -1,16 +1,19 @@
+import { LinkValue } from '~/components/LinkSelect'
 import { ObjectId } from '.'
+import { Media, PageType } from '@prisma/client'
 
 type PageCreation = {
     name: string
     published: boolean
     slug: string[]
-    metadatas: Metadata[]
+    type: PageType
+    metadatas: CreationMetadata[]
 }
 
-type Metadata = {
+type CreationMetadata = {
     id?: ObjectId
-    name: string
-    content: string | string[]
+    types: string[]
+    values: (string | number | boolean | LinkValue | Media)[]
 }
 
 export default PageCreation

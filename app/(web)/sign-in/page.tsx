@@ -16,7 +16,7 @@ const getProps = async () => {
     const sections = await prisma.section.findMany({
         where: { page: { type: PageType.SIGNIN }, type: SectionType.PAGE },
         include: {
-            medias: {
+            linkedData: {
                 include: {
                     media: true,
                     form: { include: { fields: true } },

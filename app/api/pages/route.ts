@@ -1,9 +1,10 @@
-// eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextResponse, NextRequest } from 'next/server'
 import type PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 import { PAGE_SIZE } from '~/utilities/constants'
 import { revalidatePath } from 'next/cache'
+import { LinkValue } from '~/components/LinkSelect'
+import { LinkProtocol, LinkType, Media, MediaType } from '@prisma/client'
 
 export const GET = async (request: NextRequest) => {
     const { searchParams } = request.nextUrl
@@ -44,6 +45,56 @@ export const GET = async (request: NextRequest) => {
     return NextResponse.json({ results: pages, count })
 }
 
+const parseCreateValues = (values: (string | number | boolean | LinkValue | Media)[]) => ({
+    createMany: {
+        data: values.map((value) => {
+            switch (typeof value) {
+                case 'string':
+                    return { string: value }
+                case 'boolean':
+                    return { boolean: value }
+                case 'number':
+                    return { number: value }
+
+                default: {
+                    if (
+                        value?.type === MediaType.IMAGE ||
+                        value?.type === MediaType.FILE ||
+                        value?.type === MediaType.VIDEO
+                    ) {
+                        return { mediaId: value.id }
+                    } else {
+                        if (value?.type === LinkType.IN) {
+                            return {
+                                link: {
+                                    upset: {
+                                        where: { slugId: value.slugId },
+                                    },
+                                    data: { type: LinkType.IN },
+                                },
+                            }
+                        } else if (value?.type === LinkType.OUT) {
+                            return {
+                                link: {
+                                    create: {
+                                        data: {
+                                            type: LinkType.OUT,
+                                            link: value.link || '',
+                                            protocol: value.prototol || LinkProtocol.HTTPS,
+                                        },
+                                    },
+                                },
+                            }
+                        }
+                    }
+
+                    return { string: '' }
+                }
+            }
+        }),
+    },
+})
+
 export const POST = async (request: NextRequest) => {
     const { name, slug, published, metadatas } = (await request.json()) as PageCreation
 
@@ -64,18 +115,18 @@ export const POST = async (request: NextRequest) => {
                     basic: slug.join('/'),
                 },
             },
-            metadatas: {
-                createMany: {
-                    data: metadatas.map((metadata) => ({
-                        content: Array.isArray(metadata.content)
-                            ? metadata.content.join(', ')
-                            : metadata.content,
-                        name: metadata.name,
-                    })),
-                },
-            },
         },
     })
+
+    for (const metadata of metadatas) {
+        await prisma.metadata.create({
+            data: {
+                pageId: page.id,
+                types: metadata.types,
+                values: parseCreateValues(metadata.values),
+            },
+        })
+    }
 
     revalidatePath(slug.join('/'))
 

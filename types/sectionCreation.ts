@@ -9,7 +9,7 @@ type SectionCreation = {
     type: SectionType
     block: BlockKey
     position: number
-    content: any
+    value: any
     pageId?: ObjectId
 
     medias: Map<ObjectId, Media>
@@ -24,10 +24,12 @@ export type SectionCreationCleaned = {
     type: SectionType
     block: BlockKey
     position: number
-    content: any
+    value: any
 
     medias: ObjectId[]
     forms: ObjectId[]
+    menus: ObjectId[]
+    links: ObjectId[]
 }
 
 export default SectionCreation

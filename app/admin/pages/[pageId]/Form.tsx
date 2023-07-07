@@ -23,12 +23,17 @@ const validate = (values: PageCreation) => {
         errors.name = 'Required'
     }
 
-    for (let i = 0; i < values.slug.length; i++) {
-        if (!values.slug[i]) set(errors, `slug.${i}`, 'Required')
+    if (values.type === PageType.PAGE) {
+        for (let i = 0; i < values.slug.length; i++) {
+            if (!values.slug[i]) set(errors, `slug.${i}`, 'Required')
+        }
     }
 
-    for (let i = 0; i < values.metadatas.length; i++) {
-        if (!values.metadatas[i]?.content) set(errors, `metadatas.${i}`, 'Required')
+    for (let i = 0; i < values.metadatas?.length; i++) {
+        for (let j = 0; j < (values.metadatas[i]?.values?.length || 0); j++) {
+            if (values.metadatas[i]?.values[j] === undefined || values.metadatas[i]?.values[j] === '')
+                set(errors, `metadatas.${i}.values.${j}`, 'Required')
+        }
     }
 
     return errors

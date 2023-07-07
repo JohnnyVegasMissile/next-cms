@@ -22,6 +22,8 @@ model User {
   createdContainers Container[]
   createdContents   Content[]
 
+  verified Boolean @default(false)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Message   Message[]
@@ -348,7 +350,8 @@ model Slug {
 
   revalidatedAt DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  Link          Link[]
+
+  useAsLink Link[]
 }
 
 // METADATAS
@@ -356,18 +359,35 @@ model Slug {
 model Metadata {
   id String @id @default(cuid())
 
-  name    String
-  content String
+  types  String[]
+  values MetadataValue[]
 
-  linkedPageId      String?
-  linkedPage        Page?      @relation(fields: [linkedPageId], references: [id], onDelete: Cascade)
-  linkedContainerId String?
-  linkedContainer   Container? @relation(fields: [linkedContainerId], references: [id], onDelete: Cascade, name: "containerMetadatas")
-  linkedContentId   String?
-  linkedContent     Content?   @relation(fields: [linkedContentId], references: [id], onDelete: Cascade)
+  pageId String?
+  page   Page?   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  containerId String?
+  container   Container? @relation(fields: [containerId], references: [id], onDelete: Cascade, name: "containerMetadatas")
+
+  contentId String?
+  content   Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
 
   containerTemplateId String?
   containerTemplate   Container? @relation(fields: [containerTemplateId], references: [id], onDelete: Cascade, name: "contentsMetadatas")
+}
+
+model MetadataValue {
+  id String @id @default(cuid())
+
+  metadataId String
+  metadata   Metadata @relation(fields: [metadataId], references: [id])
+
+  number  Float?
+  string  String?
+  boolean Boolean?
+  mediaId String?
+  media   Media?   @relation(fields: [mediaId], references: [id])
+  linkId  String?
+  link    Link?    @relation(fields: [linkId], references: [id])
 }
 
 // SECTIONS
@@ -398,19 +418,70 @@ enum SectionType {
 }
 
 enum CodeLanguage {
+  AF
+  SQ
   AR
+  EU
+  BE
+  BG
+  CA
   ZH
+  HR
+  CS
+  DA
+  NL
   EN
+  ET
+  FO
+  FA
+  FI
   FR
+  GD
   DE
+  EL
+  HE
   HI
+  HU
+  IS
+  ID
+  GA
   IT
   JA
   KO
-  PO
+  KU
+  LV
+  LT
+  MK
+  ML
+  MS
+  MT
+  NO
+  NB
+  NN
+  PL
+  PT
+  PA
+  RM
+  RO
   RU
+  SR
+  SK
+  SL
+  SB
   ES
+  SV
+  TH
+  TS
+  TN
   TR
+  UA
+  UR
+  VE
+  VI
+  CY
+  XH
+  JI
+  ZU
 }
 
 model Section {
@@ -421,7 +492,7 @@ model Section {
   position Int
   language CodeLanguage @default(EN)
 
-  content Json
+  value Json
 
   // Element releated
   pageId String?
@@ -430,11 +501,11 @@ model Section {
   containerId String?
   container   Container? @relation(fields: [containerId], references: [id], onDelete: Cascade)
 
-  contentId     String?
-  linkedContent Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId String?
+  content   Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
 
   // Linked data
-  medias LinkedToSection[]
+  linkedData LinkedToSection[]
 }
 
 model LinkedToSection {
@@ -445,12 +516,15 @@ model LinkedToSection {
 
   mediaId String?
   media   Media?  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  formId  String?
-  form    Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
-  linkId  String?
-  link    Link?   @relation(fields: [linkId], references: [id], onDelete: Cascade)
-  menuId  String?
-  menu    Menu?   @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  formId String?
+  form   Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  linkId String?
+  link   Link?   @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  menuId String?
+  menu   Menu?   @relation(fields: [menuId], references: [id], onDelete: Cascade)
 
   @@unique([sectionId, mediaId, formId, linkId, menuId])
 }
@@ -632,7 +706,8 @@ model Media {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  usedInSections LinkedToSection[]
+  usedInSections  LinkedToSection[]
+  usedInMetadatas MetadataValue[]
 }
 
 // MENU
@@ -705,12 +780,13 @@ model Link {
 
   type LinkType
 
-  slugId String?
+  slugId String? @unique
   slug   Slug?   @relation(fields: [slugId], references: [id], onDelete: Cascade)
 
   link     String?
   prototol LinkProtocol?
 
   usedInSections LinkedToSection[]
-  menuChild      MenuChild[]
+  usedInMetadata MetadataValue[]
+  usedInMenu     MenuChild[]
 }

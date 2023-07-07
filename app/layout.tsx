@@ -1,10 +1,11 @@
-import AdminMenu from '~/components/AdminMenu'
-import styles from './layout.module.scss'
-import { prisma } from '~/utilities/prisma'
-import './global.scss'
 import { SettingType } from '@prisma/client'
 import QueryClientWrapper from '~/components/QueryClientWrapper'
+import defaultColor from '~/utilities/defaultColors.json'
 import getSidebar from '~/utilities/getSidebar'
+import AdminMenu from '~/components/AdminMenu'
+import { prisma } from '~/utilities/prisma'
+import styles from './layout.module.scss'
+import './global.scss'
 
 // const getLang = async () => {
 //     const locales = await prisma.setting.findUnique({
@@ -49,17 +50,25 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
     const sidebar = await getSidebar()
 
     const backgroundColor =
-        themeSettings.find((e) => e.type === SettingType.BACKGROUND_COLOR)?.value || '#e9ecef'
-    const primaryColor = themeSettings.find((e) => e.type === SettingType.PRIMARY_COLOR)?.value || '#ffc300'
+        themeSettings.find((e) => e.type === SettingType.BACKGROUND_COLOR)?.value ||
+        defaultColor.backgroundColor
+    const primaryColor =
+        themeSettings.find((e) => e.type === SettingType.PRIMARY_COLOR)?.value || defaultColor.primaryColor
     const secondaryColor =
-        themeSettings.find((e) => e.type === SettingType.SECONDARY_COLOR)?.value || '#003566'
+        themeSettings.find((e) => e.type === SettingType.SECONDARY_COLOR)?.value ||
+        defaultColor.secondaryColor
     const primaryTextColor =
-        themeSettings.find((e) => e.type === SettingType.PRIMARY_TEXT_COLOR)?.value || '#000814'
+        themeSettings.find((e) => e.type === SettingType.PRIMARY_TEXT_COLOR)?.value ||
+        defaultColor.primaryTextColor
     const secondaryTextColor =
-        themeSettings.find((e) => e.type === SettingType.SECONDARY_TEXT_COLOR)?.value || '#001d3d'
-    const darkColor = themeSettings.find((e) => e.type === SettingType.DARK_COLOR)?.value || '#000814'
-    const lightColor = themeSettings.find((e) => e.type === SettingType.LIGHT_COLOR)?.value || '#e9ecef'
-    const extraColor = themeSettings.find((e) => e.type === SettingType.EXTRA_COLOR)?.value || '#ef476f'
+        themeSettings.find((e) => e.type === SettingType.SECONDARY_TEXT_COLOR)?.value ||
+        defaultColor.secondaryTextColor
+    const darkColor =
+        themeSettings.find((e) => e.type === SettingType.DARK_COLOR)?.value || defaultColor.darkColor
+    const lightColor =
+        themeSettings.find((e) => e.type === SettingType.LIGHT_COLOR)?.value || defaultColor.lightColor
+    const extraColor =
+        themeSettings.find((e) => e.type === SettingType.EXTRA_COLOR)?.value || defaultColor.extraColor
 
     return (
         <html>
@@ -100,6 +109,6 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
     )
 }
 
-export const revalidate = 'force-cache'
+export const revalidate = Infinity
 
 export default Layout

@@ -40,7 +40,7 @@ const AdminMenu = () => {
     const messagesUnread = useQuery(['messages-unread'], () => getUnreadMessages(), {
         refetchOnWindowFocus: true,
         refetchOnMount: true,
-        refetchInterval: 60000,
+        refetchInterval: 300000,
     })
 
     const onClick = (e: any) => {

@@ -127,7 +127,10 @@ const MetaInput = ({ types, onTypeChange, values, onValuesChange, errors, onDele
                             <MediaModal
                                 mediaType={MediaType.IMAGE}
                                 value={values?.[idx] as Media}
-                                onChange={(e) => onValueChange(idx, e)}
+                                onChange={(e) => {
+                                    console.log('img', e)
+                                    onValueChange(idx, e)
+                                }}
                             />
                         )}
                         {t === 'boolean' && (
@@ -147,7 +150,10 @@ const MetaInput = ({ types, onTypeChange, values, onValuesChange, errors, onDele
                         {t === 'link' && (
                             <LinkSelect
                                 value={values?.[idx] as LinkValue}
-                                onChange={(e) => onValueChange(idx, e)}
+                                onChange={(e) => {
+                                    console.log('link', e)
+                                    onValueChange(idx, e)
+                                }}
                             />
                         )}
                         {t === 'option' && (

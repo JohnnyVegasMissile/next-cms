@@ -42,7 +42,7 @@ export type LinkValue =
     | undefined
 
 interface LinkSelectProps {
-    value: LinkValue
+    value: LinkValue | undefined
     onChange(value: LinkValue): void
     error?: boolean
 }

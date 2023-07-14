@@ -46,6 +46,6 @@ const Home = async () => {
     )
 }
 
-export const revalidate = 'force-cache'
+export const revalidate = Infinity
 
 export default Home

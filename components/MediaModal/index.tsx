@@ -9,6 +9,7 @@ import {
     VideoCameraOutlined,
     FilePdfOutlined,
     WarningOutlined,
+    CloseOutlined,
 } from '@ant-design/icons'
 import { Media, MediaType } from '@prisma/client'
 import { useQuery } from '@tanstack/react-query'
@@ -324,7 +325,7 @@ const MediaModal = ({ mediaType, value, onChange }: MediaModalProps) => {
         setPage(pagination.current || 1)
     }
 
-    let typeLabel = 'n image'
+    let typeLabel = ' image'
     if (mediaType === 'FILE') typeLabel = ' file'
     if (mediaType === 'VIDEO') typeLabel = ' video'
 
@@ -332,7 +333,7 @@ const MediaModal = ({ mediaType, value, onChange }: MediaModalProps) => {
         <>
             <div style={{ display: 'flex', gap: 8, width: '100%' }}>
                 <Button size="small" type="primary" icon={<SelectOutlined />} onClick={() => setOpen(true)}>
-                    {`Select a${typeLabel}`}
+                    {`Choose${typeLabel}`}
                 </Button>
                 {!!value && (
                     <>
@@ -343,7 +344,7 @@ const MediaModal = ({ mediaType, value, onChange }: MediaModalProps) => {
                             size="small"
                             danger
                             type="primary"
-                            icon={<SelectOutlined />}
+                            icon={<CloseOutlined />}
                             onClick={() => onChange(undefined)}
                         />
                     </>

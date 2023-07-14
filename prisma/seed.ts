@@ -76,14 +76,14 @@ async function main() {
     }
 
     const newPage = [
-        { name: 'Home', type: PageType.HOMEPAGE },
-        { name: 'Sign in', type: PageType.SIGNIN },
+        { name: 'Homepage', type: PageType.HOMEPAGE, slug: '' },
+        { name: 'Sign in', type: PageType.SIGNIN, slug: 'sign-in' },
         { name: 'Not found', type: PageType.NOTFOUND },
         { name: 'Error', type: PageType.ERROR },
         { name: 'Maintenance', type: PageType.MAINTENANCE },
     ]
 
-    for (const { name, type } of newPage) {
+    for (const { name, type, slug } of newPage) {
         const pages = await prisma.page.findMany({ where: { type } })
 
         if (!pages.length) {
@@ -92,6 +92,15 @@ async function main() {
                     name,
                     type,
                     createdByUserId: root?.userId,
+                    slug:
+                        slug !== undefined
+                            ? {
+                                  create: {
+                                      full: slug,
+                                      basic: slug,
+                                  },
+                              }
+                            : undefined,
                 },
             })
         }

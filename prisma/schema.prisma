@@ -379,15 +379,17 @@ model MetadataValue {
   id String @id @default(cuid())
 
   metadataId String
-  metadata   Metadata @relation(fields: [metadataId], references: [id])
+  metadata   Metadata @relation(fields: [metadataId], references: [id], onDelete: Cascade)
 
   number  Float?
   string  String?
   boolean Boolean?
   mediaId String?
-  media   Media?   @relation(fields: [mediaId], references: [id])
+  media   Media?   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   linkId  String?
-  link    Link?    @relation(fields: [linkId], references: [id])
+  link    Link?    @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 // SECTIONS

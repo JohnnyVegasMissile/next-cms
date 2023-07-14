@@ -1,5 +1,5 @@
-import { Button, Card, Divider, Input, Select, Space, Typography } from 'antd'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Button, Card, Input, Select, Space, Typography } from 'antd'
+import { PlusOutlined, DeleteOutlined, WarningOutlined } from '@ant-design/icons'
 import { Fragment, useMemo } from 'react'
 import LinkSelect, { LinkValue } from '~/components/LinkSelect'
 import PageCreation from '~/types/pageCreation'
@@ -29,17 +29,17 @@ interface MetadatasListProps {
 
 const initialMetadata = {
     tempId: tempId(),
+    values: undefined,
 }
 
 const MetadatasList = ({ name, value, onChange, errors }: MetadatasListProps) => {
-    const handleChange = (index: number, value: any, nameField?: string) => {
+    const handleChange = (index: number, value: any, nameField?: string) =>
         onChange({
             target: {
                 name: `${name}.${index}${nameField ? `.${nameField}` : ''}`,
                 value,
             },
         })
-    }
 
     const handleRemove = (idx: number) => {
         const newMeta = [...value]
@@ -85,119 +85,39 @@ interface MetaInputProps {
 }
 
 const MetaInput = ({ types, onTypeChange, values, onValuesChange, errors, onDelete }: MetaInputProps) => {
-    const element = useMemo(() => {
-        const options = [
-            ...general,
-            ...formatDetection,
-            ...openGraph,
-            ...icons,
-            ...twitter,
-            ...iTunes,
-            ...appleWebApp,
-            ...appLinks,
-        ]
+    const basicOptions = [
+        ...general,
+        ...formatDetection,
+        ...openGraph,
+        ...icons,
+        ...twitter,
+        ...iTunes,
+        ...appleWebApp,
+        ...appLinks,
+    ]
 
-        const option = options.find((e) => e.value === types?.[0])
-
-        const onValueChange = (index: number, value: string | LinkValue | Media | number | boolean) => {
-            const newContent = [...(values || [])]
-            set(newContent, index, value)
-            onValuesChange(newContent)
-        }
-
-        return (
-            <Space.Compact size="small" style={{ width: '100%' }}>
-                {option?.type?.map((t: string, idx: number) => (
-                    <Fragment key={idx}>
-                        {/* <Tooltip
-                            key={idx}
-                            title={errors?.[idx]}
-                            color="red"
-                        > */}
-                        {t === 'string' && (
-                            <Input
-                                size="small"
-                                style={{ width: `calc(${100 / option?.type.length}%)` }}
-                                value={values?.[idx] as string}
-                                onChange={(e) => onValueChange(idx, e.target.value)}
-                                status={errors?.[idx] ? 'error' : undefined}
-                            />
-                        )}
-                        {t === 'image' && (
-                            <MediaModal
-                                mediaType={MediaType.IMAGE}
-                                value={values?.[idx] as Media}
-                                onChange={(e) => {
-                                    console.log('img', e)
-                                    onValueChange(idx, e)
-                                }}
-                            />
-                        )}
-                        {t === 'boolean' && (
-                            <Select
-                                size="small"
-                                maxTagCount="responsive"
-                                style={{ width: `calc(${100 / option?.type.length}%)` }}
-                                value={values?.[idx] as string}
-                                onChange={(e) => onValueChange(idx, e)}
-                                status={errors?.[idx] ? 'error' : undefined}
-                                options={[
-                                    { value: true, label: 'Yes' },
-                                    { values: false, label: 'No' },
-                                ]}
-                            />
-                        )}
-                        {t === 'link' && (
-                            <LinkSelect
-                                value={values?.[idx] as LinkValue}
-                                onChange={(e) => {
-                                    console.log('link', e)
-                                    onValueChange(idx, e)
-                                }}
-                            />
-                        )}
-                        {t === 'option' && (
-                            <Select
-                                size="small"
-                                maxTagCount="responsive"
-                                style={{ width: `calc(${100 / option?.type.length}%)` }}
-                                value={values?.[idx] as string}
-                                onChange={(e) => onValueChange(idx, e)}
-                                status={errors?.[idx] ? 'error' : undefined}
-                            />
-                        )}
-                        {/* </Tooltip> */}
-                    </Fragment>
-                ))}
-            </Space.Compact>
-        )
+    const option = useMemo(() => {
+        return basicOptions.find((e) => e.value === types?.[0])
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [types])
+    }, [types?.[0]])
 
-    const options = useMemo(() => {
-        const options = [
-            ...general,
-            ...formatDetection,
-            ...openGraph,
-            ...icons,
-            ...twitter,
-            ...iTunes,
-            ...appleWebApp,
-            ...appLinks,
-        ]
+    const onValueChange = (index: number, value: string | LinkValue | Media | number | boolean) => {
+        const newContent = [...(values || [])]
+        set(newContent, index, value)
+        onValuesChange(newContent)
+    }
 
-        const option = options.find((e) => e.value === types?.[0])
+    const checkIfDisable = (e: any) => {
+        const hasValue = !!types && !!types.length
+        const isChoosenOption = hasValue && types?.includes(e?.value)
+        const isOptionSelected = hasValue && option?.type?.includes('option')
+        const isMatchingType = !!option && e?.type.join(',') !== option?.type.join(',')
 
-        const checkIfDisable = (e: any) => {
-            const hasValue = !!types && !!types.length
-            const isChoosenOption = hasValue && types?.includes(e?.value)
-            const isOptionSelected = hasValue && option?.type?.includes('option')
-            const isMatchingType = !!option && e?.type.join(',') !== option?.type.join(',')
+        return { ...e, disabled: isChoosenOption ? false : isOptionSelected ? true : isMatchingType }
+    }
 
-            return { ...e, disabled: isChoosenOption ? false : isOptionSelected ? true : isMatchingType }
-        }
-
+    const cleanOptions = useMemo(() => {
         return [
             { label: 'General', options: general.map(checkIfDisable) },
             { label: 'Format detection', options: formatDetection.map(checkIfDisable) },
@@ -208,7 +128,9 @@ const MetaInput = ({ types, onTypeChange, values, onValuesChange, errors, onDele
             { label: 'Apple web app', options: appleWebApp.map(checkIfDisable) },
             { label: 'App links', options: appLinks.map(checkIfDisable) },
         ]
-    }, [types])
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [types?.[0]])
 
     return (
         <Card bodyStyle={{ padding: 8 }}>
@@ -225,8 +147,12 @@ const MetaInput = ({ types, onTypeChange, values, onValuesChange, errors, onDele
                             mode="multiple"
                             maxTagCount="responsive"
                             value={types}
-                            onChange={onTypeChange}
-                            options={options}
+                            onChange={(e) => {
+                                onTypeChange(e)
+
+                                if (!e) onValuesChange([])
+                            }}
+                            options={cleanOptions}
                         />
                         <Button
                             size="small"
@@ -240,12 +166,81 @@ const MetaInput = ({ types, onTypeChange, values, onValuesChange, errors, onDele
 
                 <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
                     <div style={{ width: 45 }}>
-                        <Text type="secondary">Value :</Text>
+                        <Text type={'secondary'}>Value :</Text>
                     </div>
-                    <div style={{ flex: 1 }}>{element}</div>
+                    <div style={{ flex: 1 }}>
+                        {/* <Space.Compact size="small" style={{ width: '100%' }}> */}
+                        <div style={{ display: 'flex', width: '100%', gap: 8, alignItems: 'center' }}>
+                            {option?.type?.map((t: string, idx: number) => (
+                                <Fragment key={idx}>
+                                    {t === 'string' && (
+                                        <Input
+                                            size="small"
+                                            style={{ width: `calc(${100 / option?.type.length}%)` }}
+                                            value={values?.[idx] as string}
+                                            onChange={(e) => onValueChange(idx, e.target.value)}
+                                            status={errors?.[idx] ? 'error' : undefined}
+                                        />
+                                    )}
+                                    {t === 'image' && (
+                                        <>
+                                            {!!errors?.[idx] && (
+                                                <WarningOutlined style={{ color: '#ff7875' }} />
+                                            )}
+                                            <div style={{ flex: 1 }}>
+                                                <MediaModal
+                                                    mediaType={MediaType.IMAGE}
+                                                    value={values?.[idx] as Media}
+                                                    onChange={(e) => onValueChange(idx, e)}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                    {t === 'boolean' && (
+                                        <Select
+                                            size="small"
+                                            maxTagCount="responsive"
+                                            style={{ width: `calc(${100 / option?.type.length}%)` }}
+                                            value={values?.[idx] as string}
+                                            onChange={(e) => onValueChange(idx, e)}
+                                            status={errors?.[idx] ? 'error' : undefined}
+                                            options={[
+                                                { value: true, label: 'Yes' },
+                                                { value: false, label: 'No' },
+                                            ]}
+                                        />
+                                    )}
+                                    {t === 'link' && (
+                                        <LinkSelect
+                                            value={values?.[idx] as LinkValue}
+                                            onChange={(e) => {
+                                                console.log('link', e)
+                                                onValueChange(idx, e)
+                                            }}
+                                            error={!!errors?.[idx]}
+                                        />
+                                    )}
+                                    {t === 'option' && (
+                                        <Select
+                                            size="small"
+                                            maxTagCount="responsive"
+                                            style={{ width: `calc(${100 / option?.type.length}%)` }}
+                                            value={values?.[idx] as string}
+                                            onChange={(e) => onValueChange(idx, e)}
+                                            status={errors?.[idx] ? 'error' : undefined}
+                                            options={option?.options.map((e: string) => ({
+                                                value: e,
+                                                label: e,
+                                            }))}
+                                        />
+                                    )}
+                                    {/* </Tooltip> */}
+                                </Fragment>
+                            ))}
+                            {/* </Space.Compact> */}
+                        </div>
+                    </div>
                 </div>
-
-                {/* <Divider style={{ margin: 0 }} /> */}
             </Space>
         </Card>
     )

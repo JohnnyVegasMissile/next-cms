@@ -1,61 +1,9 @@
-import { LinkProtocol, LinkType, Media, MediaType, PageType, SettingType } from '@prisma/client'
+import { LinkType, PageType, SettingType } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 
 import PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
-import { ObjectId } from '~/types'
-import { LinkValue } from '~/components/LinkSelect'
-
-const parseCreateValues = (values: (string | number | boolean | LinkValue | Media)[]) => ({
-    createMany: {
-        data: values.map((value) => {
-            switch (typeof value) {
-                case 'string':
-                    return { string: value }
-                case 'boolean':
-                    return { boolean: value }
-                case 'number':
-                    return { number: value }
-
-                default: {
-                    if (
-                        value?.type === MediaType.IMAGE ||
-                        value?.type === MediaType.FILE ||
-                        value?.type === MediaType.VIDEO
-                    ) {
-                        return { mediaId: value.id }
-                    } else {
-                        if (value?.type === LinkType.IN) {
-                            return {
-                                link: {
-                                    upset: {
-                                        where: { slugId: value.slugId },
-                                    },
-                                    data: { type: LinkType.IN },
-                                },
-                            }
-                        } else if (value?.type === LinkType.OUT) {
-                            return {
-                                link: {
-                                    create: {
-                                        data: {
-                                            type: LinkType.OUT,
-                                            link: value.link || '',
-                                            protocol: value.prototol || LinkProtocol.HTTPS,
-                                        },
-                                    },
-                                },
-                            }
-                        }
-                    }
-
-                    return { string: '' }
-                }
-            }
-        }),
-    },
-})
 
 export async function PUT(request: Request, context: any) {
     const { pageId } = context.params
@@ -65,32 +13,72 @@ export async function PUT(request: Request, context: any) {
     if (!Array.isArray(slug)) NextResponse.json({ message: 'Slug not valid.' }, { status: 400 })
     if (typeof published !== 'boolean') NextResponse.json({ message: 'Published not valid' }, { status: 400 })
 
-    const listID = metadatas?.map((metadata) => metadata.id)?.filter((id) => !!id)
-
-    await prisma.metadata.deleteMany({
-        where: { id: { notIn: listID as ObjectId[] }, pageId },
-    })
+    const notIn: string[] = []
 
     for (const metadata of metadatas) {
+        let metadataId: string | undefined
+
         if (!!metadata.id) {
-            await prisma.metadataValue.deleteMany({ where: { metadataId: metadata.id } })
+            metadataId = metadata.id
+
+            await prisma.metadataValue.deleteMany({ where: { metadataId } })
+
             await prisma.metadata.update({
                 where: { id: metadata.id },
-                data: {
-                    types: metadata.types,
-                    values: parseCreateValues(metadata.values),
-                },
+                data: { types: metadata.types },
             })
         } else {
-            await prisma.metadata.create({
-                data: {
-                    pageId,
-                    types: metadata.types,
-                    values: parseCreateValues(metadata.values),
-                },
-            })
+            metadataId = (
+                await prisma.metadata.create({
+                    data: { types: metadata.types, pageId },
+                })
+            )?.id
         }
+
+        await prisma.metadataValue.createMany({
+            data: metadata.values.map((value) => {
+                if (typeof value === 'string') {
+                    return { metadataId, string: value }
+                } else if (typeof value === 'number') {
+                    return { metadataId, number: value }
+                } else if (typeof value === 'boolean') {
+                    return { metadataId, boolean: value }
+                } else if (value?.type === 'IN') {
+                    return {
+                        metadataId,
+                        link: {
+                            connectOrCreate: {
+                                where: { slugId: value.slugId },
+                                create: {
+                                    type: LinkType.IN,
+                                    slugId: value.slugId,
+                                },
+                            },
+                        },
+                    }
+                } else if (value?.type === 'OUT') {
+                    return {
+                        metadataId,
+                        link: {
+                            create: {
+                                data: {
+                                    type: value.type,
+                                    link: value.link,
+                                    prototol: value.prototol,
+                                },
+                            },
+                        },
+                    }
+                } else {
+                    return { metadataId, mediaId: value?.id }
+                }
+            }),
+        })
+
+        notIn.push(metadataId)
     }
+
+    await prisma.metadata.deleteMany({ where: { id: { notIn }, pageId } })
 
     const oldPage = await prisma.page.findUnique({ where: { id: pageId }, include: { slug: true } })
     const page = await prisma.page.update({
@@ -109,7 +97,7 @@ export async function PUT(request: Request, context: any) {
                       }
                     : undefined,
         },
-        include: { slug: true, metadatas: true },
+        include: { slug: true, metadatas: { include: { values: true } } },
     })
 
     const locales =
@@ -119,30 +107,21 @@ export async function PUT(request: Request, context: any) {
             })
         )?.value.split(', ') || []
 
-    switch (page?.type) {
-        case PageType.HOMEPAGE: {
-            revalidatePath('/')
-            locales.forEach((e) => revalidatePath(`/${e.toLocaleLowerCase()}`))
-            break
-        }
-        case PageType.SIGNIN: {
-            revalidatePath('/sign-in')
-            locales.forEach((e) => revalidatePath(`/${e.toLocaleLowerCase()}/sign-in`))
-            break
-        }
-        case PageType.PAGE: {
-            if (oldPage?.slug && oldPage?.slug?.full !== slug.join('/')) {
-                revalidatePath(`/${oldPage?.slug.full as string}`)
-                locales.forEach((e) =>
-                    revalidatePath(`/${e.toLocaleLowerCase()}/${oldPage?.slug?.full as string}`)
-                )
-            }
-
-            revalidatePath(`/${slug.join('/')}`)
-            locales.forEach((e) => revalidatePath(`/${e.toLocaleLowerCase()}/${slug.join('/')}`))
-            break
-        }
+    if (oldPage?.slug && oldPage?.slug?.full !== slug.join('/')) {
+        revalidatePath(page?.type === PageType.HOMEPAGE ? '/' : `/${oldPage?.slug.full as string}`)
+        locales.forEach((e: string) =>
+            revalidatePath(
+                `/${e.toLocaleLowerCase()}${
+                    page?.type === PageType.HOMEPAGE ? '' : `/${oldPage?.slug?.full}`
+                }`
+            )
+        )
     }
+
+    revalidatePath(page?.type === PageType.HOMEPAGE ? '/' : `/${slug.join('/')}`)
+    locales.forEach((e) =>
+        revalidatePath(`/${e.toLocaleLowerCase()}${page?.type === PageType.HOMEPAGE ? '/' : slug.join('/')}`)
+    )
 
     return NextResponse.json(page)
 }

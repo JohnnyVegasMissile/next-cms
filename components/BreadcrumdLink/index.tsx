@@ -11,9 +11,10 @@ const BreadcrumdLink = ({ url }: { url: string }) => {
                         title: (
                             <Popover
                                 overlayInnerStyle={{ padding: 0 }}
-                                content={
-                                    <QRCode value={`${window.location.origin}/${url}`} bordered={false} />
-                                }
+                                content={`${window.location.origin}/${url}`}
+                                // content={
+                                //     <QRCode value={`${window.location.origin}/${url}`} bordered={false} />
+                                // }
                             >
                                 <LinkOutlined />
                             </Popover>

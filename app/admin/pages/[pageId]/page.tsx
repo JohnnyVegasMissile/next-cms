@@ -65,7 +65,17 @@ const getPage = async (pageId: string) => {
 
     const page = await prisma.page.findUnique({
         where: { id: pageId },
-        include: { slug: true, metadatas: { include: { values: { include: { link: true, media: true } } } } },
+        include: {
+            slug: true,
+            metadatas: {
+                include: {
+                    values: {
+                        include: { link: true, media: true },
+                        orderBy: { createdAt: 'asc' },
+                    },
+                },
+            },
+        },
     })
 
     if (!page) return { isUpdate: true }

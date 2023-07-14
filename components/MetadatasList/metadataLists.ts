@@ -220,9 +220,9 @@ export const openGraph: any[] = [
         multiple: true,
         toValue: (value: [Media], meta: any) => {
             const copyMeta = { ...meta }
-            const copyImgs = { ...(copyMeta.openGraph?.images || []) }
+            const copyImgs = [...(copyMeta.openGraph?.images || [])]
             copyImgs.push({
-                url: `/storage/${value[0].type.toLocaleLowerCase()}s/${value[0].uri}`,
+                url: `/storage/${value[0].type?.toLocaleLowerCase()}s/${value[0].uri}`,
                 // width: 1800,
                 // height: 1600,
                 alt: value[0].alt,
@@ -262,7 +262,7 @@ export const icons: any[] = [
         type: ['image'],
         toValue: (value: [Media], meta: any) => {
             const copyMeta = { ...meta }
-            set(copyMeta, 'icons.icon', `/storage/${value[0].type.toLocaleLowerCase()}s/${value[0].uri}`)
+            set(copyMeta, 'icons.icon', `/storage/${value[0].type?.toLocaleLowerCase()}s/${value[0].uri}`)
             return copyMeta
         },
     },
@@ -272,7 +272,7 @@ export const icons: any[] = [
         type: ['image'],
         toValue: (value: [Media], meta: any) => {
             const copyMeta = { ...meta }
-            set(copyMeta, 'icons.shortcut', `/storage/${value[0].type.toLocaleLowerCase()}s/${value[0].uri}`)
+            set(copyMeta, 'icons.shortcut', `/storage/${value[0].type?.toLocaleLowerCase()}s/${value[0].uri}`)
             return copyMeta
         },
     },
@@ -282,7 +282,7 @@ export const icons: any[] = [
         type: ['image'],
         toValue: (value: [Media], meta: any) => {
             const copyMeta = { ...meta }
-            set(copyMeta, 'icons.apple', `/storage/${value[0].type.toLocaleLowerCase()}s/${value[0].uri}`)
+            set(copyMeta, 'icons.apple', `/storage/${value[0].type?.toLocaleLowerCase()}s/${value[0].uri}`)
             return copyMeta
         },
     },
@@ -294,7 +294,7 @@ export const icons: any[] = [
             const copyMeta = { ...meta }
             set(copyMeta, 'icons.other', {
                 rel: 'apple-touch-icon-precomposed',
-                url: `/storage/${value[0].type.toLocaleLowerCase()}s/${value[0].uri}`,
+                url: `/storage/${value[0].type?.toLocaleLowerCase()}s/${value[0].uri}`,
             })
             return copyMeta
         },
@@ -370,9 +370,9 @@ export const twitter: any[] = [
         multiple: true,
         toValue: (value: [Media], meta: any) => {
             const copyMeta = { ...meta }
-            const copyImgs = { ...(copyMeta.twitter?.images || []) }
+            const copyImgs = [...(copyMeta.twitter?.images || [])]
             copyImgs.push({
-                url: `/storage/${value[0].type.toLocaleLowerCase()}s/${value[0].uri}`,
+                url: `/storage/${value[0].type?.toLocaleLowerCase()}s/${value[0].uri}`,
                 alt: value[0].alt,
             })
             set(copyMeta, 'twitter.images', copyImgs)
@@ -446,8 +446,8 @@ export const appleWebApp: any[] = [
         multiple: true,
         toValue: (value: [Media], meta: any) => {
             const copyMeta = { ...meta }
-            const copyImgs = { ...(copyMeta.appleWebApp?.startupImage || []) }
-            copyImgs.push(`/storage/${value[0].type.toLocaleLowerCase()}s/${value[0].uri}`)
+            const copyImgs = [...(copyMeta.appleWebApp?.startupImage || [])]
+            copyImgs.push(`/storage/${value[0].type?.toLocaleLowerCase()}s/${value[0].uri}`)
             set(copyMeta, 'appleWebApp.startupImage', copyImgs)
             return copyMeta
         },

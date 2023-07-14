@@ -91,7 +91,7 @@ export const generateMetadata = async ({ params }: { params: { slug: string } })
 
     const page = await prisma.page.findFirst({
         where: { slug: { full } },
-        include: { metadatas: { include: { values: { include: { link: true } } } } },
+        include: { metadatas: { include: { values: { include: { link: true, media: true } } } } },
     })
 
     if (!!page) {
@@ -102,11 +102,13 @@ export const generateMetadata = async ({ params }: { params: { slug: string } })
             appleWebApp: { title: page.name },
         }
 
-        page.metadatas.forEach((metadata) => {
-            metadata.types.forEach((type) => {
+        for (const metadata of page.metadatas) {
+            for (const type of metadata.types) {
                 const opt = options.find((e) => e.value === type)
 
                 if (!opt || !opt.toValue) return
+
+                console.log('values', metadata.values)
 
                 const cleanValues = metadata.values.map(
                     (e) =>
@@ -114,14 +116,12 @@ export const generateMetadata = async ({ params }: { params: { slug: string } })
                         (e.number === null ? undefined : e.number) ||
                         (e.boolean === null ? undefined : e.boolean) ||
                         (e.link === null ? undefined : linkToLinkValue(e.link)) ||
-                        ''
+                        (e.media === null ? undefined : e.media)
                 )
 
                 metadatas = opt.toValue(cleanValues, metadatas)
-            })
-        })
-
-        console.log('metadatas', metadatas)
+            }
+        }
 
         return metadatas
     }
@@ -153,28 +153,6 @@ export const generateMetadata = async ({ params }: { params: { slug: string } })
         }
 
     return {}
-
-    //       openGraph: {
-    //     title: 'Next.js',
-    //     description: 'The React Framework for the Web',
-    //     url: 'https://nextjs.org',
-    //     siteName: 'Next.js',
-    //     images: [
-    //       {
-    //         url: 'https://nextjs.org/og.png',
-    //         width: 800,
-    //         height: 600,
-    //       },
-    //       {
-    //         url: 'https://nextjs.org/og-alt.png',
-    //         width: 1800,
-    //         height: 1600,
-    //         alt: 'My custom alt',
-    //       },
-    //     ],
-    //     locale: 'en_US',
-    //     type: 'website',
-    //   },
 }
 
 const getSections = async (slug: string) => {

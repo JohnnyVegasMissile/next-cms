@@ -17,24 +17,10 @@ const sitemap = async (): Promise<MetadataRoute.Sitemap> => {
         },
     })
 
-    const defaults = [
-        {
-            url: `${url?.value}`,
-            lastModified: new Date(),
-        },
-        {
-            url: `${url?.value}/sign-in`,
-            lastModified: new Date(),
-        },
-    ]
-
-    return [
-        ...defaults,
-        ...slugs.map((slug) => ({
-            url: `${url?.value}/${slug.full}`,
-            lastModified: slug.revalidatedAt,
-        })),
-    ]
+    return slugs.map((slug) => ({
+        url: `${url?.value}/${slug.full}`,
+        lastModified: slug.revalidatedAt,
+    }))
 }
 
 export default sitemap

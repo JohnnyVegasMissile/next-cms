@@ -48,7 +48,6 @@ interface LinkSelectProps {
 }
 
 const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
-    // const [q, setQ] = useState('')
     const slugs = useQuery(['slugs-simple'], () => getSlugsSimple(), { enabled: value?.type === LinkType.IN })
 
     useEffect(() => {
@@ -61,7 +60,14 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
         value: slug.id,
         label: !!slug.page ? (
             <Space>
-                <FileOutlined />
+                {slug.page.type === PageType.HOMEPAGE ? (
+                    <HomeOutlined />
+                ) : slug.page.type === PageType.SIGNIN ? (
+                    <LoginOutlined />
+                ) : (
+                    <FileOutlined />
+                )}
+
                 {slug.page?.name}
             </Space>
         ) : (
@@ -70,7 +76,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
                 {slug.container?.name}
             </Space>
         ),
-        children: slug.childs.map((child) => ({
+        children: slug.childs?.map((child) => ({
             value: child.id,
             label: (
                 <Space>
@@ -135,27 +141,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
                     dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                     allowClear
                     onChange={onPageChange}
-                    treeData={[
-                        {
-                            value: PageType.HOMEPAGE,
-                            label: (
-                                <Space>
-                                    <HomeOutlined />
-                                    Homepage
-                                </Space>
-                            ),
-                        },
-                        {
-                            value: PageType.SIGNIN,
-                            label: (
-                                <Space>
-                                    <LoginOutlined />
-                                    Sign In
-                                </Space>
-                            ),
-                        },
-                        ...(options || []),
-                    ]}
+                    treeData={options}
                     autoClearSearchValue={false}
                     // searchValue={q}
                     // onSearch={setQ}

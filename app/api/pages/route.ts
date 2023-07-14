@@ -3,8 +3,7 @@ import type PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 import { PAGE_SIZE } from '~/utilities/constants'
 import { revalidatePath } from 'next/cache'
-import { LinkValue } from '~/components/LinkSelect'
-import { LinkProtocol, LinkType, Media, MediaType } from '@prisma/client'
+import { LinkType } from '@prisma/client'
 
 export const GET = async (request: NextRequest) => {
     const { searchParams } = request.nextUrl
@@ -45,63 +44,11 @@ export const GET = async (request: NextRequest) => {
     return NextResponse.json({ results: pages, count })
 }
 
-const parseCreateValues = (values: (string | number | boolean | LinkValue | Media)[]) => ({
-    createMany: {
-        data: values.map((value) => {
-            switch (typeof value) {
-                case 'string':
-                    return { string: value }
-                case 'boolean':
-                    return { boolean: value }
-                case 'number':
-                    return { number: value }
-
-                default: {
-                    if (
-                        value?.type === MediaType.IMAGE ||
-                        value?.type === MediaType.FILE ||
-                        value?.type === MediaType.VIDEO
-                    ) {
-                        return { mediaId: value.id }
-                    } else {
-                        if (value?.type === LinkType.IN) {
-                            return {
-                                link: {
-                                    upset: {
-                                        where: { slugId: value.slugId },
-                                    },
-                                    data: { type: LinkType.IN },
-                                },
-                            }
-                        } else if (value?.type === LinkType.OUT) {
-                            return {
-                                link: {
-                                    create: {
-                                        data: {
-                                            type: LinkType.OUT,
-                                            link: value.link || '',
-                                            protocol: value.prototol || LinkProtocol.HTTPS,
-                                        },
-                                    },
-                                },
-                            }
-                        }
-                    }
-
-                    return { string: '' }
-                }
-            }
-        }),
-    },
-})
-
 export const POST = async (request: NextRequest) => {
     const { name, slug, published, metadatas } = (await request.json()) as PageCreation
 
     if (typeof name !== 'string') return NextResponse.json({ message: 'Name not valid' }, { status: 400 })
-
     if (!Array.isArray(slug)) return NextResponse.json({ message: 'Slug not valid.' }, { status: 400 })
-
     if (typeof published !== 'boolean')
         return NextResponse.json({ message: 'Published not valid' }, { status: 400 })
 
@@ -119,12 +66,50 @@ export const POST = async (request: NextRequest) => {
     })
 
     for (const metadata of metadatas) {
-        await prisma.metadata.create({
-            data: {
-                pageId: page.id,
-                types: metadata.types,
-                values: parseCreateValues(metadata.values),
-            },
+        const metadataId = (
+            await prisma.metadata.create({
+                data: { types: metadata.types, pageId: page.id },
+            })
+        )?.id
+
+        await prisma.metadataValue.createMany({
+            data: metadata.values.map((value) => {
+                if (typeof value === 'string') {
+                    return { metadataId, string: value }
+                } else if (typeof value === 'number') {
+                    return { metadataId, number: value }
+                } else if (typeof value === 'boolean') {
+                    return { metadataId, boolean: value }
+                } else if (value?.type === 'IN') {
+                    return {
+                        metadataId,
+                        link: {
+                            connectOrCreate: {
+                                where: { slugId: value.slugId },
+                                create: {
+                                    type: LinkType.IN,
+                                    slugId: value.slugId,
+                                },
+                            },
+                        },
+                    }
+                } else if (value?.type === 'OUT') {
+                    return {
+                        metadataId,
+                        link: {
+                            create: {
+                                data: {
+                                    type: value.type,
+                                    link: value.link,
+                                    prototol: value.prototol,
+                                },
+                            },
+                        },
+                    }
+                } else {
+                    return { metadataId, mediaId: value?.id }
+                }
+            }),
         })
     }
 

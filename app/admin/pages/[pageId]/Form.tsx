@@ -18,6 +18,7 @@ const { Text } = Typography
 
 const validate = (values: PageCreation) => {
     let errors: any = {}
+    console.log('values', values)
 
     if (!values.name) {
         errors.name = 'Required'
@@ -31,11 +32,13 @@ const validate = (values: PageCreation) => {
 
     for (let i = 0; i < values.metadatas?.length; i++) {
         for (let j = 0; j < (values.metadatas[i]?.values?.length || 0); j++) {
-            if (values.metadatas[i]?.values[j] === undefined || values.metadatas[i]?.values[j] === '')
-                set(errors, `metadatas.${i}.values.${j}`, 'Required')
+            if (values.metadatas[i]?.values[j] === undefined || values.metadatas[i]?.values[j] === '') {
+                set(errors, `metadatas.${i}`, 'Required')
+                continue
+            }
         }
     }
-
+    console.log('err', errors, values)
     return errors
 }
 
@@ -145,7 +148,7 @@ const Form = ({ pageId, isUpdate, page, type }: FormPageProps) => {
 
                         {type !== PageType.HOMEPAGE && (
                             <>
-                                <Divider style={{ margin: '1rem', width: '97%', minWidth: '97%' }} />
+                                <Divider style={{ margin: '1rem' }} />
 
                                 <WithLabel
                                     label="URL :"

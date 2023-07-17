@@ -46,7 +46,7 @@ export async function PUT(request: NextRequest, context: any) {
                     type: SectionType.PAGE,
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
-                    content: section.value,
+                    value: section.value,
 
                     linkedData: {
                         createMany: {
@@ -98,7 +98,7 @@ export async function PUT(request: NextRequest, context: any) {
                     type: SectionType.PAGE_SIDEBAR,
                     block: section.block,
                     position: parseInt(section.position as unknown as string),
-                    content: section.value,
+                    value: section.value,
 
                     linkedData: {
                         createMany: {

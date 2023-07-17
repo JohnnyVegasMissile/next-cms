@@ -108,8 +108,6 @@ export const generateMetadata = async ({ params }: { params: { slug: string } })
 
                 if (!opt || !opt.toValue) return
 
-                console.log('values', metadata.values)
-
                 const cleanValues = metadata.values.map(
                     (e) =>
                         (e.string === null ? undefined : e.string) ||

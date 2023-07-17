@@ -1,11 +1,11 @@
-import { Form, FormField, Link, Media, Section } from '@prisma/client'
+import { Form, FormField, Link, Media, Menu, Section } from '@prisma/client'
 import { BlockKey } from '~/blocks'
 import blocksViews from '~/blocks/views'
 import { ObjectId } from '~/types'
 
 interface DisplaySectionProps {
     section: Section & {
-        medias?:
+        linkedData?:
             | {
                   form:
                       | (Form & {
@@ -20,22 +20,25 @@ interface DisplaySectionProps {
                       | null
                   media: Media | null
                   link: Link | null
+                  menu: Menu | null
               }[]
             | null
     }
 }
 
 const DisplaySection = async ({ section }: DisplaySectionProps) => {
-    const { block, content, medias } = section
+    const { block, value, linkedData } = section
     const View = blocksViews[block as BlockKey]
 
     if (!View) return null
 
     return (
         <View
-            content={content}
-            medias={new Map(medias?.filter((e) => !!e.media).map((e) => [e.media?.id!, e.media!]))}
-            forms={new Map(medias?.filter((e) => !!e.form).map((e) => [e.form?.id!, e.form!]))}
+            value={value}
+            medias={new Map(linkedData?.filter((e) => !!e.media).map((e) => [e.media?.id!, e.media!]))}
+            forms={new Map(linkedData?.filter((e) => !!e.form).map((e) => [e.form?.id!, e.form!]))}
+            links={new Map(linkedData?.filter((e) => !!e.link).map((e) => [e.link?.id!, e.link!]))}
+            menus={new Map(linkedData?.filter((e) => !!e.menu).map((e) => [e.menu?.id!, e.menu!]))}
         />
     )
 }

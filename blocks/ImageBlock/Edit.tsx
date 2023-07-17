@@ -8,8 +8,8 @@ import Image from 'next/image'
 import { ContentType } from '.'
 
 const ImageBlock = ({ position }: EditBlockProps) => {
-    const { errors, content, medias, addMedia } = useSection<ContentType>(position)
-    const { imageId } = content || {}
+    const { errors, value, medias, addMedia } = useSection<ContentType>(position)
+    const { imageId } = value || {}
 
     const img = medias?.get(imageId || '')
 
@@ -21,7 +21,7 @@ const ImageBlock = ({ position }: EditBlockProps) => {
                 )}
                 <div className={classNames(styles['button'])}>
                     <MediaModal
-                        value={medias?.get(imageId || '')}
+                        // value={medias?.get(imageId || '')}
                         onChange={(media) => addMedia('imageId', media)}
                         mediaType={MediaType.IMAGE}
                     />

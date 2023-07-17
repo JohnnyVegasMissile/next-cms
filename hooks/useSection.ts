@@ -21,13 +21,13 @@ const useSection = <T>(position: number) => {
     const section = sections[position]
     const sectionErrors = errors?.[position]
 
-    const onSetFieldValue = (name: string, value: any) => setFieldValue(`${position}.content.${name}`, value)
+    const onSetFieldValue = (name: string, value: any) => setFieldValue(`${position}.value.${name}`, value)
 
     const addMedia = (name: string, media: Media | undefined) => {
         if (!media) {
-            setFieldValue(`${position}.content.${name}`, undefined)
+            setFieldValue(`${position}.value.${name}`, undefined)
         } else {
-            setFieldValue(`${position}.content.${name}`, media.id)
+            setFieldValue(`${position}.value.${name}`, media.id)
 
             const newMediaSet = new Map(section?.medias)
             newMediaSet.set(media.id, media)
@@ -37,9 +37,9 @@ const useSection = <T>(position: number) => {
 
     const addForm = (name: string, form: Form | undefined) => {
         if (!form) {
-            setFieldValue(`${position}.content.${name}`, undefined)
+            setFieldValue(`${position}.value.${name}`, undefined)
         } else {
-            setFieldValue(`${position}.content.${name}`, form.id)
+            setFieldValue(`${position}.value.${name}`, form.id)
 
             const newFormSet = new Map(section?.forms)
             newFormSet.set(form.id, form as any as FormSimple)
@@ -49,9 +49,9 @@ const useSection = <T>(position: number) => {
 
     const addMenu = (name: string, menu: Menu | undefined) => {
         if (!menu) {
-            setFieldValue(`${position}.content.${name}`, undefined)
+            setFieldValue(`${position}.value.${name}`, undefined)
         } else {
-            setFieldValue(`${position}.content.${name}`, menu.id)
+            setFieldValue(`${position}.value.${name}`, menu.id)
 
             const newMenuSet = new Map(section?.menus)
             newMenuSet.set(menu.id, menu)
@@ -60,7 +60,7 @@ const useSection = <T>(position: number) => {
     }
 
     return {
-        content: section?.content as T,
+        value: section?.value as T,
         setFieldValue: onSetFieldValue,
         medias: section?.medias,
         addMedia,

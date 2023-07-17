@@ -24,6 +24,19 @@ const getSections = async (slug: string) => {
                         media: true,
                         form: { include: { fields: true } },
                         link: true,
+                        menu: {
+                            include: {
+                                childs: {
+                                    include: {
+                                        childs: {
+                                            include: {
+                                                childs: true,
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -40,6 +53,19 @@ const getSections = async (slug: string) => {
                         media: true,
                         form: { include: { fields: true } },
                         link: true,
+                        menu: {
+                            include: {
+                                childs: {
+                                    include: {
+                                        childs: {
+                                            include: {
+                                                childs: true,
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -56,6 +82,19 @@ const getSections = async (slug: string) => {
                         media: true,
                         form: { include: { fields: true } },
                         link: true,
+                        menu: {
+                            include: {
+                                childs: {
+                                    include: {
+                                        childs: {
+                                            include: {
+                                                childs: true,
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -70,6 +109,19 @@ const getSections = async (slug: string) => {
                         media: true,
                         form: { include: { fields: true } },
                         link: true,
+                        menu: {
+                            include: {
+                                childs: {
+                                    include: {
+                                        childs: {
+                                            include: {
+                                                childs: true,
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -84,6 +136,19 @@ const getSections = async (slug: string) => {
                         media: true,
                         form: { include: { fields: true } },
                         link: true,
+                        menu: {
+                            include: {
+                                childs: {
+                                    include: {
+                                        childs: {
+                                            include: {
+                                                childs: true,
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -112,6 +177,6 @@ const Sidebar = async ({ params }: { params: { slug: string } }) => {
     )
 }
 
-export const revalidate = 'force-cache'
+export const revalidate = Infinity
 
 export default Sidebar

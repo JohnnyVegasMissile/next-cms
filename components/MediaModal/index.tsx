@@ -281,7 +281,7 @@ const columns = [
 
 interface MediaModalProps {
     mediaType: MediaType
-    value: Media | undefined
+    value?: Media | undefined
     onChange(e: Media | undefined): void
 }
 

@@ -1,12 +1,14 @@
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
 import FormBlock from './FormBlock'
-import { Form, FormField, Media, SectionType } from '@prisma/client'
+import { Form, FormField, Link, Media, Menu, SectionType } from '@prisma/client'
 import { ObjectId } from '~/types'
 
 export type ViewBlockProps<T> = {
-    content: T
+    value: T
     medias: Map<ObjectId, Media>
+    links: Map<ObjectId, Link>
+    menus: Map<ObjectId, Menu>
     forms: Map<
         ObjectId,
         Form & {
@@ -26,8 +28,11 @@ export type EditBlockProps = {
 }
 
 export type BlockDetails = {
-    View: ({ content }: ViewBlockProps<any>) => JSX.Element
-    Edit: ({ position }: EditBlockProps) => JSX.Element
+    View: ({ value }: ViewBlockProps<any>) => JSX.Element
+    Edit: {
+        ({ position }: EditBlockProps): JSX.Element
+        Panel?: ({ position }: EditBlockProps) => JSX.Element
+    }
     title: string
     // position: ('HEADER' | 'FOOTER' | 'SIDEBAR' | 'CONTENT')[]
     availableIn: SectionType[]

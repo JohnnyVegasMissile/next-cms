@@ -13,6 +13,19 @@ const getProps = async () => {
                     media: true,
                     form: { include: { fields: true } },
                     link: true,
+                    menu: {
+                        include: {
+                            childs: {
+                                include: {
+                                    childs: {
+                                        include: {
+                                            childs: true,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -38,6 +51,6 @@ const NotFound = async () => {
     )
 }
 
-export const revalidate = 'force-cache'
+export const revalidate = Infinity
 
 export default NotFound

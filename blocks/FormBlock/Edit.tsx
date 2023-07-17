@@ -2,11 +2,9 @@
 
 import classNames from 'classnames'
 import styles from './TextBlock.module.scss'
-import Image from 'next/image'
 import Link from 'next/link'
 import useSection from '~/hooks/useSection'
 import { EditBlockProps } from '..'
-import SectionWrap from '~/components/SectionWrap'
 import { FormFieldType } from '@prisma/client'
 import WithLabel from '~/components/WithLabel'
 import ListSelect from '~/components/ListSelect'
@@ -18,26 +16,34 @@ import { Fragment } from 'react'
 const { Text } = Typography
 
 const Edit = ({ position }: EditBlockProps) => {
-    const { content, forms, addForm } = useSection<ContentType>(position)
-    const { formId } = content || {}
+    const { value, forms } = useSection<ContentType>(position)
+    const { formId } = value || {}
 
     const form = forms?.get(formId || '')
 
     return (
-        <SectionWrap
-            position={position}
-            panel={
-                <WithLabel label="Form">
-                    <ListSelect.Form value={formId} onChange={(_, form) => addForm('formId', form)} />
-                </WithLabel>
-            }
-        >
-            <section className={classNames(styles['section'])}>
-                {!form ? <Text>Choose a form</Text> : <DisplayFormInputs form={form} />}
-            </section>
-        </SectionWrap>
+        <section className={classNames(styles['section'])}>
+            {!form ? <Text>Choose a form</Text> : <DisplayFormInputs form={form} />}
+        </section>
     )
 }
+
+const Panel = ({ position }: EditBlockProps) => {
+    const { value, addForm, errors } = useSection<ContentType>(position)
+    const { formId } = value || {}
+
+    return (
+        <WithLabel label="Form">
+            <ListSelect.Form
+                value={formId}
+                onChange={(_, form) => addForm('formId', form)}
+                error={errors?.formId}
+            />
+        </WithLabel>
+    )
+}
+
+Edit.Panel = Panel
 
 export default Edit
 

@@ -28,7 +28,17 @@ const SectionWrap = ({ children, panel }: SectionWrapProps) => {
                 </Drawer>
             )}
             <div style={{ position: 'relative' }}>
-                <Space.Compact size="small" className={styles['buttons-wrap']}>
+                <Space.Compact
+                    size="small"
+                    style={{
+                        position: 'absolute',
+                        top: '0.25rem',
+                        right: '0.25rem',
+                        width: 'fit-content',
+                        opacity: 1,
+                        zIndex: 999,
+                    }}
+                >
                     <PopOptions
                         onUp={() => {}}
                         disableUp={true}

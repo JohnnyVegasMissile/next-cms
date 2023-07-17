@@ -12,15 +12,15 @@ import { MediaType } from '@prisma/client'
 import StyledInput from '~/components/StyledInput'
 
 const Edit = ({ position }: EditBlockProps) => {
-    const { content, setFieldValue, medias, addMedia } = useSection(position)
-    const { title, subtitle, text, buttons, image, switched } = content || {}
+    const { value, setFieldValue, medias, addMedia } = useSection(position)
+    const { title, subtitle, text, buttons, image, switched, mediaId } = value || {}
 
     return (
         <SectionWrap
             position={position}
             panel={
                 <MediaModal
-                    value={medias?.get(content.mediaId)}
+                    value={medias?.get(mediaId)}
                     onChange={(media) => addMedia('mediaId', media)}
                     mediaType={MediaType.IMAGE}
                 />

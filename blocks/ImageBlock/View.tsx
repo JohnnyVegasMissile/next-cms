@@ -6,8 +6,8 @@ import classNames from 'classnames'
 import Image from 'next/image'
 import { ContentType } from '.'
 
-const ImageBlock = ({ content, medias }: ViewBlockProps<ContentType>) => {
-    const { imageId } = content || {}
+const ImageBlock = ({ value, medias }: ViewBlockProps<ContentType>) => {
+    const { imageId } = value || {}
 
     const img = medias?.get(imageId || '')
 

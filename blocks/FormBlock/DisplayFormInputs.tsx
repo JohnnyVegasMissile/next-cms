@@ -7,7 +7,6 @@ import { useFormik } from 'formik'
 import { ObjectId } from '~/types'
 import set from 'lodash.set'
 import { useMutation } from '@tanstack/react-query'
-import { error } from 'console'
 import { isEmail } from '~/utilities'
 import { postMessage } from '~/network/messages'
 

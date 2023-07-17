@@ -20,7 +20,20 @@ const getProps = async () => {
                 include: {
                     media: true,
                     form: { include: { fields: true } },
-                    link: true,
+                    link: { include: { slug: true } },
+                    menu: {
+                        include: {
+                            childs: {
+                                include: {
+                                    childs: {
+                                        include: {
+                                            childs: true,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
             },
         },

@@ -12,7 +12,7 @@ export const validateSections = (values: { [key in string]: SectionCreation[] })
             const validate = blocks[section.block].validate
 
             if (!!validate) {
-                const sectionErrors = validate(section.content)
+                const sectionErrors = validate(section.value)
 
                 if (!!Object.keys(sectionErrors).length)
                     set(errors, `${key}.${section.position}`, sectionErrors)
@@ -32,24 +32,26 @@ export const sectionToSectionCreation = (values: { [key in string]: SectionRespo
             type: section.type,
             block: section.block as BlockKey,
             position: section.position,
-            content: section.content as any,
+            value: section.value as any,
 
             medias: new Map(
-                section.medias
+                section.linkedData
                     ?.filter((media) => !!media.media)
                     .map((media) => [media.media?.id, media.media])
             ),
-
             forms: new Map(
-                section.medias?.filter((media) => !!media.form).map((media) => [media.form?.id, media.form])
+                section.linkedData
+                    ?.filter((media) => !!media.form)
+                    .map((media) => [media.form?.id, media.form])
             ),
-
             menus: new Map(
-                section.medias?.filter((media) => !!media.menu).map((media) => [media.menu?.id, media.menu])
+                section.linkedData
+                    ?.filter((media) => !!media.menu)
+                    .map((media) => [media.menu?.id, media.menu])
             ),
         }))
     })
-    console.log('cleanSections', cleanSections)
+
     return cleanSections
 }
 
@@ -61,7 +63,7 @@ export const cleanSectionCreation = (values: { [key in string]: SectionCreation[
             const medias: ObjectId[] = []
             const forms: ObjectId[] = []
 
-            const stringifiedContent = JSON.stringify(section.content)
+            const stringifiedContent = JSON.stringify(section.value)
 
             section.medias.forEach((_, key) => {
                 if (stringifiedContent.includes(`"${key}"`)) medias.push(key)

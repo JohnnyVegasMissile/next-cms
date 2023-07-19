@@ -34,7 +34,7 @@ import { useFormik } from 'formik'
 import { useMutation } from '@tanstack/react-query'
 import { updateSettings } from '~/network/settings'
 import SettingsCreation from '~/types/settingsCreation'
-import { SettingType } from '@prisma/client'
+import { CodeLanguage, SettingType } from '@prisma/client'
 import { revalidateAll } from '~/network/api'
 import { exportDB, importDB } from '~/network/db'
 import { RcFile } from 'antd/es/upload'
@@ -555,32 +555,6 @@ const Settings = ({ settings }: FormProps) => {
     ]
 
     const language = [
-        // {
-        //     key: '1',
-        //     title: 'Allowed languages',
-        //     element: (
-        //         <Transfer
-        //             oneWay
-        //             dataSource={Object.keys(languages).map((key) => ({
-        //                 key,
-        //                 title: languages[key as CodeLanguage].name || '',
-        //                 description: languages[key as CodeLanguage].en || '',
-        //                 disabled: key === formik.values[SettingType.LANGUAGE_PREFERRED],
-        //             }))}
-        //             titles={['Inactive', 'Active']}
-        //             targetKeys={formik.values.LANGUAGE_LOCALES}
-        //             onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_LOCALES, e)}
-        //             render={(item) => (
-        //                 <Space>
-        //                     <Text>{item.title}</Text>
-        //                     <Tooltip title={item.description}>
-        //                         <InfoCircleOutlined style={{ color: '#aaa' }} />
-        //                     </Tooltip>
-        //                 </Space>
-        //             )}
-        //         />
-        //     ),
-        // },
         {
             key: '1',
             title: 'Preferred language',
@@ -626,48 +600,43 @@ const Settings = ({ settings }: FormProps) => {
                     rightColumns={columns}
                 >
                     {({
-                        direction,
                         filteredItems,
                         onItemSelectAll,
                         onItemSelect,
                         selectedKeys: listSelectedKeys,
                         disabled: listDisabled,
-                    }) => {
-                        const rowSelection: TableRowSelection<TransferItem> = {
-                            getCheckboxProps: (item) => ({ disabled: listDisabled || item.disabled }),
-                            onSelectAll(selected, selectedRows) {
-                                const treeSelectedKeys = selectedRows
-                                    .filter((item) => !item.disabled)
-                                    .map(({ key }) => key)
-                                const diffKeys = selected
-                                    ? difference(treeSelectedKeys, listSelectedKeys)
-                                    : difference(listSelectedKeys, treeSelectedKeys)
-                                onItemSelectAll(diffKeys as string[], selected)
-                            },
-                            onSelect({ key }, selected) {
-                                onItemSelect(key as string, selected)
-                            },
-                            selectedRowKeys: listSelectedKeys,
-                        }
-
-                        return (
-                            <Table
-                                pagination={false}
-                                scroll={{ y: 400 }}
-                                rowSelection={rowSelection}
-                                columns={columns}
-                                dataSource={filteredItems}
-                                size="small"
-                                style={{ pointerEvents: listDisabled ? 'none' : undefined }}
-                                onRow={({ key, disabled: itemDisabled }) => ({
-                                    onClick: () => {
-                                        if (itemDisabled || listDisabled) return
-                                        onItemSelect(key as string, !listSelectedKeys.includes(key as string))
-                                    },
-                                })}
-                            />
-                        )
-                    }}
+                    }) => (
+                        <Table
+                            pagination={false}
+                            scroll={{ y: 375 }}
+                            rowSelection={{
+                                getCheckboxProps: (item) => ({ disabled: listDisabled || item.disabled }),
+                                onSelectAll(selected, selectedRows) {
+                                    const treeSelectedKeys = selectedRows
+                                        .filter((item) => !item.disabled)
+                                        .map(({ key }) => key)
+                                    const diffKeys = selected
+                                        ? difference(treeSelectedKeys, listSelectedKeys)
+                                        : difference(listSelectedKeys, treeSelectedKeys)
+                                    onItemSelectAll(diffKeys as string[], selected)
+                                },
+                                onSelect({ key }, selected) {
+                                    onItemSelect(key as string, selected)
+                                },
+                                selectedRowKeys: listSelectedKeys,
+                            }}
+                            columns={columns}
+                            dataSource={filteredItems}
+                            size="small"
+                            style={{ pointerEvents: listDisabled ? 'none' : undefined }}
+                            onRow={({ key, disabled: itemDisabled }) => ({
+                                onClick: () => {
+                                    if (itemDisabled || listDisabled) return
+                                    onItemSelect(key as string, !listSelectedKeys.includes(key as string))
+                                },
+                            })}
+                        />
+                    )}
                 </Transfer>
             ),
         },

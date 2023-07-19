@@ -6,7 +6,7 @@ import { PageType, SectionType, SettingType } from '@prisma/client'
 import styles from './layout.module.scss'
 import { prisma } from '~/utilities/prisma'
 import DisplaySection from '~/components/DisplaySection'
-import getSection from '~/utilities/getSection'
+import getSection, { SectionResponse } from '~/utilities/getSection'
 
 const myFont = localFont({ src: '../../public/Garute-VF.ttf', variable: '--my-font' })
 
@@ -41,7 +41,15 @@ const getSettings = async () => {
     })
 }
 
-const getSections = async () => {
+const getSections = async (): Promise<{
+    layoutHeader: SectionResponse[]
+    layoutFooter: SectionResponse[]
+    layoutContentHeader: SectionResponse[]
+    layoutContentFooter: SectionResponse[]
+    layoutSidebarHeader: SectionResponse[]
+    layoutSidebarFooter: SectionResponse[]
+    maintenanceSections: SectionResponse[]
+}> => {
     const layoutHeader = await getSection({ type: SectionType.LAYOUT_HEADER })
     const layoutFooter = await getSection({ type: SectionType.LAYOUT_FOOTER })
     const layoutSidebarHeader = await getSection({ type: SectionType.LAYOUT_SIDEBAR_TOP })
@@ -150,5 +158,9 @@ const Layout = async ({
         </>
     )
 }
+
+// export function generateStaticParams() {
+//     return [{ slug: ['a', '1'] }, { slug: ['b', '2'] }, { slug: ['c', '3'] }]
+// }
 
 export default Layout

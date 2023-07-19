@@ -1,4 +1,4 @@
-import { SectionType, SettingType } from '@prisma/client'
+import { CodeLanguage, SectionType, SettingType } from '@prisma/client'
 import { notFound } from 'next/navigation'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
@@ -57,13 +57,29 @@ const getSidebar = async () => {
     }
 }
 
+const getLanguage = async () => {
+    const locales = await prisma.setting.findFirst({
+        where: { type: SettingType.LANGUAGE_LOCALES },
+    })
+
+    const preferred = await prisma.setting.findFirst({
+        where: { type: SettingType.LANGUAGE_PREFERRED },
+    })
+
+    return {
+        locales: (locales?.value.split(',') || ['EN']) as CodeLanguage[],
+        preferred: (preferred?.value || 'EN') as CodeLanguage,
+    }
+}
+
 const EditPageSections = async ({ params }: any) => {
     const layout = await getSections(params.pageId)
     const sidebar = await getSidebar()
+    const languages = await getLanguage()
 
     if (!layout) notFound()
 
-    return <Form pageId={params.pageId} layout={layout} sidebar={sidebar} />
+    return <Form pageId={params.pageId} layout={layout} sidebar={sidebar} {...languages} />
 }
 
 export const dynamic = 'force-dynamic'

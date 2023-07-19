@@ -18,8 +18,18 @@ import {
     ColorPicker,
     Upload,
     Tabs,
+    Tooltip,
+    Transfer,
+    Table,
+    Tag,
 } from 'antd'
-import { UploadOutlined, CheckOutlined, ReloadOutlined, DownloadOutlined } from '@ant-design/icons'
+import {
+    UploadOutlined,
+    CheckOutlined,
+    ReloadOutlined,
+    DownloadOutlined,
+    InfoCircleOutlined,
+} from '@ant-design/icons'
 import { useFormik } from 'formik'
 import { useMutation } from '@tanstack/react-query'
 import { updateSettings } from '~/network/settings'
@@ -29,6 +39,10 @@ import { revalidateAll } from '~/network/api'
 import { exportDB, importDB } from '~/network/db'
 import { RcFile } from 'antd/es/upload'
 import { ReactNode, useState } from 'react'
+import languages from '~/utilities/languages'
+import { TableRowSelection } from 'antd/es/table/interface'
+import { TransferItem } from 'antd/es/transfer'
+import difference from 'lodash/difference'
 
 const { Text } = Typography
 
@@ -528,52 +542,136 @@ const Settings = ({ settings }: FormProps) => {
         },
     ]
 
-    // const language = [
-    //     {
-    //         key: '1',
-    //         title: 'Allowed languages',
-    //         element: (
-    //             <Transfer
-    //                 oneWay
-    //                 dataSource={Object.keys(Locales).map((key) => ({
-    //                     key,
-    //                     title: Locales[key as codeLang].title || '',
-    //                     description: Locales[key as codeLang].en || '',
-    //                     disabled: key === formik.values[SettingType.LANGUAGE_PREFERRED],
-    //                 }))}
-    //                 titles={['Inactive', 'Active']}
-    //                 targetKeys={formik.values.LANGUAGE_LOCALES}
-    //                 onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_LOCALES, e)}
-    //                 render={(item) => (
-    //                     <Space>
-    //                         <Text>{item.title}</Text>
-    //                         <Tooltip title={item.description}>
-    //                             <InfoCircleOutlined  style={{ color: '#aaa' }} />
-    //                         </Tooltip>
-    //                     </Space>
-    //                 )}
-    //             />
-    //         ),
-    //     },
-    //     {
-    //         key: '2',
-    //         title: 'Preferred language',
-    //         element: (
-    //             <Select
-    //                 size="small"
-    //                 disabled={!formik.values.LANGUAGE_LOCALES?.length}
-    //                 value={formik.values[SettingType.LANGUAGE_PREFERRED]}
-    //                 onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_PREFERRED, e)}
-    //                 placeholder="Preferred language"
-    //                 style={{ width: 200 }}
-    //                 options={formik.values.LANGUAGE_LOCALES?.map((e) => ({
-    //                     value: e,
-    //                     label: Locales[e as codeLang]?.title,
-    //                 }))}
-    //             />
-    //         ),
-    //     },
-    // ]
+    const columns = [
+        {
+            title: 'Name',
+            render: (record: any) => `${record?.name} (${record?.en})`,
+        },
+        {
+            width: 75,
+            title: 'Code',
+            render: (record: any) => <Tag>{record.code}</Tag>,
+        },
+    ]
+
+    const language = [
+        // {
+        //     key: '1',
+        //     title: 'Allowed languages',
+        //     element: (
+        //         <Transfer
+        //             oneWay
+        //             dataSource={Object.keys(languages).map((key) => ({
+        //                 key,
+        //                 title: languages[key as CodeLanguage].name || '',
+        //                 description: languages[key as CodeLanguage].en || '',
+        //                 disabled: key === formik.values[SettingType.LANGUAGE_PREFERRED],
+        //             }))}
+        //             titles={['Inactive', 'Active']}
+        //             targetKeys={formik.values.LANGUAGE_LOCALES}
+        //             onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_LOCALES, e)}
+        //             render={(item) => (
+        //                 <Space>
+        //                     <Text>{item.title}</Text>
+        //                     <Tooltip title={item.description}>
+        //                         <InfoCircleOutlined style={{ color: '#aaa' }} />
+        //                     </Tooltip>
+        //                 </Space>
+        //             )}
+        //         />
+        //     ),
+        // },
+        {
+            key: '1',
+            title: 'Preferred language',
+            element: (
+                <Select
+                    size="small"
+                    disabled={!formik.values.LANGUAGE_LOCALES?.length}
+                    value={formik.values[SettingType.LANGUAGE_PREFERRED]}
+                    onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_PREFERRED, e)}
+                    placeholder="Preferred language"
+                    style={{ width: 200 }}
+                    options={formik.values.LANGUAGE_LOCALES?.map((e) => ({
+                        value: e,
+                        label: languages[e as CodeLanguage]?.name,
+                    }))}
+                />
+            ),
+        },
+        {
+            key: '2',
+            title: 'Allowed languages',
+            element: (
+                <Transfer
+                    style={{ maxWidth: 750 }}
+                    oneWay={formik.values.LANGUAGE_LOCALES?.length === 1}
+                    dataSource={Object.keys(languages).map((key) => ({
+                        key,
+                        ...languages[key as CodeLanguage],
+                        disabled: key === formik.values[SettingType.LANGUAGE_PREFERRED],
+                    }))}
+                    targetKeys={formik.values.LANGUAGE_LOCALES}
+                    // disabled={disabled}
+                    showSearch={true}
+                    onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_LOCALES, e)}
+                    filterOption={(inputValue, item) => {
+                        return (
+                            item.name.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1 ||
+                            item.en.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1 ||
+                            item.code.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
+                        )
+                    }}
+                    leftColumns={columns}
+                    rightColumns={columns}
+                >
+                    {({
+                        direction,
+                        filteredItems,
+                        onItemSelectAll,
+                        onItemSelect,
+                        selectedKeys: listSelectedKeys,
+                        disabled: listDisabled,
+                    }) => {
+                        const rowSelection: TableRowSelection<TransferItem> = {
+                            getCheckboxProps: (item) => ({ disabled: listDisabled || item.disabled }),
+                            onSelectAll(selected, selectedRows) {
+                                const treeSelectedKeys = selectedRows
+                                    .filter((item) => !item.disabled)
+                                    .map(({ key }) => key)
+                                const diffKeys = selected
+                                    ? difference(treeSelectedKeys, listSelectedKeys)
+                                    : difference(listSelectedKeys, treeSelectedKeys)
+                                onItemSelectAll(diffKeys as string[], selected)
+                            },
+                            onSelect({ key }, selected) {
+                                onItemSelect(key as string, selected)
+                            },
+                            selectedRowKeys: listSelectedKeys,
+                        }
+
+                        return (
+                            <Table
+                                pagination={false}
+                                scroll={{ y: 400 }}
+                                rowSelection={rowSelection}
+                                columns={columns}
+                                dataSource={filteredItems}
+                                size="small"
+                                style={{ pointerEvents: listDisabled ? 'none' : undefined }}
+                                onRow={({ key, disabled: itemDisabled }) => ({
+                                    onClick: () => {
+                                        if (itemDisabled || listDisabled) return
+                                        onItemSelect(key as string, !listSelectedKeys.includes(key as string))
+                                    },
+                                })}
+                            />
+                        )
+                    }}
+                </Transfer>
+            ),
+        },
+    ]
 
     const [tabKey, setTabKey] = useState('general')
 
@@ -660,6 +758,10 @@ const Settings = ({ settings }: FormProps) => {
                         label: 'Database',
                     },
                     {
+                        key: 'language',
+                        label: 'Languages',
+                    },
+                    {
                         key: 'other',
                         label: 'Other',
                         disabled: true,
@@ -699,6 +801,19 @@ const Settings = ({ settings }: FormProps) => {
                     <Row gutter={[8, 8]}>
                         <CustomList list={database} />
                     </Row>
+                )}
+                {tabKey === 'language' && (
+                    <List
+                        size="small"
+                        itemLayout="horizontal"
+                        dataSource={language}
+                        renderItem={(item) => (
+                            <List.Item key={item.key} style={{ padding: 16 }}>
+                                <Text strong>{item.title} :</Text>
+                                {item.element}
+                            </List.Item>
+                        )}
+                    />
                 )}
             </Card>
         </>

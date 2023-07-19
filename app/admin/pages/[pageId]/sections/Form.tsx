@@ -1,7 +1,7 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import { message } from 'antd'
+import { FloatButton, Tooltip, message } from 'antd'
 import { useFormik } from 'formik'
 import { useState } from 'react'
 import { updatePageSections } from '~/network/pages'
@@ -12,11 +12,23 @@ import SectionsManager from '~/components/SectionsManager'
 import { useRouter } from 'next/navigation'
 import { SectionsFloatButtons } from '~/components/Sections'
 import {
+    QuestionCircleOutlined,
+    SyncOutlined,
+    LoadingOutlined,
+    MenuOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    CloseOutlined,
+    CheckOutlined,
+} from '@ant-design/icons'
+import {
     cleanSectionCreation,
     sectionToSectionCreation,
     validateSections,
 } from '~/utilities/validateSections'
 import { SectionResponse } from '~/utilities/getSection'
+import { CodeLanguage } from '@prisma/client'
+import languages from '~/utilities/languages'
 
 type Layout = { content: SectionResponse[]; sidebar: SectionResponse[] }
 type LayoutCreation = {
@@ -36,9 +48,12 @@ interface FormProps {
         breakpointClass: string
         position: string
     }
+    locales: CodeLanguage[]
+    preferred: CodeLanguage
 }
 
-const Form = ({ pageId, layout, sidebar }: FormProps) => {
+const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
+    const [activeLocale, setActiveLocale] = useState(preferred)
     const router = useRouter()
     const [showSidebar, setShowSidebar] = useState(sidebar.isActive)
     const formik = useFormik<LayoutCreation>({
@@ -88,7 +103,56 @@ const Form = ({ pageId, layout, sidebar }: FormProps) => {
                 </div>
             </div>
 
+            {/* <FloatButton.Group
+                shape="square"
+                trigger="click"
+                type="primary"
+                icon={null}
+                style={{ right: 36 }}
+                description={activeLocale}
+            >
+                {locales.map((e) => (
+                    <FloatButton
+                        key={e}
+                        type={e === activeLocale ? 'primary' : 'default'}
+                        description={
+                            <Tooltip title={`${languages[e]?.en} (${languages[e]?.name})`}>{e}</Tooltip>
+                        }
+                        onClick={() => setActiveLocale(e)}
+                    />
+                ))}
+            </FloatButton.Group>
+
+            <FloatButton.Group
+                shape="square"
+                trigger="click"
+                type="primary"
+                style={{ right: 36 + 40 + 24 }}
+                icon={submit.isLoading ? <LoadingOutlined /> : <MenuOutlined />}
+            >
+                {!submit.isLoading && (
+                    <>
+                        {sidebar.isActive && (
+                            <FloatButton
+                                icon={showSidebar ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+                                onClick={() => setShowSidebar(!showSidebar)}
+                            />
+                        )}
+                        <FloatButton icon={<CloseOutlined />} onClick={() => formik.resetForm()} />
+                        <FloatButton
+                            type="primary"
+                            icon={<CheckOutlined />}
+                            onClick={() => formik.submitForm()}
+                        />
+                    </>
+                )}
+            </FloatButton.Group> */}
+
             <SectionsFloatButtons
+                activeLocale={activeLocale}
+                locales={locales}
+                preferred={preferred}
+                onLocaleChange={setActiveLocale}
                 loading={submit.isLoading}
                 active={sidebar.isActive}
                 open={showSidebar}

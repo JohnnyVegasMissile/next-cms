@@ -21,7 +21,6 @@ const getProps = async (
     })
 
     if (!!slug && !!lang && preferred?.value === lang) {
-        console.log(`/${slug.join('/')}`)
         return { redirectUrl: `/${slug.join('/')}` }
     }
 
@@ -45,7 +44,7 @@ const getProps = async (
     if (!exist) return { exist: false }
 
     if (!!exist.pageId && exist.page?.published) {
-        const pageSections = await getSection({ pageId: exist.pageId, type: SectionType.PAGE })
+        const pageSections = await getSection({ pageId: exist.pageId, type: SectionType.PAGE, language })
 
         return { exist: true, sections: pageSections }
     } else if (!!exist.containerId && exist.container?.published) {

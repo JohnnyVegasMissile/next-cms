@@ -1,6 +1,7 @@
-const NotFoundZh = async () => {
-    return <p>Not found - Zh</p>
-}
+import { CodeLanguage } from '@prisma/client'
+import OthersNotFound from '../../OthersNotFound'
+
+const NotFoundZh = async () => <OthersNotFound lang={CodeLanguage.ZH} />
 
 export const revalidate = Infinity
 

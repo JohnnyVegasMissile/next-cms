@@ -1,5 +1,5 @@
-const HomePref = async () => {
-    return <p>Home - Pref</p>
-}
+import OthersPage from '../OthersPage'
+
+const HomePref = async () => <OthersPage homepage />
 
 export default HomePref

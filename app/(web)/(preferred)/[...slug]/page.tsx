@@ -1,5 +1,5 @@
-const SlugPref = async () => {
-    return <p>Slug - Pref</p>
-}
+import OthersPage from '../../OthersPage'
+
+const SlugPref = async ({ params }: { params: { slug: string[] } }) => <OthersPage slug={params.slug} />
 
 export default SlugPref

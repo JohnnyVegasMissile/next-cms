@@ -1,5 +1,7 @@
+import OthersNotFound from '../OthersNotFound'
+
 const NotFoundPref = async () => {
-    return <p>Not found - Pref</p>
+    return <OthersNotFound />
 }
 
 export const revalidate = Infinity

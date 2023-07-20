@@ -1,12 +1,6 @@
 import { ReactNode } from 'react'
+import OthersLayout from '../OthersLayout'
 
-const LayoutPref = async ({ children }: { children: ReactNode }) => {
-    return (
-        <>
-            <p>Layout - Pref</p>
-            {children}
-        </>
-    )
-}
+const LayoutPref = async ({ children }: { children: ReactNode }) => <OthersLayout content={children} />
 
 export default LayoutPref

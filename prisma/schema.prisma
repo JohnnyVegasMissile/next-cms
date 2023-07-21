@@ -359,8 +359,9 @@ model Slug {
 model Metadata {
   id String @id @default(cuid())
 
-  types  String[]
-  values MetadataValue[]
+  types    String[]
+  values   MetadataValue[]
+  language CodeLanguage?
 
   pageId String?
   page   Page?   @relation(fields: [pageId], references: [id], onDelete: Cascade)

@@ -1,8 +1,8 @@
-import { LinkType, PageType, SettingType } from '@prisma/client'
+import { CodeLanguage, LinkType, PageType, SettingType } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 
-import PageCreation from '~/types/pageCreation'
+import PageCreation, { CreationMetadata } from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 
 export async function PUT(request: Request, context: any) {
@@ -15,7 +15,22 @@ export async function PUT(request: Request, context: any) {
 
     const notIn: string[] = []
 
-    for (const metadata of metadatas) {
+    const cleanMetadatas: CreationMetadata[] = []
+
+    Object.keys(metadatas).forEach((key) => {
+        const macthingMetadatas = metadatas[key as CodeLanguage | 'ALL']
+
+        const language = key === 'ALL' ? undefined : (key as CodeLanguage)
+
+        for (const metadata of macthingMetadatas!) {
+            cleanMetadatas.push({
+                ...metadata,
+                language,
+            })
+        }
+    })
+
+    for (const metadata of cleanMetadatas) {
         let metadataId: string | undefined
 
         if (!!metadata.id) {
@@ -30,7 +45,7 @@ export async function PUT(request: Request, context: any) {
         } else {
             metadataId = (
                 await prisma.metadata.create({
-                    data: { types: metadata.types, pageId },
+                    data: { types: metadata.types, pageId, language: metadata.language },
                 })
             )?.id
         }
@@ -38,14 +53,14 @@ export async function PUT(request: Request, context: any) {
         await prisma.metadataValue.createMany({
             data: metadata.values.map((value) => {
                 if (typeof value === 'string') {
-                    return { metadataId, string: value }
+                    return { metadataId: metadataId!, string: value }
                 } else if (typeof value === 'number') {
-                    return { metadataId, number: value }
+                    return { metadataId: metadataId!, number: value }
                 } else if (typeof value === 'boolean') {
-                    return { metadataId, boolean: value }
+                    return { metadataId: metadataId!, boolean: value }
                 } else if (value?.type === 'IN') {
                     return {
-                        metadataId,
+                        metadataId: metadataId!,
                         link: {
                             connectOrCreate: {
                                 where: { slugId: value.slugId },
@@ -58,7 +73,7 @@ export async function PUT(request: Request, context: any) {
                     }
                 } else if (value?.type === 'OUT') {
                     return {
-                        metadataId,
+                        metadataId: metadataId!,
                         link: {
                             create: {
                                 data: {
@@ -70,7 +85,10 @@ export async function PUT(request: Request, context: any) {
                         },
                     }
                 } else {
-                    return { metadataId, mediaId: value?.id }
+                    return {
+                        metadataId: metadataId!,
+                        mediaId: value?.id,
+                    }
                 }
             }),
         })

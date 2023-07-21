@@ -3,7 +3,8 @@ import type PageCreation from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
 import { PAGE_SIZE } from '~/utilities/constants'
 import { revalidatePath } from 'next/cache'
-import { LinkType } from '@prisma/client'
+import { CodeLanguage, LinkType } from '@prisma/client'
+import { CreationMetadata } from '~/types/pageCreation'
 
 export const GET = async (request: NextRequest) => {
     const { searchParams } = request.nextUrl
@@ -65,10 +66,25 @@ export const POST = async (request: NextRequest) => {
         },
     })
 
-    for (const metadata of metadatas) {
+    const cleanMetadatas: CreationMetadata[] = []
+
+    Object.keys(metadatas).forEach((key) => {
+        const macthingMetadatas = metadatas[key as CodeLanguage | 'ALL']
+
+        const language = key === 'ALL' ? undefined : (key as CodeLanguage)
+
+        for (const metadata of macthingMetadatas!) {
+            cleanMetadatas.push({
+                ...metadata,
+                language,
+            })
+        }
+    })
+
+    for (const metadata of cleanMetadatas) {
         const metadataId = (
             await prisma.metadata.create({
-                data: { types: metadata.types, pageId: page.id },
+                data: { types: metadata.types, pageId: page.id, language: metadata.language },
             })
         )?.id
 
@@ -107,7 +123,10 @@ export const POST = async (request: NextRequest) => {
                         },
                     }
                 } else {
-                    return { metadataId, mediaId: value?.id }
+                    return {
+                        metadataId,
+                        mediaId: value?.id,
+                    }
                 }
             }),
         })

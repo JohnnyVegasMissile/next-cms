@@ -2,7 +2,7 @@ import { Button, Card, Input, Select, Space, Typography } from 'antd'
 import { PlusOutlined, DeleteOutlined, WarningOutlined } from '@ant-design/icons'
 import { Fragment, useMemo } from 'react'
 import LinkSelect, { LinkValue } from '~/components/LinkSelect'
-import PageCreation from '~/types/pageCreation'
+import { CreationMetadata } from '~/types/pageCreation'
 import {
     general,
     formatDetection,
@@ -16,15 +16,17 @@ import {
 import { tempId } from '~/utilities'
 import set from 'lodash.set'
 import MediaModal from '../MediaModal'
-import { Media, MediaType } from '@prisma/client'
+import { CodeLanguage, Media, MediaType } from '@prisma/client'
 
 const { Text } = Typography
 
 interface MetadatasListProps {
     name: string
-    value: PageCreation['metadatas']
+    value: CreationMetadata[]
     onChange(e: any): void
     errors: string[]
+    locales: CodeLanguage[]
+    preferred: CodeLanguage
 }
 
 const initialMetadata = {

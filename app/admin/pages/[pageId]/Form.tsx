@@ -1,9 +1,22 @@
 'use client'
 
-import { Button, Card, Col, Divider, Input, Popconfirm, Radio, Row, Space, Typography, message } from 'antd'
+import {
+    Button,
+    Card,
+    Col,
+    Divider,
+    Input,
+    Popconfirm,
+    Radio,
+    Row,
+    Space,
+    Tooltip,
+    Typography,
+    message,
+} from 'antd'
 import { PicCenterOutlined, CheckOutlined } from '@ant-design/icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { PageType } from '@prisma/client'
+import { CodeLanguage, PageType } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { useFormik } from 'formik'
 import set from 'lodash.set'
@@ -13,6 +26,8 @@ import MetadatasList from '~/components/MetadatasList'
 import PageCreation from '~/types/pageCreation'
 import SlugEdit from '~/components/SlugEdit'
 import WithLabel from '~/components/WithLabel'
+import languages from '~/utilities/languages'
+import { useState } from 'react'
 
 const { Text } = Typography
 
@@ -30,15 +45,15 @@ const validate = (values: PageCreation) => {
         }
     }
 
-    for (let i = 0; i < values.metadatas?.length; i++) {
-        for (let j = 0; j < (values.metadatas[i]?.values?.length || 0); j++) {
-            if (values.metadatas[i]?.values[j] === undefined || values.metadatas[i]?.values[j] === '') {
-                set(errors, `metadatas.${i}`, 'Required')
-                continue
-            }
-        }
-    }
-    console.log('err', errors, values)
+    // for (let i = 0; i < values.metadatas?.length; i++) {
+    //     for (let j = 0; j < (values.metadatas[i]?.values?.length || 0); j++) {
+    //         if (values.metadatas[i]?.values[j] === undefined || values.metadatas[i]?.values[j] === '') {
+    //             set(errors, `metadatas.${i}`, 'Required')
+    //             continue
+    //         }
+    //     }
+    // }
+
     return errors
 }
 
@@ -47,9 +62,12 @@ interface FormPageProps {
     isUpdate: boolean
     page: PageCreation
     type: PageType | undefined
+    locales: CodeLanguage[]
+    preferred: CodeLanguage
 }
 
-const Form = ({ pageId, isUpdate, page, type }: FormPageProps) => {
+const Form = ({ pageId, isUpdate, page, type, locales, preferred }: FormPageProps) => {
+    const [metaTab, setMetaTab] = useState<CodeLanguage | 'ALL'>('ALL')
     const router = useRouter()
     const queryClient = useQueryClient()
     const formik = useFormik({
@@ -166,12 +184,37 @@ const Form = ({ pageId, isUpdate, page, type }: FormPageProps) => {
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card size="small" title="Metadatas" style={{ minHeight: '100%' }}>
+                    <Card
+                        size="small"
+                        title="Metadatas"
+                        style={{ minHeight: '100%' }}
+                        tabList={[
+                            {
+                                key: 'ALL',
+                                tab: 'All',
+                            },
+                            ...(locales?.map((locale) => ({
+                                key: locale,
+                                tab: (
+                                    <Tooltip title={languages[locale].name}>
+                                        <Text>
+                                            {languages[locale].en}
+                                            {locale === preferred && <Text type="warning"> *</Text>}
+                                        </Text>
+                                    </Tooltip>
+                                ),
+                            })) || []),
+                        ]}
+                        activeTabKey={metaTab}
+                        onTabChange={(e: any) => setMetaTab(e)}
+                    >
                         <MetadatasList
-                            name="metadatas"
-                            value={formik.values.metadatas}
+                            name={`metadatas.${metaTab}`}
+                            value={formik.values.metadatas[metaTab] || []}
                             onChange={formik.handleChange}
                             errors={formik.errors.metadatas as string[]}
+                            locales={locales}
+                            preferred={preferred}
                         />
                     </Card>
                 </Col>

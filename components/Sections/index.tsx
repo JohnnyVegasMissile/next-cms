@@ -42,6 +42,27 @@ export const SectionsFloatButtons = ({
             shape="square"
             trigger="click"
             type="primary"
+            style={{ right: 36 + 40 + 24 }}
+            icon={loading ? <LoadingOutlined /> : <MenuOutlined />}
+        >
+            {!loading && (
+                <>
+                    {active && (
+                        <FloatButton
+                            icon={open ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+                            onClick={onOpenClick}
+                        />
+                    )}
+                    <FloatButton icon={<CloseOutlined />} onClick={onResetClick} />
+                    <FloatButton type="primary" icon={<CheckOutlined />} onClick={onSubmit} />
+                </>
+            )}
+        </FloatButton.Group>
+
+        <FloatButton.Group
+            shape="square"
+            trigger="click"
+            type="primary"
             icon={null}
             style={{ right: 36 }}
             description={
@@ -63,27 +84,6 @@ export const SectionsFloatButtons = ({
                     onClick={() => onLocaleChange(e)}
                 />
             ))}
-        </FloatButton.Group>
-
-        <FloatButton.Group
-            shape="square"
-            trigger="click"
-            type="primary"
-            style={{ right: 36 + 40 + 24 }}
-            icon={loading ? <LoadingOutlined /> : <MenuOutlined />}
-        >
-            {!loading && (
-                <>
-                    {active && (
-                        <FloatButton
-                            icon={open ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-                            onClick={onOpenClick}
-                        />
-                    )}
-                    <FloatButton icon={<CloseOutlined />} onClick={onResetClick} />
-                    <FloatButton type="primary" icon={<CheckOutlined />} onClick={onSubmit} />
-                </>
-            )}
         </FloatButton.Group>
     </>
 )

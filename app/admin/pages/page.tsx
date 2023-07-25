@@ -27,8 +27,6 @@ const columns: ColumnsType<DataType> = [
                 switch (page.type) {
                     case PageType.HOMEPAGE:
                         return <Tag color="blue">Homepage</Tag>
-                    case PageType.SIGNIN:
-                        return <Tag color="green">Sign in</Tag>
                     case PageType.NOTFOUND:
                         return <Tag color="orange">Not found</Tag>
                     case PageType.ERROR:
@@ -51,9 +49,6 @@ const columns: ColumnsType<DataType> = [
             switch (page.type) {
                 case PageType.HOMEPAGE:
                     return <BreadcrumdLink url="" />
-
-                case PageType.SIGNIN:
-                    return <BreadcrumdLink url="sign-in" />
 
                 case PageType.PAGE:
                     return <BreadcrumdLink url={`${page?.slug?.full}`} />
@@ -159,7 +154,6 @@ const Pages = () => {
                         { label: 'Error', value: PageType.ERROR },
                         { label: 'Maintenance', value: PageType.MAINTENANCE },
                         { label: 'Not found', value: PageType.NOTFOUND },
-                        { label: 'Sign in', value: PageType.SIGNIN },
                     ],
                 },
             ]}

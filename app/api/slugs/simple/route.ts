@@ -11,11 +11,6 @@ export async function GET(request: NextRequest) {
         include: { page: { select: { id: true, name: true, type: true } } },
     })
 
-    const sign = await prisma.slug.findFirst({
-        where: { page: { name: { contains: q }, type: PageType.SIGNIN } },
-        include: { page: { select: { id: true, name: true, type: true } } },
-    })
-
     const slugs = await prisma.slug.findMany({
         where: {
             parentId: null,
@@ -36,5 +31,5 @@ export async function GET(request: NextRequest) {
     })
 
     // NextResponse extends the Web Response API
-    return NextResponse.json([home, sign, ...slugs])
+    return NextResponse.json([home, ...slugs])
 }

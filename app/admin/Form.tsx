@@ -578,26 +578,21 @@ const Settings = ({ settings }: FormProps) => {
             title: 'Allowed languages',
             element: (
                 <Transfer
+                    showSearch={true}
                     style={{ maxWidth: 750 }}
+                    targetKeys={formik.values.LANGUAGE_LOCALES}
                     oneWay={formik.values.LANGUAGE_LOCALES?.length === 1}
                     dataSource={Object.keys(languages).map((key) => ({
                         key,
                         ...languages[key as CodeLanguage],
                         disabled: key === formik.values[SettingType.LANGUAGE_PREFERRED],
                     }))}
-                    targetKeys={formik.values.LANGUAGE_LOCALES}
-                    // disabled={disabled}
-                    showSearch={true}
                     onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_LOCALES, e)}
-                    filterOption={(inputValue, item) => {
-                        return (
-                            item.name.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1 ||
-                            item.en.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1 ||
-                            item.code.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
-                        )
-                    }}
-                    leftColumns={columns}
-                    rightColumns={columns}
+                    filterOption={(inputValue, item) =>
+                        item.name.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1 ||
+                        item.en.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1 ||
+                        item.code.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
+                    }
                 >
                     {({
                         filteredItems,
@@ -694,50 +689,48 @@ const Settings = ({ settings }: FormProps) => {
                     </Space>
                 </div>
             </Card>
-            <Tabs
-                style={{ marginBottom: -32, paddingLeft: 14 }}
-                activeKey={tabKey}
-                onChange={(e) => setTabKey(e)}
-                type="card"
+
+            <Card
                 size="small"
-                items={[
+                tabList={[
                     {
                         key: 'general',
-                        label: 'General',
+                        tab: 'General',
                     },
                     {
                         key: 'theme',
-                        label: 'Theme',
+                        tab: 'Theme',
                     },
                     {
                         key: 'sidebar',
-                        label: 'Sidebar',
+                        tab: 'Sidebar',
                     },
 
                     {
                         key: 'smtp',
-                        label: 'SMTP',
+                        tab: 'SMTP',
                     },
                     {
                         key: 'grpd',
-                        label: 'GRPD',
+                        tab: 'GRPD',
                     },
                     {
                         key: 'database',
-                        label: 'Database',
+                        tab: 'Database',
                     },
                     {
                         key: 'language',
-                        label: 'Languages',
+                        tab: 'Languages',
                     },
                     {
                         key: 'other',
-                        label: 'Other',
+                        tab: 'Other',
                         disabled: true,
                     },
                 ]}
-            />
-            <Card size="small">
+                activeTabKey={tabKey}
+                onTabChange={(e) => setTabKey(e)}
+            >
                 {tabKey === 'general' && (
                     <Row gutter={[8, 8]}>
                         <CustomList list={generalLeft} />

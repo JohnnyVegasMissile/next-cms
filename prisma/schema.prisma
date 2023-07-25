@@ -537,7 +537,6 @@ model LinkedToSection {
 enum PageType {
   PAGE
   HOMEPAGE
-  SIGNIN
   NOTFOUND
   ERROR
   MAINTENANCE

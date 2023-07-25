@@ -60,13 +60,7 @@ const LinkSelect = ({ value, onChange, error }: LinkSelectProps) => {
         value: slug.id,
         label: !!slug.page ? (
             <Space>
-                {slug.page.type === PageType.HOMEPAGE ? (
-                    <HomeOutlined />
-                ) : slug.page.type === PageType.SIGNIN ? (
-                    <LoginOutlined />
-                ) : (
-                    <FileOutlined />
-                )}
+                {slug.page.type === PageType.HOMEPAGE ? <HomeOutlined /> : <FileOutlined />}
 
                 {slug.page?.name}
             </Space>

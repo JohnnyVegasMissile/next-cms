@@ -77,7 +77,6 @@ async function main() {
 
     const newPage = [
         { name: 'Homepage', type: PageType.HOMEPAGE, slug: '' },
-        { name: 'Sign in', type: PageType.SIGNIN, slug: 'sign-in' },
         { name: 'Not found', type: PageType.NOTFOUND },
         { name: 'Error', type: PageType.ERROR },
         { name: 'Maintenance', type: PageType.MAINTENANCE },

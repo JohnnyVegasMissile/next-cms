@@ -1,9 +1,9 @@
 import { ReactNode } from 'react'
 import { CodeLanguage } from '@prisma/client'
-import OthersLayout from '../../OthersLayout'
+import { PagesDisplays } from '~/components/PagesDisplays'
 
 const LayoutFr = async ({ children }: { children: ReactNode }) => (
-    <OthersLayout lang={CodeLanguage.FR} content={children} />
+    <PagesDisplays.Layout lang={CodeLanguage.FR} content={children} />
 )
 
 export const revalidate = Infinity

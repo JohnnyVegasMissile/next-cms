@@ -1,7 +1,7 @@
 import { CodeLanguage } from '@prisma/client'
-import OthersPage from '../../OthersPage'
+import { PagesDisplays } from '~/components/PagesDisplays'
 
-const HomeFr = async () => <OthersPage homepage lang={CodeLanguage.FR} slug={['fr']} />
+const HomeFr = async () => <PagesDisplays.Page homepage lang={CodeLanguage.FR} slug={['fr']} />
 
 export const revalidate = Infinity
 

@@ -1,7 +1,7 @@
-import OthersNotFound from '../OthersNotFound'
+import { PagesDisplays } from '~/components/PagesDisplays'
 
 const NotFoundPref = async () => {
-    return <OthersNotFound />
+    return <PagesDisplays.NotFound />
 }
 
 export const revalidate = Infinity

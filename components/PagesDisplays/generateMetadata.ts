@@ -69,7 +69,7 @@ const linkToLinkValue = (link: Link): LinkValue => {
     }
 }
 
-export const generateMetadata = async ({ params }: { params: { slug: string } }) => {
+const generateMetadata = async ({ params }: { params: { slug: string } }) => {
     const full = Array.isArray(params.slug) ? params.slug.join('/') : params.slug
 
     const langMetas = await getLangMetas(full, CodeLanguage.EN)
@@ -148,3 +148,5 @@ export const generateMetadata = async ({ params }: { params: { slug: string } })
 
     return {}
 }
+
+export default generateMetadata

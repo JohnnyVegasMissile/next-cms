@@ -1,5 +1,7 @@
-import OthersPage from '../../OthersPage'
+import { PagesDisplays } from '~/components/PagesDisplays'
 
-const SlugPref = async ({ params }: { params: { slug: string[] } }) => <OthersPage slug={params.slug} />
+const SlugPref = async ({ params }: { params: { slug: string[] } }) => (
+    <PagesDisplays.Page slug={params.slug} />
+)
 
 export default SlugPref

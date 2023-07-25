@@ -1,5 +1,5 @@
-import OthersPage from '../OthersPage'
+import { PagesDisplays } from '~/components/PagesDisplays'
 
-const HomePref = async () => <OthersPage homepage />
+const HomePref = async () => <PagesDisplays.Page homepage />
 
 export default HomePref

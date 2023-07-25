@@ -1,6 +1,6 @@
-import OthersNotFound from '../OthersNotFound'
+import { PagesDisplays } from '~/components/PagesDisplays'
 
-const NotFoundAll = async () => <OthersNotFound />
+const NotFoundAll = async () => <PagesDisplays.NotFound />
 
 export const revalidate = Infinity
 

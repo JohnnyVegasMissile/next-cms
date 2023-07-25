@@ -3,13 +3,15 @@
 import { Badge, Button, Divider, Popconfirm, Space, Tag, Tooltip } from 'antd'
 import { CopyOutlined, EditOutlined, DeleteOutlined, PicCenterOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
-import { getPages } from '~/network/pages'
+import { deletePage, getPages } from '~/network/pages'
 import { Page, PageType, Slug } from '@prisma/client'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import AdminTable from '~/components/AdminTable'
 import BreadcrumdLink from '~/components/BreadcrumdLink'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { ObjectId } from '~/types'
 
 dayjs.extend(relativeTime)
 
@@ -110,19 +112,30 @@ const columns: ColumnsType<DataType> = [
                         </Tooltip>
                     </Link>
                 )}
-                <Popconfirm
+                <DeleteButton pageId={page.id} disabled={page.type !== PageType.PAGE}/>
+            </Space>
+        ),
+    },
+]
+
+const DeleteButton = ({ pageId, disabled }: { pageId: ObjectId, disabled: boolean }) => {
+    const queryClient = useQueryClient()
+    const deletion = useMutation(() => deletePage(pageId), { onSuccess: () => queryClient.invalidateQueries(['pages']) })
+
+    return <Popconfirm
                     placement="left"
                     title="Delete the task"
                     description="Are you sure to delete this task?"
-                    // onConfirm={(e) => e?.stopPropagation()}
+                    onConfirm={() => deletion.mutate()}
                     // onCancel={(e) => e?.stopPropagation()}
                     okText="Delete"
                     cancelText="Cancel"
-                    disabled={page.type !== PageType.PAGE}
+                    disabled={disabled}
                 >
                     <Tooltip title="Delete">
                         <Button
-                            disabled={page.type !== PageType.PAGE}
+                            loading={deletion.isLoading}
+                            disabled={disabled}
                             type="primary"
                             danger
                             icon={<DeleteOutlined />}
@@ -132,10 +145,7 @@ const columns: ColumnsType<DataType> = [
                         </Button>
                     </Tooltip>
                 </Popconfirm>
-            </Space>
-        ),
-    },
-]
+}
 
 const Pages = () => {
     return (

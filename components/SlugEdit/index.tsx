@@ -49,8 +49,10 @@ const SlugEdit = ({ value, onChange, errors, paramsId }: SlugEditProps) => {
     }
 
     const onSlugChange = (index: number, slug: string) => {
+        const newSlug  = slug.replaceAll(' ', '-').toLocaleLowerCase()
+
         let newValue = [...value]
-        newValue[index] = slug
+        newValue[index] = newSlug
 
         onChange(newValue)
     }

@@ -47,6 +47,15 @@ export const updatePage = (id: ObjectId, data: PageCreation): Promise<PageRespon
         data,
     })
 
+export const deletePage = (id: ObjectId): Promise<{ message: string }> =>
+    INSTANCE({
+        method: 'DELETE',
+        url: `/api/pages/${id}`,
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+
 export const updatePageSections = (
     id: ObjectId,
     data: { content: SectionCreationCleaned[]; sidebar: SectionCreationCleaned[] }

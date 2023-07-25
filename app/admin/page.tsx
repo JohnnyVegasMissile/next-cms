@@ -822,6 +822,10 @@ import SettingsCreation from '~/types/settingsCreation'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
 
+export const metadata = {
+    title: 'Settings | Admin',
+}
+
 const getSettings = async () => {
     const settings = await prisma.setting.findMany({
         where: { visible: true },

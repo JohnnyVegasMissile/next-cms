@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import PageCreation, { CreationMetadata } from '~/types/pageCreation'
 import { prisma } from '~/utilities/prisma'
+import languages from '~/utilities/languages'
 
 export async function PUT(request: Request, context: any) {
     const { pageId } = context.params
@@ -142,4 +143,26 @@ export async function PUT(request: Request, context: any) {
     )
 
     return NextResponse.json(page)
+}
+
+export async function DELETE(_: Request, context: any) {
+    const { pageId } = context.params
+
+    const page = await prisma.page.findUnique({ where: { id: pageId }, include: { slug: true } })
+
+    if (!page) return NextResponse.json({ message: 'Page not found' }, { status: 404 })
+
+    if (page.type !== PageType.PAGE) return NextResponse.json({ message: 'Page not deletable' }, { status: 400 })
+
+    await prisma.page.delete({ where: { id: pageId } })
+
+    const setting = await prisma.setting.findUnique({ where: { type: SettingType.LANGUAGE_LOCALES } })
+    const locales = setting?.value.split(', ') || []
+
+    revalidatePath(`/${page.slug?.full}`)
+    for (const locale of locales) {
+        revalidatePath(`/${languages[locale as CodeLanguage].code}/${page.slug?.full}`)
+    }
+
+    return NextResponse.json({ message: 'Page deleted' })
 }

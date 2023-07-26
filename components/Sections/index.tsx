@@ -48,7 +48,7 @@ export const SectionsFloatButtons = ({
                 description={
                     <Tooltip
                         placement="left"
-                        title={`${languages[activeLocale]?.en} (${languages[activeLocale]?.name})`}
+                        title={`${languages[activeLocale]?.name} (${languages[activeLocale]?.en})`}
                     >
                         {activeLocale}
                     </Tooltip>
@@ -59,7 +59,7 @@ export const SectionsFloatButtons = ({
                         key={e}
                         type={e === activeLocale ? 'primary' : 'default'}
                         description={
-                            <Tooltip placement="left" title={`${languages[e]?.en} (${languages[e]?.name})`}>
+                            <Tooltip placement="left" title={`${languages[e]?.name} (${languages[e]?.en})`}>
                                 {e}
                                 {e === preferred && <Text type="warning">*</Text>}
                             </Tooltip>

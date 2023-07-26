@@ -46,7 +46,10 @@ export const SectionsFloatButtons = ({
                 icon={null}
                 style={{ right: 36 + 40 + 24 }}
                 description={
-                    <Tooltip title={`${languages[activeLocale]?.en} (${languages[activeLocale]?.name})`}>
+                    <Tooltip
+                        placement="left"
+                        title={`${languages[activeLocale]?.en} (${languages[activeLocale]?.name})`}
+                    >
                         {activeLocale}
                     </Tooltip>
                 }

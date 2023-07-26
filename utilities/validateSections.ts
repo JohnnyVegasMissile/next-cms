@@ -34,30 +34,34 @@ export const sectionToSectionCreation = (values: {
     let cleanSections: any = {}
 
     Object.keys(values).forEach((key) => {
-        Object.keys(values[key]!).forEach((lang) => {
-            cleanSections[key] = values[key]![lang as CodeLanguage]?.map((section: SectionResponse) => ({
-                id: section.id,
-                type: section.type,
-                block: section.block as BlockKey,
-                position: section.position,
-                value: section.value as any,
+        cleanSections[key] = {}
 
-                medias: new Map(
-                    section.linkedData
-                        ?.filter((media) => !!media.media)
-                        .map((media) => [media.media?.id, media.media])
-                ),
-                forms: new Map(
-                    section.linkedData
-                        ?.filter((media) => !!media.form)
-                        .map((media) => [media.form?.id, media.form])
-                ),
-                menus: new Map(
-                    section.linkedData
-                        ?.filter((media) => !!media.menu)
-                        .map((media) => [media.menu?.id, media.menu])
-                ),
-            }))
+        Object.keys(values[key]!).forEach((lang) => {
+            cleanSections[key][lang as CodeLanguage] = values[key]![lang as CodeLanguage]?.map(
+                (section: SectionResponse) => ({
+                    id: section.id,
+                    type: section.type,
+                    block: section.block as BlockKey,
+                    position: section.position,
+                    value: section.value as any,
+
+                    medias: new Map(
+                        section.linkedData
+                            ?.filter((media) => !!media.media)
+                            .map((media) => [media.media?.id, media.media])
+                    ),
+                    forms: new Map(
+                        section.linkedData
+                            ?.filter((media) => !!media.form)
+                            .map((media) => [media.form?.id, media.form])
+                    ),
+                    menus: new Map(
+                        section.linkedData
+                            ?.filter((media) => !!media.menu)
+                            .map((media) => [media.menu?.id, media.menu])
+                    ),
+                })
+            )
         })
     })
 
@@ -70,8 +74,10 @@ export const cleanSectionCreation = (values: {
     let cleanValues: any = {}
 
     Object.keys(values).forEach((key) => {
+        cleanValues[key] = {}
+
         Object.keys(values[key]!).forEach((lang) => {
-            cleanValues[key] = values[key]![lang as CodeLanguage]?.map((section) => {
+            cleanValues[key][lang as CodeLanguage] = values[key]![lang as CodeLanguage]?.map((section) => {
                 const medias: ObjectId[] = []
                 const forms: ObjectId[] = []
                 const links: ObjectId[] = []

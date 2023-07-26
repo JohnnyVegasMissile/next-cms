@@ -69,7 +69,7 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
         }
     )
 
-    console.log('kkkklayout', layout)
+    console.log('kkkk values', layout)
 
     return (
         <>
@@ -91,7 +91,10 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                     <SectionsManager
                         name={`content.${activeLocale}`}
                         sections={formik.values.content?.[activeLocale] || []}
-                        onChange={formik.setFieldValue}
+                        onChange={(a, b) => {
+                            console.log('kkkk onChange', a, b)
+                            formik.setFieldValue(a, b)
+                        }}
                         error={formik.errors.content}
                     />
                 </div>

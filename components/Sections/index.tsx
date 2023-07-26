@@ -38,7 +38,7 @@ export const SectionsFloatButtons = ({
     onLocaleChange,
 }: SectionsFloatButtonsProps) => (
     <>
-        {locales.length < 1 && (
+        {locales.length > 1 && (
             <FloatButton.Group
                 shape="square"
                 trigger="click"

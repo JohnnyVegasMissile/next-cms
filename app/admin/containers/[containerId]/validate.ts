@@ -62,7 +62,6 @@ const validate = (values: ContainerCreation<Dayjs>) => {
 
             case ContainerFieldType.DATE: {
                 if (field?.multiple) {
-                    console.log('kkkk multi')
                     for (let j = 0; j < (field.defaultMultipleDateValue?.length || 0); j++) {
                         if (
                             !!field?.startDate &&
@@ -131,8 +130,8 @@ export const cleanBeforeSend = (values: ContainerCreation<Dayjs>) => {
 
             case ContainerFieldType.DATE: {
                 if (field.multiple) {
-                    defaultValue.defaultMultipleDateValue = field.defaultMultipleDateValue?.map((date) =>
-                        date?.toISOString()
+                    defaultValue.defaultMultipleDateValue = field.defaultMultipleDateValue?.map(
+                        (date) => date?.toISOString()
                     )
                 } else {
                     defaultValue.defaultDateValue = field.defaultDateValue?.toISOString() || undefined

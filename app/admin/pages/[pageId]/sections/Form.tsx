@@ -19,10 +19,13 @@ import {
 import { SectionResponse } from '~/utilities/getSection'
 import { CodeLanguage } from '@prisma/client'
 
-type Layout = { content: SectionResponse[]; sidebar: SectionResponse[] }
+type Layout = {
+    content: { [key in CodeLanguage]?: SectionResponse[] }
+    sidebar: { [key in CodeLanguage]?: SectionResponse[] }
+}
 type LayoutCreation = {
-    content: SectionCreation[]
-    sidebar: SectionCreation[]
+    content: { [key in CodeLanguage]?: SectionCreation[] }
+    sidebar: { [key in CodeLanguage]?: SectionCreation[] }
 }
 
 const validate = (values: LayoutCreation) => validateSections(values)
@@ -66,6 +69,8 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
         }
     )
 
+    console.log('kkkklayout', layout)
+
     return (
         <>
             <div className={classNames(styles['content-wrap'], sidebar.position, sidebar.breakpointClass)}>
@@ -75,8 +80,8 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                         style={{ width: sidebar.width, backgroundColor: sidebar.backgroundColor }}
                     >
                         <SectionsManager
-                            name="sidebar"
-                            sections={formik.values.sidebar}
+                            name={`sidebar.${activeLocale}`}
+                            sections={formik.values.sidebar?.[activeLocale] || []}
                             onChange={formik.setFieldValue}
                             error={formik.errors.sidebar}
                         />
@@ -84,8 +89,8 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                 )}
                 <div className={styles['content']}>
                     <SectionsManager
-                        name="content"
-                        sections={formik.values.content}
+                        name={`content.${activeLocale}`}
+                        sections={formik.values.content?.[activeLocale] || []}
                         onChange={formik.setFieldValue}
                         error={formik.errors.content}
                     />

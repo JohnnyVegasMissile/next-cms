@@ -3,90 +3,107 @@ import { ObjectId } from '~/types'
 import SectionCreation from '~/types/sectionCreation'
 import { SectionResponse } from './getSection'
 import set from 'lodash.set'
+import { CodeLanguage } from '@prisma/client'
 
-export const validateSections = (values: { [key in string]: SectionCreation[] }) => {
+export const validateSections = (values: {
+    [key in string]: { [key in CodeLanguage]?: SectionCreation[] }
+}) => {
     let errors: any = {}
 
     Object.keys(values).forEach((key) => {
-        values[key]?.forEach((section) => {
-            const validate = blocks[section.block].validate
+        Object.keys(values[key]!).forEach((lang) => {
+            values[key]![lang as CodeLanguage]?.forEach((section) => {
+                const validate = blocks[section.block as BlockKey].validate
 
-            if (!!validate) {
-                const sectionErrors = validate(section.value)
+                if (!!validate) {
+                    const sectionErrors = validate(section.value)
 
-                if (!!Object.keys(sectionErrors).length)
-                    set(errors, `${key}.${section.position}`, sectionErrors)
-            }
+                    if (!!Object.keys(sectionErrors).length)
+                        set(errors, `${key}.${lang}.${section.position}`, sectionErrors)
+                }
+            })
         })
     })
 
     return errors
 }
 
-export const sectionToSectionCreation = (values: { [key in string]: SectionResponse[] }) => {
+export const sectionToSectionCreation = (values: {
+    [key in string]: { [key in CodeLanguage]?: SectionResponse[] }
+}) => {
     let cleanSections: any = {}
 
     Object.keys(values).forEach((key) => {
-        cleanSections[key] = values[key]?.map((section) => ({
-            id: section.id,
-            type: section.type,
-            block: section.block as BlockKey,
-            position: section.position,
-            value: section.value as any,
+        Object.keys(values[key]!).forEach((lang) => {
+            cleanSections[key] = values[key]![lang as CodeLanguage]?.map((section: SectionResponse) => ({
+                id: section.id,
+                type: section.type,
+                block: section.block as BlockKey,
+                position: section.position,
+                value: section.value as any,
 
-            medias: new Map(
-                section.linkedData
-                    ?.filter((media) => !!media.media)
-                    .map((media) => [media.media?.id, media.media])
-            ),
-            forms: new Map(
-                section.linkedData
-                    ?.filter((media) => !!media.form)
-                    .map((media) => [media.form?.id, media.form])
-            ),
-            menus: new Map(
-                section.linkedData
-                    ?.filter((media) => !!media.menu)
-                    .map((media) => [media.menu?.id, media.menu])
-            ),
-        }))
+                medias: new Map(
+                    section.linkedData
+                        ?.filter((media) => !!media.media)
+                        .map((media) => [media.media?.id, media.media])
+                ),
+                forms: new Map(
+                    section.linkedData
+                        ?.filter((media) => !!media.form)
+                        .map((media) => [media.form?.id, media.form])
+                ),
+                menus: new Map(
+                    section.linkedData
+                        ?.filter((media) => !!media.menu)
+                        .map((media) => [media.menu?.id, media.menu])
+                ),
+            }))
+        })
     })
 
     return cleanSections
 }
 
-export const cleanSectionCreation = (values: { [key in string]: SectionCreation[] }) => {
+export const cleanSectionCreation = (values: {
+    [key in string]: { [key in CodeLanguage]?: SectionCreation[] }
+}) => {
     let cleanValues: any = {}
 
     Object.keys(values).forEach((key) => {
-        cleanValues[key] = values[key]?.map((section) => {
-            const medias: ObjectId[] = []
-            const forms: ObjectId[] = []
+        Object.keys(values[key]!).forEach((lang) => {
+            cleanValues[key] = values[key]![lang as CodeLanguage]?.map((section) => {
+                const medias: ObjectId[] = []
+                const forms: ObjectId[] = []
+                const links: ObjectId[] = []
+                const menus: ObjectId[] = []
 
-            const stringifiedContent = JSON.stringify(section.value)
+                const stringifiedContent = JSON.stringify(section.value)
 
-            section.medias.forEach((_, key) => {
-                if (stringifiedContent.includes(`"${key}"`)) medias.push(key)
+                section.medias.forEach((_, key) => {
+                    if (stringifiedContent.includes(`"${key}"`)) medias.push(key)
+                })
 
-                // if (!!findInObject(section.content, key)) {
-                //     medias.push(key)
-                // }
+                section.forms.forEach((_, key) => {
+                    if (stringifiedContent.includes(`"${key}"`)) forms.push(key)
+                })
+
+                section.links.forEach((_, key) => {
+                    if (stringifiedContent.includes(`"${key}"`)) links.push(key)
+                })
+
+                section.menus.forEach((_, key) => {
+                    if (stringifiedContent.includes(`"${key}"`)) menus.push(key)
+                })
+
+                return {
+                    ...section,
+                    medias,
+                    forms,
+                    links,
+                    menus,
+                    tempId: undefined,
+                }
             })
-
-            section.forms.forEach((_, key) => {
-                if (stringifiedContent.includes(`"${key}"`)) forms.push(key)
-
-                // if (!!findInObject(section.content, key)) {
-                //     forms.push(key)
-                // }
-            })
-
-            return {
-                ...section,
-                medias,
-                forms,
-                tempId: undefined,
-            }
         })
     })
 

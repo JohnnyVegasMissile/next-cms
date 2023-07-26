@@ -10,7 +10,8 @@ import { prisma } from '~/utilities/prisma'
 const getProps = async (
     lang: CodeLanguage | undefined,
     slug: string[] | undefined,
-    homepage: boolean | boolean
+    homepage: boolean,
+    sidebar: boolean
 ): Promise<
     | { redirectUrl: string; sections?: undefined; exist?: undefined }
     | { sections: SectionResponse[]; redirectUrl?: undefined; exist: true }
@@ -44,13 +45,17 @@ const getProps = async (
     if (!exist) return { exist: false }
 
     if (!!exist.pageId && exist.page?.published) {
-        const pageSections = await getSection({ pageId: exist.pageId, type: SectionType.PAGE, language })
+        const pageSections = await getSection({
+            pageId: exist.pageId,
+            type: sidebar ? SectionType.PAGE_SIDEBAR : SectionType.PAGE,
+            language,
+        })
 
         return { exist: true, sections: pageSections }
     } else if (!!exist.containerId && exist.container?.published) {
         const containerSections = await getSection({
             containerId: exist.containerId,
-            type: SectionType.CONTAINER,
+            type: sidebar ? SectionType.CONTAINER_SIDEBAR : SectionType.CONTAINER,
             language,
         })
 
@@ -58,17 +63,17 @@ const getProps = async (
     } else if (!!exist.contentId && exist.content?.published) {
         const contentSections = await getSection({
             contentId: exist.contentId,
-            type: SectionType.CONTENT,
+            type: sidebar ? SectionType.CONTENT_SIDEBAR : SectionType.CONTENT,
             language,
         })
         const containerTopSections = await getSection({
             containerId: exist.content.containerId,
-            type: SectionType.TEMPLATE_TOP,
+            type: sidebar ? SectionType.TEMPLATE_SIDEBAR_TOP : SectionType.TEMPLATE_TOP,
             language,
         })
         const containerBottomSections = await getSection({
             containerId: exist.content.containerId,
-            type: SectionType.TEMPLATE_BOTTOM,
+            type: sidebar ? SectionType.TEMPLATE_SIDEBAR_BOTTOM : SectionType.TEMPLATE_BOTTOM,
             language,
         })
 
@@ -85,12 +90,14 @@ const OthersPage = async ({
     lang,
     slug,
     homepage,
+    sidebar,
 }: {
     lang?: CodeLanguage
     slug?: string[]
     homepage?: boolean
+    sidebar?: boolean
 }) => {
-    const { sections, exist, redirectUrl } = await getProps(lang, slug, !!homepage)
+    const { sections, exist, redirectUrl } = await getProps(lang, slug, !!homepage, !!sidebar)
 
     if (!!redirectUrl) redirect(redirectUrl, RedirectType.replace)
 

@@ -38,11 +38,40 @@ export const SectionsFloatButtons = ({
     onLocaleChange,
 }: SectionsFloatButtonsProps) => (
     <>
+        {locales.length < 1 && (
+            <FloatButton.Group
+                shape="square"
+                trigger="click"
+                type="primary"
+                icon={null}
+                style={{ right: 36 + 40 + 24 }}
+                description={
+                    <Tooltip title={`${languages[activeLocale]?.en} (${languages[activeLocale]?.name})`}>
+                        {activeLocale}
+                    </Tooltip>
+                }
+            >
+                {locales.map((e) => (
+                    <FloatButton
+                        key={e}
+                        type={e === activeLocale ? 'primary' : 'default'}
+                        description={
+                            <Tooltip title={`${languages[e]?.en} (${languages[e]?.name})`}>
+                                {e}
+                                {e === preferred && <Text type="warning">*</Text>}
+                            </Tooltip>
+                        }
+                        onClick={() => onLocaleChange(e)}
+                    />
+                ))}
+            </FloatButton.Group>
+        )}
+
         <FloatButton.Group
             shape="square"
             trigger="click"
             type="primary"
-            style={{ right: 36 + 40 + 24 }}
+            style={{ right: 36 }}
             icon={loading ? <LoadingOutlined /> : <MenuOutlined />}
         >
             {!loading && (
@@ -57,33 +86,6 @@ export const SectionsFloatButtons = ({
                     <FloatButton type="primary" icon={<CheckOutlined />} onClick={onSubmit} />
                 </>
             )}
-        </FloatButton.Group>
-
-        <FloatButton.Group
-            shape="square"
-            trigger="click"
-            type="primary"
-            icon={null}
-            style={{ right: 36 }}
-            description={
-                <Tooltip title={`${languages[activeLocale]?.en} (${languages[activeLocale]?.name})`}>
-                    {activeLocale}
-                </Tooltip>
-            }
-        >
-            {locales.map((e) => (
-                <FloatButton
-                    key={e}
-                    type={e === activeLocale ? 'primary' : 'default'}
-                    description={
-                        <Tooltip title={`${languages[e]?.en} (${languages[e]?.name})`}>
-                            {e}
-                            {e === preferred && <Text type="warning">*</Text>}
-                        </Tooltip>
-                    }
-                    onClick={() => onLocaleChange(e)}
-                />
-            ))}
         </FloatButton.Group>
     </>
 )

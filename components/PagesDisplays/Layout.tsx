@@ -106,11 +106,11 @@ const getProps = async (
 
 const OthersPageLayout = async ({
     content,
-    side,
+    sideContent,
     lang,
 }: {
     content: ReactNode
-    side?: ReactNode
+    sideContent?: ReactNode
     lang?: CodeLanguage
 }) => {
     const {
@@ -163,7 +163,7 @@ const OthersPageLayout = async ({
                                 <DisplaySection section={section} />
                             </Suspense>
                         ))}
-                        {side}
+                        {sideContent}
                         {layoutSidebarFooter.map((section) => (
                             <Suspense key={section.id}>
                                 <DisplaySection section={section} />

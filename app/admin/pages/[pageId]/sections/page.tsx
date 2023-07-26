@@ -33,8 +33,8 @@ const getLanguage = async () => {
     })
 
     return {
-        locales: (locales?.value.split(', ') || ['EN']) as CodeLanguage[],
-        preferred: (preferred?.value || 'EN') as CodeLanguage,
+        locales: (locales?.value.split(', ') || [CodeLanguage.EN]) as CodeLanguage[],
+        preferred: (preferred?.value || CodeLanguage.EN) as CodeLanguage,
     }
 }
 

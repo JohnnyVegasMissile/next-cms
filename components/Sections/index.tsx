@@ -1,4 +1,4 @@
-import { FloatButton, Tooltip, Typography } from 'antd'
+import { Button, FloatButton, Popover, Space, Tooltip, Typography } from 'antd'
 import {
     MenuOutlined,
     CloseOutlined,
@@ -6,6 +6,7 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     LoadingOutlined,
+    CopyOutlined,
 } from '@ant-design/icons'
 import { CodeLanguage } from '@prisma/client'
 import languages from '~/utilities/languages'
@@ -23,6 +24,7 @@ interface SectionsFloatButtonsProps {
     preferred: CodeLanguage
     activeLocale: CodeLanguage
     onLocaleChange(code: CodeLanguage): void
+    onCopy(code: CodeLanguage): void
 }
 
 export const SectionsFloatButtons = ({
@@ -36,6 +38,7 @@ export const SectionsFloatButtons = ({
     preferred,
     activeLocale,
     onLocaleChange,
+    onCopy,
 }: SectionsFloatButtonsProps) => (
     <>
         {locales.length > 1 && (
@@ -50,21 +53,40 @@ export const SectionsFloatButtons = ({
                         placement="left"
                         title={`${languages[activeLocale]?.name} (${languages[activeLocale]?.en})`}
                     >
-                        {activeLocale}
+                        {languages[activeLocale]?.code.toLocaleUpperCase()}
                     </Tooltip>
                 }
             >
-                {locales.map((e) => (
+                {locales.map((locale) => (
                     <FloatButton
-                        key={e}
-                        type={e === activeLocale ? 'primary' : 'default'}
+                        key={locale}
+                        type={locale === activeLocale ? 'primary' : 'default'}
                         description={
-                            <Tooltip placement="left" title={`${languages[e]?.name} (${languages[e]?.en})`}>
-                                {e}
-                                {e === preferred && <Text type="warning">*</Text>}
-                            </Tooltip>
+                            <Popover
+                                overlayInnerStyle={{ padding: 8 }}
+                                placement="left"
+                                content={
+                                    <Space>
+                                        <Text>{`${languages[locale]?.name} (${languages[locale]?.en})`}</Text>
+                                        {activeLocale !== locale && (
+                                            <Button
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    onCopy(locale)
+                                                }}
+                                                type="primary"
+                                                size="small"
+                                                icon={<CopyOutlined />}
+                                            />
+                                        )}
+                                    </Space>
+                                }
+                            >
+                                {languages[locale]?.code.toLocaleUpperCase()}
+                                {locale === preferred && <Text type="warning">*</Text>}
+                            </Popover>
                         }
-                        onClick={() => onLocaleChange(e)}
+                        onClick={() => onLocaleChange(locale)}
                     />
                 ))}
             </FloatButton.Group>

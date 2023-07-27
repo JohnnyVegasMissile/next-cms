@@ -15,7 +15,7 @@ import {
     message,
 } from 'antd'
 import { PicCenterOutlined, CheckOutlined } from '@ant-design/icons'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CodeLanguage, PageType } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { useFormik } from 'formik'
@@ -28,6 +28,7 @@ import SlugEdit from '~/components/SlugEdit'
 import WithLabel from '~/components/WithLabel'
 import languages from '~/utilities/languages'
 import { useState } from 'react'
+import { getPageMetrics } from '~/network/metrics'
 
 const { Text } = Typography
 
@@ -90,6 +91,8 @@ const Form = ({ pageId, isUpdate, page, type, locales, preferred }: FormPageProp
             onError: () => message.error('Something went wrong, try again later.'),
         }
     )
+
+    const metrics = useQuery(['page-metrics', { id: pageId }], () => getPageMetrics(pageId))
 
     return (
         <>

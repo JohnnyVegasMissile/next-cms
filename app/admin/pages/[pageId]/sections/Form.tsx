@@ -69,8 +69,6 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
         }
     )
 
-    console.log('kkkk values', layout)
-
     return (
         <>
             <div className={classNames(styles['content-wrap'], sidebar.position, sidebar.breakpointClass)}>
@@ -91,10 +89,7 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                     <SectionsManager
                         name={`content.${activeLocale}`}
                         sections={formik.values.content?.[activeLocale] || []}
-                        onChange={(a, b) => {
-                            console.log('kkkk onChange', a, b)
-                            formik.setFieldValue(a, b)
-                        }}
+                        onChange={(a, b) => formik.setFieldValue(a, b)}
                         error={formik.errors.content}
                     />
                 </div>
@@ -111,6 +106,9 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                 onOpenClick={() => setShowSidebar(!showSidebar)}
                 onResetClick={() => formik.resetForm()}
                 onSubmit={() => formik.submitForm()}
+                onCopy={(code) =>
+                    formik.setFieldValue(`content.${activeLocale}`, formik.values.content?.[code])
+                }
             />
         </>
     )

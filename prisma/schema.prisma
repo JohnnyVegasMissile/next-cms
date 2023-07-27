@@ -352,6 +352,7 @@ model Slug {
   updatedAt     DateTime @updatedAt
 
   useAsLink Link[]
+  metrics   Metric[]
 }
 
 // METADATAS
@@ -791,4 +792,28 @@ model Link {
   usedInSections LinkedToSection[]
   usedInMetadata MetadataValue[]
   usedInMenu     MenuChild[]
+}
+
+enum MetricName {
+  TTFB
+  FCP
+  LCP
+  FID
+  CLS
+  INP
+}
+
+model Metric {
+  id String @id @default(cuid())
+
+  name MetricName
+  day  DateTime
+
+  value Float
+  count Int
+
+  slugId String
+  slug   Slug   @relation(fields: [slugId], references: [id], onDelete: Cascade)
+
+  @@unique([name, day, slugId])
 }

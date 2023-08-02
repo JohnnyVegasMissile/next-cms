@@ -21,8 +21,8 @@ const getProps = async (
         where: { type: SettingType.LANGUAGE_PREFERRED },
     })
 
-    if (!!slug && !!lang && preferred?.value === lang) {
-        return { redirectUrl: `/${slug.join('/')}` }
+    if (!!lang && preferred?.value === lang) {
+        return { redirectUrl: `/${(slug || []).join('/')}` }
     }
 
     const language = (lang || preferred?.value) as CodeLanguage

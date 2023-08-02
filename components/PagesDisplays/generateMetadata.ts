@@ -12,8 +12,9 @@ import {
 } from '~/components/MetadatasList/metadataLists'
 import { LinkValue } from '~/components/LinkSelect'
 import { ObjectId } from '~/types'
+import languages from '~/utilities/languages'
 
-const getLangMetas = async (url: string, lang: CodeLanguage) => {
+const getLangMetas = async (url: string, lang: CodeLanguage | undefined) => {
     const locales =
         (
             await prisma.setting.findUnique({
@@ -27,25 +28,25 @@ const getLangMetas = async (url: string, lang: CodeLanguage) => {
         })
     )?.value
 
-    const sideUrl = (
+    const siteUrl = (
         await prisma.setting.findUnique({
             where: { type: SettingType.SITE_URL },
         })
     )?.value!
 
     const canonical = `/${url}`
-    const languages: any = {}
+    const langs: any = {}
 
     for (const locale of locales) {
         if (locale !== preferred) {
-            languages[locale.toLocaleLowerCase()!] = `/${locale}/${url}`
+            langs[languages[locale as CodeLanguage].code] = `/${locale}/${url}`
         }
     }
 
-    const metadataBase = new URL(sideUrl)
+    const metadataBase = new URL(siteUrl)
     const alternates = {
         canonical,
-        languages,
+        languages: langs,
     }
 
     return {
@@ -69,10 +70,8 @@ const linkToLinkValue = (link: Link): LinkValue => {
     }
 }
 
-const generateMetadata = async ({ params }: { params: { slug: string } }) => {
-    const full = Array.isArray(params.slug) ? params.slug.join('/') : params.slug
-
-    const langMetas = await getLangMetas(full, CodeLanguage.EN)
+const generateMetadata = async (slug: string, lang?: CodeLanguage) => {
+    const langMetas = await getLangMetas(slug, CodeLanguage.EN)
 
     const options = [
         ...general,
@@ -86,8 +85,14 @@ const generateMetadata = async ({ params }: { params: { slug: string } }) => {
     ]
 
     const page = await prisma.page.findFirst({
-        where: { slug: { full } },
-        include: { metadatas: { include: { values: { include: { link: true, media: true } } } } },
+        where: { slug: { full: slug } },
+        include: {
+            metadatas: {
+                where: !!lang ? { language: null } : { OR: [{ language: null }, { language: lang }] },
+                include: { values: { include: { link: true, media: true } } },
+                orderBy: { language: { sort: 'asc', nulls: 'first' } },
+            },
+        },
     })
 
     if (!!page) {
@@ -121,7 +126,7 @@ const generateMetadata = async ({ params }: { params: { slug: string } }) => {
     }
 
     const content = await prisma.container.findFirst({
-        where: { slug: { full } },
+        where: { slug: { full: slug } },
     })
 
     if (!!content)
@@ -134,7 +139,7 @@ const generateMetadata = async ({ params }: { params: { slug: string } }) => {
         }
 
     const container = await prisma.container.findFirst({
-        where: { slug: { full } },
+        where: { slug: { full: slug } },
     })
 
     if (!!container)

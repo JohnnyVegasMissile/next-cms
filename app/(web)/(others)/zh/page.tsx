@@ -1,7 +1,7 @@
 import { CodeLanguage } from '@prisma/client'
 import { PagesDisplays } from '~/components/PagesDisplays'
 
-const HomeZh = async () => <PagesDisplays.Page lang={CodeLanguage.ZH} slug={['zh']} />
+const HomeZh = async () => <PagesDisplays.Page lang={CodeLanguage.ZH} />
 
 export const revalidate = Infinity
 

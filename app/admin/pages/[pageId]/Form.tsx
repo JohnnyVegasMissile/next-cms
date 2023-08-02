@@ -33,8 +33,16 @@ import WithLabel from '~/components/WithLabel'
 import languages from '~/utilities/languages'
 import { useMemo, useRef, useState } from 'react'
 import { getPageMetrics } from '~/network/metrics'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ChartToolTip, ReferenceLine } from 'recharts';
-import dayjs from 'dayjs'
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip as ChartToolTip,
+    ReferenceLine,
+} from 'recharts'
+import dayjs, { Dayjs } from 'dayjs'
 
 const { Text } = Typography
 
@@ -99,107 +107,15 @@ const Form = ({ pageId, isUpdate, page, type, locales, preferred }: FormPageProp
         }
     )
 
-    const metrics = useQuery(['page-metrics', { id: pageId }], () => getPageMetrics(pageId), {
-        enabled: showStats
-    })
-
-    const filteredMetrics = useMemo(() => {
-        let data: { [key in MetricName]: (Metric & { date?: string | undefined; Value?: number})[]} = {
-            TTFB: [],
-            FCP: [],
-            LCP: [],
-            FID: [],
-            CLS: [],
-            INP: [],
-        }
-
-        for (const metric of metrics.data || []) {
-            data[metric.name].push({...metric, Value: Math.round(metric.value),  date: dayjs(metric.day).format('DD MMMM YYYY') })
-        }
-
-        return data
-    }, [metrics.data])
-
     return (
         <>
-            <Modal
-                centered
-                open={showStats}
-                footer={null}
-                onCancel={() => setShowStats(false)}
-                width={'90vw'}
-                bodyStyle={{ height: '80vh' }}
-                title={
-                <Space>
-                    <DatePicker size="small"/>
-                    <DatePicker  size="small"/>
-                </Space>
-                }
-            >
-                {
-                    metrics.isFetching ?
-                        <div
-                            style={{
-                                justifyContent: 'center',
-                                display: 'flex',
-                                alignItems: 'center',
-                                height: '100%',
-                            }}
-                        >
-                            <Spin />
-                        </div>
-                        :
-                        <div style={{overflow: 'scroll' , height: '100%'}}>
-                            <Row>
-                                {[
-                                    { label: 'Time to First Byte', name: 'TTFB', min: 200, max: 500 },
-                                    { label: 'First Contentful Paint', name: 'FCP', min: 1.8, max: 3 },
-                                    { label: 'Largest Contentful Paint', name: 'LCP', min: 2.5, max: 4 },
-                                    { label: 'First Input Delay', name: 'FID', min: 100, max: 300 },
-                                    { label: 'Cumulative Layout Shift', name: 'CLS', min: 0.1, max: 0.25 },
-                                    { label: 'Input Performance', name: 'INP', min: 200, max: 500 },
-
-                                ].map((e) => 
-                                    <Col key={e.name} span={12}>
-                                        <Space direction='vertical' style={{ width: '100%' }} size="large">
-                                            <Text strong>{e.label}<Text type="secondary"> ({e.name})</Text></Text>
-
-                                            {
-                                                !filteredMetrics[e.name as MetricName]?.length ?
-                                                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /> :
-                                                <LineChart
-                                                    width={600}
-                                                    height={300}
-                                                    data={filteredMetrics[e.name as MetricName]}
-                                                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                                                >
-                                                    <ReferenceLine y={e.min} stroke="#52c41a" />
-                                                    <ReferenceLine y={e.max} stroke="#ff4d4f" />
-
-                                                    <CartesianGrid strokeDasharray="3 3" />
-                                                    <XAxis dataKey="date" />
-                                                    <YAxis />
-                                                    <ChartToolTip />
-                                                    <Line type="monotone" dataKey="Value" stroke="#1677ff" />
-                                                </LineChart>
-                                            }
-                                        </Space>
-                                    </Col>
-                                )}
-                            </Row>
-                        </div>
-                }
-                
-
-            </Modal>
-
             <Card size="small">
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Text strong>{isUpdate ? 'Update' : 'Create new'} page</Text>
 
                     <Space>
                         <Button
-                            size='small'
+                            size="small"
                             type="primary"
                             icon={<LineChartOutlined />}
                             onClick={() => setShowStats(true)}
@@ -278,12 +194,12 @@ const Form = ({ pageId, isUpdate, page, type, locales, preferred }: FormPageProp
                                     label="URL :"
                                     error={(formik.errors.slug as string[])?.find((e) => !!e)}
                                 >
-                                        <SlugEdit
-                                            value={formik.values.slug}
-                                            onChange={(e) => formik.setFieldValue('slug', e)}
-                                            errors={formik.errors.slug as string[]}
-                                            paramsId={isUpdate ? { pageId } : undefined}
-                                        />
+                                    <SlugEdit
+                                        value={formik.values.slug}
+                                        onChange={(e) => formik.setFieldValue('slug', e)}
+                                        errors={formik.errors.slug as string[]}
+                                        paramsId={isUpdate ? { pageId } : undefined}
+                                    />
                                 </WithLabel>
                             </>
                         )}
@@ -325,8 +241,161 @@ const Form = ({ pageId, isUpdate, page, type, locales, preferred }: FormPageProp
                     </Card>
                 </Col>
             </Row>
+
+            <MetricsModal pageId={pageId} showStats={showStats} onShowStatsChange={setShowStats} />
         </>
     )
 }
 
 export default Form
+
+interface MetricsModalProps {
+    pageId: string
+    showStats: boolean
+    onShowStatsChange: (value: boolean) => void
+}
+
+const MetricsModal = ({ pageId, showStats, onShowStatsChange }: MetricsModalProps) => {
+    const [filters, setFilters] = useState<{ from: Dayjs | undefined; to: Dayjs | undefined }>({
+        from: undefined,
+        to: undefined,
+    })
+
+    const metrics = useQuery(
+        ['page-metrics', { id: pageId, ...filters }],
+        () => getPageMetrics(pageId, filters),
+        {
+            enabled: showStats,
+        }
+    )
+
+    const filteredMetrics = useMemo(() => {
+        let data: { [key in MetricName]: (Metric & { date?: string | undefined; Value?: number })[] } = {
+            TTFB: [],
+            FCP: [],
+            LCP: [],
+            FID: [],
+            CLS: [],
+            INP: [],
+        }
+
+        for (const metric of metrics.data || []) {
+            data[metric.name].push({
+                ...metric,
+                Value: Math.round(metric.value),
+                date: dayjs(metric.day).format('DD MMM YYYY'),
+            })
+        }
+
+        return data
+    }, [metrics.data])
+
+    return (
+        <Modal
+            centered
+            open={showStats}
+            footer={null}
+            onCancel={() => onShowStatsChange(false)}
+            width={'90vw'}
+            bodyStyle={{ height: '80vh' }}
+            title={
+                <>
+                    <Space>
+                        <DatePicker
+                            style={{ width: 150 }}
+                            format={'DD MMM YYYY'}
+                            value={filters.from}
+                            onChange={(from) =>
+                                setFilters((e) => ({
+                                    ...e,
+                                    from:
+                                        from
+                                            ?.set('hour', 0)
+                                            .set('minute', 0)
+                                            .set('second', 0)
+                                            .set('millisecond', 0) || undefined,
+                                }))
+                            }
+                            size="small"
+                            placeholder="From"
+                        />
+                        <DatePicker
+                            style={{ width: 150 }}
+                            format={'DD MMM YYYY'}
+                            value={filters.to}
+                            onChange={(to) =>
+                                setFilters((e) => ({
+                                    ...e,
+                                    to:
+                                        to
+                                            ?.set('hour', 0)
+                                            .set('minute', 0)
+                                            .set('second', 0)
+                                            .set('millisecond', 0) || undefined,
+                                }))
+                            }
+                            size="small"
+                            placeholder="To"
+                        />
+                    </Space>
+                    <Divider style={{ marginTop: 8, marginBottom: 0 }} />
+                </>
+            }
+        >
+            {metrics.isFetching ? (
+                <div
+                    style={{
+                        justifyContent: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        height: '100%',
+                    }}
+                >
+                    <Spin />
+                </div>
+            ) : (
+                <div style={{ overflowY: 'scroll', height: '100%', overflowX: 'hidden' }}>
+                    <Row>
+                        {[
+                            { label: 'Time to First Byte', name: 'TTFB', min: 200, max: 500 },
+                            { label: 'First Contentful Paint', name: 'FCP', min: 1.8, max: 3 },
+                            { label: 'Largest Contentful Paint', name: 'LCP', min: 2.5, max: 4 },
+                            { label: 'First Input Delay', name: 'FID', min: 100, max: 300 },
+                            { label: 'Cumulative Layout Shift', name: 'CLS', min: 0.1, max: 0.25 },
+                            { label: 'Input Performance', name: 'INP', min: 200, max: 500 },
+                        ].map((e) => (
+                            <Col key={e.name} span={12}>
+                                <Space direction="vertical" style={{ width: '100%' }} size="large">
+                                    <Text strong>
+                                        {e.label}
+                                        <Text type="secondary"> ({e.name})</Text>
+                                    </Text>
+
+                                    {!filteredMetrics[e.name as MetricName]?.length ? (
+                                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                                    ) : (
+                                        <LineChart
+                                            width={600}
+                                            height={300}
+                                            data={filteredMetrics[e.name as MetricName]}
+                                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                        >
+                                            <ReferenceLine y={e.min} stroke="#52c41a" />
+                                            <ReferenceLine y={e.max} stroke="#ff4d4f" />
+
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="date" padding={{ left: 15, right: 15 }} />
+                                            <YAxis />
+                                            <ChartToolTip />
+                                            <Line type="monotone" dataKey="Value" stroke="#1677ff" />
+                                        </LineChart>
+                                    )}
+                                </Space>
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
+            )}
+        </Modal>
+    )
+}

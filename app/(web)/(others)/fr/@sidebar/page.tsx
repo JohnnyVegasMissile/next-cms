@@ -1,6 +1,6 @@
 import { CodeLanguage } from '@prisma/client'
 import { PagesDisplays } from '~/components/PagesDisplays'
 
-const HomeFRSide = async () => <PagesDisplays.Page lang={CodeLanguage.FR} slug={['fr']} sidebar />
+const HomeFR = async () => <PagesDisplays.Page lang={CodeLanguage.FR} sidebar />
 
-export default HomeFRSide
+export default HomeFR

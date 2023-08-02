@@ -45,3 +45,6 @@ next-env.d.ts
 !/uploads/images/.gitkeep
 /uploads/videos/*
 !/uploads/videos/.gitkeep
+
+/app/(web)/(others)/*
+!/app/(web)/(others)/.gitkeep

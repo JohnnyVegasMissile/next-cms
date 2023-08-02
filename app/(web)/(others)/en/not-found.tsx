@@ -1,8 +1,8 @@
 import { CodeLanguage } from '@prisma/client'
 import { PagesDisplays } from '~/components/PagesDisplays'
 
-const NotFoundEn = async () => <PagesDisplays.NotFound lang={CodeLanguage.EN} />
+const NotFoundEN = async () => <PagesDisplays.NotFound lang={CodeLanguage.EN} />
 
 export const revalidate = Infinity
 
-export default NotFoundEn
+export default NotFoundEN

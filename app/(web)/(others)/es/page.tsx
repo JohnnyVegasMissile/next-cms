@@ -1,8 +1,10 @@
 import { CodeLanguage } from '@prisma/client'
 import { PagesDisplays } from '~/components/PagesDisplays'
 
-const HomeEs = async () => <PagesDisplays.Page homepage lang={CodeLanguage.ES} />
+const SlugES = async ({ params }: { params: { slug: string[] } }) => (
+    <PagesDisplays.Page lang={CodeLanguage.ES} slug={params.slug} />
+)
 
 export const revalidate = Infinity
 
-export default HomeEs
+export default SlugES

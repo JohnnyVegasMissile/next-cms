@@ -125,8 +125,6 @@ export const GET = async (request: NextRequest) => {
         }
     }
 
-    console.log(where?.AND)
-
     let skip = 0
     if (typeof page === 'string' && page !== '0' && page !== '1') {
         skip = (parseInt(page) - 1) * PAGE_SIZE

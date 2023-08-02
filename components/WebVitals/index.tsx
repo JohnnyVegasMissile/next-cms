@@ -5,7 +5,6 @@ import { sendMetrics } from '~/network/metrics'
 
 const WebVitals = () => {
     useReportWebVitals((metric) => {
-        console.log('metric', metric)
         sendMetrics({
             name: metric.name,
             value: metric.value,

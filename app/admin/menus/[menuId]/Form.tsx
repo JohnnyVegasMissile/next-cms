@@ -97,8 +97,6 @@ const validate = (values: MenuCreation) => {
         }
     }
 
-    console.log('errors', errors)
-
     return errors
 }
 

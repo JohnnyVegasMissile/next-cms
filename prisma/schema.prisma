@@ -806,8 +806,9 @@ enum MetricName {
 model Metric {
   id String @id @default(cuid())
 
-  name MetricName
-  day  DateTime
+  name     MetricName
+  day      DateTime
+  language CodeLanguage
 
   value Float
   count Int

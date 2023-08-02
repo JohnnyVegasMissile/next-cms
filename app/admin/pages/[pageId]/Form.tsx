@@ -17,6 +17,7 @@ import {
     message,
     Tooltip,
     DatePicker,
+    Segmented,
 } from 'antd'
 import { PicCenterOutlined, CheckOutlined, LineChartOutlined, QuestionOutlined } from '@ant-design/icons'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -48,7 +49,6 @@ const { Text } = Typography
 
 const validate = (values: PageCreation) => {
     let errors: any = {}
-    console.log('values', values)
 
     if (!values.name) {
         errors.name = 'Required'
@@ -242,7 +242,7 @@ const Form = ({ pageId, isUpdate, page, type, locales, preferred }: FormPageProp
                 </Col>
             </Row>
 
-            <MetricsModal pageId={pageId} showStats={showStats} onShowStatsChange={setShowStats} />
+            <MetricsModal pageId={pageId} showStats={showStats} onShowStatsChange={setShowStats} locales={locales} preferred={preferred} />
         </>
     )
 }
@@ -253,12 +253,15 @@ interface MetricsModalProps {
     pageId: string
     showStats: boolean
     onShowStatsChange: (value: boolean) => void
+    locales: CodeLanguage[]
+    preferred: CodeLanguage
 }
 
-const MetricsModal = ({ pageId, showStats, onShowStatsChange }: MetricsModalProps) => {
-    const [filters, setFilters] = useState<{ from: Dayjs | undefined; to: Dayjs | undefined }>({
+const MetricsModal = ({ pageId, showStats, onShowStatsChange, locales, preferred }: MetricsModalProps) => {
+    const [filters, setFilters] = useState<{ from: Dayjs | undefined; to: Dayjs | undefined; language: CodeLanguage }>({
         from: undefined,
         to: undefined,
+        language: preferred
     })
 
     const metrics = useQuery(
@@ -295,12 +298,19 @@ const MetricsModal = ({ pageId, showStats, onShowStatsChange }: MetricsModalProp
             centered
             open={showStats}
             footer={null}
-            onCancel={() => onShowStatsChange(false)}
+            onCancel={() => {
+                onShowStatsChange(false)
+                setFilters({
+                    from: undefined,
+                    to: undefined,
+                    language: preferred
+                })
+            } }
             width={'90vw'}
             bodyStyle={{ height: '80vh' }}
             title={
                 <>
-                    <Space>
+                    <Space size="middle">
                         <DatePicker
                             style={{ width: 150 }}
                             format={'DD MMM YYYY'}
@@ -337,6 +347,13 @@ const MetricsModal = ({ pageId, showStats, onShowStatsChange }: MetricsModalProp
                             size="small"
                             placeholder="To"
                         />
+                        <Radio.Group
+                            buttonStyle="solid"
+                            value={filters.language}
+                            onChange={(e) => setFilters(f => ({ ...f, language: e.target.value }))}
+                            size="small">
+                            {locales.map(key => <Radio.Button key={key} value={key}><Tooltip title={languages[key].name}>{languages[key].en}{key === preferred && <Text type="warning"> *</Text>}</Tooltip></Radio.Button>)}
+                        </Radio.Group>
                     </Space>
                     <Divider style={{ marginTop: 8, marginBottom: 0 }} />
                 </>

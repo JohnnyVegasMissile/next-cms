@@ -215,10 +215,7 @@ const MetaInput = ({ types, onTypeChange, values, onValuesChange, errors, onDele
                                     {t === 'link' && (
                                         <LinkSelect
                                             value={values?.[idx] as LinkValue}
-                                            onChange={(e) => {
-                                                console.log('link', e)
-                                                onValueChange(idx, e)
-                                            }}
+                                            onChange={(e) => onValueChange(idx, e)}
                                             error={!!errors?.[idx]}
                                         />
                                     )}

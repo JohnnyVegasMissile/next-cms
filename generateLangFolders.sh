@@ -4,8 +4,7 @@ path="app/(web)/(others)/"
 
 rm -rfv $path*
 
-touch $path$lowerCodeLang/.gitkeep
-touch $path$lowerCodeLang/not-found.tsx
+touch $path/not-found.tsx
 
 echo "import { PagesDisplays } from '~/components/PagesDisplays'
 
@@ -57,7 +56,7 @@ export const revalidate = Infinity
 export default Home$codeLang" > $path$lowerCodeLang/page.tsx
 
     mkdir -p $path$lowerCodeLang/[...slug]
-    touch $path$lowerCodeLang/page.tsx
+    touch $path$lowerCodeLang/[...slug]/page.tsx
 
     echo "import { CodeLanguage } from '@prisma/client'
 import { PagesDisplays } from '~/components/PagesDisplays'
@@ -68,7 +67,7 @@ const Slug$codeLang = async ({ params }: { params: { slug: string[] } }) => (
 
 export const revalidate = Infinity
 
-export default Slug$codeLang" > $path$lowerCodeLang/page.tsx
+export default Slug$codeLang" > $path$lowerCodeLang/[...slug]/page.tsx
 
     mkdir -p $path$lowerCodeLang/@sidebar
     touch $path$lowerCodeLang/@sidebar/page.tsx

@@ -18,10 +18,10 @@
         "test:head": "playwright test --headed",
         "analyze": "ANALYZE=true npm run build",
         "--------------------------------------------": "--------------------------------------------",
-        "prebuild": "npm run prisma:prod",
+        "prebuild": "npm run lang:generate && npm run prisma:prod",
         "build": "next build",
         "start": "next start",
-        "predev": "npm run prisma:dev",
+        "predev": "npm run lang:generate && npm run prisma:dev",
         "dev": "next dev -p 8080"
     },
     "prisma": {

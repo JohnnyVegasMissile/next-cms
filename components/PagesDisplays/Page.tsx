@@ -17,6 +17,7 @@ const getProps = async (
     | { sections: SectionResponse[]; redirectUrl?: undefined; exist: true }
     | { sections?: undefined; redirectUrl?: undefined; exist: false }
 > => {
+    console.log(lang, slug, homepage, sidebar)
     const preferred = await prisma.setting.findFirst({
         where: { type: SettingType.LANGUAGE_PREFERRED },
     })

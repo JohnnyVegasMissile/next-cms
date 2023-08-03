@@ -1,10 +1,5 @@
-import { Suspense } from 'react'
 import { PagesDisplays } from '~/components/PagesDisplays'
 
-const HomePrefSide = async () => (
-    <Suspense>
-        <PagesDisplays.Page homepage sidebar />
-    </Suspense>
-)
+const HomePrefSide = async () => <PagesDisplays.Page homepage sidebar />
 
 export default HomePrefSide

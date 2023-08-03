@@ -98,7 +98,6 @@ const OthersPage = async ({
     sidebar?: boolean
 }) => {
     const { sections, exist, redirectUrl } = await getProps(lang, slug, !!homepage, !!sidebar)
-
     if (!!redirectUrl) redirect(redirectUrl, RedirectType.replace)
 
     if (!exist) notFound()

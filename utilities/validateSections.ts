@@ -85,19 +85,19 @@ export const cleanSectionCreation = (values: {
 
                 const stringifiedContent = JSON.stringify(section.value)
 
-                section.medias.forEach((_, key) => {
+                section.medias?.forEach((_, key) => {
                     if (stringifiedContent.includes(`"${key}"`)) medias.push(key)
                 })
 
-                section.forms.forEach((_, key) => {
+                section.forms?.forEach((_, key) => {
                     if (stringifiedContent.includes(`"${key}"`)) forms.push(key)
                 })
 
-                section.links.forEach((_, key) => {
+                section.links?.forEach((_, key) => {
                     if (stringifiedContent.includes(`"${key}"`)) links.push(key)
                 })
 
-                section.menus.forEach((_, key) => {
+                section.menus?.forEach((_, key) => {
                     if (stringifiedContent.includes(`"${key}"`)) menus.push(key)
                 })
 

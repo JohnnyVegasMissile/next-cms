@@ -47,7 +47,9 @@ export default NotFound$codeLang" > $path$lowerCodeLang/not-found.tsx
     touch $path$lowerCodeLang/page.tsx
 
     echo "import { CodeLanguage } from '@prisma/client'
-import { PagesDisplays } from '~/components/PagesDisplays'
+import { PagesDisplays, generateMetadata as getMetas } from '~/components/PagesDisplays'
+
+export const generateMetadata = async () => getMetas('', CodeLanguage.$codeLang)
 
 const Home$codeLang = async () => <PagesDisplays.Page homepage lang={CodeLanguage.$codeLang} />
 
@@ -59,7 +61,10 @@ export default Home$codeLang" > $path$lowerCodeLang/page.tsx
     touch $path$lowerCodeLang/[...slug]/page.tsx
 
     echo "import { CodeLanguage } from '@prisma/client'
-import { PagesDisplays } from '~/components/PagesDisplays'
+import { PagesDisplays, generateMetadata as getMetas } from '~/components/PagesDisplays'
+
+export const generateMetadata = async ({ params }: { params: { slug: string } }) =>
+    getMetas(Array.isArray(params.slug) ? params.slug.join('/') : params.slug, CodeLanguage.$codeLang)
 
 const Slug$codeLang = async ({ params }: { params: { slug: string[] } }) => (
     <PagesDisplays.Page lang={CodeLanguage.$codeLang} slug={params.slug} />

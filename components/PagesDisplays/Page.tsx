@@ -28,7 +28,11 @@ const getProps = async (
     const language = (lang || preferred?.value) as CodeLanguage
 
     if (homepage) {
-        const sections = await getSection({ page: { type: PageType.HOMEPAGE }, language })
+        const sections = await getSection({
+            page: { type: PageType.HOMEPAGE },
+            type: sidebar ? SectionType.PAGE_SIDEBAR : SectionType.PAGE,
+            language,
+        })
 
         return { exist: true, sections }
     }
@@ -107,9 +111,7 @@ const OthersPage = async ({
     return (
         <>
             {sections.map((section) => (
-                <Suspense key={section.id}>
-                    <DisplaySection section={section} />
-                </Suspense>
+                <DisplaySection key={section.id} section={section} />
             ))}
         </>
     )

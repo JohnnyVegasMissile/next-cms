@@ -14,7 +14,14 @@ const ImageBlock = ({ value, medias }: ViewBlockProps<ContentType>) => {
     return (
         <section className={classNames(styles['section'])}>
             <div className={classNames(styles['image-wrapper'])}>
-                <Image fill className="" src={`/storage/images/${img?.uri || ''}`} alt={img?.alt || ''} />
+                <Image
+                    priority
+                    fill
+                    className=""
+                    src={`/storage/images/${img?.uri || ''}`}
+                    alt={img?.alt || ''}
+                    sizes="750px"
+                />
             </div>
         </section>
     )

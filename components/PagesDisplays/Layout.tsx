@@ -144,9 +144,7 @@ const OthersPageLayout = async ({
         <>
             <header>
                 {layoutHeader.map((section) => (
-                    <Suspense key={section.id}>
-                        <DisplaySection section={section} />
-                    </Suspense>
+                    <DisplaySection key={section.id} section={section} />
                 ))}
             </header>
 
@@ -159,38 +157,28 @@ const OthersPageLayout = async ({
                 {sidebar.isActive && (
                     <div className={classNames(styles['aside'], styles[sidebar.breakPoint!])}>
                         {layoutSidebarHeader.map((section) => (
-                            <Suspense key={section.id}>
-                                <DisplaySection section={section} />
-                            </Suspense>
+                            <DisplaySection key={section.id} section={section} />
                         ))}
                         {sideContent}
                         {layoutSidebarFooter.map((section) => (
-                            <Suspense key={section.id}>
-                                <DisplaySection section={section} />
-                            </Suspense>
+                            <DisplaySection key={section.id} section={section} />
                         ))}
                     </div>
                 )}
                 <main className={styles['content']}>
                     {layoutContentHeader.map((section) => (
-                        <Suspense key={section.id}>
-                            <DisplaySection section={section} />
-                        </Suspense>
+                        <DisplaySection key={section.id} section={section} />
                     ))}
                     {content}
                     {layoutContentFooter.map((section) => (
-                        <Suspense key={section.id}>
-                            <DisplaySection section={section} />
-                        </Suspense>
+                        <DisplaySection key={section.id} section={section} />
                     ))}
                 </main>
             </div>
 
             <footer>
                 {layoutFooter.map((section) => (
-                    <Suspense key={section.id}>
-                        <DisplaySection section={section} />
-                    </Suspense>
+                    <DisplaySection key={section.id} section={section} />
                 ))}
             </footer>
         </>

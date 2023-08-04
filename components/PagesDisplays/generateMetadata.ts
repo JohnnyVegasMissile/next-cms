@@ -13,6 +13,7 @@ import {
 import { LinkValue } from '~/components/LinkSelect'
 import { ObjectId } from '~/types'
 import languages from '~/utilities/languages'
+import { ResolvingMetadata } from 'next'
 
 const getLangMetas = async (url: string, lang: CodeLanguage | undefined) => {
     const locales =
@@ -39,7 +40,9 @@ const getLangMetas = async (url: string, lang: CodeLanguage | undefined) => {
 
     for (const locale of locales) {
         if (locale !== preferred) {
-            langs[languages[locale as CodeLanguage].code] = `/${locale}/${url}`
+            langs[languages[locale as CodeLanguage].code] = `/${
+                languages[locale as CodeLanguage].code
+            }/${url}`
         }
     }
 
@@ -71,8 +74,6 @@ const linkToLinkValue = (link: Link): LinkValue => {
 }
 
 const generateMetadata = async (slug: string, lang?: CodeLanguage) => {
-    const langMetas = await getLangMetas(slug, CodeLanguage.EN)
-
     const options = [
         ...general,
         ...formatDetection,
@@ -84,26 +85,47 @@ const generateMetadata = async (slug: string, lang?: CodeLanguage) => {
         ...appLinks,
     ]
 
-    const page = await prisma.page.findFirst({
-        where: { slug: { full: slug } },
+    let language = lang
+
+    if (!language) {
+        const preferred = await prisma.setting.findFirst({
+            where: { type: SettingType.LANGUAGE_PREFERRED },
+        })
+
+        language = (preferred?.value as CodeLanguage) || CodeLanguage.EN
+    }
+
+    const langMetas = await getLangMetas(slug || '', language)
+
+    const exist = await prisma.slug.findFirst({
+        where: { full: slug || '' },
         include: {
-            metadatas: {
-                where: !!lang ? { language: null } : { OR: [{ language: null }, { language: lang }] },
-                include: { values: { include: { link: true, media: true } } },
-                orderBy: { language: { sort: 'asc', nulls: 'first' } },
-            },
+            page: { select: { published: true, name: true } },
+            container: { select: { published: true } },
+            content: { select: { containerId: true, published: true } },
         },
     })
 
-    if (!!page) {
+    if (!!exist?.pageId) {
+        const pageMetadatas = await prisma.metadata.findMany({
+            where: {
+                OR: [
+                    { pageId: exist?.pageId, language: null },
+                    { pageId: exist?.pageId, language },
+                ],
+            },
+            include: { values: { include: { link: true, media: true } } },
+            orderBy: { language: { sort: 'asc', nulls: 'first' } },
+        })
+
         let metadatas: any = {
             ...langMetas,
-            openGraph: { title: page.name },
-            twitter: { title: page.name },
-            appleWebApp: { title: page.name },
+            openGraph: { title: exist?.page?.name },
+            twitter: { title: exist?.page?.name },
+            appleWebApp: { title: exist?.page?.name },
         }
 
-        for (const metadata of page.metadatas) {
+        for (const metadata of pageMetadatas) {
             for (const type of metadata.types) {
                 const opt = options.find((e) => e.value === type)
 

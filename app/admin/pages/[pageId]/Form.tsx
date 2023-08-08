@@ -114,28 +114,30 @@ const Form = ({ pageId, isUpdate, page, type, locales, preferred }: FormPageProp
                     <Text strong>{isUpdate ? 'Update' : 'Create new'} page</Text>
 
                     <Space>
-                        <Button
-                            size="small"
-                            type="primary"
-                            icon={<LineChartOutlined />}
-                            onClick={() => setShowStats(true)}
-                        />
                         {isUpdate && (
-                            <Popconfirm
-                                title="Continue without saving?"
-                                description="Make sure to save your changes."
-                                onConfirm={() => router.push(`/admin/pages/${pageId}/sections`)}
-                                okText="Continue"
-                            >
+                            <>
                                 <Button
-                                    icon={<PicCenterOutlined />}
                                     size="small"
-                                    type="dashed"
-                                    disabled={submit.isLoading}
+                                    type="primary"
+                                    icon={<LineChartOutlined />}
+                                    onClick={() => setShowStats(true)}
+                                />
+                                <Popconfirm
+                                    title="Continue without saving?"
+                                    description="Make sure to save your changes."
+                                    onConfirm={() => router.push(`/admin/pages/${pageId}/sections`)}
+                                    okText="Continue"
                                 >
-                                    Custom sections
-                                </Button>
-                            </Popconfirm>
+                                    <Button
+                                        icon={<PicCenterOutlined />}
+                                        size="small"
+                                        type="dashed"
+                                        disabled={submit.isLoading}
+                                    >
+                                        Custom sections
+                                    </Button>
+                                </Popconfirm>
+                            </>
                         )}
 
                         <Button

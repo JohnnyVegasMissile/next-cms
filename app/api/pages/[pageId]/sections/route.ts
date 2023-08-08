@@ -22,9 +22,7 @@ export async function PUT(request: NextRequest, context: any) {
                 })
 
                 const modified = await prisma.section.update({
-                    where: {
-                        id: section.id,
-                    },
+                    where: { id: section.id },
                     data: {
                         position: parseInt(section.position as unknown as string),
                         content: section.value,

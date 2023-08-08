@@ -1,9 +1,9 @@
 'use client'
 
-import { Badge, Button, Divider, Popconfirm, Space, Tag, Tooltip } from 'antd'
+import { Badge, Button, Divider, Popconfirm, Space, Tag, Tooltip, message } from 'antd'
 import { CopyOutlined, EditOutlined, DeleteOutlined, PicCenterOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
-import { deletePage, getPages } from '~/network/pages'
+import { deletePage, duplicatePage, getPages } from '~/network/pages'
 import { Page, PageType, Slug } from '@prisma/client'
 import Link from 'next/link'
 import dayjs from 'dayjs'
@@ -88,17 +88,10 @@ const columns: ColumnsType<DataType> = [
                     </Tooltip>
                 </Link>
                 <Divider type="vertical" style={{ margin: 0 }} />
-                <Link
-                    href={{
-                        pathname: '/admin/pages',
-                        query: { duplicate: page.id },
-                    }}
-                    prefetch={false}
-                >
-                    <Tooltip title="Duplicate">
-                        <Button icon={<CopyOutlined />} size="small" />
-                    </Tooltip>
-                </Link>
+                <DuplicateButton
+                    page={page.id}
+                    disabled={!(page.type === PageType.PAGE || page.type === PageType.HOMEPAGE)}
+                />
                 {page.type !== PageType.HOMEPAGE && page.type !== PageType.PAGE ? (
                     <Button type="primary" icon={<EditOutlined />} size="small" disabled={true}>
                         Edit
@@ -112,39 +105,43 @@ const columns: ColumnsType<DataType> = [
                         </Tooltip>
                     </Link>
                 )}
-                <DeleteButton pageId={page.id} disabled={page.type !== PageType.PAGE}/>
+                <DeleteButton pageId={page.id} disabled={page.type !== PageType.PAGE} />
             </Space>
         ),
     },
 ]
 
-const DeleteButton = ({ pageId, disabled }: { pageId: ObjectId, disabled: boolean }) => {
+const DeleteButton = ({ pageId, disabled }: { pageId: ObjectId; disabled: boolean }) => {
     const queryClient = useQueryClient()
-    const deletion = useMutation(() => deletePage(pageId), { onSuccess: () => queryClient.invalidateQueries(['pages']) })
+    const deletion = useMutation(() => deletePage(pageId), {
+        onSuccess: () => queryClient.invalidateQueries(['pages']),
+    })
 
-    return <Popconfirm
-                    placement="left"
-                    title="Delete the task"
-                    description="Are you sure to delete this task?"
-                    onConfirm={() => deletion.mutate()}
-                    // onCancel={(e) => e?.stopPropagation()}
-                    okText="Delete"
-                    cancelText="Cancel"
+    return (
+        <Popconfirm
+            placement="left"
+            title="Delete the task"
+            description="Are you sure to delete this task?"
+            onConfirm={() => deletion.mutate()}
+            // onCancel={(e) => e?.stopPropagation()}
+            okText="Delete"
+            cancelText="Cancel"
+            disabled={disabled}
+        >
+            <Tooltip title="Delete">
+                <Button
+                    loading={deletion.isLoading}
                     disabled={disabled}
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                    size="small"
                 >
-                    <Tooltip title="Delete">
-                        <Button
-                            loading={deletion.isLoading}
-                            disabled={disabled}
-                            type="primary"
-                            danger
-                            icon={<DeleteOutlined />}
-                            size="small"
-                        >
-                            Delete
-                        </Button>
-                    </Tooltip>
-                </Popconfirm>
+                    Delete
+                </Button>
+            </Tooltip>
+        </Popconfirm>
+    )
 }
 
 const Pages = () => {
@@ -173,3 +170,35 @@ const Pages = () => {
 
 export const dynamic = 'force-dynamic'
 export default Pages
+
+interface DuplicateButtonProps {
+    page: ObjectId
+    disabled: boolean
+}
+
+const DuplicateButton = ({ page, disabled }: DuplicateButtonProps) => {
+    const queryClient = useQueryClient()
+    const [messageApi, contextHolder] = message.useMessage()
+    const duplicate = useMutation(() => duplicatePage(page), {
+        onSuccess: () => {
+            queryClient.invalidateQueries(['pages'])
+            messageApi.success('Page duplicated')
+        },
+        onError: () => messageApi.error('Error while duplicating page'),
+    })
+
+    return (
+        <>
+            {contextHolder}
+            <Tooltip title="Duplicate">
+                <Button
+                    disabled={disabled}
+                    onClick={() => duplicate.mutate()}
+                    loading={duplicate.isLoading}
+                    icon={<CopyOutlined />}
+                    size="small"
+                />
+            </Tooltip>{' '}
+        </>
+    )
+}

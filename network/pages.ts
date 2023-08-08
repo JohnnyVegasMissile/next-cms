@@ -53,7 +53,7 @@ export const deletePage = (id: ObjectId): Promise<{ message: string }> =>
         url: `/api/pages/${id}`,
         headers: {
             'Content-Type': 'application/json',
-        }
+        },
     })
 
 export const updatePageSections = (
@@ -67,4 +67,13 @@ export const updatePageSections = (
             'Content-Type': 'application/json',
         },
         data,
+    })
+
+export const duplicatePage = (id: ObjectId): Promise<PageResponse> =>
+    INSTANCE({
+        method: 'POST',
+        url: `/api/pages/${id}/duplicate`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
     })

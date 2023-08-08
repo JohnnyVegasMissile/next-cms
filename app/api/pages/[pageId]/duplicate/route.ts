@@ -1,48 +1,71 @@
-import { CodeLanguage, SettingType } from '@prisma/client'
-import dayjs from 'dayjs'
+import { PageType } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '~/utilities/prisma'
 
 export async function POST(_: NextRequest, context: any) {
     const { pageId } = context.params
 
-    const slug = prisma.slug.findUnique({ where: { pageId } })
+    const page = await prisma.page.findUnique({ where: { id: pageId }, include: { slug: true } })
 
-    const metadatas = prisma.metadata.findMany({ where: { pageId }, include: { values: true } })
+    if (
+        !page ||
+        page.type === PageType.NOTFOUND ||
+        page.type === PageType.ERROR ||
+        page.type === PageType.MAINTENANCE
+    )
+        return NextResponse.json({ error: 'Page not found' }, { status: 404 })
 
-    const sections = prisma.section.findMany({ where: { pageId }, include: { linkedData: true } })
-    // const { searchParams } = new URL(request.url)
-    // const from = searchParams.get('from')
-    // const to = searchParams.get('to')
-    // let language = searchParams.get('language') as CodeLanguage | null
+    const newPage = await prisma.page.create({
+        data: {
+            name: page.name,
+            type: PageType.PAGE,
+            published: false,
+            // slug: {
+            //     create: {
+            //         basic: `${page.slug!.basic || 'homepage'}-copy`,
+            //         full: `${page.slug!.full || 'homepage'}-copy`,
+            //     },
+            // },
+        },
+    })
 
-    // let day = undefined
+    let count = 1
+    while (true) {
+        const exist = await prisma.slug.findUnique({
+            where: { full: `${page.slug!.full || 'homepage'} (${count})` },
+        })
 
-    // if (!!from) {
-    //     const gte = dayjs(from)
-    //         .set('hour', 0)
-    //         .set('minute', 0)
-    //         .set('second', 0)
-    //         .set('millisecond', 0)
-    //         .toDate()
+        if (!exist) {
+            await prisma.slug.create({
+                data: {
+                    pageId: newPage.id!,
+                    basic: `${page.slug!.basic || 'homepage'} (${count})`,
+                    full: `${page.slug!.full || 'homepage'} (${count})`,
+                },
+            })
+            break
+        }
 
-    //     day = { ...(day || {}), gte }
-    // }
-    // if (!!to) {
-    //     const lte = dayjs(to).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).toDate()
+        count++
+    }
 
-    //     day = { ...(day || {}), lte }
-    // }
+    const metadatas = await prisma.metadata.findMany({ where: { pageId }, include: { values: true } })
 
-    // if (!language) {
-    //     language = (await prisma.setting.findUnique({ where: { type: SettingType.LANGUAGE_PREFERRED } }))?.value as CodeLanguage
-    // }
+    const sections = await prisma.section.findMany({ where: { pageId }, include: { linkedData: true } })
 
-    // const metrics = await prisma.metric.findMany({
-    //     where: { slug: { pageId }, day, language },
-    //     orderBy: { day: 'asc' },
-    // })
+    for (const section of sections) {
+        await prisma.section.create({
+            data: {
+                type: section.type,
+                block: section.block,
+                position: section.position,
+                language: section.language,
 
-    // // NextResponse extends the Web Response API
-    // return NextResponse.json(metrics)
+                value: section.value || {},
+                pageId: newPage.id!,
+            },
+        })
+    }
+
+    return NextResponse.json(newPage)
 }

@@ -1,16 +1,19 @@
+'use client'
+
 import { Editor, EditorState, RichUtils } from 'draft-js'
 import 'draft-js/dist/Draft.css'
 import { CSSProperties, useEffect, useState } from 'react'
 import { convertFromHTML, convertToHTML } from 'draft-convert'
 
 interface StyledInputProps {
-    value: string
+    value: string | undefined
     onChange(value: string): void
     boldStyle?: CSSProperties
     italicStyle?: CSSProperties
     underlineStyle?: CSSProperties
     strikethroughStyle?: CSSProperties
     noBreak?: boolean
+    placeholder?: string
 }
 
 const StyledInput = ({
@@ -21,6 +24,7 @@ const StyledInput = ({
     underlineStyle,
     strikethroughStyle,
     noBreak,
+    placeholder,
 }: StyledInputProps) => {
     const [isFocus, setIsFocus] = useState(false)
     const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
@@ -106,7 +110,7 @@ const StyledInput = ({
             editorState={editorState}
             onChange={handleOnChange}
             handleKeyCommand={handleKeyCommand}
-            placeholder="cdlsd"
+            placeholder={placeholder || 'Enter value...'}
         />
     )
 }

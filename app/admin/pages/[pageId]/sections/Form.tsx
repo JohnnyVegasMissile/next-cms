@@ -106,9 +106,10 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                 onOpenClick={() => setShowSidebar(!showSidebar)}
                 onResetClick={() => formik.resetForm()}
                 onSubmit={() => formik.submitForm()}
-                onCopy={(code) =>
+                onCopy={(code) => {
                     formik.setFieldValue(`content.${activeLocale}`, formik.values.content?.[code])
-                }
+                    formik.setFieldValue(`sidebar.${activeLocale}`, formik.values.sidebar?.[code])
+                }}
             />
         </>
     )

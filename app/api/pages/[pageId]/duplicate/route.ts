@@ -63,6 +63,16 @@ export async function POST(_: NextRequest, context: any) {
 
                 value: section.value || {},
                 pageId: newPage.id!,
+                linkedData: {
+                    createMany: {
+                        data: section.linkedData.map((e) => ({
+                            mediaId: e.mediaId || undefined,
+                            formId: e.formId || undefined,
+                            linkId: e.linkId || undefined,
+                            menuId: e.menuId || undefined,
+                        })),
+                    },
+                },
             },
         })
     }

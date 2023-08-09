@@ -1,8 +1,8 @@
-// eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextRequest, NextResponse } from 'next/server'
-import { Section, SectionType } from '@prisma/client'
+import { CodeLanguage, Section, SectionType, SettingType } from '@prisma/client'
 import { SectionCreationCleaned } from '~/types/sectionCreation'
 import { prisma } from '~/utilities/prisma'
+import revalidateAllSlugs from '~/utilities/revalidateAllSlugs'
 
 const sectionNames: {
     key: 'header' | 'topSidebar' | 'bottomSidebar' | 'topContent' | 'bottomContent' | 'footer'
@@ -40,55 +40,90 @@ export async function GET(_: NextRequest) {
         })
     }
 
-    // NextResponse extends the Web Response API
     return NextResponse.json(layout)
 }
 
 export async function PUT(request: NextRequest) {
     const newSections = (await request.json()) as {
-        header: SectionCreationCleaned[]
-        topSidebar: SectionCreationCleaned[]
-        bottomSidebar: SectionCreationCleaned[]
-        topContent: SectionCreationCleaned[]
-        bottomContent: SectionCreationCleaned[]
-        footer: SectionCreationCleaned[]
+        header: { [key in CodeLanguage]?: SectionCreationCleaned[] }
+        topSidebar: { [key in CodeLanguage]?: SectionCreationCleaned[] }
+        bottomSidebar: { [key in CodeLanguage]?: SectionCreationCleaned[] }
+        topContent: { [key in CodeLanguage]?: SectionCreationCleaned[] }
+        bottomContent: { [key in CodeLanguage]?: SectionCreationCleaned[] }
+        footer: { [key in CodeLanguage]?: SectionCreationCleaned[] }
     }
 
-    for (const { key, type } of sectionNames) {
-        const content: Section[] = []
+    const locales = (
+        await prisma.setting.findUnique({ where: { type: SettingType.LANGUAGE_LOCALES } })
+    )?.value.split(', ') as CodeLanguage[]
 
-        for (const section of newSections[key]) {
-            if (section.id) {
-                const modified = await prisma.section.update({
-                    where: {
-                        id: section.id,
-                    },
-                    data: {
-                        position: section.position,
-                        content: section.content,
-                    },
-                })
+    for (const option of sectionNames) {
+        const notIn: string[] = []
 
-                content.push(modified)
-            } else {
-                const created = await prisma.section.create({
-                    data: {
-                        type,
-                        block: section.block,
-                        position: section.position,
-                        content: section.content,
-                    },
-                })
+        for (const lang of locales) {
+            if (!newSections[option.key]?.[lang as CodeLanguage]) continue
 
-                content.push(created)
+            const sections = newSections[option.key]?.[lang as CodeLanguage] || []
+
+            for (const section of sections) {
+                if (section.id) {
+                    await prisma.linkedToSection.deleteMany({
+                        where: { sectionId: section.id },
+                    })
+
+                    const modified = await prisma.section.update({
+                        where: { id: section.id },
+                        data: {
+                            position: parseInt(section.position as unknown as string),
+                            value: section.value,
+
+                            linkedData: {
+                                createMany: {
+                                    data: [
+                                        ...section.medias.map((mediaId) => ({ mediaId })),
+                                        ...section.forms.map((formId) => ({ formId })),
+                                        ...section.links.map((linkId) => ({ linkId })),
+                                        ...section.menus.map((menuId) => ({ menuId })),
+                                    ],
+                                },
+                            },
+                        },
+                    })
+
+                    notIn.push(modified.id)
+                } else {
+                    const created = await prisma.section.create({
+                        data: {
+                            language: lang as CodeLanguage,
+                            type: option.type,
+                            block: section.block,
+                            position: parseInt(section.position as unknown as string),
+                            value: section.value,
+
+                            linkedData: {
+                                createMany: {
+                                    data: [
+                                        ...section.medias.map((mediaId) => ({ mediaId })),
+                                        ...section.forms.map((formId) => ({ formId })),
+                                        ...section.links.map((linkId) => ({ linkId })),
+                                        ...section.menus.map((menuId) => ({ menuId })),
+                                    ],
+                                },
+                            },
+                        },
+                    })
+
+                    notIn.push(created.id)
+                }
             }
         }
 
         await prisma.section.deleteMany({
-            where: { id: { notIn: content.map((e) => e.id) }, type },
+            where: { id: { notIn }, type: option.type },
         })
     }
 
-    // NextResponse extends the Web Response API
+    await revalidateAllSlugs()
+
     return NextResponse.json(newSections)
 }

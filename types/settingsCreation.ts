@@ -1,5 +1,11 @@
 import { SettingType } from '@prisma/client'
 
+export type SettingScriptsValue = {
+    type: 'link' | 'script'
+    strategy: 'beforeInteractive' | 'afterInteractive' | 'lazyOnload' | 'worker'
+    value: string
+}[]
+
 type SettingsCreation = {
     [SettingType.SITE_URL]?: string
     [SettingType.INDEXED]?: boolean
@@ -32,6 +38,8 @@ type SettingsCreation = {
 
     [SettingType.SIDEBAR_COLOR]?: `#${string}`
     [SettingType.SIDEBAR_BREAKPOINT_SIZE]?: 'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
+
+    [SettingType.SCRIPTS]?: SettingScriptsValue
 }
 
 export default SettingsCreation

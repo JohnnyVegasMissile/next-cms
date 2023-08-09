@@ -1,6 +1,8 @@
-import { Section, SectionType, SettingType } from '@prisma/client'
+import { CodeLanguage, Section, SectionType, SettingType } from '@prisma/client'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
+import getSection, { SectionResponse } from '~/utilities/getSection'
+import getLanguage from '~/utilities/getLanguage'
 
 const sectionNames: {
     key: 'header' | 'topSidebar' | 'bottomSidebar' | 'topContent' | 'bottomContent' | 'footer'
@@ -16,29 +18,35 @@ const sectionNames: {
 
 const getLayout = async () => {
     let layout: {
-        header: Section[]
-        topSidebar: Section[]
-        bottomSidebar: Section[]
-        topContent: Section[]
-        bottomContent: Section[]
-        footer: Section[]
+        header: { [key in CodeLanguage]?: SectionResponse[] }
+        topSidebar: { [key in CodeLanguage]?: SectionResponse[] }
+        bottomSidebar: { [key in CodeLanguage]?: SectionResponse[] }
+        topContent: { [key in CodeLanguage]?: SectionResponse[] }
+        bottomContent: { [key in CodeLanguage]?: SectionResponse[] }
+        footer: { [key in CodeLanguage]?: SectionResponse[] }
     } = {
-        header: [],
-        topSidebar: [],
-        bottomSidebar: [],
-        topContent: [],
-        bottomContent: [],
-        footer: [],
+        header: {},
+        topSidebar: {},
+        bottomSidebar: {},
+        topContent: {},
+        bottomContent: {},
+        footer: {},
     }
 
     for (const { key, type } of sectionNames) {
-        layout[key] = await prisma.section.findMany({
-            where: { type },
-            orderBy: { position: 'asc' },
-        })
+        const sections = await getSection({ type })
+
+        const filteredContent: { [key in CodeLanguage]?: SectionResponse[] } = {}
+
+        for (const section of sections) {
+            const previous = filteredContent[section.language] || []
+            previous.push(section)
+            filteredContent[section.language] = previous
+        }
+
+        layout[key] = filteredContent
     }
 
-    // NextResponse extends the Web Response API
     return layout
 }
 
@@ -80,8 +88,9 @@ const getSidebar = async () => {
 const UpdateLayout = async () => {
     const layout = await getLayout()
     const sidebar = await getSidebar()
+    const languages = await getLanguage()
 
-    return <Form layout={layout} sidebar={sidebar} />
+    return <Form layout={layout} sidebar={sidebar} {...languages} />
 }
 
 export default UpdateLayout

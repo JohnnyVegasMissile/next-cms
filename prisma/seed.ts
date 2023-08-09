@@ -59,6 +59,8 @@ async function main() {
         { type: SettingType.SIDEBAR_BREAKPOINT_SIZE, value: 'medium' },
         // Maintenance
         { type: SettingType.MAINTENANCE_MODE, value: 'false' },
+        // Scripts
+        { type: SettingType.SCRIPTS, value: '[]' },
     ]
 
     for (const { type, value, visible } of newSettings) {

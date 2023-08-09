@@ -1,5 +1,6 @@
 'use client'
 
+import { ReactNode, useState } from 'react'
 import {
     Avatar,
     Button,
@@ -17,8 +18,6 @@ import {
     message,
     ColorPicker,
     Upload,
-    Tabs,
-    Tooltip,
     Transfer,
     Table,
     Tag,
@@ -28,26 +27,34 @@ import {
     CheckOutlined,
     ReloadOutlined,
     DownloadOutlined,
-    InfoCircleOutlined,
+    DeleteOutlined,
+    PlusOutlined,
 } from '@ant-design/icons'
+import get from 'lodash/get'
+import set from 'lodash/set'
 import { useFormik } from 'formik'
+import { RcFile } from 'antd/es/upload'
+import difference from 'lodash/difference'
 import { useMutation } from '@tanstack/react-query'
-import { updateSettings } from '~/network/settings'
-import SettingsCreation from '~/types/settingsCreation'
 import { CodeLanguage, SettingType } from '@prisma/client'
+
+import languages from '~/utilities/languages'
 import { revalidateAll } from '~/network/api'
 import { exportDB, importDB } from '~/network/db'
-import { RcFile } from 'antd/es/upload'
-import { ReactNode, useState } from 'react'
-import languages from '~/utilities/languages'
-import { TableRowSelection } from 'antd/es/table/interface'
-import { TransferItem } from 'antd/es/transfer'
-import difference from 'lodash/difference'
+import { updateSettings } from '~/network/settings'
+import SettingsCreation from '~/types/settingsCreation'
 
 const { Text } = Typography
 
-const validate = (_: SettingsCreation) => {
-    const errors = {}
+const validate = (values: SettingsCreation) => {
+    const errors: any = {}
+
+    for (let i = 0; i < (values.SCRIPTS?.length || 0); i++) {
+        const script = values.SCRIPTS![i]
+        if (!script!.value) {
+            set(errors, `${SettingType.SCRIPTS}.${i}.value`, 'error')
+        }
+    }
 
     return errors
 }
@@ -71,6 +78,7 @@ const Settings = ({ settings }: FormProps) => {
             updateSettings({
                 ...values,
                 [`${SettingType.LANGUAGE_LOCALES}`]: values[SettingType.LANGUAGE_LOCALES]?.join(', '),
+                [`${SettingType.SCRIPTS}`]: JSON.stringify(values[SettingType.SCRIPTS]),
             }),
         {
             onSuccess: () => message.success('Settings modified with success.'),
@@ -723,6 +731,10 @@ const Settings = ({ settings }: FormProps) => {
                         tab: 'Languages',
                     },
                     {
+                        key: 'scripts',
+                        tab: 'Scripts',
+                    },
+                    {
                         key: 'other',
                         tab: 'Other',
                         disabled: true,
@@ -776,6 +788,135 @@ const Settings = ({ settings }: FormProps) => {
                             </List.Item>
                         )}
                     />
+                )}
+                {tabKey === 'scripts' && (
+                    <>
+                        <List
+                            size="small"
+                            itemLayout="horizontal"
+                            dataSource={formik.values.SCRIPTS}
+                            renderItem={(item, idx) => (
+                                <List.Item key={idx} style={{ padding: 16 }}>
+                                    <div
+                                        style={{
+                                            gap: 8,
+                                            width: '100%',
+                                            display: 'flex',
+                                        }}
+                                    >
+                                        <div style={{ width: '33%', maxWidth: 250 }}>
+                                            <Select
+                                                size="small"
+                                                style={{ width: '100%' }}
+                                                value={item.type}
+                                                onChange={(e) =>
+                                                    formik.setFieldValue(
+                                                        `${SettingType.SCRIPTS}.${idx}.type`,
+                                                        e
+                                                    )
+                                                }
+                                                options={[
+                                                    {
+                                                        value: 'link',
+                                                        label: 'Link',
+                                                    },
+                                                    {
+                                                        value: 'script',
+                                                        label: 'Script',
+                                                    },
+                                                ]}
+                                            />
+                                        </div>
+                                        <div style={{ width: '33%', maxWidth: 250 }}>
+                                            <Select
+                                                size="small"
+                                                style={{ width: '100%' }}
+                                                value={item.strategy}
+                                                onChange={(e) =>
+                                                    formik.setFieldValue(
+                                                        `${SettingType.SCRIPTS}.${idx}.strategy`,
+                                                        e
+                                                    )
+                                                }
+                                                options={[
+                                                    {
+                                                        value: 'afterInteractive',
+                                                        label: 'After interactive',
+                                                    },
+                                                    {
+                                                        value: 'afterLoad',
+                                                        label: 'After load',
+                                                    },
+                                                    {
+                                                        value: 'beforeInteractive',
+                                                        label: 'Before interactive',
+                                                    },
+                                                    {
+                                                        value: 'beforeLoad',
+                                                        label: 'Before load',
+                                                    },
+                                                ]}
+                                            />
+                                        </div>
+                                        {item.type === 'link' && (
+                                            <Input
+                                                status={get(formik, `errors.SCRIPTS.${idx}.value`)}
+                                                size="small"
+                                                style={{ flex: 1 }}
+                                                value={item.value}
+                                                onChange={(e) =>
+                                                    formik.setFieldValue(
+                                                        `${SettingType.SCRIPTS}.${idx}.value`,
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                        )}
+                                        {item.type === 'script' && (
+                                            <Input.TextArea
+                                                status={get(formik, `errors.SCRIPTS.${idx}.value`)}
+                                                size="small"
+                                                style={{ flex: 1 }}
+                                                onChange={(e) =>
+                                                    formik.setFieldValue(
+                                                        `${SettingType.SCRIPTS}.${idx}.value`,
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                        )}
+                                        <Button
+                                            type="primary"
+                                            danger
+                                            icon={<DeleteOutlined />}
+                                            size="small"
+                                            onClick={() => {
+                                                const values = [...(formik.values.SCRIPTS || [])]
+                                                values.splice(idx, 1)
+                                                formik.setFieldValue(SettingType.SCRIPTS, values)
+                                            }}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </List.Item>
+                            )}
+                        />
+
+                        <Button
+                            size="small"
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() =>
+                                formik.setFieldValue(SettingType.SCRIPTS, [
+                                    ...(formik.values.SCRIPTS || []),
+                                    { type: 'link', strategy: 'afterInteractive', value: '' },
+                                ])
+                            }
+                        >
+                            Add script
+                        </Button>
+                    </>
                 )}
             </Card>
         </>

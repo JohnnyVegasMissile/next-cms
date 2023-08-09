@@ -68,12 +68,22 @@ const getProps = async (
         return { langEnabled: true, maintenance: true, maintenanceSections }
     }
 
-    const layoutHeader = await getSection({ type: SectionType.LAYOUT_HEADER })
-    const layoutFooter = await getSection({ type: SectionType.LAYOUT_FOOTER })
-    const layoutSidebarHeader = await getSection({ type: SectionType.LAYOUT_SIDEBAR_TOP })
-    const layoutSidebarFooter = await getSection({ type: SectionType.LAYOUT_SIDEBAR_BOTTOM })
-    const layoutContentHeader = await getSection({ type: SectionType.LAYOUT_CONTENT_TOP })
-    const layoutContentFooter = await getSection({ type: SectionType.LAYOUT_CONTENT_BOTTOM })
+    let language = lang as CodeLanguage
+
+    if (!language) {
+        const preferred = await prisma.setting.findFirst({
+            where: { type: SettingType.LANGUAGE_PREFERRED },
+        })
+
+        language = preferred?.value as CodeLanguage
+    }
+
+    const layoutHeader = await getSection({ type: SectionType.LAYOUT_HEADER, language })
+    const layoutFooter = await getSection({ type: SectionType.LAYOUT_FOOTER, language })
+    const layoutSidebarHeader = await getSection({ type: SectionType.LAYOUT_SIDEBAR_TOP, language })
+    const layoutSidebarFooter = await getSection({ type: SectionType.LAYOUT_SIDEBAR_BOTTOM, language })
+    const layoutContentHeader = await getSection({ type: SectionType.LAYOUT_CONTENT_TOP, language })
+    const layoutContentFooter = await getSection({ type: SectionType.LAYOUT_CONTENT_BOTTOM, language })
 
     const position = await prisma.setting.findUnique({
         where: { type: SettingType.SIDEBAR_POSITION },
@@ -125,6 +135,8 @@ const OthersPageLayout = async ({
         layoutSidebarHeader,
         layoutSidebarFooter,
     } = await getProps(lang)
+
+    console.log('layoutHeader', lang, layoutHeader)
 
     if (!langEnabled) notFound()
 

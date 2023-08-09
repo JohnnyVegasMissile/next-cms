@@ -12,51 +12,37 @@ import { MediaType } from '@prisma/client'
 import StyledInput from '~/components/StyledInput'
 
 const Edit = ({ position }: EditBlockProps) => {
-    const { content, setFieldValue, medias, addMedia } = useSection(position)
-    const { title, subtitle, text, buttons, image, switched } = content || {}
+    const { value, setFieldValue } = useSection<ContentType>(position)
+    const { title } = value || {}
 
     return (
-        <SectionWrap
-            position={position}
-            panel={
-                <MediaModal
-                    value={medias?.get(content.mediaId)}
-                    onChange={(media) => addMedia('mediaId', media)}
-                    mediaType={MediaType.IMAGE}
+        <section className={classNames(styles['section'])}>
+            <div className={classNames(styles['infos'])}>
+                <StyledInput
+                    value={text}
+                    onChange={(e) => setFieldValue('text', e)}
+                    boldStyle={{ color: 'var(--primary-color)' }}
+                    italicStyle={{ color: 'var(--primary-color)' }}
                 />
-            }
-        >
-            <section className={classNames(styles['section'], { [styles['switch']!]: !!switched })}>
-                <div className={classNames(styles['infos'])}>
-                    {title && <h1>{title}</h1>}
-                    {subtitle && <h3>{subtitle}</h3>}
-                    <StyledInput
-                        value={text}
-                        onChange={(e) => setFieldValue('text', e)}
-                        boldStyle={{ color: 'var(--primary-color)' }}
-                        italicStyle={{ color: 'var(--primary-color)' }}
-                    />
 
-                    {!!buttons?.length && (
-                        <div className={classNames(styles['wrap-button'])}>
-                            {buttons.map((btn: any, idx: any) => (
-                                <div
-                                    key={idx}
-                                    className={classNames(styles['button'], {
-                                        [styles['secondary']!]: btn.type === 'secondary',
-                                    })}
-                                >
-                                    <Link href={btn.label}>
-                                        <span>{btn.label}</span>
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                {image && <Image src={image} alt="Picture of the author" height={200} width={300} />}
-            </section>
-        </SectionWrap>
+                {!!buttons?.length && (
+                    <div className={classNames(styles['wrap-button'])}>
+                        {buttons.map((btn: any, idx: any) => (
+                            <div
+                                key={idx}
+                                className={classNames(styles['button'], {
+                                    [styles['secondary']!]: btn.type === 'secondary',
+                                })}
+                            >
+                                <Link href={btn.label}>
+                                    <span>{btn.label}</span>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </section>
     )
 }
 

@@ -1,4 +1,3 @@
-// eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextResponse, NextRequest } from 'next/server'
 import { promises as fs } from 'fs'
 import mime from 'mime-types'

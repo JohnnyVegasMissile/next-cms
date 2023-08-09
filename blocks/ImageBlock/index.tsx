@@ -32,7 +32,7 @@ const Details: BlockDetails = {
     default: {},
     validate: (value: ContentType) => {
         let errors: { [key: string]: string } = {}
-        console.log('value', value)
+
         if (!value.imageId) errors['imageId'] = 'Required'
 
         return errors

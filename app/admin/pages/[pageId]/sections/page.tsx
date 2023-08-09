@@ -1,10 +1,11 @@
-import { CodeLanguage, SectionType, SettingType } from '@prisma/client'
+import { CodeLanguage, SectionType } from '@prisma/client'
 import { notFound } from 'next/navigation'
 import { prisma } from '~/utilities/prisma'
 import Form from './Form'
 import { Metadata } from 'next'
 import getSection, { SectionResponse } from '~/utilities/getSection'
 import getSidebar from '~/utilities/getSidebar'
+import getLanguage from '~/utilities/getLanguage'
 
 export const metadata: Metadata = {
     title: 'Edit page sections',
@@ -36,21 +37,6 @@ const getSections = async (pageId: string) => {
     return {
         content: filteredContent,
         sidebar: filteredSidebar,
-    }
-}
-
-const getLanguage = async () => {
-    const locales = await prisma.setting.findFirst({
-        where: { type: SettingType.LANGUAGE_LOCALES },
-    })
-
-    const preferred = await prisma.setting.findFirst({
-        where: { type: SettingType.LANGUAGE_PREFERRED },
-    })
-
-    return {
-        locales: (locales?.value.split(', ') || [CodeLanguage.EN]) as CodeLanguage[],
-        preferred: (preferred?.value || CodeLanguage.EN) as CodeLanguage,
     }
 }
 

@@ -1,7 +1,6 @@
 import { CodeLanguage, PageType, SectionType, SettingType } from '@prisma/client'
 import { RedirectType } from 'next/dist/client/components/redirect'
 import { notFound, redirect } from 'next/navigation'
-import { Suspense } from 'react'
 import DefaultSection from '~/components/DefaultSection'
 import DisplaySection from '~/components/DisplaySection'
 import getSection, { SectionResponse } from '~/utilities/getSection'

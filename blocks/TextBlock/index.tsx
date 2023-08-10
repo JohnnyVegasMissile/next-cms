@@ -35,7 +35,6 @@ const Details: BlockDetails = {
 
         if (!value.text || value.text === '<br/>') errors['text'] = 'Required'
 
-        console.log('err', errors, value.text)
         return errors
     },
 }

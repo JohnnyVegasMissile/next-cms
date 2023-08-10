@@ -47,8 +47,16 @@ export const SectionsFloatButtons = ({
         const withErrors: CodeLanguage[] = []
 
         Object.keys(errors).forEach((key) => {
+            console.log('errr 0', errors[key])
+
             Object.keys(errors[key]!).forEach((locale) => {
-                if (!errors[key]![locale as CodeLanguage]) {
+                console.log(
+                    'errr 1',
+                    errors[key]![locale as CodeLanguage],
+                    !errors[key]![locale as CodeLanguage]
+                )
+
+                if (!!errors[key]![locale as CodeLanguage]) {
                     withErrors.push(locale as CodeLanguage)
                 }
             })
@@ -67,7 +75,7 @@ export const SectionsFloatButtons = ({
                     icon={null}
                     style={{
                         right: 36 + 40 + 24,
-                        border: !!hasErrors.length ? '1px solid #ff4d4f' : undefined,
+                        outline: !!hasErrors.length ? '2px solid #ff4d4f' : undefined,
                     }}
                     description={
                         <Tooltip
@@ -83,9 +91,14 @@ export const SectionsFloatButtons = ({
                             <FloatButton
                                 key={locale}
                                 type={locale === activeLocale ? 'primary' : 'default'}
+                                style={{
+                                    outline: hasErrors.includes(locale) ? '2px solid #ff4d4f' : undefined,
+                                }}
                                 description={
                                     <Popover
-                                        overlayInnerStyle={{ padding: 8 }}
+                                        overlayInnerStyle={{
+                                            padding: 8,
+                                        }}
                                         placement="left"
                                         content={
                                             <Space>

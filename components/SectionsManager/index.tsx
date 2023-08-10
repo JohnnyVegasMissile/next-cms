@@ -6,6 +6,7 @@ import { SectionsContext } from '~/hooks/useSection'
 import { tempId } from '~/utilities'
 import { useState } from 'react'
 import PopOptions from '../PopOptions'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 
 interface SectionsManagerProps {
     name: string
@@ -16,6 +17,7 @@ interface SectionsManagerProps {
 }
 
 const SectionsManager = ({ name, sections, onChange, error, label }: SectionsManagerProps) => {
+    const [parent] = useAutoAnimate()
     const items = [
         {
             key: 'elements',
@@ -51,6 +53,35 @@ const SectionsManager = ({ name, sections, onChange, error, label }: SectionsMan
         },
     ]
 
+    const handleDelete = (idx: number) => {
+        const newSections = [...sections]
+        newSections.splice(idx, 1)
+
+        for (let i = idx; i < newSections.length; i++) {
+            newSections[i]!.position = i
+        }
+
+        onChange(name, newSections)
+    }
+
+    const handleDown = (idx: number) => {
+        let newSections = [...sections]
+        const temp = newSections[idx]!
+        newSections[idx] = { ...newSections[idx + 1]!, position: idx }
+        newSections[idx + 1] = { ...temp, position: idx + 1 }
+
+        onChange(name, newSections)
+    }
+
+    const handleUp = (idx: number) => {
+        let newSections = [...sections]
+        const temp = newSections[idx]!
+        newSections[idx] = { ...newSections[idx - 1]!, position: idx }
+        newSections[idx - 1] = { ...temp, position: idx - 1 }
+
+        onChange(name, newSections)
+    }
+
     return (
         <>
             <SectionsContext.Provider
@@ -60,18 +91,25 @@ const SectionsManager = ({ name, sections, onChange, error, label }: SectionsMan
                     errors: error as any,
                 }}
             >
-                {sections.map((section, idx) => {
-                    const Block = blocks[section.block].Edit
+                <div ref={parent}>
+                    {sections.map((section, idx) => {
+                        const Block = blocks[section.block].Edit
 
-                    return (
-                        <SectionWrap
-                            key={section.id || section.tempId || idx}
-                            position={section.position}
-                            Edit={Block}
-                            Panel={Block.Panel}
-                        />
-                    )
-                })}
+                        return (
+                            <SectionWrap
+                                key={section.id || section.tempId || idx}
+                                position={section.position}
+                                Edit={Block}
+                                Panel={Block.Panel}
+                                onDelete={() => handleDelete(idx)}
+                                onDown={() => handleDown(idx)}
+                                onUp={() => handleUp(idx)}
+                                isFirst={idx === 0}
+                                isLast={idx === sections.length - 1}
+                            />
+                        )
+                    })}
+                </div>
             </SectionsContext.Provider>
 
             <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
@@ -89,9 +127,23 @@ interface SectionWrapProps {
     position: number
     Edit({ position }: EditBlockProps): JSX.Element
     Panel?({ position }: EditBlockProps): JSX.Element
+    onUp(): void
+    onDown(): void
+    onDelete(): void
+    isFirst: boolean
+    isLast: boolean
 }
 
-const SectionWrap = ({ Edit, Panel, position }: SectionWrapProps) => {
+const SectionWrap = ({
+    Edit,
+    Panel,
+    position,
+    onDelete,
+    onDown,
+    onUp,
+    isFirst,
+    isLast,
+}: SectionWrapProps) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -120,11 +172,11 @@ const SectionWrap = ({ Edit, Panel, position }: SectionWrapProps) => {
                     }}
                 >
                     <PopOptions
-                        onUp={() => {}}
-                        disableUp={true}
-                        onDown={() => {}}
-                        disableDown={true}
-                        onDelete={() => {}}
+                        onUp={onUp}
+                        disableUp={isFirst}
+                        onDown={onDown}
+                        disableDown={isLast}
+                        onDelete={onDelete}
                     >
                         <Button size="small" type="primary" icon={<SettingOutlined />} />
                     </PopOptions>

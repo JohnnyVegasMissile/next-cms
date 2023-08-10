@@ -1,4 +1,4 @@
-arr=( "AF" "SQ" "AR" "EU" "BE" "BG" "CA" "ZH" "HR" "CS" "DA" "NL" "EN" "ET" "FO" "FA" "FI" "FR" "GD" "DE" "EL" "HE" "HI" "HU" "IS" "ID" "GA" "IT" "JA" "KO" "KU" "LV" "LT" "MK" "ML" "MS" "MT" "NO" "NB" "NN" "PL" "PT" "PA" "RM" "RO" "RU" "SR" "SK" "SL" "SB" "ES" "SV" "TH" "TS" "TN" "TR" "UA" "UR" "VE" "VI" "CY" "XH" "JI" "ZU" )
+arr=( "AB" "AA" "AF" "SQ" "AM" "AR" "AN" "HY" "AS" "AY" "AZ" "BA" "EU" "BN" "DZ" "BH" "BI" "BR" "BG" "MY" "BE" "KM" "CA" "ZH" "CO" "HR" "CS" "DA" "NL" "EN" "EO" "ET" "FO" "FA" "FJ" "FI" "FR" "FY" "GD" "GV" "GL" "KA" "DE" "EL" "KL" "GN" "GU" "HT" "HA" "HE" "HI" "HU" "IS" "IO" "ID" "IA" "IE" "IU" "IK" "GA" "IT" "JA" "JV" "KN" "KS" "KK" "RW" "KY" "RN" "KO" "KU" "LO" "LA" "LV" "LI" "LN" "LT" "MK" "MG" "MS" "ML" "MT" "MI" "MR" "MO" "MN" "NA" "NE" "NO" "OC" "OR" "OM" "PS" "PL" "PT" "PA" "QU" "RM" "RO" "RU" "SM" "SG" "SA" "SR" "SH" "ST" "TN" "SN" "II" "SD" "SI" "SS" "SK" "SL" "SO" "ES" "SU" "SW" "SV" "TL" "TG" "TA" "TT" "TE" "TH" "BO" "TI" "TO" "TS" "TR" "TK" "TW" "UG" "UK" "UR" "UZ" "VI" "VO" "WA" "CY" "WO" "XH" "YI" "YO" "ZU" )
 
 path="app/(web)/(others)/"
 

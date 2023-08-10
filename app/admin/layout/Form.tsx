@@ -87,7 +87,7 @@ const Form = ({ layout, sidebar, locales, preferred }: LayoutFormProps) => {
                     name={`header.${activeLocale}`}
                     sections={formik.values.header?.[activeLocale] || []}
                     onChange={formik.setFieldValue}
-                    error={formik.errors.header}
+                    error={formik.errors.header?.[activeLocale]}
                     label="header"
                 />
                 <div
@@ -102,7 +102,7 @@ const Form = ({ layout, sidebar, locales, preferred }: LayoutFormProps) => {
                                 name={`topSidebar.${activeLocale}`}
                                 sections={formik.values.topSidebar?.[activeLocale] || []}
                                 onChange={formik.setFieldValue}
-                                error={formik.errors.topSidebar}
+                                error={formik.errors.topSidebar?.[activeLocale]}
                                 label="top sidebar"
                             />
 
@@ -118,7 +118,7 @@ const Form = ({ layout, sidebar, locales, preferred }: LayoutFormProps) => {
                                 name={`bottomSidebar.${activeLocale}`}
                                 sections={formik.values.bottomSidebar?.[activeLocale] || []}
                                 onChange={formik.setFieldValue}
-                                error={formik.errors.bottomSidebar}
+                                error={formik.errors.bottomSidebar?.[activeLocale]}
                                 label="bottom sidebar"
                             />
                         </div>
@@ -128,7 +128,7 @@ const Form = ({ layout, sidebar, locales, preferred }: LayoutFormProps) => {
                             name={`topContent.${activeLocale}`}
                             sections={formik.values.topContent?.[activeLocale] || []}
                             onChange={formik.setFieldValue}
-                            error={formik.errors.topContent}
+                            error={formik.errors.topContent?.[activeLocale]}
                             label="top content"
                         />
 
@@ -144,7 +144,7 @@ const Form = ({ layout, sidebar, locales, preferred }: LayoutFormProps) => {
                             name={`bottomContent.${activeLocale}`}
                             sections={formik.values.bottomContent?.[activeLocale] || []}
                             onChange={formik.setFieldValue}
-                            error={formik.errors.bottomContent}
+                            error={formik.errors.bottomContent?.[activeLocale]}
                             label="bottom content"
                         />
                     </div>
@@ -153,7 +153,7 @@ const Form = ({ layout, sidebar, locales, preferred }: LayoutFormProps) => {
                     name={`footer.${activeLocale}`}
                     sections={formik.values.footer?.[activeLocale] || []}
                     onChange={formik.setFieldValue}
-                    error={formik.errors.footer}
+                    error={formik.errors.footer?.[activeLocale]}
                     label="footer"
                 />
             </div>

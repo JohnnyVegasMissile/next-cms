@@ -11,9 +11,11 @@ const Edit = ({ position }: EditBlockProps) => {
     const { value, errors, setFieldValue } = useSection<ContentType>(position)
     const { text } = value || {}
 
+    console.log('errrrr', value, errors)
+
     return (
         <section className={classNames(styles['section'])}>
-            <div className={classNames(styles['container'])}>
+            <div className={classNames(styles['container'], { [styles['error']!]: !!errors?.text })}>
                 <StyledInput
                     value={text}
                     onChange={(e) => setFieldValue('text', e)}

@@ -33,8 +33,9 @@ const Details: BlockDetails = {
     validate: (value: ContentType) => {
         let errors: { [key: string]: string } = {}
 
-        if (!value.text) errors['text'] = 'Required'
+        if (!value.text || value.text === '<br/>') errors['text'] = 'Required'
 
+        console.log('err', errors, value.text)
         return errors
     },
 }

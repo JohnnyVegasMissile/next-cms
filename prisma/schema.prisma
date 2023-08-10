@@ -423,69 +423,150 @@ enum SectionType {
 }
 
 enum CodeLanguage {
+  AB
+  AA
   AF
   SQ
+  AM
   AR
+  AN
+  HY
+  AS
+  AY
+  AZ
+  BA
   EU
-  BE
+  BN
+  DZ
+  BH
+  BI
+  BR
   BG
+  MY
+  BE
+  KM
   CA
   ZH
+  CO
   HR
   CS
   DA
   NL
   EN
+  EO
   ET
   FO
   FA
+  FJ
   FI
   FR
+  FY
   GD
+  GV
+  GL
+  KA
   DE
   EL
+  KL
+  GN
+  GU
+  HT
+  HA
   HE
   HI
   HU
   IS
+  IO
   ID
+  IA
+  IE
+  IU
+  IK
   GA
   IT
   JA
+  JV
+  KN
+  KS
+  KK
+  RW
+  KY
+  RN
   KO
   KU
+  LO
+  LA
   LV
+  LI
+  LN
   LT
   MK
-  ML
+  MG
   MS
+  ML
   MT
+  MI
+  MR
+  MO
+  MN
+  NA
+  NE
   NO
-  NB
-  NN
+  OC
+  OR
+  OM
+  PS
   PL
   PT
   PA
+  QU
   RM
   RO
   RU
+  SM
+  SG
+  SA
   SR
+  SH
+  ST
+  TN
+  SN
+  II
+  SD
+  SI
+  SS
   SK
   SL
-  SB
+  SO
   ES
+  SU
+  SW
   SV
+  TL
+  TG
+  TA
+  TT
+  TE
   TH
+  BO
+  TI
+  TO
   TS
-  TN
   TR
-  UA
+  TK
+  TW
+  UG
+  UK
   UR
-  VE
+  UZ
   VI
+  VO
+  WA
   CY
+  WO
   XH
-  JI
+  YI
+  YO
   ZU
 }
 

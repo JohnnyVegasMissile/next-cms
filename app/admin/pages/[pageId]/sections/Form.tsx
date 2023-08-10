@@ -81,7 +81,7 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                             name={`sidebar.${activeLocale}`}
                             sections={formik.values.sidebar?.[activeLocale] || []}
                             onChange={formik.setFieldValue}
-                            error={formik.errors.sidebar}
+                            error={formik.errors.sidebar?.[activeLocale]}
                         />
                     </div>
                 )}
@@ -90,7 +90,7 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                         name={`content.${activeLocale}`}
                         sections={formik.values.content?.[activeLocale] || []}
                         onChange={(a, b) => formik.setFieldValue(a, b)}
-                        error={formik.errors.content}
+                        error={formik.errors.content?.[activeLocale]}
                     />
                 </div>
             </div>

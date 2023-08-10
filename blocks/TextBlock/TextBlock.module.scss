@@ -11,6 +11,10 @@
         max-width: 100%;
         width: 750px;
 
+        &.error {
+            outline: 1px solid #ff4d4f;
+        }
+
         & .text {
             line-height: 1.5rem;
 

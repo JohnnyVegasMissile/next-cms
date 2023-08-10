@@ -110,6 +110,7 @@ const Form = ({ pageId, layout, sidebar, locales, preferred }: FormProps) => {
                     formik.setFieldValue(`content.${activeLocale}`, formik.values.content?.[code])
                     formik.setFieldValue(`sidebar.${activeLocale}`, formik.values.sidebar?.[code])
                 }}
+                errors={formik.errors}
             />
         </>
     )

@@ -404,13 +404,12 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
                                                         <ContentsFilter
                                                             fields={container.data?.fields}
                                                             values={selectedMenu.filters!}
-                                                            onChange={(e) => {
-                                                                console.log(`${nameSelected}.filters`, e)
+                                                            onChange={(e) =>
                                                                 formik.setFieldValue(
                                                                     `${nameSelected}.filters`,
                                                                     e
                                                                 )
-                                                            }}
+                                                            }
                                                         />
                                                         {/* <Divider
                                                             style={{ marginTop: 0, marginBottom: '0.5rem' }}

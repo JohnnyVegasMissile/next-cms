@@ -1,6 +1,7 @@
 .content-wrap {
     display: flex;
     margin: -1rem;
+    min-height: 100%;
 
     &.left {
         flex-direction: row;

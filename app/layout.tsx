@@ -1,4 +1,4 @@
-import { SettingType } from '@prisma/client'
+import { CodeLanguage, SettingType } from '@prisma/client'
 import QueryClientWrapper from '~/components/QueryClientWrapper'
 import defaultColor from '~/utilities/defaultColors.json'
 import getSidebar from '~/utilities/getSidebar'
@@ -6,6 +6,7 @@ import AdminMenu from '~/components/AdminMenu'
 import { prisma } from '~/utilities/prisma'
 import styles from './layout.module.scss'
 import './global.scss'
+import languages from '~/utilities/languages'
 
 // const getLang = async () => {
 //     const locales = await prisma.setting.findUnique({
@@ -25,6 +26,14 @@ import './global.scss'
 // headersList.set('Accept-Language', 'en-US,en;q=0.5')
 // headersList.set('Accept-Language', accept)
 // }
+
+const getPreferred = async () => {
+    const preferred = await prisma.setting.findUnique({
+        where: { type: SettingType.LANGUAGE_PREFERRED },
+    })
+
+    return preferred?.value as CodeLanguage
+}
 
 const getTheme = async () => {
     return await prisma.setting.findMany({
@@ -48,6 +57,7 @@ const getTheme = async () => {
 const Layout = async ({ children }: { children: React.ReactNode }) => {
     const themeSettings = await getTheme()
     const sidebar = await getSidebar()
+    const preferred = await getPreferred()
 
     const backgroundColor =
         themeSettings.find((e) => e.type === SettingType.BACKGROUND_COLOR)?.value ||
@@ -71,8 +81,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
         themeSettings.find((e) => e.type === SettingType.EXTRA_COLOR)?.value || defaultColor.extraColor
 
     return (
-        <html>
-            {/* eslint-disable-next-line @next/next/no-head-element */}
+        <html lang={languages[preferred].code}>
             <head>
                 <link rel="icon" href="/storage/favicon.ico" sizes="any" />
 

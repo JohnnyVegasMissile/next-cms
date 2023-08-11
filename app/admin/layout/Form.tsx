@@ -177,6 +177,7 @@ const Form = ({ layout, sidebar, locales, preferred }: LayoutFormProps) => {
                     formik.setFieldValue(`bottomContent.${activeLocale}`, formik.values.bottomContent?.[code])
                     formik.setFieldValue(`footer.${activeLocale}`, formik.values.footer?.[code])
                 }}
+                errors={formik.errors}
             />
         </>
     )

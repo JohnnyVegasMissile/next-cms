@@ -8,7 +8,7 @@ import { EditBlockProps } from '..'
 import { FormFieldType } from '@prisma/client'
 import WithLabel from '~/components/WithLabel'
 import ListSelect from '~/components/ListSelect'
-import { Typography } from 'antd'
+import { Typography, Alert } from 'antd'
 import { ContentType } from '.'
 import { FormSimple } from '~/types/formCreation'
 import { Fragment } from 'react'
@@ -16,14 +16,20 @@ import { Fragment } from 'react'
 const { Text } = Typography
 
 const Edit = ({ position }: EditBlockProps) => {
-    const { value, forms } = useSection<ContentType>(position)
+    const { value, forms, errors } = useSection<ContentType>(position)
     const { formId } = value || {}
 
     const form = forms?.get(formId || '')
 
     return (
         <section className={classNames(styles['section'])}>
-            {!form ? <Text>Choose a form</Text> : <DisplayFormInputs form={form} />}
+            {!form ? (
+                <div style={{ minWidth: 750 }}>
+                    <Alert message="Choose a form" type={!!errors?.formId ? 'error' : 'info'} showIcon />
+                </div>
+            ) : (
+                <DisplayFormInputs form={form} />
+            )}
         </section>
     )
 }

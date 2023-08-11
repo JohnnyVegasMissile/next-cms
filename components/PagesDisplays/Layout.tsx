@@ -136,8 +136,6 @@ const OthersPageLayout = async ({
         layoutSidebarFooter,
     } = await getProps(lang)
 
-    console.log('layoutHeader', lang, layoutHeader)
-
     if (!langEnabled) notFound()
 
     if (maintenance) {

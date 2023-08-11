@@ -6,6 +6,7 @@ import useSection from '~/hooks/useSection'
 import styles from './TextBlock.module.scss'
 import { EditBlockProps } from '..'
 import { ContentType } from '.'
+import { useRouter } from 'next/router'
 
 const Edit = ({ position }: EditBlockProps) => {
     const { value, errors, setFieldValue } = useSection<ContentType>(position)

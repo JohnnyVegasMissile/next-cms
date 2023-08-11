@@ -7,6 +7,7 @@ import {
     MenuUnfoldOutlined,
     LoadingOutlined,
     CopyOutlined,
+    WarningOutlined,
 } from '@ant-design/icons'
 import { CodeLanguage } from '@prisma/client'
 import languages from '~/utilities/languages'
@@ -46,16 +47,8 @@ export const SectionsFloatButtons = ({
     const hasErrors = useMemo(() => {
         const withErrors: CodeLanguage[] = []
 
-        Object.keys(errors).forEach((key) => {
-            console.log('errr 0', errors[key])
-
+        Object.keys(errors || {}).forEach((key) => {
             Object.keys(errors[key]!).forEach((locale) => {
-                console.log(
-                    'errr 1',
-                    errors[key]![locale as CodeLanguage],
-                    !errors[key]![locale as CodeLanguage]
-                )
-
                 if (!!errors[key]![locale as CodeLanguage]) {
                     withErrors.push(locale as CodeLanguage)
                 }
@@ -73,16 +66,20 @@ export const SectionsFloatButtons = ({
                     trigger="click"
                     type="primary"
                     icon={null}
-                    style={{
-                        right: 36 + 40 + 24,
-                        outline: !!hasErrors.length ? '2px solid #ff4d4f' : undefined,
-                    }}
+                    style={{ right: 36 + 40 + 24 }}
                     description={
                         <Tooltip
                             placement="left"
                             title={`${languages[activeLocale]?.name} (${languages[activeLocale]?.en})`}
                         >
-                            {languages[activeLocale]?.code.toLocaleUpperCase()}
+                            {!!hasErrors.length ? (
+                                <WarningOutlined style={{ color: '#f5222d', fontSize: '1.5rem' }} />
+                            ) : (
+                                <>
+                                    {languages[activeLocale]?.code.toLocaleUpperCase()}
+                                    {preferred === activeLocale && <Text type="warning">*</Text>}
+                                </>
+                            )}
                         </Tooltip>
                     }
                 >
@@ -90,15 +87,11 @@ export const SectionsFloatButtons = ({
                         return (
                             <FloatButton
                                 key={locale}
+                                badge={{ count: hasErrors.includes(locale) ? '!' : 0 }}
                                 type={locale === activeLocale ? 'primary' : 'default'}
-                                style={{
-                                    outline: hasErrors.includes(locale) ? '2px solid #ff4d4f' : undefined,
-                                }}
                                 description={
                                     <Popover
-                                        overlayInnerStyle={{
-                                            padding: 8,
-                                        }}
+                                        overlayInnerStyle={{ padding: 8 }}
                                         placement="left"
                                         content={
                                             <Space>
@@ -118,7 +111,7 @@ export const SectionsFloatButtons = ({
                                         }
                                     >
                                         {languages[locale]?.code.toLocaleUpperCase()}
-                                        {locale === preferred && <Text type="warning">*</Text>}
+                                        {preferred === locale && <Text type="warning">*</Text>}
                                     </Popover>
                                 }
                                 onClick={() => onLocaleChange(locale)}

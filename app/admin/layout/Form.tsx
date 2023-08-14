@@ -10,7 +10,7 @@ import SectionCreation, { SectionCreationCleaned } from '~/types/sectionCreation
 import SectionsManager from '~/components/SectionsManager'
 import { updateLayout } from '~/network/layout'
 import { CodeLanguage, Section } from '@prisma/client'
-import { SectionsFloatButtons } from '~/components/Sections'
+import { SectionsFloatButtons } from '~/components/SectionsFloatButtons'
 import {
     validateSections,
     sectionToSectionCreation,

@@ -10,7 +10,7 @@ import styles from './Form.module.scss'
 import classNames from 'classnames'
 import SectionsManager from '~/components/SectionsManager'
 import { useRouter } from 'next/navigation'
-import { SectionsFloatButtons } from '~/components/Sections'
+import { SectionsFloatButtons } from '~/components/SectionsFloatButtons'
 import {
     cleanSectionCreation,
     sectionToSectionCreation,

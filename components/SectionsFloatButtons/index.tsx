@@ -1,17 +1,17 @@
 import { Button, FloatButton, Popover, Space, Tooltip, Typography } from 'antd'
 import {
+    CopyOutlined,
     MenuOutlined,
     CloseOutlined,
     CheckOutlined,
+    LoadingOutlined,
+    WarningOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
-    LoadingOutlined,
-    CopyOutlined,
-    WarningOutlined,
 } from '@ant-design/icons'
 import { CodeLanguage } from '@prisma/client'
 import languages from '~/utilities/languages'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 const { Text } = Typography
 
@@ -44,6 +44,7 @@ export const SectionsFloatButtons = ({
     onCopy,
     errors,
 }: SectionsFloatButtonsProps) => {
+    const [isOpen, setIsOpen] = useState({ lang: false, setting: false })
     const hasErrors = useMemo(() => {
         const withErrors: CodeLanguage[] = []
 
@@ -62,25 +63,29 @@ export const SectionsFloatButtons = ({
         <>
             {locales.length > 1 && (
                 <FloatButton.Group
+                    open={isOpen.lang}
+                    onOpenChange={(x) => setIsOpen((e) => ({ setting: e.setting, lang: x }))}
                     shape="square"
                     trigger="click"
                     type="primary"
                     icon={null}
                     style={{ right: 36 + 40 + 24 }}
                     description={
-                        <Tooltip
-                            placement="left"
-                            title={`${languages[activeLocale]?.name} (${languages[activeLocale]?.en})`}
-                        >
-                            {!!hasErrors.length ? (
-                                <WarningOutlined style={{ color: '#f5222d', fontSize: '1.5rem' }} />
-                            ) : (
-                                <>
-                                    {languages[activeLocale]?.code.toLocaleUpperCase()}
-                                    {preferred === activeLocale && <Text type="warning">*</Text>}
-                                </>
-                            )}
-                        </Tooltip>
+                        !isOpen.lang && (
+                            <Tooltip
+                                placement="left"
+                                title={`${languages[activeLocale]?.name} (${languages[activeLocale]?.en})`}
+                            >
+                                {!!hasErrors.length ? (
+                                    <WarningOutlined style={{ color: '#f5222d', fontSize: '1.5rem' }} />
+                                ) : (
+                                    <>
+                                        {languages[activeLocale]?.code.toLocaleUpperCase()}
+                                        {preferred === activeLocale && <Text type="warning">*</Text>}
+                                    </>
+                                )}
+                            </Tooltip>
+                        )
                     }
                 >
                     {locales.map((locale) => {
@@ -122,6 +127,13 @@ export const SectionsFloatButtons = ({
             )}
 
             <FloatButton.Group
+                key={'setting'}
+                open={isOpen.setting}
+                onClick={(e) => console.log('kkkk onClick', e)}
+                onOpenChange={(x) => {
+                    console.log('kkkk onOpenChange', x)
+                    setIsOpen((e) => ({ lang: e.lang, setting: x }))
+                }}
                 shape="square"
                 trigger="click"
                 type="primary"

@@ -556,6 +556,10 @@ const Settings = ({ settings }: FormProps) => {
             render: (record: any) => `${record?.name} (${record?.en})`,
         },
         {
+            title: 'Familly',
+            render: (record: any) => record.familly,
+        },
+        {
             width: 75,
             title: 'Code',
             render: (record: any) => <Tag>{record.code}</Tag>,
@@ -574,9 +578,10 @@ const Settings = ({ settings }: FormProps) => {
                     onChange={(e) => formik.setFieldValue(SettingType.LANGUAGE_PREFERRED, e)}
                     placeholder="Preferred language"
                     style={{ width: 200 }}
-                    options={formik.values.LANGUAGE_LOCALES?.map((e) => ({
-                        value: e,
-                        label: languages[e as CodeLanguage]?.name,
+                    options={formik.values.LANGUAGE_LOCALES?.map((key) => ({
+                        value: key,
+                        label: `${languages[key as CodeLanguage]?.name} (${languages[key as CodeLanguage]
+                            ?.en})`,
                     }))}
                 />
             ),
@@ -587,7 +592,7 @@ const Settings = ({ settings }: FormProps) => {
             element: (
                 <Transfer
                     showSearch={true}
-                    style={{ maxWidth: 750 }}
+                    style={{ maxWidth: 1200 }}
                     targetKeys={formik.values.LANGUAGE_LOCALES}
                     oneWay={formik.values.LANGUAGE_LOCALES?.length === 1}
                     dataSource={Object.keys(languages).map((key) => ({

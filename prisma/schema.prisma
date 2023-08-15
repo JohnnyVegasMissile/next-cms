@@ -827,6 +827,7 @@ model MenuChild {
   menuId String
   menu   Menu   @relation(fields: [menuId], references: [id], onDelete: Cascade)
 
+  name     String
   type     MenuChildType
   parentId String?
   parent   MenuChild?    @relation(fields: [parentId], references: [id], name: "childs", onDelete: Cascade)

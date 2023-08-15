@@ -16,6 +16,8 @@ import MenuCreation, { MenuChild } from '~/types/menuCreation'
 import set from 'lodash.set'
 import { MenuChildType } from '@prisma/client'
 import { useRouter } from 'next/navigation'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { tempId } from '~/utilities'
 
 const { Text } = Typography
 
@@ -42,8 +44,8 @@ const validate = (values: MenuCreation) => {
         const menuFirstName = `childs.${i}`
         if (!menuFirstLevel) continue
 
-        if (!menuFirstLevel.label) {
-            set(errors, `${menuFirstName}.label`, 'Required')
+        if (!menuFirstLevel.name) {
+            set(errors, `${menuFirstName}.name`, 'Required')
         }
 
         if (menuFirstLevel.type === 'CONTENT' && !menuFirstLevel.container) {
@@ -61,8 +63,8 @@ const validate = (values: MenuCreation) => {
             const menuSecondName = `${menuFirstName}.childs.${j}`
             if (!menuSecondLevel) continue
 
-            if (!menuSecondLevel?.label) {
-                set(errors, `${menuSecondName}.label`, 'Required')
+            if (!menuSecondLevel?.name) {
+                set(errors, `${menuSecondName}.name`, 'Required')
             }
 
             if (menuSecondLevel.type === 'CONTENT' && !menuSecondLevel.container) {
@@ -80,8 +82,8 @@ const validate = (values: MenuCreation) => {
                 const menuThirdName = `${menuSecondName}.childs.${k}`
                 if (!menuThirdLevel) continue
 
-                if (!menuThirdLevel.label) {
-                    set(errors, `${menuThirdName}.label`, 'Required')
+                if (!menuThirdLevel.name) {
+                    set(errors, `${menuThirdName}.name`, 'Required')
                 }
 
                 if (menuThirdLevel.type === 'CONTENT' && !menuThirdLevel.container) {
@@ -107,6 +109,7 @@ interface FormMenuProps {
 }
 
 const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
+    const [parent] = useAutoAnimate()
     const [selected, setSelected] = useState<number[] | undefined>()
     const router = useRouter()
     const queryClient = useQueryClient()
@@ -176,11 +179,11 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
                     <Text strong>{isUpdate ? 'Update' : 'Create new'} menu</Text>
 
                     <Button
+                        size="small"
                         type="primary"
                         icon={<CheckOutlined />}
-                        size="small"
+                        loading={submit.isLoading}
                         onClick={() => formik.handleSubmit()}
-                        // loading={submit.isLoading}
                     >
                         {isUpdate ? 'Update menu' : 'Create new'}
                     </Button>
@@ -207,15 +210,22 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
 
                 <Row gutter={[16, 16]}>
                     <Col span={16}>
-                        <Space direction="vertical" style={{ width: '100%' }}>
+                        <div ref={parent} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {formik.values.childs.map((level1Menu, idx1) => (
-                                <Fragment key={idx1}>
+                                <div
+                                    key={level1Menu.id || level1Menu.tempId}
+                                    style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+                                >
                                     <MenuLine
+                                        isFirst={idx1 === 0}
+                                        isLast={idx1 === formik.values.childs.length - 1}
+                                        onUp={() => {}}
+                                        onDown={() => {}}
                                         title={labelize[level1Menu.type]}
                                         name={`childs.${idx1}.label`}
                                         type={level1Menu.type}
                                         error={get(formik, `errors.childs.${idx1}`)}
-                                        label={level1Menu.label}
+                                        label={level1Menu.name}
                                         onLabelChange={formik.handleChange}
                                         level={0}
                                         onClick={() => handleSelection([idx1])}
@@ -244,13 +254,20 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
                                         }
                                     />
                                     {level1Menu.childs?.map((level2Menu, idx2) => (
-                                        <Fragment key={`${idx1}/${idx2}`}>
+                                        <div
+                                            key={level2Menu.id || level2Menu.tempId}
+                                            style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+                                        >
                                             <MenuLine
+                                                isFirst={idx2 === 0}
+                                                isLast={idx2 === level1Menu.childs!.length - 1}
+                                                onUp={() => {}}
+                                                onDown={() => {}}
                                                 title={labelize[level2Menu.type]}
                                                 name={`childs.${idx1}.childs.${idx2}.label`}
                                                 type={level2Menu.type}
                                                 error={get(formik, `errors.childs.${idx1}.childs.${idx2}`)}
-                                                label={level2Menu.label}
+                                                label={level2Menu.name}
                                                 onLabelChange={formik.handleChange}
                                                 level={1}
                                                 onClick={() => handleSelection([idx1, idx2])}
@@ -289,7 +306,11 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
                                             />
                                             {level2Menu.childs?.map((level3Menu, idx3) => (
                                                 <MenuLine
-                                                    key={`${idx1}/${idx2}/${idx3}`}
+                                                    key={level3Menu.id || level3Menu.tempId}
+                                                    isFirst={idx3 === 0}
+                                                    isLast={idx3 === level2Menu.childs!.length - 1}
+                                                    onUp={() => {}}
+                                                    onDown={() => {}}
                                                     title={labelize[level3Menu.type]}
                                                     name={`childs.${idx1}.childs.${idx2}.childs.${idx3}.label`}
                                                     type={level3Menu.type}
@@ -297,16 +318,16 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
                                                         formik,
                                                         `errors.childs.${idx1}.childs.${idx2}.childs.${idx3}`
                                                     )}
-                                                    label={level3Menu.label}
+                                                    label={level3Menu.name}
                                                     onLabelChange={formik.handleChange}
                                                     level={2}
                                                     onClick={() => handleSelection([idx1, idx2, idx3])}
                                                     selected={areEqual(selected, [idx1, idx2, idx3])}
                                                 />
                                             ))}
-                                        </Fragment>
+                                        </div>
                                     ))}
-                                </Fragment>
+                                </div>
                             ))}
 
                             <MenuLine.Add
@@ -314,6 +335,7 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
                                     formik.setFieldValue('childs', [
                                         ...formik.values.childs,
                                         {
+                                            tempId: tempId(),
                                             label: '',
                                             childs: type === 'CONTENT' ? undefined : [],
                                             filters: type === 'CONTENT' ? new Map() : undefined,
@@ -330,7 +352,7 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
                                     handleSelection([formik.values.childs.length])
                                 }}
                             />
-                        </Space>
+                        </div>
                     </Col>
                     <Col span={8}>
                         {!!selected && (
@@ -338,7 +360,7 @@ const CreateMenu = ({ menuId, isUpdate, menu }: FormMenuProps) => {
                                 title={
                                     <Text>
                                         {`${labelize[selectedMenu.type]} : `}
-                                        <Text type="secondary">{selectedMenu.label}</Text>
+                                        <Text type="secondary">{selectedMenu.name}</Text>
                                     </Text>
                                 }
                                 size="small"

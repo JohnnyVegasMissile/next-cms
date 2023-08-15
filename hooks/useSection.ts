@@ -1,4 +1,4 @@
-import { Form, Media, Menu } from '@prisma/client'
+import { Form, Media, Menu, MenuChild } from '@prisma/client'
 import { FormikErrors } from 'formik'
 import { createContext, useContext } from 'react'
 import { FormSimple } from '~/types/formCreation'
@@ -47,7 +47,7 @@ const useSection = <T>(position: number) => {
         }
     }
 
-    const addMenu = (name: string, menu: Menu | undefined) => {
+    const addMenu = (name: string, menu: (Menu & { childs: MenuChild[] }) | undefined) => {
         if (!menu) {
             setFieldValue(`${position}.value.${name}`, undefined)
         } else {

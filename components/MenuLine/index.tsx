@@ -18,6 +18,10 @@ interface MenuLineProps {
     onClick(): void
     selected?: boolean
     addChild?(type: 'TITLE' | 'LINK' | 'CONTENT'): void
+    isFirst: boolean
+    isLast: boolean
+    onUp(): void
+    onDown(): void
 }
 
 const MenuLine = ({
@@ -30,6 +34,10 @@ const MenuLine = ({
     onClick,
     selected,
     addChild,
+    isFirst,
+    isLast,
+    onUp,
+    onDown,
 }: MenuLineProps) => {
     const items = [
         { key: 'TITLE', label: 'Title', onClick: () => addChild!('TITLE') },
@@ -40,8 +48,20 @@ const MenuLine = ({
     return (
         <div className={styles['wrapper']} style={{ marginLeft: `${level * 3}rem` }}>
             <Space align="center" direction="vertical" size={1}>
-                <Button size="small" type="primary" icon={<CaretUpOutlined />} />
-                <Button size="small" type="primary" icon={<CaretDownOutlined />} />
+                <Button
+                    size="small"
+                    type="primary"
+                    icon={<CaretUpOutlined />}
+                    disabled={isFirst}
+                    onClick={onUp}
+                />
+                <Button
+                    size="small"
+                    type="primary"
+                    icon={<CaretDownOutlined />}
+                    disabled={isLast}
+                    onClick={onDown}
+                />
             </Space>
             <Card
                 size="small"

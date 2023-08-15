@@ -8,55 +8,43 @@ import useSection from '~/hooks/useSection'
 import { EditBlockProps } from '..'
 import SectionWrap from '~/components/SectionWrap'
 import MediaModal from '~/components/MediaModal'
-import { MediaType } from '@prisma/client'
+import { MediaType, MenuChildType } from '@prisma/client'
 import StyledInput from '~/components/StyledInput'
+import { ContentType } from '.'
 
 const Edit = ({ position }: EditBlockProps) => {
-    const { content, setFieldValue, medias, addMedia } = useSection(position)
-    const { title, subtitle, text, buttons, image, switched } = content || {}
+    const { errors, value, menus, addMenu } = useSection<ContentType>(position)
+    const { menuId } = value || {}
+
+    const menu = menus?.get(menuId || '')
 
     return (
-        <SectionWrap
-            position={position}
-            panel={
-                <MediaModal
-                    value={medias?.get(content.mediaId)}
-                    onChange={(media) => addMedia('mediaId', media)}
-                    mediaType={MediaType.IMAGE}
-                />
-            }
-        >
-            <section className={classNames(styles['section'], { [styles['switch']!]: !!switched })}>
-                <div className={classNames(styles['infos'])}>
-                    {title && <h1>{title}</h1>}
-                    {subtitle && <h3>{subtitle}</h3>}
-                    <StyledInput
-                        value={text}
-                        onChange={(e) => setFieldValue('text', e)}
-                        boldStyle={{ color: 'var(--primary-color)' }}
-                        italicStyle={{ color: 'var(--primary-color)' }}
-                    />
+        <section className={classNames(styles['section'])}>
+            <ul>
+                {menu?.childs.map((child) => {
+                    switch (child.type) {
+                        case MenuChildType.CONTENT:
+                            return (
+                                <li>
+                                    {child.name}
+                                    {/* {!!child.child.length && (
+                                        <ul>
+                                            {child.child.map((e) => (
+                                                <li>{e.name}</li>
+                                            ))}
+                                        </ul>
+                                    )} */}
+                                </li>
+                            )
 
-                    {!!buttons?.length && (
-                        <div className={classNames(styles['wrap-button'])}>
-                            {buttons.map((btn: any, idx: any) => (
-                                <div
-                                    key={idx}
-                                    className={classNames(styles['button'], {
-                                        [styles['secondary']!]: btn.type === 'secondary',
-                                    })}
-                                >
-                                    <Link href={btn.label}>
-                                        <span>{btn.label}</span>
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                {image && <Image src={image} alt="Picture of the author" height={200} width={300} />}
-            </section>
-        </SectionWrap>
+                        case MenuChildType.LINK:
+                            return <></>
+                        case MenuChildType.TITLE:
+                            return <></>
+                    }
+                })}
+            </ul>
+        </section>
     )
 }
 

@@ -3,7 +3,9 @@ import { LinkValue } from '~/components/LinkSelect'
 import { ObjectId } from '.'
 
 export type MenuChild<T> = {
-    label: string
+    id?: ObjectId
+    tempId?: ObjectId
+    name: string
     type: MenuChildType
     link?: LinkValue
     extras: { name: string; value: string }[]
